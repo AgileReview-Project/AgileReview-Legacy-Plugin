@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Insert Comment">
+<intro>
+<description>This tutorial guides you through the creation of your first review.</description>
+</intro>
+<item title="Open View">
+<description>Select Window &gt; Show View &gt; AgileReview Explorer in the menubar. This step changes the perspective to set up the
+Review-Explorer on the left site.
+</description>
+<command
+      required="false"
+      serialization="org.eclipse.ui.views.showView"/>
+</item>
+<item
+      title="Add new Review">
+   <description>
+      With pressing the &quot;+&quot;-button in the Explorerview you can add your first review.
+   </description>
+   <command
+         required="false"
+         serialization="org.eclipse.ui.edit.text.openLocalFile"/>
+</item>
+<item
+      title="Add Review-ID">
+   <description>
+      Please enter the new Review-ID.
+   </description>
+</item>
+<item
+      skip="true"
+      title="Select review">
+   <description>
+      Before you can insert the review details you have to select the new review in the AgileReview-Explorer.
+   </description>
+</item>
+<item
+      skip="true"
+      title="Insert Content">
+   <description>
+      After creating the first review, you have to fill this with content. This is possible with the Review Detail view.
+Please insert your information.
+   </description>
+</item>
+</cheatsheet>

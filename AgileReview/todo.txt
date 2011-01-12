@@ -1,0 +1,31 @@
+- Exception Handling: Fehler über MessageDialog.openError()/MessageDialog.openWarning() darstellen?# -> vllt Zentral auch durch Activator
+	behandeln, wodurch man auch mitloggen kann
+- momentan nicht betrachteter Fall: Alle Kommentare aller Reviews einer Datei anzeigen
+- Save-on-demand
+- Load-on-demand
+- expanden im ReviewExplorer fixen
+- Exception beim Beende von Eclipse beheben
+
+-Speicherarchitektur evtl. an SVN-Speicherstruktur anpassen -> schonmal Refactoring Sicherheit gegen Package Umbenennungen!
+-> Probleme beim Refactoring:
+	- Beispiel Umbenennung von Methodennamen -> Methodennamen ändern sich in überall, wodurch
+		theoretisch alle Offsets und Length Attribute der Kommentare neu berechnet werden müssten.
+		Die Frage ist wie das funktionieren kann wenn die Files nicht offen sind um Annotation notifications
+		zu feuern :(
+
+Iteration 2:
+	UI:
+		ReviewExplorer -> Fertig
+		ReviewDetail -> Fertig
+		Perspective von AgileReview -> Fertig
+		"Review erstellen" Wizard -> Fertig
+		(Kommentar Bubbles) -> vorerst Zurückgestellt
+	Control:
+		Review löschen -> Fertig
+		Review erstellen -> Fertig
+		Review aktivieren -> Logik vorhanden, jedoch noch ohne Anzeige
+		
+		(Codebereich als "gereviewed" markieren)
+		Löschen einer Datei aus Review
+			-> alle Kommentare der Datei löschen
+		Kommentare kontextspezifisch vorfiltern

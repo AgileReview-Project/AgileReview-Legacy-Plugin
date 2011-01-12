@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Delete Comment">
+   <intro>
+		<description>This tutorial guides you through the deleting of a comment.</description>
+	</intro>
+   <item
+         title="Select comment">
+      <description>
+         In this Step you have to select one or more comment(s).This is possible in the table of the &quot;Comments Summary&quot; view.
+      </description>
+   </item>
+   <item
+         title="Delete Comment">
+      <description>
+         Press the &quot;delte Comment&quot; button in the &quot;Comments Summary&quot; view.
+      </description>
+   </item>
+</cheatsheet>

@@ -1,0 +1,840 @@
+package de.tukl.cs.softech.agilereview.view;
+
+import agileReview.softech.tukl.de.CommentDocument.Comment;
+import agileReview.softech.tukl.de.ReferenceDocument.Reference;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.apache.xmlbeans.XmlException;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.ITextEditor;
+
+import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.control.CommentController;
+import de.tukl.cs.softech.agilereview.control.ReviewAccess;
+import de.tukl.cs.softech.agilereview.model.wrapper.AbstractMultipleWrapper;
+import de.tukl.cs.softech.agilereview.model.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.view.commenttable.ExplorerSelectionFilter;
+import de.tukl.cs.softech.agilereview.view.commenttable.AgileCommentFilter;
+import de.tukl.cs.softech.agilereview.view.commenttable.AgileViewerComparator;
+
+/**
+ * Used to provide an overview for review comments using a table
+ */
+public class CommentTableView extends ViewPart implements ISelectionListener, IPartListener2 {
+
+	/**
+	 * Current Instance used by the ViewPart
+	 */
+	private static CommentTableView instance;
+	/**
+	 * The comments to be displayed (model of TableViewer viewer) 
+	 */
+	private ArrayList<Comment> comments;
+	/**
+	 * The comments filtered by the viewers text field (and the explorers selection) 
+	 */
+	private ArrayList<Comment> filteredComments;
+	/**
+	 * The view that displays the comments
+	 */
+	private TableViewer viewer;
+	/**
+	 * Comparator of the view, used to sort columns ascending/descending
+	 */
+	private AgileViewerComparator comparator;
+	/**
+	 * Filter of the view, used to filter by a given search string
+	 */
+	private AgileCommentFilter commentFilter;
+	/**
+	 * Filter of the view, used to filter by selected entries of the explorer
+	 */
+	private ExplorerSelectionFilter selectionFilter = new ExplorerSelectionFilter(new ArrayList<String>(), new HashMap<String, HashSet<String>>());
+	/**
+	 * Should the content of the table be linked to the selections of the explorer?
+	 */
+	private boolean linkExplorer = true;
+	/**
+	 * The number of columns of the parent's GridLayout
+	 */
+	private static final int layoutCols = 6;
+	/**
+	 * The titles of the table's columns, also used to fill the filter menu 
+	 */
+	private String[] titles = { "ReviewID", "CommentID", "Author", "Recipient", "Status", "Priority", "Revision", "Date created", "Date modified", "Replies", "Location" };
+	/**
+	 * The width of the table's columns
+	 */
+	private int[] bounds = { 60, 70, 70, 70, 70, 70, 55, 120, 120, 50, 100 };
+	/**
+	 * The AnnotationModel of the active editor
+	 */
+	private IAnnotationModel annotationModel;
+	/**
+	 * Currently visible annotations given by a position
+	 */
+	private HashMap<Position, ArrayDeque<Annotation>> annotationMap = new HashMap<Position, ArrayDeque<Annotation>>();
+	
+	/**
+	 * Provides the current used instance of the CommentTableView
+	 * @return instance of CommentTableView
+	 */
+	public static CommentTableView getInstance() {
+		return instance;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	public void createPartControl(Composite parent) {
+		instance = this;
+		setAnnotationModel();
+		
+		// get comments from CommentController
+		try {
+			this.comments = ReviewAccess.getInstance().getAllComments();
+			this.filteredComments = this.comments;
+		} catch (XmlException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// set layout of parent
+		GridLayout layout = new GridLayout(layoutCols, false);
+		parent.setLayout(layout);
+		
+		// create UI elements (filter, add-/delete-button)
+		createToolBar(parent);
+		createViewer(parent);
+		
+		// set comparator (sorting order of columns) and filter
+		comparator = new AgileViewerComparator();
+		viewer.setComparator(comparator);
+		commentFilter = new AgileCommentFilter("ALL");
+		viewer.addFilter(commentFilter);
+		
+		// register this class as a selection provider
+		getSite().setSelectionProvider(viewer);
+		
+		// register this class as a selection listener (to observe explorer)
+		getSite().getPage().addSelectionListener(this);
+		
+		//register this class as a part listener (to observe opened and closed editors)
+		getSite().getPage().addPartListener(this);
+		
+		//add help context
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".TableView");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
+	@Override
+	public void setFocus() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/**
+	 * Used to set a new model
+	 * @param comments
+	 */
+	public void setTableContent(ArrayList<Comment> comments) {
+		this.comments = comments;
+		viewer.setInput(comments);
+		viewer.refresh();
+	}
+	
+	/**
+	 * Add a comment to an existing model
+	 * @param comment the comment
+	 */
+	public void addComment(Comment comment) {
+		this.comments.add(comment);
+		this.filteredComments.add(comment);
+		viewer.setInput(this.comments);
+		comment.setReference(Reference.Factory.newInstance());
+		if (getSite().getPage().getActiveEditor() instanceof IEditorPart) {
+			IEditorPart editor = getSite().getPage().getActiveEditor();
+			ISelection selection = ((ITextEditor)editor).getSelectionProvider().getSelection();
+			comment.getReference().setLength(((ITextSelection)selection).getLength());
+			comment.getReference().setOffset(((ITextSelection)selection).getOffset());
+		}
+		addAnnotation(comment);
+		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
+	}
+	
+	/**
+	 * Delete a comment from the model
+	 * @param comment the comment
+	 */
+	public void deleteComment(Comment comment) {
+		this.comments.remove(comment);
+		if (this.filteredComments.contains(comment)) {
+			this.filteredComments.remove(comment);	
+		}		
+		viewer.setInput(this.comments);
+		deleteAnnotation(comment);
+	}
+	
+	/**
+	 * Reload current table input
+	 */
+	public void refreshComments() {
+		viewer.refresh();
+	}
+	
+	/**
+	 * Creates the TableViewer component, sets it's model and layout
+	 * @param parent The parent of the TableViewer
+	 * @return viewer The TableView component of this view
+	 */
+	private TableViewer createViewer(Composite parent) {
+
+		// create viewer
+		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+		createColumns(parent, viewer);
+
+		// set attributes of viewer's table
+		Table table = viewer.getTable();
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
+		// set input for viewer
+		viewer.setContentProvider(new ArrayContentProvider());
+		viewer.setInput(this.comments);
+
+		// provide access to selections of table rows
+		viewer.addSelectionChangedListener(CommentController.getInstance()); // TODO umstellen auf ISelectionListener und dann über SelectionProvider!!!
+		getSite().setSelectionProvider(viewer);
+
+		// set layout of the viewer
+		GridData gridData = new GridData();
+		gridData.verticalAlignment = GridData.FILL;
+		gridData.horizontalSpan = layoutCols;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = true;
+		gridData.horizontalAlignment = GridData.FILL;
+		viewer.getControl().setLayoutData(gridData);
+		
+		// set properties of columns to titles
+		viewer.setColumnProperties(this.titles);
+		
+		return viewer;
+	}
+	
+	/**
+	 * Creates the columns of the viewer and adds label providers to fill cells
+	 * @param parent The parent object of the viewer
+	 * @param viewer The viewer who's columns are to be created
+	 */
+	private void createColumns(Composite parent, TableViewer viewer) {
+		
+		// ReviewID
+		TableViewerColumn col = createColumn(titles[0], bounds[0], 0);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				return c.getReviewID();
+			}
+		});
+		
+		// CommentID
+		col = createColumn(titles[1], bounds[1], 1);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				return c.getId();
+			}
+		});
+		
+		// Author
+		col = createColumn(titles[2], bounds[2], 2);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				return c.getAuthor();
+			}
+		});
+
+		// Recipient
+		col = createColumn(titles[3], bounds[3], 3);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				return c.getRecipient();
+			}
+		});
+		
+		// Status
+		col = createColumn(titles[4], bounds[4], 4);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				String status = PropertiesManager.getInstance().getCommentStatusByID(c.getStatus());			
+				return status;
+			}
+		});
+		
+		// Priority
+		col = createColumn(titles[5], bounds[5], 5);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				String prio = PropertiesManager.getInstance().getCommentPriorityByID(c.getPriority());
+				return prio;
+			}
+		});
+		
+		// Revision
+		col = createColumn(titles[6], bounds[6], 6);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				return String.valueOf(c.getRevision());
+			}
+		});
+		
+		// Date created
+		col = createColumn(titles[7], bounds[7], 7);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				DateFormat df = new SimpleDateFormat( "dd.M.yyyy', 'HH:mm:ss" );				
+				return df.format(c.getCreationDate().getTime());
+			}
+		});
+		
+		// Date modified
+		col = createColumn(titles[8], bounds[8], 8);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				DateFormat df = new SimpleDateFormat( "dd.M.yyyy', 'HH:mm:ss" );
+				return df.format(c.getLastModified().getTime());
+			}
+		});
+		
+		// Number of relplies
+		col = createColumn(titles[9], bounds[9], 9);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				return String.valueOf(c.getReplies().getReplyArray().length);
+			}
+		});
+		
+		// Location
+		col = createColumn(titles[10], bounds[10], 10);
+		col.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				Comment c = (Comment) element;
+				return c.getPath();
+			}
+		});
+	}
+	
+	/**
+	 * Creates a single column of the viewer with given parameters 
+	 * @param title The title to be set
+	 * @param bound The width of the column
+	 * @param colNumber The columns number
+	 * @return The column with given parameters
+	 */
+	private TableViewerColumn createColumn(String title, int bound, int colNumber) {
+		TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
+		TableColumn column = viewerColumn.getColumn();
+		column.setText(title);
+		column.setWidth(bound);
+		column.setResizable(true);
+		column.setMoveable(true);
+		column.addSelectionListener(getSelectionAdapter(column, colNumber));
+		return viewerColumn;
+	}
+	
+	/**
+	 * Get the selection adapter of a given column
+	 * @param column the column 
+	 * @param index the column's index
+	 * @return the columns selection adapter
+	 */
+	private SelectionAdapter getSelectionAdapter(final TableColumn column,
+			final int index) {
+		SelectionAdapter selectionAdapter = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				comparator.setColumn(index);
+				int dir = viewer.getTable().getSortDirection();
+				if (viewer.getTable().getSortColumn() == column) {
+					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+				} else {
+
+					dir = SWT.DOWN;
+				}
+				viewer.getTable().setSortDirection(dir);
+				viewer.getTable().setSortColumn(column);
+				viewer.refresh();
+			}
+		};
+		return selectionAdapter;
+	}
+
+	/**
+	 * create the toolbar containing filter and add/delete buttons
+	 * @param parent the toolsbar's parent
+	 * @return the toolbar
+	 */
+	private ToolBar createToolBar(Composite parent) {
+		// create toolbar
+		final ToolBar toolBar = new ToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+
+		// add dropdown box to toolbar to select category to filter
+		final ToolItem itemDropDown = new ToolItem(toolBar, SWT.DROP_DOWN);
+	    itemDropDown.setText("Search for ALL");
+	    itemDropDown.setToolTipText("Click here to select the filter option");
+
+	    // create listener to submit category changes to dropdown box and filter
+	    Listener selectionListener = new Listener() {
+	    	public void handleEvent(Event event) {
+	    		MenuItem item = (MenuItem)event.widget;
+	    		viewer.removeFilter(commentFilter);
+	    		commentFilter = new AgileCommentFilter(item.getText());
+	    		viewer.addFilter(commentFilter);
+		    	itemDropDown.setText("Search for "+item.getText());
+		    	toolBar.pack();
+		    }
+		};
+		
+	    // create menu for dropdown box
+	    final Menu menu = new Menu(parent.getShell(), SWT.POP_UP);
+	    
+	    // add menu items
+	    MenuItem item = new MenuItem(menu, SWT.PUSH);
+    	item.setText("ALL");
+    	item.addListener(SWT.Selection, selectionListener);
+    	item = new MenuItem(menu, SWT.SEPARATOR);
+	    for (int i=0; i<titles.length; i++) {
+	    	item = new MenuItem(menu, SWT.PUSH);
+	    	item.setText(titles[i]);
+		    item.addListener(SWT.Selection, selectionListener);
+	    }
+	    
+	    // add text field for filter to toolbar
+	    ToolItem itemSeparator = new ToolItem(toolBar, SWT.SEPARATOR);
+	    final Text text = new Text(toolBar, SWT.BORDER | SWT.SINGLE);
+	    text.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent ke) {
+				commentFilter.setSearchText(text.getText());
+				if (!text.getText().equals("")) {
+					deleteAnnotations(getEditorPath());
+					filterComments();
+					addAnnotations(getEditorPath());	
+				} else {
+					deleteAnnotations(getEditorPath());
+					filteredComments = comments;
+					addAnnotations(getEditorPath());
+				}
+				viewer.refresh();		
+			}
+
+		});
+	    text.pack();
+	    itemSeparator.setWidth(text.getBounds().width);
+	    itemSeparator.setControl(text);	   
+	    
+	    // add seperator to toolbar
+	    itemSeparator = new ToolItem(toolBar, SWT.SEPARATOR);
+	    
+	    // add "add comment" button to toolbar
+	    ToolItem itemAddComment = new ToolItem(toolBar, SWT.PUSH);
+	    itemAddComment.setText("Add Comment");
+	    itemAddComment.setData("add");
+	    itemAddComment.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.COMMENT_ADD)).createImage());
+	    itemAddComment.addListener(SWT.Selection, CommentController.getInstance());
+	    
+	    // add "delete comment" button to toolbar
+	    ToolItem itemDelComment = new ToolItem(toolBar, SWT.PUSH);
+	    itemDelComment.setText("Delete Comment");
+	    itemDelComment.setData("delete");
+	    itemDelComment.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.COMMENT_DELETE)).createImage());
+	    itemDelComment.addListener(SWT.Selection, CommentController.getInstance());
+	    
+	    // add "show all comments" button to toolbar
+	    ToolItem itemAllComments = new ToolItem(toolBar, SWT.CHECK);
+	    itemAllComments.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.SYNCED)).createImage());
+	    itemAllComments.setText("Link Explorer");
+	    itemAllComments.setSelection(true);
+	    // add listener to connect and disconnect explorer and table
+	    itemAllComments.addListener(SWT.Selection, new Listener() {
+			
+			@Override
+			public void handleEvent(Event event) {
+				linkExplorer = !linkExplorer;
+				deleteAnnotations(getEditorPath());
+				if (!linkExplorer) {
+					viewer.removeFilter(selectionFilter);
+				} else {
+					viewer.addFilter(selectionFilter);
+				}
+				filterComments();
+				addAnnotations(getEditorPath());
+				viewer.refresh();
+			}
+		});
+	    
+	    // add listener to dropdown box to show menu
+	    itemDropDown.addListener(SWT.Selection, new Listener() {
+		      public void handleEvent(Event event) {
+		        if(event.detail == SWT.ARROW || event.detail == 0) {
+		          Rectangle bounds = itemDropDown.getBounds();
+		          Point point = toolBar.toDisplay(bounds.x, bounds.y + bounds.height);
+		          menu.setLocation(point);
+		          menu.setVisible(true);
+		          text.setFocus();
+		        }
+		      }
+		    });
+	    
+	    toolBar.pack();
+	    
+		return toolBar;
+	}
+		
+	/** Used to add images to add/delete button
+	 * @param path path to the image
+	 * @return an imagedescriptor of the given path
+	 */
+	private static ImageDescriptor createImageDescriptor(String path) {
+	    return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, path);
+	}
+	
+	/**
+	 * Sets the annotationmodel of the viewer to the annotationmodel of the currently opened editor
+	 */
+	public void setAnnotationModel() {
+		if (getSite().getPage().getActiveEditor() instanceof IEditorPart) {
+			IEditorPart editor = getSite().getPage().getActiveEditor();
+			IEditorInput input = editor.getEditorInput();
+			this.annotationModel = ((ITextEditor)editor).getDocumentProvider().getAnnotationModel(input);
+		}
+	}
+	
+	/**
+	 * Removes all AgileReview annotations from the annotationmodel of the currently opened editor
+	 * @param editorFilePath the path of the file displayed in the currently opened editor
+	 */
+	public void deleteAnnotations(String editorFilePath) {
+		for (Comment c : this.filteredComments) {
+			if (editorFilePath.matches(".*"+Pattern.quote(c.getPath()))) {
+				deleteAnnotation(c);
+			}
+		}		
+	}
+	
+	/**
+	 * Adds all AgileReview annotations belonging to the file displayed in the currently opened editor to the annotationmodel
+	 * @param editorFilePath the path of the file displayed in the currently opened editor
+	 */
+	public void addAnnotations(String editorFilePath) {
+		for (Comment c : this.filteredComments) {
+			if (editorFilePath.matches(".*"+Pattern.quote(c.getPath()))) {
+				addAnnotation(c);
+			}
+		}
+	}
+	
+	/**
+	 * Adds a single annotation specified by a comment to the annotation model
+	 * @param comment the comment to be added
+	 */
+	public void addAnnotation(Comment comment) {
+		Position p = new Position(comment.getReference().getOffset(), comment.getReference().getLength());
+		Annotation annotation = new Annotation("AgileReview.comment.annotation",true,comment.getAuthor()+": "+comment.getText());
+		
+		// there's already an annotation at this position
+		if (this.annotationMap.containsKey(p))
+		{
+			this.annotationMap.get(p).add(annotation);
+		}
+		// there's no annotation at this position
+		else
+		{
+			ArrayDeque<Annotation> tmpQueue = new ArrayDeque<Annotation>();
+			tmpQueue.add(annotation);
+			this.annotationMap.put(p, tmpQueue);
+		}
+		
+		this.annotationModel.addAnnotation(annotation, p);
+	}
+	
+	/**
+	 * Deletes a single annotation specified by a comment
+	 * @param comment
+	 */
+	public void deleteAnnotation(Comment comment) {	
+		
+		String editorFilePath = getEditorPath();
+		
+		if (editorFilePath.matches(".*"+Pattern.quote(comment.getPath()))) {
+			Position p = new Position(comment.getReference().getOffset(), comment.getReference().getLength());
+			
+			// Delete from local savings
+			ArrayDeque<Annotation> currQue = this.annotationMap.get(p);
+			Annotation delAnnotation = currQue.remove();
+			if (currQue.isEmpty())
+			{
+				this.annotationMap.remove(p);
+			}
+				
+			// Delete from AnnotationModel
+			Position delPosition = this.annotationModel.getPosition(delAnnotation);
+			delPosition.delete();
+			delAnnotation.markDeleted(true);
+			this.annotationModel.removeAnnotation(delAnnotation);
+		}
+	}
+
+	/**
+	 * Editor has been brought to top, add annotations
+	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partBroughtToTop(IWorkbenchPartReference partRef) {
+		if (partRef.getPart(false) instanceof IEditorPart) {
+			IEditorInput input = ((IEditorPart)partRef.getPart(false)).getEditorInput();
+			if (input != null && input instanceof FileEditorInput) {
+				setAnnotationModel();
+				String editorFilePath = ((FileEditorInput)input).getFile().getLocation().toOSString();
+				addAnnotations(editorFilePath);
+			}
+		}
+	}
+
+	/**
+	 * Editor has been hidden, remove annotations
+	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partHidden(IWorkbenchPartReference partRef) {
+		if (partRef.getPart(false) instanceof IEditorPart) {
+			IEditorInput input = ((IEditorPart)partRef.getPart(false)).getEditorInput();
+			if (input != null && input instanceof FileEditorInput) {
+				String editorFilePath = ((FileEditorInput)input).getFile().getLocation().toOSString();
+				deleteAnnotations(editorFilePath);
+			}
+		}
+	}
+
+	/**
+	 * Not used!
+	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partInputChanged(IWorkbenchPartReference partRef) {
+		//Nothing to do here...		
+	}
+
+	/** 
+	 * Not used!
+	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partOpened(IWorkbenchPartReference partRef) {
+		//Nothing to do here...
+	}
+
+	/**
+	 * Not used!
+	 * @see org.eclipse.ui.IPartListener2#partVisible(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partVisible(IWorkbenchPartReference partRef) {
+		//Nothing to do here...
+	}
+	
+	/**
+	 * Not used!
+	 * @see org.eclipse.ui.IPartListener2#partActivated(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partActivated(IWorkbenchPartReference partRef) {
+		//Nothing to do here...
+	}
+	
+	/**
+	 * Not used!
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partClosed(IWorkbenchPartReference partRef) {
+		//Nothing to do here...
+	}
+
+	/**
+	 * Not used!
+	 * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partDeactivated(IWorkbenchPartReference partRef) {
+		//Nothing to do here...
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
+	@Override
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+		if (linkExplorer) {
+			if(selection != null && part != null) {
+				if(part instanceof ReviewExplorer) {
+					if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
+
+						//if there is a selectionFilter, remove it
+						if (this.selectionFilter != null) {
+							viewer.removeFilter(this.selectionFilter);						
+						}
+
+						//get selection, selection's iterator, initialize reviewIDs and paths
+						IStructuredSelection sel = (IStructuredSelection) selection;
+						Iterator<?> it = sel.iterator();
+						ArrayList<String> reviewIDs = new ArrayList<String>();
+						HashMap<String, HashSet<String>> paths = new HashMap<String, HashSet<String>>(); 
+						
+						// get all selected reviews and paths
+						while (it.hasNext()) {
+							Object next = it.next();
+							if (next instanceof MultipleReviewWrapper) {
+								String reviewID = ((MultipleReviewWrapper)next).getWrappedReview().getId();
+								if (!reviewIDs.contains(reviewID)) {
+									reviewIDs.add(reviewID);
+								}
+							} else if (next instanceof AbstractMultipleWrapper) {
+								String path = ((AbstractMultipleWrapper)next).getPath();
+								String reviewID = ((AbstractMultipleWrapper)next).getReviewId();
+								if (paths.containsKey(reviewID)) {
+									paths.get(reviewID).add(path);
+								} else {
+									paths.put(reviewID, new HashSet<String>());
+									paths.get(reviewID).add(path);
+								}
+								System.out.println(path);
+							}
+						}
+
+						// add a new filter by the given criteria to the viewer
+						this.selectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
+						viewer.addFilter(this.selectionFilter);
+						
+						// refresh annotations, update list of filtered comments
+						deleteAnnotations(getEditorPath());
+						filterComments();
+						addAnnotations(getEditorPath());
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Filter comments by criteria recieved from explorer and search field
+	 */
+	private void filterComments() {
+		List<Object> filteredCommentObjects;
+		if (linkExplorer) {
+			// filter by selections from explorer and search word from text field
+			filteredCommentObjects = Arrays.asList(selectionFilter.filter(viewer, this, commentFilter.filter(viewer, this, this.comments.toArray())));
+		} else {
+			// filter by search word from text field
+			filteredCommentObjects = Arrays.asList(commentFilter.filter(viewer, this, this.comments.toArray()));	
+		}		
+		this.filteredComments = new ArrayList<Comment>();
+		for (Object o : filteredCommentObjects) {
+			filteredComments.add((Comment) o);
+		}
+	}
+	
+	/**
+	 * Get the file path to the file displayed in the currently opened editor
+	 * @return the file path
+	 */
+	private String getEditorPath() {
+		IEditorPart currentEditor = getSite().getPage().getActiveEditor();
+		if (currentEditor == null) {
+			// eclipse is closing
+			return "";
+		}
+		FileEditorInput input = (FileEditorInput) currentEditor.getEditorInput(); 
+		String editorPath = ((FileEditorInput)input).getFile().getLocation().toOSString();
+		return editorPath;
+	}
+	
+	public TableViewer getViewer() {
+		return this.viewer;
+	}
+}
