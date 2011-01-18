@@ -42,8 +42,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPageService;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveListener;
+import org.eclipse.ui.IPerspectiveListener3;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
@@ -67,7 +72,7 @@ import de.tukl.cs.softech.agilereview.view.commenttable.ExplorerSelectionFilter;
 /**
  * Used to provide an overview for review comments using a table
  */
-public class CommentTableView extends ViewPart implements ISelectionListener, IPartListener2 {
+public class CommentTableView extends ViewPart implements ISelectionListener, IPartListener2, IPerspectiveListener3 {
 
 	/**
 	 * Current Instance used by the ViewPart
@@ -113,6 +118,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 * The width of the table's columns
 	 */
 	private int[] bounds = { 60, 70, 70, 70, 70, 70, 55, 120, 120, 50, 100 };
+	private boolean startup = true;
 	
 	/**
 	 * Provides the current used instance of the CommentTableView
@@ -163,6 +169,10 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		
 		//register this class as a part listener (to observe opened and closed editors)
 		getSite().getPage().addPartListener(this);
+		
+//		PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(this);
+		IPageService service = (IPageService) getSite().getService(IPageService.class);
+		service.addPerspectiveListener(this);
 		
 		//add help context
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".TableView");
@@ -608,22 +618,31 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			AnnotationController.getInstance().removeAnnotations(editor);
 		}
 	}
-
-	/**
-	 * Not used!
-	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partInputChanged(IWorkbenchPartReference partRef) {
-		//Nothing to do here...		
-	}
-
+	
 	/** 
 	 * Not used!
 	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	@Override
 	public void partOpened(IWorkbenchPartReference partRef) {
+		//Nothing to do here...
+	}
+	
+	/**
+	 * Not used!
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partClosed(IWorkbenchPartReference partRef) {
+		//Nothing to do here...		
+	}
+	
+	/**
+	 * Not used!
+	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	@Override
+	public void partInputChanged(IWorkbenchPartReference partRef) {
 		//Nothing to do here...		
 	}
 
@@ -645,15 +664,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		//Nothing to do here...
 	}
 	
-	/**
-	 * Not used!
-	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partClosed(IWorkbenchPartReference partRef) {
-		//Nothing to do here...		
-	}
-
 	/**
 	 * Not used!
 	 * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
@@ -741,5 +751,59 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+	@Override
+	public void perspectiveActivated(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective) {
+		if (!perspective.getLabel().equals("AgileReview")) {
+			AnnotationController.getInstance().removeAnnotations((ITextEditor) getActiveEditor());
+			this.startup = false;
+		}
+		if (perspective.getLabel().equals("AgileReview") && !this.startup) { 
+			AnnotationController.getInstance().addAnnotations((ITextEditor) getActiveEditor(), this.filteredComments);
+		}
+	}
+
+	@Override
+	public void perspectiveDeactivated(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective) {
+				
+	}
+
+	@Override
+	public void perspectiveChanged(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective, String changeId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void perspectiveClosed(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void perspectiveOpened(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void perspectiveSavedAs(IWorkbenchPage page,
+			IPerspectiveDescriptor oldPerspective,
+			IPerspectiveDescriptor newPerspective) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void perspectiveChanged(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective,
+			IWorkbenchPartReference partRef, String changeId) {
+		// TODO Auto-generated method stub
+		
+	}
 }
