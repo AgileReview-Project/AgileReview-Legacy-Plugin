@@ -25,6 +25,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.control.ReviewAccess;
+import de.tukl.cs.softech.agilereview.control.AnnotationController;
 import de.tukl.cs.softech.agilereview.model.RERootNode;
 import de.tukl.cs.softech.agilereview.model.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.model.wrapper.MultipleReviewWrapper;
@@ -164,7 +165,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		{
 			try 
 			{
-				Review newRev = RA.createNewReview(in.getValue().trim());
+				Review newRev = RA.createNewReview(in.getValue());
 				MultipleReviewWrapper rWrap = new MultipleReviewWrapper(newRev, newRev.getId());
 				// When a new review is created this should be open
 				rWrap.setOpen(true);

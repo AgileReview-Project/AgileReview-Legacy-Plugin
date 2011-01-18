@@ -68,9 +68,8 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * Creates a new instance of the CommentController
 	 */
 	private CommentController() {
-		while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(this);
-		}
+		while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {}
+		//PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(this);
 	}
 	
 	/**
@@ -84,9 +83,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 	public void handleEvent(Event event) {
 		if((event.widget.getData()) instanceof String) {
 			if(((String)event.widget.getData()).equals("save")) {
-				if(registered.contains(CommentTableView.getInstance().getClass())) {
-					CommentTableView.getInstance().refreshComments();
-				}
+				CommentTableView.getInstance().refreshComments();
 			} else if(((String)event.widget.getData()).equals("delete")) {
 				Iterator<Comment> it = currentSelection.iterator();
 				CommentTableView ctv = CommentTableView.getInstance();

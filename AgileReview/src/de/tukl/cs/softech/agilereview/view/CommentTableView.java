@@ -1,26 +1,20 @@
 package de.tukl.cs.softech.agilereview.view;
 
-import agileReview.softech.tukl.de.CommentDocument.Comment;
-import agileReview.softech.tukl.de.ReferenceDocument.Reference;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlException;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
-import org.eclipse.jface.text.source.Annotation;
-import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -47,27 +41,28 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import agileReview.softech.tukl.de.CommentDocument.Comment;
+import agileReview.softech.tukl.de.ReferenceDocument.Reference;
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.control.AnnotationController;
 import de.tukl.cs.softech.agilereview.control.CommentController;
 import de.tukl.cs.softech.agilereview.control.ReviewAccess;
 import de.tukl.cs.softech.agilereview.model.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.model.wrapper.MultipleReviewWrapper;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.view.commenttable.ExplorerSelectionFilter;
 import de.tukl.cs.softech.agilereview.view.commenttable.AgileCommentFilter;
 import de.tukl.cs.softech.agilereview.view.commenttable.AgileViewerComparator;
+import de.tukl.cs.softech.agilereview.view.commenttable.ExplorerSelectionFilter;
 
 /**
  * Used to provide an overview for review comments using a table
@@ -118,14 +113,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 * The width of the table's columns
 	 */
 	private int[] bounds = { 60, 70, 70, 70, 70, 70, 55, 120, 120, 50, 100 };
-	/**
-	 * The AnnotationModel of the active editor
-	 */
-	private IAnnotationModel annotationModel;
-	/**
-	 * Currently visible annotations given by a position
-	 */
-	private HashMap<Position, ArrayDeque<Annotation>> annotationMap = new HashMap<Position, ArrayDeque<Annotation>>();
 	
 	/**
 	 * Provides the current used instance of the CommentTableView
@@ -141,7 +128,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	@Override
 	public void createPartControl(Composite parent) {
 		instance = this;
-		setAnnotationModel();
 		
 		// get comments from CommentController
 		try {
@@ -180,14 +166,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		
 		//add help context
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".TableView");
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -206,17 +184,23 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 * @param comment the comment
 	 */
 	public void addComment(Comment comment) {
+		// add comment to (un)filtered model
 		this.comments.add(comment);
-		this.filteredComments.add(comment);
-		viewer.setInput(this.comments);
-		comment.setReference(Reference.Factory.newInstance());
-		if (getSite().getPage().getActiveEditor() instanceof IEditorPart) {
-			IEditorPart editor = getSite().getPage().getActiveEditor();
-			ISelection selection = ((ITextEditor)editor).getSelectionProvider().getSelection();
-			comment.getReference().setLength(((ITextSelection)selection).getLength());
-			comment.getReference().setOffset(((ITextSelection)selection).getOffset());
+		if (!this.comments.equals(this.filteredComments)) { 
+			this.filteredComments.add(comment);
 		}
-		addAnnotation(comment);
+		viewer.setInput(this.comments);
+		
+		// create reference for comment
+		comment.setReference(Reference.Factory.newInstance());
+		Position position = getNewCommentPosition();
+		comment.getReference().setLength(position.getLength());
+		comment.getReference().setOffset(position.getOffset());
+		
+		// add annotation
+		AnnotationController.getInstance().addAnnotation((ITextEditor) getActiveEditor(), comment);
+		
+		// set selection (to display comment in detail view)
 		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
 	}
 	
@@ -225,12 +209,40 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 * @param comment the comment
 	 */
 	public void deleteComment(Comment comment) {
+		// add comment to (un)filtered model
 		this.comments.remove(comment);
 		if (this.filteredComments.contains(comment)) {
 			this.filteredComments.remove(comment);	
 		}		
 		viewer.setInput(this.comments);
-		deleteAnnotation(comment);
+		
+		// remove annotation
+		AnnotationController.getInstance().removeAnnotation(comment);
+	}
+
+	/**
+	 * @return the currently active editor
+	 */
+	private IEditorPart getActiveEditor() {
+		return getSite().getPage().getActiveEditor();
+	}
+
+	/**
+	 * @return a position representing the currently selected text, or Position(0,0) if nothing or everything is selected
+	 */
+	private Position getNewCommentPosition() {
+		Position result = new Position(0,0);
+		if (getSite().getPage().getActiveEditor() instanceof IEditorPart) {
+			IEditorPart editor = getSite().getPage().getActiveEditor();
+			IDocument document = ((ITextEditor)editor).getDocumentProvider().getDocument(editor.getEditorInput());
+			ISelection selection = ((ITextEditor)editor).getSelectionProvider().getSelection();
+			int length = ((ITextSelection)selection).getLength();
+			int offset = ((ITextSelection)selection).getOffset();
+			if (!(length == document.getLength())) {
+				result = new Position(offset,length);
+			}
+		}
+		return result;
 	}
 	
 	/**
@@ -492,13 +504,11 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			public void keyReleased(KeyEvent ke) {
 				commentFilter.setSearchText(text.getText());
 				if (!text.getText().equals("")) {
-					deleteAnnotations(getEditorPath());
 					filterComments();
-					addAnnotations(getEditorPath());	
+					AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
 				} else {
-					deleteAnnotations(getEditorPath());
 					filteredComments = comments;
-					addAnnotations(getEditorPath());
+					AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
 				}
 				viewer.refresh();		
 			}
@@ -536,14 +546,13 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			@Override
 			public void handleEvent(Event event) {
 				linkExplorer = !linkExplorer;
-				deleteAnnotations(getEditorPath());
 				if (!linkExplorer) {
 					viewer.removeFilter(selectionFilter);
 				} else {
 					viewer.addFilter(selectionFilter);
 				}
 				filterComments();
-				addAnnotations(getEditorPath());
+				AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
 				viewer.refresh();
 			}
 		});
@@ -573,92 +582,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	private static ImageDescriptor createImageDescriptor(String path) {
 	    return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, path);
 	}
-	
-	/**
-	 * Sets the annotationmodel of the viewer to the annotationmodel of the currently opened editor
-	 */
-	public void setAnnotationModel() {
-		if (getSite().getPage().getActiveEditor() instanceof IEditorPart) {
-			IEditorPart editor = getSite().getPage().getActiveEditor();
-			IEditorInput input = editor.getEditorInput();
-			this.annotationModel = ((ITextEditor)editor).getDocumentProvider().getAnnotationModel(input);
-		}
-	}
-	
-	/**
-	 * Removes all AgileReview annotations from the annotationmodel of the currently opened editor
-	 * @param editorFilePath the path of the file displayed in the currently opened editor
-	 */
-	public void deleteAnnotations(String editorFilePath) {
-		for (Comment c : this.filteredComments) {
-			if (editorFilePath.matches(".*"+Pattern.quote(c.getPath()))) {
-				deleteAnnotation(c);
-			}
-		}		
-	}
-	
-	/**
-	 * Adds all AgileReview annotations belonging to the file displayed in the currently opened editor to the annotationmodel
-	 * @param editorFilePath the path of the file displayed in the currently opened editor
-	 */
-	public void addAnnotations(String editorFilePath) {
-		for (Comment c : this.filteredComments) {
-			if (editorFilePath.matches(".*"+Pattern.quote(c.getPath()))) {
-				addAnnotation(c);
-			}
-		}
-	}
-	
-	/**
-	 * Adds a single annotation specified by a comment to the annotation model
-	 * @param comment the comment to be added
-	 */
-	public void addAnnotation(Comment comment) {
-		Position p = new Position(comment.getReference().getOffset(), comment.getReference().getLength());
-		Annotation annotation = new Annotation("AgileReview.comment.annotation",true,comment.getAuthor()+": "+comment.getText());
-		
-		// there's already an annotation at this position
-		if (this.annotationMap.containsKey(p))
-		{
-			this.annotationMap.get(p).add(annotation);
-		}
-		// there's no annotation at this position
-		else
-		{
-			ArrayDeque<Annotation> tmpQueue = new ArrayDeque<Annotation>();
-			tmpQueue.add(annotation);
-			this.annotationMap.put(p, tmpQueue);
-		}
-		
-		this.annotationModel.addAnnotation(annotation, p);
-	}
-	
-	/**
-	 * Deletes a single annotation specified by a comment
-	 * @param comment
-	 */
-	public void deleteAnnotation(Comment comment) {	
-		
-		String editorFilePath = getEditorPath();
-		
-		if (editorFilePath.matches(".*"+Pattern.quote(comment.getPath()))) {
-			Position p = new Position(comment.getReference().getOffset(), comment.getReference().getLength());
-			
-			// Delete from local savings
-			ArrayDeque<Annotation> currQue = this.annotationMap.get(p);
-			Annotation delAnnotation = currQue.remove();
-			if (currQue.isEmpty())
-			{
-				this.annotationMap.remove(p);
-			}
-				
-			// Delete from AnnotationModel
-			Position delPosition = this.annotationModel.getPosition(delAnnotation);
-			delPosition.delete();
-			delAnnotation.markDeleted(true);
-			this.annotationModel.removeAnnotation(delAnnotation);
-		}
-	}
 
 	/**
 	 * Editor has been brought to top, add annotations
@@ -666,13 +589,10 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 */
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
-		if (partRef.getPart(false) instanceof IEditorPart) {
-			IEditorInput input = ((IEditorPart)partRef.getPart(false)).getEditorInput();
-			if (input != null && input instanceof FileEditorInput) {
-				setAnnotationModel();
-				String editorFilePath = ((FileEditorInput)input).getFile().getLocation().toOSString();
-				addAnnotations(editorFilePath);
-			}
+//		System.out.println(partRef.getPartName()+" brought to top");
+		if (partRef.getPart(false) instanceof ITextEditor) {
+			ITextEditor editor = (ITextEditor) partRef.getPart(false);
+			AnnotationController.getInstance().addAnnotations(editor, this.filteredComments);
 		}
 	}
 
@@ -682,12 +602,10 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 */
 	@Override
 	public void partHidden(IWorkbenchPartReference partRef) {
-		if (partRef.getPart(false) instanceof IEditorPart) {
-			IEditorInput input = ((IEditorPart)partRef.getPart(false)).getEditorInput();
-			if (input != null && input instanceof FileEditorInput) {
-				String editorFilePath = ((FileEditorInput)input).getFile().getLocation().toOSString();
-				deleteAnnotations(editorFilePath);
-			}
+//		System.out.println(partRef.getPartName()+" hidden");
+		if (partRef.getPart(false) instanceof ITextEditor) {
+			ITextEditor editor = (ITextEditor) partRef.getPart(false);
+			AnnotationController.getInstance().removeAnnotations(editor);
 		}
 	}
 
@@ -706,7 +624,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 */
 	@Override
 	public void partOpened(IWorkbenchPartReference partRef) {
-		//Nothing to do here...
+		//Nothing to do here...		
 	}
 
 	/**
@@ -733,7 +651,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 */
 	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
-		//Nothing to do here...
+		//Nothing to do here...		
 	}
 
 	/**
@@ -742,7 +660,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 */
 	@Override
 	public void partDeactivated(IWorkbenchPartReference partRef) {
-		//Nothing to do here...
+		//Nothing to do here...		
 	}
 	
 	/* (non-Javadoc)
@@ -792,9 +710,8 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 						viewer.addFilter(this.selectionFilter);
 						
 						// refresh annotations, update list of filtered comments
-						deleteAnnotations(getEditorPath());
 						filterComments();
-						addAnnotations(getEditorPath());
+						AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
 					}
 				}
 			}
@@ -802,7 +719,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	}
 	
 	/**
-	 * Filter comments by criteria recieved from explorer and search field
+	 * Filter comments by criteria received from explorer and search field
 	 */
 	private void filterComments() {
 		List<Object> filteredCommentObjects;
@@ -818,23 +735,11 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			filteredComments.add((Comment) o);
 		}
 	}
-	
-	/**
-	 * Get the file path to the file displayed in the currently opened editor
-	 * @return the file path
-	 */
-	private String getEditorPath() {
-		IEditorPart currentEditor = getSite().getPage().getActiveEditor();
-		if (currentEditor == null) {
-			// eclipse is closing
-			return "";
-		}
-		FileEditorInput input = (FileEditorInput) currentEditor.getEditorInput(); 
-		String editorPath = ((FileEditorInput)input).getFile().getLocation().toOSString();
-		return editorPath;
+
+	@Override
+	public void setFocus() {
+		// TODO Auto-generated method stub
+		
 	}
 	
-	public TableViewer getViewer() {
-		return this.viewer;
-	}
 }

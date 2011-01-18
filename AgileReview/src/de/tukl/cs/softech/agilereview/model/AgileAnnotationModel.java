@@ -1,7 +1,6 @@
 package de.tukl.cs.softech.agilereview.model;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -13,8 +12,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
- * @author reuter
- * This class is used to store annotations for a given texteditor
+ * This class is used to store annotations for a given text editor
  */
 public class AgileAnnotationModel {
 
@@ -23,16 +21,12 @@ public class AgileAnnotationModel {
 	 */
 	private IAnnotationModel annotationModel;
 	/**
-	 * The annotations added by AgileReview to the annotation model 
+	 * The annotations added by AgileReview to the editor's annotation model 
 	 */
 	private HashMap<Position, ArrayDeque<Annotation>> annotationMap = new HashMap<Position, ArrayDeque<Annotation>>();
-	/**
-	 * Indicates whether the annotations are currently visible or not. 
-	 */
-	private boolean removed = false;
 	
 	/**
-	 * @param editor The texteditor in which the annotations will be displayed
+	 * @param editor The text editor in which the annotations will be displayed
 	 */
 	public AgileAnnotationModel(IEditorPart editor) {
 		IEditorInput input = editor.getEditorInput();
@@ -67,7 +61,6 @@ public class AgileAnnotationModel {
 	/**
 	 * Deletes an existing annotation at a given position p.
 	 * @param p The position where the annotation will be deleted.
-	 * @param text
 	 */
 	public void deleteAnnotation(Position p) {
 		
@@ -88,30 +81,15 @@ public class AgileAnnotationModel {
 	}
 	
 	/**
-	 * Removes all annotations from the editor, but does not delete them completely.
+	 * Removes all annotations from the editor's annotation model.
 	 */
-	public void removeAllAnnoations() {
-		if (!removed) {
+	public void deleteAnnoations() {
+		if (!this.annotationMap.isEmpty()) {
 			for (Entry<Position, ArrayDeque<Annotation>> annotationsAtPosition : annotationMap.entrySet()) {
-				for (Annotation annotation : annotationsAtPosition.getValue()) {
-					this.annotationModel.removeAnnotation(annotation);
+				for (@SuppressWarnings("unused") Annotation annotation : annotationsAtPosition.getValue()) {
+					deleteAnnotation(annotationsAtPosition.getKey());
 				}
 			}
-			removed = true;
-		}
-	}
-	
-	/**
-	 * Shows all annotations 
-	 */
-	public void showAnnotations(ArrayList<Position> positions) {
-		if (removed) {
-			for (Entry<Position, ArrayDeque<Annotation>> annotationsAtPosition : annotationMap.entrySet()) {
-				for (Annotation annotation : annotationsAtPosition.getValue()) {
-					this.annotationModel.addAnnotation(annotation, annotationsAtPosition.getKey());
-				}
-			}
-			removed = true;
 		}
 	}
 	
