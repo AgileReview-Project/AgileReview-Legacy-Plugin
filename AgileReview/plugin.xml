@@ -166,5 +166,11 @@
          commandId="org.eclipse.ui.file.refresh">
    </handler>
 </extension>
+<extension
+      point="org.eclipse.ui.startup">
+   <startup
+         class="de.tukl.cs.softech.agilereview.control.Startup">
+   </startup>
+</extension>
     
 </plugin>

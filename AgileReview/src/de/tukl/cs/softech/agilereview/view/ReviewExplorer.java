@@ -4,20 +4,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE.SharedImages;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
@@ -25,7 +28,6 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.control.ReviewAccess;
-import de.tukl.cs.softech.agilereview.control.AnnotationController;
 import de.tukl.cs.softech.agilereview.model.RERootNode;
 import de.tukl.cs.softech.agilereview.model.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.model.wrapper.MultipleReviewWrapper;
@@ -33,12 +35,13 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.view.explorer.REContentProvider;
 import de.tukl.cs.softech.agilereview.view.explorer.RELabelProvider;
 import de.tukl.cs.softech.agilereview.view.explorer.REOpenAction;
+import de.tukl.cs.softech.agilereview.view.explorer.REViewerComparator;
 
 /**
  * The Review Explorer is the view which shows all reviews as well as 
  * the files and folder which are commented in the corresponding reviews.
  */
-public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
+public class ReviewExplorer extends ViewPart implements IDoubleClickListener, IInputValidator {
 
 	/**
 	 * {@link ReviewAccess} for accessing xml data
@@ -79,6 +82,10 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 * Properties manager for repeated access 
 	 */
 	private PropertiesManager props = PropertiesManager.getInstance();
+	/**
+	 * Pattern for matching the forbidden characters
+	 */
+	private Pattern forbiddenCharPattern;
 	
 	/**
 	 * Instance for Singleton-Pattern
@@ -103,7 +110,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		treeViewer = new TreeViewer(parent);
 		treeViewer.setContentProvider(new REContentProvider());
 		treeViewer.setLabelProvider(new RELabelProvider());
-		treeViewer.setComparator(new ViewerComparator());
+		treeViewer.setComparator(new REViewerComparator());
 		refreshInput();
 		
 		// Define the actions for toolbar
@@ -137,6 +144,18 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 			}
 		};
 		openCloseReviewAction.setToolTipText("Opens or Closes a review. Closed reviews are not loaded.");
+		openCloseReviewAction.setImageDescriptor(ImageDescriptor.createFromImage(PlatformUI.getWorkbench().getSharedImages().getImage(SharedImages.IMG_OBJ_PROJECT_CLOSED)));
+		
+		//TODO export Action
+		/*Action tmp = new Action("export"){
+			public void run() {
+				List<Review> reviews = new ArrayList<Review>();
+				for(MultipleReviewWrapper r : root.getReviews()) {
+					reviews.add(r.getWrappedReview());
+				}
+				XSLExport.exportReviews(reviews);
+			}
+		};*/
 		
 		
 		openFileAction = new REOpenAction(this.getSite().getPage(), treeViewer);
@@ -149,9 +168,17 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		toolbarManager.add(setActiveReviewAction);
 		toolbarManager.add(openCloseReviewAction);
 		
+		//TODO export Action
+		//toolbarManager.add(tmp);
+		
 		treeViewer.addDoubleClickListener(this);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".ReviewExplorer");
 		getSite().setSelectionProvider(treeViewer);
+		
+		// Set inputValidator regex
+		String forbiddenChars = props.getInternalProperty(PropertiesManager.INTERNAL_KEYS.FORBIDDEN_CHARS);
+		String regex = "[^"+Pattern.quote(forbiddenChars)+"]*";
+		this.forbiddenCharPattern = Pattern.compile(regex);
 	}
 	
 	/**
@@ -159,13 +186,13 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	private void addNewReview() 
 	{
-		InputDialog in = new InputDialog(null ,"Add new Review", "Please enter a name for the new Review", "", null);
+		InputDialog in = new InputDialog(null ,"Add new Review", "Please enter a name for the new Review", "", this);
 		int input = in.open();
 		if (input == Window.OK)
 		{
 			try 
 			{
-				Review newRev = RA.createNewReview(in.getValue());
+				Review newRev = RA.createNewReview(in.getValue().trim());
 				MultipleReviewWrapper rWrap = new MultipleReviewWrapper(newRev, newRev.getId());
 				// When a new review is created this should be open
 				rWrap.setOpen(true);
@@ -173,7 +200,6 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 				
 				root.addReview(rWrap);
 				this.refresh();
-				// TODO: dann sind all collapsed. Kann sie auch alle aufmachen, aber gleich doof -> Lsg?
 			} catch (IOException e) 
 			{
 				// TODO: Auto-generated method stub
@@ -225,7 +251,6 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 			props.removeFromOpenReviews(wrap.getReviewId());
 
 			this.refresh();
-			// TODO: dann sind all collapsed. Kann sie auch alle aufmachen, aber gleich doof -> Lsg?
 		}
 		treeViewer.getTree().setRedraw(true);
 	}
@@ -372,5 +397,16 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		if(openFileAction.isEnabled()){
 			openFileAction.run();
 		}
+	}
+
+	@Override
+	public String isValid(String newText) 
+	{
+		String result = null;
+		if (!this.forbiddenCharPattern.matcher(newText).matches())
+		{
+			result = "Please don't use any of the following characters: "+props.getInternalProperty(PropertiesManager.INTERNAL_KEYS.FORBIDDEN_CHARS);
+		}
+		return result;
 	}
 }

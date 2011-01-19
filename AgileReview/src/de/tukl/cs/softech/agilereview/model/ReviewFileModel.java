@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -171,4 +172,21 @@ public class ReviewFileModel {
 		return this.xmlCommentDocuments.containsKey(file) || this.xmlReviewDocuments.containsKey(file);
 	}
 	
+	/**
+	 * Returns all stored CommentsDocuments
+	 * @return all stored CommentsDocuments
+	 */
+	public Collection<CommentsDocument> getAllCommentsDocument()
+	{
+		return this.xmlCommentDocuments.values();
+	}
+	
+	/**
+	 * Returns all stored ReviewDocuments
+	 * @return all stored ReviewDocuments
+	 */
+	public Collection<ReviewDocument> getAllReviewDocument()
+	{
+		return this.xmlReviewDocuments.values();
+	}
 }

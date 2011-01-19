@@ -71,15 +71,15 @@ public class AgileAnnotationModel {
 		// Delete from local savings
 		ArrayDeque<Annotation> currQue = this.annotationMap.get(p);
 		Annotation delAnnotation = currQue.remove();
+
+		// Delete from AnnotationModel
+		Position delPosition = this.annotationModel.getPosition(delAnnotation);
 		if (currQue.isEmpty())
 		{
 			this.annotationMap.remove(p);
+			delAnnotation.markDeleted(true);
+			delPosition.delete();
 		}
-			
-		// Delete from AnnotationModel
-		Position delPosition = this.annotationModel.getPosition(delAnnotation);
-		delPosition.delete();
-		delAnnotation.markDeleted(true);
 		this.annotationModel.removeAnnotation(delAnnotation);
 		
 	}
@@ -92,8 +92,11 @@ public class AgileAnnotationModel {
 			HashSet<Position> delPos = new HashSet<Position>();
 			delPos.addAll(annotationMap.keySet());
 			for (Position position : delPos) {
-				ArrayDeque<Annotation> delAnnotations = this.annotationMap.get(position).clone();
-				for (Annotation annotation : delAnnotations) {
+				int numberOfAnnotations = 0;
+				for (Annotation annotation : this.annotationMap.get(position)) {
+					numberOfAnnotations++;
+				}
+				for (int i=0; i<numberOfAnnotations; i++) {
 					deleteAnnotation(position);
 				}
 			}

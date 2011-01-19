@@ -32,6 +32,14 @@ public class PropertiesManager {
 		 */
 		public static String SOURCE_FOLDER = "source_folder";
 		/**
+		 * The separator character to combine reviewId, author and commentId
+		 */
+		public static String KEY_SEPARATOR = "key_separator";
+		/**
+		 * Characters which are not allowed in ReviewIds and author names
+		 */
+		public static String FORBIDDEN_CHARS = "forbidden_chars";
+		/**
 		 * Possible values for a comment's priority
 		 */
 		public static String COMMENT_PRIORITIES = "comment_priority";
@@ -115,7 +123,7 @@ public class PropertiesManager {
 	/**
 	 * loaded external properties
 	 */
-	private Preferences externalPreferences;
+	private Preferences externalPreferences; 
 	/**
 	 * Strings representing the configured status of Comments
 	 */
@@ -161,7 +169,7 @@ public class PropertiesManager {
 	/**
 	 * Returns the property according to the given key
 	 * @param key for the requested value
-	 * @return the requested value //TODO or null??
+	 * @return the requested value or null if no mapping exists
 	 */
 	public String getInternalProperty(String key) {
 		return internalProperties.getProperty(key);
@@ -190,11 +198,11 @@ public class PropertiesManager {
 	 * @param reviewId Id of the review to be added
 	 */
 	public void addToOpenReviews(String reviewId)
-	{// TODO: using "." as separator is bad. Think of something better
+	{
 		String strKey = PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS;
 		String oldValue = getExternalPreference(strKey);
 		
-		if (oldValue.equals(""))
+		if (oldValue.isEmpty())
 		{
 			// This mapping does not exist
 			setExternalPreference(strKey, reviewId);
@@ -202,7 +210,7 @@ public class PropertiesManager {
 		else
 		{
 			// Mapping is existent
-			String newValue = oldValue + "." + reviewId;
+			String newValue = oldValue + this.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR) + reviewId;
 			setExternalPreference(strKey, newValue);
 		}
 	}
@@ -213,11 +221,29 @@ public class PropertiesManager {
 	 */
 	public void removeFromOpenReviews(String reviewId)
 	{
+		String keySeparator = this.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		String oldValue = getExternalPreference(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS);
-		String newValue = oldValue.replaceAll("\\.?"+Pattern.quote(reviewId)+"\\.?", "");
-		newValue = newValue.replaceAll("\\.\\.", "\\.");
+		String[] group = oldValue.split(Pattern.quote(keySeparator));
+		
+		String newValue = "";
+		for (String currID :group)
+		{
+			if (!reviewId.equals(currID))
+			{
+				if (newValue.isEmpty())
+				{
+					newValue = currID;
+				}
+				else
+				{
+					newValue = newValue + keySeparator + currID;
+				}
+			}
+		}
 		setExternalPreference(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS, newValue);
 	}
+	
+	
 	/**
 	 * Returns all reviews which are declared to be "open" in the workspace-specific preferences of this plugin
 	 * @return Array of IDs of all review which are "open"
@@ -233,7 +259,7 @@ public class PropertiesManager {
 		}
 		else
 		{
-			result = val.split("\\.");
+			result = val.split(Pattern.quote(this.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
 		}
 	
 		return result;

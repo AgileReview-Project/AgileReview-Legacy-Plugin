@@ -229,6 +229,8 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		
 		// set selection (to display comment in detail view)
 		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
+		
+		System.out.println(this.comments);
 	}
 	
 	/**

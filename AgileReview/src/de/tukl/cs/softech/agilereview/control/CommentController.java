@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
@@ -23,7 +24,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
-
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.view.CommentTableView;
 import de.tukl.cs.softech.agilereview.view.DetailView;
@@ -68,10 +68,74 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * Creates a new instance of the CommentController
 	 */
 	private CommentController() {
-		while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {}
-		//PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(this);
+		//wait until all necessary elements are initialized
+		Display.getCurrent().asyncExec(new Runnable() {		
+			@Override
+			public void run() {
+				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {}
+				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {}
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(CommentController.this);
+			}
+		});
 	}
 	
+	/**
+	 * Adds a new comment
+	 */
+	private void addNewComment()  {
+		if (!PropertiesManager.getInstance().getActiveReview().isEmpty())
+		{
+			try
+			{
+				String pathToFile = "";
+				IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+				if ( part instanceof ITextEditor ) {
+					IEditorInput input = part.getEditorInput();
+					if (input != null && input instanceof FileEditorInput) {
+						pathToFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
+					}
+				}
+				String activeReview = PropertiesManager.getInstance().getActiveReview();
+				Comment newComment = ra.createNewComment(activeReview , System.getProperty("user.name"), pathToFile);
+				CommentTableView.getInstance().addComment(newComment);
+				// Refresh the Review Explorer
+				ReviewExplorer.getInstance().refresh();
+			}
+			catch (IOException e)
+			{
+				//TODO Auto-generated
+				e.printStackTrace();
+			}
+
+		}
+		else
+		{
+			MessageDialog.openWarning(null, "Warning: No active review", "Please activate a review before adding comments!");
+		}
+	}
+
+	/**
+	 * Deletes the selected comment
+	 */
+	private void deleteComment() {
+		ArrayList<Comment> copy = new ArrayList<Comment>(currentSelection);
+		Iterator<Comment> it = copy.iterator();
+		CommentTableView ctv = CommentTableView.getInstance();
+		while (it.hasNext()) {
+			Comment c = it.next();
+			ctv.deleteComment(c);
+			try {
+				ra.deleteComment(c);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		DetailView.getInstance().changeParent(DetailView.EMPTY);
+		// Refresh the Review Explorer
+		ReviewExplorer.getInstance().refresh();
+	}
+
 	/**
 	 * manages:<br>
 	 * "save" events of {@link CommentDetail} or {@link ReviewDetail}<br>
@@ -83,60 +147,17 @@ public class CommentController extends Observable implements Listener, ISelectio
 	public void handleEvent(Event event) {
 		if((event.widget.getData()) instanceof String) {
 			if(((String)event.widget.getData()).equals("save")) {
-				CommentTableView.getInstance().refreshComments();
+				if(registered.contains(CommentTableView.getInstance().getClass())) {
+					CommentTableView.getInstance().refreshComments();
+				}
 			} else if(((String)event.widget.getData()).equals("delete")) {
-				Iterator<Comment> it = currentSelection.iterator();
-				CommentTableView ctv = CommentTableView.getInstance();
-				while (it.hasNext()) {
-					Comment c = it.next();
-					ctv.deleteComment(c);
-					try {
-						ra.deleteComment(c);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				DetailView.getInstance().changeParent(DetailView.EMPTY);
-				// Refresh the Review Explorer
-				ReviewExplorer.getInstance().refresh();
+				deleteComment();
 			} else if(((String)event.widget.getData()).equals("add")) {
-				if (!PropertiesManager.getInstance().getActiveReview().isEmpty())
-				{
-					try {
-						String pathToFile = "";
-						IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-						if ( part instanceof ITextEditor ) {
-							IEditorInput input = part.getEditorInput();
-							if (input != null && input instanceof FileEditorInput) {
-								pathToFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
-							}
-						}
-						String activeReview = PropertiesManager.getInstance().getActiveReview();
-						CommentTableView.getInstance().addComment(ra.createNewComment(activeReview , System.getProperty("user.name"), pathToFile));
-						// Refresh the Review Explorer
-						ReviewExplorer.getInstance().refresh();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				else
-				{
-					MessageDialog.openWarning(null, "Warning: No active review", "Please activate a review before adding comments!");
-				}
-			}
-			
-			// Save changes
-			try {
-				ra.save();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				addNewComment();
 			}
 		}
 	}
-
+	
 	/**
 	 * hears for the current selection of the CommentTableView
 	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
