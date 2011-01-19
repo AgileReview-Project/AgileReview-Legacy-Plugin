@@ -1,8 +1,12 @@
 package de.tukl.cs.softech.agilereview.model;
 
+import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
+
+import javax.crypto.spec.PSource;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -85,12 +89,12 @@ public class AgileAnnotationModel {
 	 */
 	public void deleteAnnoations() {
 		if (!this.annotationMap.isEmpty()) {
-			System.out.println("Not Empty!");
-			for (Entry<Position, ArrayDeque<Annotation>> annotationsAtPosition : annotationMap.entrySet()) {
-				System.out.println(annotationsAtPosition.getKey());
-				while (!annotationsAtPosition.getValue().isEmpty()) {
-					System.out.println("  Deleting...");
-					deleteAnnotation(annotationsAtPosition.getKey());
+			HashSet<Position> delPos = new HashSet<Position>();
+			delPos.addAll(annotationMap.keySet());
+			for (Position position : delPos) {
+				ArrayDeque<Annotation> delAnnotations = this.annotationMap.get(position).clone();
+				for (Annotation annotation : delAnnotations) {
+					deleteAnnotation(position);
 				}
 			}
 		}
