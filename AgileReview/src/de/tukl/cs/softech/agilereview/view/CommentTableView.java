@@ -257,7 +257,12 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		viewer.setInput(this.comments);
 		
 		// remove annotation and tags
-		parserMap.get(getActiveEditor()).removeCommentTags(comment);
+		try {
+			parserMap.get(getActiveEditor()).removeCommentTags(comment);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		AnnotationController.getInstance().removeAnnotation(comment);
 	}
 
@@ -654,6 +659,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			if (!this.parserMap.containsKey(editor)) {
 				this.parserMap.put(editor, new AnnotationParser(editor));	
 			}
+			this.parserMap.get(editor).getIdPositionMap();
 		}
 	}
 
