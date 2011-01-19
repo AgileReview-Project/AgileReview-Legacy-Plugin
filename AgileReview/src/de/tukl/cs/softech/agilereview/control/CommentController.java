@@ -199,7 +199,6 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 */
 	@Override
 	public void partClosed(IWorkbenchPart part) {
-		System.out.println("partClosed -> "+part.getClass());
 		registered.remove(part.getClass());
 	}
 	
@@ -218,7 +217,6 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 */
 	@Override
 	public void partOpened(IWorkbenchPart part) {
-		System.out.println("partOpened -> "+part.getClass());
 		registered.add(part.getClass());
 	}
 }

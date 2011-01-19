@@ -258,7 +258,9 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		
 		// remove annotation and tags
 		try {
-			parserMap.get(getActiveEditor()).removeCommentTags(comment);
+			openEditor(comment);
+			AnnotationParser annotationParser = parserMap.get(getActiveEditor());
+			annotationParser.removeCommentTags(comment);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -327,16 +329,8 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
-				IPath path = new Path(comment.getPath());
-				IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-				IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
-				try {
-					getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
-					((ITextEditor)getActiveEditor()).selectAndReveal(comment.getReference().getOffset(), 0);
-				} catch (PartInitException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	
+				openEditor(comment);	
+				((ITextEditor)getActiveEditor()).selectAndReveal(comment.getReference().getOffset(), 0);
 			}
 		});
 
@@ -661,7 +655,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			} else {
 				this.parserMap.get(editor).reload();
 			}
-			this.parserMap.get(editor).getIdPositionMap();
+			//this.parserMap.get(editor).getIdPositionMap();
 		}
 	}
 
@@ -864,5 +858,17 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			IWorkbenchPartReference partRef, String changeId) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	private void openEditor(Comment comment) {
+		IPath path = new Path(comment.getPath());
+		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+		try {
+			getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
+		} catch (PartInitException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
