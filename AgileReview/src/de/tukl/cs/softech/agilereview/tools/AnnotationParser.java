@@ -104,8 +104,9 @@ public class AnnotationParser {
 						tagPositions = idTagPositions.get(key);
 						//begin tag
 						if(tagPositions != null) {
-							//same begin tag already found
+							//same begin tag already exists
 							document.replace(r.getOffset(), r.getLength(), "");
+							System.out.println("currupt: <same begin tag already exists>: "+key);
 							tagDeleted = true;
 						} else {
 							idPositionMap.put(key, new Position(document.getLineOffset(line)));
@@ -113,13 +114,14 @@ public class AnnotationParser {
 						}
 					}
 					
-					if(matcher.group(3).equals("?") && idPositionMap.get(key) != null && !tagDeleted) {
+					if(matcher.group(3).equals("?") && !tagDeleted) {
 						tagPositions = idTagPositions.get(key);
 						//end tag
 						if(tagPositions != null) {
 							if(tagPositions[1] != null) {
-								//same end tag already found
+								//same end tag already exists
 								document.replace(r.getOffset(), r.getLength(), "");
+								System.out.println("currupt: <same end tag already exists>: "+key);
 								tagDeleted = true;
 							} else {
 								//end tag not set
@@ -134,6 +136,7 @@ public class AnnotationParser {
 						} else {
 							//end tag without begin tag
 							document.replace(r.getOffset(), r.getLength(), "");
+							System.out.println("currupt: <end tag without begin tag>: "+key);
 							tagDeleted = true;
 						}
 					}
@@ -162,6 +165,7 @@ public class AnnotationParser {
 				Iterator<Position> it = positionsToDelete.descendingIterator();
 				while(it.hasNext()) {
 					Position tmp = it.next();
+					System.out.println("currupt: <begin tag without end tag>");
 					document.replace(tmp.getOffset(), tmp.getLength(), "");
 				}
 				//parse the file another time to get the correct positions for the tags
@@ -253,6 +257,8 @@ public class AnnotationParser {
 	public void removeCommentTags(Comment comment) throws BadLocationException {
 		String key = comment.getReviewID()+"|"+comment.getAuthor()+"|"+comment.getId();
 		Position[] p = idTagPositions.get(key);
+		if(p == null) return;
+		
 		if(p[0].equals(p[1])) {
 			//a single line comment
 			document.replace(p[0].getOffset(), p[0].getLength(), "");
@@ -272,7 +278,10 @@ public class AnnotationParser {
 	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException {
 		TreeSet<Position> tagPositions = new TreeSet<Position>();
 		for(Comment c : comments) {
-			tagPositions.addAll(Arrays.asList(idTagPositions.get(c.getReviewID()+"|"+c.getAuthor()+"|"+c.getId())));
+			Position[] ps = idTagPositions.get(c.getReviewID()+"|"+c.getAuthor()+"|"+c.getId());
+			if(ps != null) {
+				tagPositions.addAll(Arrays.asList(ps));
+			}
 		}
 		Iterator<Position> it = tagPositions.descendingIterator();
 		while(it.hasNext()) {

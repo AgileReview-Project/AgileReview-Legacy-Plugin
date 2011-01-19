@@ -658,6 +658,8 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			AnnotationController.getInstance().addAnnotations(editor, this.filteredComments);
 			if (!this.parserMap.containsKey(editor)) {
 				this.parserMap.put(editor, new AnnotationParser(editor));	
+			} else {
+				this.parserMap.get(editor).reload();
 			}
 			this.parserMap.get(editor).getIdPositionMap();
 		}
