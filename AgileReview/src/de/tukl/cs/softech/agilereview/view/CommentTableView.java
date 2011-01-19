@@ -1,6 +1,5 @@
 package de.tukl.cs.softech.agilereview.view;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,6 +16,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
@@ -74,6 +74,7 @@ import de.tukl.cs.softech.agilereview.control.CommentController;
 import de.tukl.cs.softech.agilereview.control.ReviewAccess;
 import de.tukl.cs.softech.agilereview.model.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.model.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.tools.AnnotationParser;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.view.commenttable.AgileCommentFilter;
 import de.tukl.cs.softech.agilereview.view.commenttable.AgileViewerComparator;
@@ -136,6 +137,10 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 * indicates whether annotations are displayed or not
 	 */
 	private boolean hideAnnotations = false; 
+	/**
+	 * map of currently opened editors and their annotation parsers
+	 */
+	private HashMap<ITextEditor, AnnotationParser> parserMap = new HashMap<ITextEditor, AnnotationParser>();
 	
 	/**
 	 * Provides the current used instance of the CommentTableView
@@ -187,7 +192,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		//register this class as a part listener (to observe opened and closed editors)
 		getSite().getPage().addPartListener(this);
 		
-//		PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(this);
+		// register this class as a perspective listener
 		IPageService service = (IPageService) getSite().getService(IPageService.class);
 		service.addPerspectiveListener(this);
 		
@@ -220,7 +225,14 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		
 		// create reference for comment
 		comment.setReference(Reference.Factory.newInstance());
+		//Position position = getNewCommentPosition();
 		Position position = getNewCommentPosition();
+		try {
+			position = parserMap.get(getActiveEditor()).addTagsInDocument(comment);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		comment.getReference().setLength(position.getLength());
 		comment.getReference().setOffset(position.getOffset());
 		
@@ -230,7 +242,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		// set selection (to display comment in detail view)
 		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
 		
-		System.out.println(this.comments);
 	}
 	
 	/**
@@ -245,7 +256,8 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		}		
 		viewer.setInput(this.comments);
 		
-		// remove annotation
+		// remove annotation and tags
+		parserMap.get(getActiveEditor()).removeCommentTags(comment);
 		AnnotationController.getInstance().removeAnnotation(comment);
 	}
 
@@ -309,11 +321,9 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
-				IWorkbenchPage page = getSite().getPage();
 				Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
 				IPath path = new Path(comment.getPath());
 				IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-				System.out.println(file.getFullPath());
 				IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 				try {
 					getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
@@ -638,10 +648,12 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 */
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
-//		System.out.println(partRef.getPartName()+" brought to top");
 		if (partRef.getPart(false) instanceof ITextEditor && !this.hideAnnotations) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			AnnotationController.getInstance().addAnnotations(editor, this.filteredComments);
+			if (!this.parserMap.containsKey(editor)) {
+				this.parserMap.put(editor, new AnnotationParser(editor));	
+			}
 		}
 	}
 
@@ -651,7 +663,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 */
 	@Override
 	public void partHidden(IWorkbenchPartReference partRef) {
-//		System.out.println(partRef.getPartName()+" hidden");
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			AnnotationController.getInstance().removeAnnotations(editor);
@@ -750,7 +761,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 									paths.put(reviewID, new HashSet<String>());
 									paths.get(reviewID).add(path);
 								}
-								System.out.println(path);
 							}
 						}
 
@@ -802,7 +812,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		if (perspective.getLabel().equals("AgileReview") && !this.startup) { 
 			AnnotationController.getInstance().addAnnotations((ITextEditor) getActiveEditor(), this.filteredComments);
 			this.hideAnnotations = false;
-			System.out.println("mööp");
 		}
 	}
 

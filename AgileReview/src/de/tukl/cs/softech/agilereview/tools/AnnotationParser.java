@@ -170,11 +170,12 @@ public class AnnotationParser {
 				
 				// Write tags
 				if (editor.getEditorInput().getName().endsWith(".java")) {
-					doc.replace(insertStartOffset, 0, "/*?"+commentTag+"*/");
 					doc.replace(insertEndOffset, 0, "/*"+commentTag+"?*/");
+					doc.replace(insertStartOffset, 0, "/*?"+commentTag+"*/");
+					
 				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
-					doc.replace(insertStartOffset, 0, "<!--?"+commentTag+"-->");
 					doc.replace(insertEndOffset, 0, "<!--"+commentTag+"?-->");
+					doc.replace(insertStartOffset, 0, "<!--?"+commentTag+"-->");
 				}
 				
 				result = new Position(doc.getLineOffset(selStartLine), 
