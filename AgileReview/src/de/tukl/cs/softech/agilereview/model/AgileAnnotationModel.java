@@ -85,8 +85,11 @@ public class AgileAnnotationModel {
 	 */
 	public void deleteAnnoations() {
 		if (!this.annotationMap.isEmpty()) {
+			System.out.println("Not Empty!");
 			for (Entry<Position, ArrayDeque<Annotation>> annotationsAtPosition : annotationMap.entrySet()) {
-				for (@SuppressWarnings("unused") Annotation annotation : annotationsAtPosition.getValue()) {
+				System.out.println(annotationsAtPosition.getKey());
+				while (!annotationsAtPosition.getValue().isEmpty()) {
+					System.out.println("  Deleting...");
 					deleteAnnotation(annotationsAtPosition.getKey());
 				}
 			}

@@ -1,5 +1,6 @@
 package de.tukl.cs.softech.agilereview.view;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -11,12 +12,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.xmlbeans.XmlException;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -41,17 +48,20 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageService;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IPerspectiveListener3;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -118,7 +128,14 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 * The width of the table's columns
 	 */
 	private int[] bounds = { 60, 70, 70, 70, 70, 70, 55, 120, 120, 50, 100 };
+	/**
+	 * indicates whether Eclipse was just started or not
+	 */
 	private boolean startup = true;
+	/**
+	 * indicates whether annotations are displayed or not
+	 */
+	private boolean hideAnnotations = false; 
 	
 	/**
 	 * Provides the current used instance of the CommentTableView
@@ -285,6 +302,26 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		// provide access to selections of table rows
 		viewer.addSelectionChangedListener(CommentController.getInstance()); // TODO umstellen auf ISelectionListener und dann über SelectionProvider!!!
 		getSite().setSelectionProvider(viewer);
+		
+		viewer.addDoubleClickListener( new IDoubleClickListener() {
+			
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				IWorkbenchPage page = getSite().getPage();
+				Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
+				IPath path = new Path(comment.getPath());
+				IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+				System.out.println(file.getFullPath());
+				IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+				try {
+					getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
+					((ITextEditor)getActiveEditor()).selectAndReveal(comment.getReference().getOffset(), 0);
+				} catch (PartInitException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+			}
+		});
 
 		// set layout of the viewer
 		GridData gridData = new GridData();
@@ -600,7 +637,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 //		System.out.println(partRef.getPartName()+" brought to top");
-		if (partRef.getPart(false) instanceof ITextEditor) {
+		if (partRef.getPart(false) instanceof ITextEditor && !this.hideAnnotations) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			AnnotationController.getInstance().addAnnotations(editor, this.filteredComments);
 		}
@@ -758,9 +795,12 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		if (!perspective.getLabel().equals("AgileReview")) {
 			AnnotationController.getInstance().removeAnnotations((ITextEditor) getActiveEditor());
 			this.startup = false;
+			this.hideAnnotations = true;
 		}
 		if (perspective.getLabel().equals("AgileReview") && !this.startup) { 
 			AnnotationController.getInstance().addAnnotations((ITextEditor) getActiveEditor(), this.filteredComments);
+			this.hideAnnotations = false;
+			System.out.println("mööp");
 		}
 	}
 
