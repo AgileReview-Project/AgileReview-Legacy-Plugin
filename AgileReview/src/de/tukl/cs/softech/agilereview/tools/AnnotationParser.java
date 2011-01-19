@@ -30,11 +30,11 @@ public class AnnotationParser {
 	 * Regular Expression to find and differentiate each comment tag in java files
 	 */
 	//TODO prove for tag structure including | in order to get more resistance against normal comments
-	private static final String javaTagRegex = "/\\*\\s*(\\??)\\s*([^\\?]*)\\s*(\\??)\\s*\\*/";
+	private static final String javaTagRegex = "/\\*\\s*(\\??)\\s*([^\\?\\r\\n]*)\\s*(\\??)\\s*\\*/";
 	/**
 	 * Regular Expression to find and differentiate each comment tag in XML files
 	 */	
-	private static final String xmlTagRegex = "<!--\\s*(\\??)\\s*([^\\?]*)\\s*(\\??)\\s*-->";
+	private static final String xmlTagRegex = "<!--\\s*(\\??)\\s*([^\\?\\r\\n]*)\\s*(\\??)\\s*-->";
 	/**
 	 * Pattern to identify comment tags in java files
 	 */
