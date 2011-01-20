@@ -241,7 +241,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		
 		// set selection (to display comment in detail view)
 		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
-		
+		this.parserMap.get(this.getActiveEditor()).reload();
 	}
 	
 	/**
@@ -266,6 +266,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			e.printStackTrace();
 		}
 		AnnotationController.getInstance().removeAnnotation(comment);
+		this.parserMap.get(this.getActiveEditor()).reload();
 	}
 
 	/**

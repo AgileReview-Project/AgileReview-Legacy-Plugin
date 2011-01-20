@@ -74,6 +74,8 @@ public class AnnotationController {
 	 */
 	public void addAnnotation(ITextEditor editor, Comment comment) {
 		// add annotation, check if comment really belongs to the given editor
+		/*//TODO BUG!!!! for example: the relative paths /src/main/blubb.java and
+		 *  /main/blubb.java will be the same!!! */
 		if (getEditorPath(editor).matches(".*"+Pattern.quote(comment.getPath()))) {
 			// set annotation model; if there's none, create one
 			if (!this.annotationModelMap.containsKey(comment.getPath())) {

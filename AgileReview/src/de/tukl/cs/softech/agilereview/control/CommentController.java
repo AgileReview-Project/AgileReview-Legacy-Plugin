@@ -147,9 +147,10 @@ public class CommentController extends Observable implements Listener, ISelectio
 	public void handleEvent(Event event) {
 		if((event.widget.getData()) instanceof String) {
 			if(((String)event.widget.getData()).equals("save")) {
-				if(registered.contains(CommentTableView.getInstance().getClass())) {
+				//TODO BUG
+				//if(registered.contains(CommentTableView.getInstance().getClass())) {
 					CommentTableView.getInstance().refreshComments();
-				}
+				//}
 			} else if(((String)event.widget.getData()).equals("delete")) {
 				deleteComment();
 			} else if(((String)event.widget.getData()).equals("add")) {
@@ -217,6 +218,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 */
 	@Override
 	public void partOpened(IWorkbenchPart part) {
+		System.out.println("registered -> "+part.getClass());
 		registered.add(part.getClass());
 	}
 }

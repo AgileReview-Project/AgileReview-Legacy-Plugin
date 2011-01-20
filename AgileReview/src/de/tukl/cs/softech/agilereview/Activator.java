@@ -3,6 +3,7 @@ package de.tukl.cs.softech.agilereview;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import de.tukl.cs.softech.agilereview.control.CommentController;
 import de.tukl.cs.softech.agilereview.control.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
@@ -37,7 +38,6 @@ public class Activator extends AbstractUIPlugin {
 		
 		// Load all comments of all "open" reviews
 		ReviewAccess.getInstance().fillDatabaseForOpenReviews();
-
 	}
 
 	/*

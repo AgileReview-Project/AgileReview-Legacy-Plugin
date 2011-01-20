@@ -8,6 +8,7 @@ import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 
 import de.tukl.cs.softech.agilereview.control.ReviewAccess;
+import de.tukl.cs.softech.agilereview.view.CommentTableView;
 
 /**
  * ExecutionListener which methods are executed, if a command is triggered.
@@ -23,14 +24,16 @@ public class ExecutionListener implements IExecutionListener {
 	@Override
 	public void postExecuteFailure(String commandId, ExecutionException exception) {
 		// TODO Auto-generated method stub
-
+		System.out.println("blubber fail");
 	}
 
 	@Override
 	public void postExecuteSuccess(String commandId, Object returnValue) {
+		System.out.println("blubber succ");
 		if(commandId.equals("org.eclipse.ui.file.save") || commandId.equals("org.eclipse.ui.file.saveAll")) {
 			try {
 				ReviewAccess.getInstance().save();
+				CommentTableView.getInstance().refreshComments();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -40,6 +43,7 @@ public class ExecutionListener implements IExecutionListener {
 
 	@Override
 	public void preExecute(String commandId, ExecutionEvent event) {
+		System.out.println("blubber");
 		/*if (commandId.equals("org.eclipse.ui.edit.cut"))
 		{
 			if (event.getApplicationContext() instanceof EvaluationContext)

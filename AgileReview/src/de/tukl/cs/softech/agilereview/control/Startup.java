@@ -26,9 +26,9 @@ public class Startup  implements IStartup {
 	private ResourceChangeListener resourceChangeListener = new ResourceChangeListener();
 	
 	@Override
-	public void earlyStartup()
-	{
+	public void earlyStartup() {
 		// add executionlistener to listen to interesting commands
+		System.out.println("register executionListener");
 		((ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class)).addExecutionListener(executionListener);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener, IResourceChangeEvent.POST_CHANGE);
 	}
