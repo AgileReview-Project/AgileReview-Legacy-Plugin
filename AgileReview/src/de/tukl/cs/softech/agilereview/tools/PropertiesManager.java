@@ -326,4 +326,14 @@ public class PropertiesManager {
 		return this.getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 	}
 	
+	/**
+	 * Returns the user name as specified in the preferences or the System's user name,
+	 * if user name is not specified in preferences
+	 * @return user name
+	 */
+	public String getUser()
+	{
+		return System.getProperty("user.name");
+	}
+	
 }

@@ -30,15 +30,15 @@ public class ExecutionListener implements IExecutionListener {
 	@Override
 	public void postExecuteSuccess(String commandId, Object returnValue) {
 		System.out.println("blubber succ");
-		if(commandId.equals("org.eclipse.ui.file.save") || commandId.equals("org.eclipse.ui.file.saveAll")) {
-			try {
-				ReviewAccess.getInstance().save();
-				CommentTableView.getInstance().refreshComments();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
+//		if(commandId.equals("org.eclipse.ui.file.save") || commandId.equals("org.eclipse.ui.file.saveAll")) {
+//			try {
+//				ReviewAccess.getInstance().save();
+//				CommentTableView.getInstance().refreshComments();
+//			} catch (IOException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//		}
 	}
 
 	@Override

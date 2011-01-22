@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -232,6 +233,9 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		comment.getReference().setLength(position.getLength());
 		comment.getReference().setOffset(position.getOffset());
@@ -262,6 +266,9 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			AnnotationParser annotationParser = parserMap.get(getActiveEditor());
 			annotationParser.removeCommentTags(comment);
 		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

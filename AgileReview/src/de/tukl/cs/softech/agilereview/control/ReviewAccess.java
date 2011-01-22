@@ -765,7 +765,7 @@ public class ReviewAccess {
 	
 	
 	/**
-	 * Refactors the whole database according to the given parameters
+	 * Refactors the whole database according to the given parameters and saves it automatically
 	 * @param oldPath old path of the refactored item
 	 * @param newPath new path of the refactored item
 	 * @param type type of the refactored item (see static fields PROJECT, FOLDER, FILE in {@link IResource})

@@ -17,11 +17,18 @@ public class RERootNode {
 	 */
 	private HashSet<MultipleReviewWrapper> reviews = new HashSet<MultipleReviewWrapper>();
 	
+	
+	public RERootNode()
+	{
+		super();
+	}
+	
 	/**
 	 * Constructs an ReviewExplorerRootNode
 	 * @param reviews wrapped reviews
 	 */
 	public RERootNode(Collection<MultipleReviewWrapper> reviews) {
+		this();
 		this.reviews.addAll(reviews);
 	}
 	
@@ -48,5 +55,13 @@ public class RERootNode {
 	 */
 	public HashSet<MultipleReviewWrapper> getReviews() {
 		return this.reviews;
+	}
+	
+	/**
+	 *  Removes all objects from the root node
+	 */
+	public void clear()
+	{
+		this.reviews.clear();
 	}
 }

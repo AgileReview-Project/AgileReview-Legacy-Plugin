@@ -81,7 +81,6 @@ public class AgileAnnotationModel {
 			delPosition.delete();
 		}
 		this.annotationModel.removeAnnotation(delAnnotation);
-		
 	}
 	
 	/**

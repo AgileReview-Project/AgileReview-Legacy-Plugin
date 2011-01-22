@@ -1,7 +1,6 @@
 package de.tukl.cs.softech.agilereview.view;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.regex.Pattern;
@@ -16,6 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Composite;
@@ -50,7 +50,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 	/**
 	 * The root node of the treeviewer
 	 */
-	private RERootNode root;
+	private RERootNode root = new RERootNode();
 	
 	/**
 	 * The tree for showing the reviews
@@ -90,7 +90,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 	/**
 	 * Instance for Singleton-Pattern
 	 */
-	private static ReviewExplorer instance;
+	private static ReviewExplorer instance = new ReviewExplorer();
 	
 	/**
 	 * Returns the current instance of the ReviewExplorer
@@ -99,6 +99,11 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 	public static ReviewExplorer getInstance()
 	{
 		return instance;
+	}
+	
+	public ReviewExplorer()
+	{
+		
 	}
 	
 	@Override
@@ -111,6 +116,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		treeViewer.setContentProvider(new REContentProvider());
 		treeViewer.setLabelProvider(new RELabelProvider());
 		treeViewer.setComparator(new REViewerComparator());
+		treeViewer.setInput(this.root);
 		refreshInput();
 		
 		// Define the actions for toolbar
@@ -368,24 +374,34 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		this.treeViewer.getControl().redraw();
 	}
 	
-	@Override
-	public void setFocus() {}
 	
 	/**
 	 * Sets the input of the ReviewExplorer completely new
 	 */
 	public void refreshInput()
 	{
-		ArrayList<MultipleReviewWrapper> wrapList = new ArrayList<MultipleReviewWrapper>();
+		// Save expansion state
+		this.treeViewer.getControl().setRedraw(false);
+		TreePath[] expandedElements = this.treeViewer.getExpandedTreePaths();
+		
+		// Refresh the input
+		this.root.clear();
 		for (Review r : RA.getAllReviews())
 		{
 			MultipleReviewWrapper currWrap = new MultipleReviewWrapper(r, r.getId());
 			// Check if review is "open"
 			currWrap.setOpen(props.isReviewOpen(r.getId()));
-			wrapList.add(currWrap);
+			root.addReview(currWrap);
 		}
-		root = new RERootNode(wrapList);
-		treeViewer.setInput(root);
+		
+		// Expand nodes again
+		this.treeViewer.refresh();
+		for (Object o : expandedElements)
+		{
+			this.treeViewer.expandToLevel(o, 1);
+		}
+		this.treeViewer.getControl().setRedraw(true);
+		this.treeViewer.getControl().redraw();
 	}
 	
 	/*
@@ -409,4 +425,8 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		}
 		return result;
 	}
+	
+	@Override
+	public void setFocus() {}
+	
 }

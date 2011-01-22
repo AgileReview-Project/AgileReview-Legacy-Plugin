@@ -96,7 +96,9 @@ public class CommentController extends Observable implements Listener, ISelectio
 					}
 				}
 				String activeReview = PropertiesManager.getInstance().getActiveReview();
-				Comment newComment = ra.createNewComment(activeReview , System.getProperty("user.name"), pathToFile);
+				String user  = PropertiesManager.getInstance().getUser();
+				// TODO: What to do, if user is not valid
+				Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
 				CommentTableView.getInstance().addComment(newComment);
 				// Refresh the Review Explorer
 				ReviewExplorer.getInstance().refresh();
@@ -133,6 +135,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 		}
 		DetailView.getInstance().changeParent(DetailView.EMPTY);
 		// Refresh the Review Explorer
+		// TODO: check if registered, otherwise nullpointer
 		ReviewExplorer.getInstance().refresh();
 	}
 
@@ -155,6 +158,14 @@ public class CommentController extends Observable implements Listener, ISelectio
 				deleteComment();
 			} else if(((String)event.widget.getData()).equals("add")) {
 				addNewComment();
+			}
+			
+			// Save the changes to XML
+			try {
+				ReviewAccess.getInstance().save();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}

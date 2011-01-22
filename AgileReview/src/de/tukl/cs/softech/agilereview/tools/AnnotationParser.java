@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
@@ -60,6 +61,9 @@ public class AnnotationParser {
 	 * Document which provides the contents for this instance
 	 */
 	private IDocument document;
+	/**
+	 * The document of this parser
+	 */
 	private ITextEditor editor;
 
 	/**
@@ -183,66 +187,69 @@ public class AnnotationParser {
 	 * @param comment Comment for which the tags should be inserted
 	 * @return Position of the added {@link Comment} or null if the selection is no instance of {@link ITextSelection}
 	 * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
+	 * @throws CoreException 
 	 */
-	public Position addTagsInDocument(Comment comment) throws BadLocationException {
+	public Position addTagsInDocument(Comment comment) throws BadLocationException, CoreException {
 		Position result = null;
 
 		ISelection selection= editor.getSelectionProvider().getSelection();
 		if (selection instanceof ITextSelection) {
 			int selStartLine = ((ITextSelection)selection).getStartLine();
 			int selEndLine = ((ITextSelection)selection).getEndLine();
-			IDocument doc = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 			
 			String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 			String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 			
 			if (selStartLine == selEndLine)	{
 				// Only one line is selected
-				String lineDelimiter = doc.getLineDelimiter(selStartLine);
+				String lineDelimiter = document.getLineDelimiter(selStartLine);
 				int lineDelimiterLength = 0;
 				if (lineDelimiter != null) {
 					lineDelimiterLength = lineDelimiter.length();
 				}
 				
-				int insertOffset = doc.getLineOffset(selStartLine)+doc.getLineLength(selStartLine)-lineDelimiterLength;
+				int insertOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
 				
 				if (editor.getEditorInput().getName().endsWith(".java")) {
-					doc.replace(insertOffset, 0, "/*?"+commentTag+"?*/");
+					document.replace(insertOffset, 0, "/*?"+commentTag+"?*/");
 				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
-					doc.replace(insertOffset, 0, "<!--?"+commentTag+"?-->");
+					document.replace(insertOffset, 0, "<!--?"+commentTag+"?-->");
 				}
 				
-				result = new Position(doc.getLineOffset(selStartLine), doc.getLineLength(selStartLine)-lineDelimiterLength);
+				result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
 			} else {
 				// Calculate insert position for start line
-				String lineDelimiter = doc.getLineDelimiter(selStartLine);
+				String lineDelimiter = document.getLineDelimiter(selStartLine);
 				int lineDelimiterLength = 0;
 				if (lineDelimiter != null) {
 					lineDelimiterLength = lineDelimiter.length();
 				}
-				int insertStartOffset = doc.getLineOffset(selStartLine)+doc.getLineLength(selStartLine)-lineDelimiterLength;
+				int insertStartOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
 				
 				// Calculate insert position for end line
-				lineDelimiter = doc.getLineDelimiter(selEndLine);
+				lineDelimiter = document.getLineDelimiter(selEndLine);
 				lineDelimiterLength = 0;
 				if (lineDelimiter != null) {
 					lineDelimiterLength = lineDelimiter.length();
 				}
-				int insertEndOffset = doc.getLineOffset(selEndLine)+doc.getLineLength(selEndLine)-lineDelimiterLength;
+				int insertEndOffset = document.getLineOffset(selEndLine)+document.getLineLength(selEndLine)-lineDelimiterLength;
 				
 				// Write tags
 				if (editor.getEditorInput().getName().endsWith(".java")) {
-					doc.replace(insertEndOffset, 0, "/*"+commentTag+"?*/");
-					doc.replace(insertStartOffset, 0, "/*?"+commentTag+"*/");
+					document.replace(insertEndOffset, 0, "/*"+commentTag+"?*/");
+					document.replace(insertStartOffset, 0, "/*?"+commentTag+"*/");
 					
 				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
-					doc.replace(insertEndOffset, 0, "<!--"+commentTag+"?-->");
-					doc.replace(insertStartOffset, 0, "<!--?"+commentTag+"-->");
+					document.replace(insertEndOffset, 0, "<!--"+commentTag+"?-->");
+					document.replace(insertStartOffset, 0, "<!--?"+commentTag+"-->");
 				}
 				
-				result = new Position(doc.getLineOffset(selStartLine), 
-						doc.getLineOffset(selEndLine) - doc.getLineOffset(selStartLine) + doc.getLineLength(selEndLine)-lineDelimiterLength);
+				result = new Position(document.getLineOffset(selStartLine), 
+						document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
 			}
+			
+			// Save the current document to save the tags
+			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
 		}
 		return result;
 	}
@@ -253,9 +260,11 @@ public class AnnotationParser {
 	 * will be reparsed
 	 * @param comment which should be deleted
 	 * @throws BadLocationException if the {@link Position} is corrupted (the document should be reparsed then)
+	 * @throws CoreException  if document can not be saved
 	 */
-	public void removeCommentTags(Comment comment) throws BadLocationException {
-		String key = comment.getReviewID()+"|"+comment.getAuthor()+"|"+comment.getId();
+	public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {
+		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String key = comment.getReviewID()+separator+comment.getAuthor()+separator+comment.getId();
 		Position[] p = idTagPositions.get(key);
 		if(p == null) return;
 		
@@ -267,6 +276,10 @@ public class AnnotationParser {
 			document.replace(p[1].getOffset(), p[1].getLength(), "");
 			document.replace(p[0].getOffset(), p[0].getLength(), "");
 		}
+		// Save the current document to save the change
+		editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
+		
+		// Parse new
 		parseInput();
 	}
 	
@@ -274,21 +287,28 @@ public class AnnotationParser {
 	 * Removes all tags of the given comments. After this is done the document will be reparsed
 	 * @param comments which should be deleted
 	 * @throws BadLocationException if the {@link Position} is corrupted (the document should be reparsed then)
+	 * @throws CoreException if document can not be saved
 	 */
-	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException {
-		TreeSet<Position> tagPositions = new TreeSet<Position>();
-		for(Comment c : comments) {
-			Position[] ps = idTagPositions.get(c.getReviewID()+"|"+c.getAuthor()+"|"+c.getId());
-			if(ps != null) {
-				tagPositions.addAll(Arrays.asList(ps));
-			}
+	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {
+		for (Comment c:comments)
+		{
+			this.removeCommentTags(c);
 		}
-		Iterator<Position> it = tagPositions.descendingIterator();
-		while(it.hasNext()) {
-			Position tmp = it.next();
-			document.replace(tmp.getOffset(), tmp.getLength(), "");
-		}
-		parseInput();
+		
+//		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+//		TreeSet<Position> tagPositions = new TreeSet<Position>();
+//		for(Comment c : comments) {
+//			Position[] ps = idTagPositions.get(c.getReviewID()+separator+c.getAuthor()+separator+c.getId());
+//			if(ps != null) {
+//				tagPositions.addAll(Arrays.asList(ps));
+//			}
+//		}
+//		Iterator<Position> it = tagPositions.descendingIterator();
+//		while(it.hasNext()) {
+//			Position tmp = it.next();
+//			document.replace(tmp.getOffset(), tmp.getLength(), "");
+//		}
+//		parseInput();
 	}
 	
 	/**
@@ -304,15 +324,5 @@ public class AnnotationParser {
 	 */
 	public TreeMap<String, Position> getIdPositionMap() {
 		return idPositionMap;
-	}
-	
-	/**
-	 * Returns the pattern used here
-	 * @return pattern used in this parser
-	 */
-	public static Pattern[] getPattern()
-	{
-		Pattern[] result = {javaTagPattern, xmlTagPattern};
-		return result;
 	}
 }
