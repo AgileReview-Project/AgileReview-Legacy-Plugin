@@ -1,25 +1,24 @@
 package de.tukl.cs.softech.agilereview.view;
 
-import agileReview.softech.tukl.de.CommentDocument.Comment;
-
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.model.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.model.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.view.detail.AbstractDetail;
 import de.tukl.cs.softech.agilereview.view.detail.CommentDetail;
 import de.tukl.cs.softech.agilereview.view.detail.ReviewDetail;
 
 /**
  * The DetailView class manages the different UIs which can occur in the detail view
  */
-public class DetailView extends ViewPart implements ISelectionListener {
+public class DetailView extends ViewPart {
 
 	/**
 	 * Static Field for describing an empty view
@@ -56,8 +55,16 @@ public class DetailView extends ViewPart implements ISelectionListener {
 	private static DetailView instance;
 
 	/**
-	 * Returns the current instance of the CommentDetailView
-	 * @return the current instance of the CommentDetailView
+	 * Creates a new instance of DetailView
+	 * (should not be called of someone self, will be called by eclipse)
+	 */
+	public DetailView() {
+		ViewControl.registerView(this.getClass());
+	}
+
+	/**
+	 * Returns the current instance of the DetailView
+	 * @return the current instance of the DetailView
 	 */
 	public static DetailView getInstance() {
 		return instance;
@@ -97,7 +104,6 @@ public class DetailView extends ViewPart implements ISelectionListener {
 	public void createPartControl(Composite parent) {
 		instance = this;
 
-		getSite().getPage().addSelectionListener(this);
 		this.actParent = parent;
 		this.parentParent = parent.getParent();
 		this.parentStyle = parent.getStyle();
@@ -123,37 +129,43 @@ public class DetailView extends ViewPart implements ISelectionListener {
 			break;
 		}
 	}
+	
+	/**
+	 * saves every changes made in the current Detail View
+	 * @param part will be forwarded from the {@link ViewControl}
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	protected void partClosedOrDeactivated(IWorkbenchPart part) {
+		if(actParent instanceof AbstractDetail && !actParent.isDisposed()) {
+			((AbstractDetail<?>)actParent).partClosedOrDeactivated(part);
+		}
+	}
 
 	/**
-	 * hears for selections inside the review table and from the review explorer
-	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 * Reaction of selection changes in {@link CommentTableView} or {@link ReviewExplorer}
+	 * @param part will be forwarded from the {@link ViewControl}
+	 * @param selection will be forwarded from the {@link ViewControl}
 	 */
-	@Override
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if(selection != null && part != null) {
-			if(part instanceof CommentTableView) {
-				if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
-					IStructuredSelection sel = (IStructuredSelection) selection;
-					if(!(this.actParent instanceof CommentDetail)) {
-						this.changeParent(DetailView.COMMENT_DETAIL);
+	protected void selectionChanged(IWorkbenchPart part, ISelection selection) {
+		if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
+			IStructuredSelection sel = (IStructuredSelection) selection;
+			Object e;
+			
+			if(part instanceof ReviewExplorer) {
+				if((e = sel.getFirstElement()) instanceof MultipleReviewWrapper) {
+					if(!(this.actParent instanceof ReviewDetail)) {
+						this.changeParent(DetailView.REVIEW_DETAIL);
 					}
-					Object e;
-					if((e = sel.getFirstElement()) instanceof Comment) {
-						((CommentDetail)this.actParent).fillContents((Comment)e);
-					}
+					((ReviewDetail)this.actParent).fillContents((MultipleReviewWrapper)e);
+				} else if((e = sel.getFirstElement()) instanceof AbstractMultipleWrapper) {
+					this.changeParent(EMPTY);
 				}
-			} else if(part instanceof ReviewExplorer) {
-				if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
-					IStructuredSelection sel = (IStructuredSelection) selection;
-					Object e;
-					if((e = sel.getFirstElement()) instanceof MultipleReviewWrapper) {
-						if(!(this.actParent instanceof ReviewDetail)) {
-							this.changeParent(DetailView.REVIEW_DETAIL);
-						}
-						((ReviewDetail)this.actParent).fillContents((MultipleReviewWrapper)e);
-					} else if((e = sel.getFirstElement()) instanceof AbstractMultipleWrapper) {
-						this.changeParent(EMPTY);
-					}
+			} else if(part instanceof CommentTableView) {
+				if(!(this.actParent instanceof CommentDetail)) {
+					this.changeParent(DetailView.COMMENT_DETAIL);
+				}
+				if((e = sel.getFirstElement()) instanceof Comment) {
+					((CommentDetail)this.actParent).fillContents((Comment)e);
 				}
 			}
 		}

@@ -53,10 +53,8 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageService;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener3;
-import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -84,7 +82,7 @@ import de.tukl.cs.softech.agilereview.view.commenttable.ExplorerSelectionFilter;
 /**
  * Used to provide an overview for review comments using a table
  */
-public class CommentTableView extends ViewPart implements ISelectionListener, IPartListener2, IPerspectiveListener3 {
+public class CommentTableView extends ViewPart implements IPerspectiveListener3 {
 
 	/**
 	 * Current Instance used by the ViewPart
@@ -144,6 +142,14 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	private HashMap<ITextEditor, AnnotationParser> parserMap = new HashMap<ITextEditor, AnnotationParser>();
 	
 	/**
+	 * Creates a new instance of CommentTableView
+	 * (should not be called of someone self, will be called by eclipse)
+	 */
+	public CommentTableView() {
+		ViewControl.registerView(this.getClass());
+	}
+	
+	/**
 	 * Provides the current used instance of the CommentTableView
 	 * @return instance of CommentTableView
 	 */
@@ -187,12 +193,6 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 		// register this class as a selection provider
 		getSite().setSelectionProvider(viewer);
 		
-		// register this class as a selection listener (to observe explorer)
-		getSite().getPage().addSelectionListener(this);
-		
-		//register this class as a part listener (to observe opened and closed editors)
-		getSite().getPage().addPartListener(this);
-		
 		// register this class as a perspective listener
 		IPageService service = (IPageService) getSite().getService(IPageService.class);
 		service.addPerspectiveListener(this);
@@ -206,7 +206,7 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 	 * Used to set a new model
 	 * @param comments
 	 */
-	public void setTableContent(ArrayList<Comment> comments) {
+	protected void setTableContent(ArrayList<Comment> comments) {
 		this.comments = comments;
 		viewer.setInput(comments);
 		viewer.refresh();
@@ -651,10 +651,10 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 
 	/**
 	 * Editor has been brought to top, add annotations
+	 * @param partRef will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	@Override
-	public void partBroughtToTop(IWorkbenchPartReference partRef) {
+	protected void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor && !this.hideAnnotations) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			AnnotationController.getInstance().addAnnotations(editor, this.filteredComments);
@@ -663,126 +663,73 @@ public class CommentTableView extends ViewPart implements ISelectionListener, IP
 			} else {
 				this.parserMap.get(editor).reload();
 			}
-			//this.parserMap.get(editor).getIdPositionMap();
 		}
 	}
 
 	/**
 	 * Editor has been hidden, remove annotations
+	 * @param partRef will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	@Override
-	public void partHidden(IWorkbenchPartReference partRef) {
+	protected void partHidden(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			AnnotationController.getInstance().removeAnnotations(editor);
 		}
 	}
 	
-	/** 
-	 * Not used!
-	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partOpened(IWorkbenchPartReference partRef) {
-		//Nothing to do here...
-	}
-	
-	/**
-	 * Not used!
-	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partClosed(IWorkbenchPartReference partRef) {
-		//Nothing to do here...		
-	}
-	
-	/**
-	 * Not used!
-	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partInputChanged(IWorkbenchPartReference partRef) {
-		//Nothing to do here...		
-	}
-
-	/**
-	 * Not used!
-	 * @see org.eclipse.ui.IPartListener2#partVisible(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partVisible(IWorkbenchPartReference partRef) {
-		//Nothing to do here...
-	}
-	
-	/**
-	 * Not used!
-	 * @see org.eclipse.ui.IPartListener2#partActivated(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partActivated(IWorkbenchPartReference partRef) {
-		//Nothing to do here...
-	}
-	
-	/**
-	 * Not used!
-	 * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partDeactivated(IWorkbenchPartReference partRef) {
-		//Nothing to do here...		
-	}
-	
-	/* (non-Javadoc)
+	/** Selection of ReviewExplorer changed, filter comments
+	 * @param part will be forwarded from the {@link ViewControl}
+	 * @param selection will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if (linkExplorer) {
-			if(selection != null && part != null) {
-				if(part instanceof ReviewExplorer) {
-					if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
+	protected void selectionChanged(IWorkbenchPart part, ISelection selection) {
+		if (linkExplorer && part instanceof ReviewExplorer) {
+			if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
 
-						//if there is a selectionFilter, remove it
-						if (this.selectionFilter != null) {
-							viewer.removeFilter(this.selectionFilter);						
+				// if there is a selectionFilter, remove it
+				if (this.selectionFilter != null) {
+					viewer.removeFilter(this.selectionFilter);
+				}
+
+				// get selection, selection's iterator, initialize reviewIDs and
+				// paths
+				IStructuredSelection sel = (IStructuredSelection) selection;
+				Iterator<?> it = sel.iterator();
+				ArrayList<String> reviewIDs = new ArrayList<String>();
+				HashMap<String, HashSet<String>> paths = new HashMap<String, HashSet<String>>();
+
+				// get all selected reviews and paths
+				while (it.hasNext()) {
+					Object next = it.next();
+					if (next instanceof MultipleReviewWrapper) {
+						String reviewID = ((MultipleReviewWrapper) next)
+								.getWrappedReview().getId();
+						if (!reviewIDs.contains(reviewID)) {
+							reviewIDs.add(reviewID);
 						}
-
-						//get selection, selection's iterator, initialize reviewIDs and paths
-						IStructuredSelection sel = (IStructuredSelection) selection;
-						Iterator<?> it = sel.iterator();
-						ArrayList<String> reviewIDs = new ArrayList<String>();
-						HashMap<String, HashSet<String>> paths = new HashMap<String, HashSet<String>>(); 
-						
-						// get all selected reviews and paths
-						while (it.hasNext()) {
-							Object next = it.next();
-							if (next instanceof MultipleReviewWrapper) {
-								String reviewID = ((MultipleReviewWrapper)next).getWrappedReview().getId();
-								if (!reviewIDs.contains(reviewID)) {
-									reviewIDs.add(reviewID);
-								}
-							} else if (next instanceof AbstractMultipleWrapper) {
-								String path = ((AbstractMultipleWrapper)next).getPath();
-								String reviewID = ((AbstractMultipleWrapper)next).getReviewId();
-								if (paths.containsKey(reviewID)) {
-									paths.get(reviewID).add(path);
-								} else {
-									paths.put(reviewID, new HashSet<String>());
-									paths.get(reviewID).add(path);
-								}
-							}
+					} else if (next instanceof AbstractMultipleWrapper) {
+						String path = ((AbstractMultipleWrapper) next)
+								.getPath();
+						String reviewID = ((AbstractMultipleWrapper) next)
+								.getReviewId();
+						if (paths.containsKey(reviewID)) {
+							paths.get(reviewID).add(path);
+						} else {
+							paths.put(reviewID, new HashSet<String>());
+							paths.get(reviewID).add(path);
 						}
-
-						// add a new filter by the given criteria to the viewer
-						this.selectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
-						viewer.addFilter(this.selectionFilter);
-						
-						// refresh annotations, update list of filtered comments
-						filterComments();
-						AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
 					}
 				}
+
+				// add a new filter by the given criteria to the viewer
+				this.selectionFilter = new ExplorerSelectionFilter(reviewIDs,
+						paths);
+				viewer.addFilter(this.selectionFilter);
+
+				// refresh annotations, update list of filtered comments
+				filterComments();
+				AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
 			}
 		}
 	}

@@ -8,10 +8,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.WorkbenchPart;
 
 import de.tukl.cs.softech.agilereview.control.CommentController;
 import de.tukl.cs.softech.agilereview.view.DetailView;
@@ -22,7 +19,7 @@ import de.tukl.cs.softech.agilereview.view.DetailView;
  * for a revert action by setting the object Data to "revert" and for a save action by setting the object Data to "save"
  * @param <E> type which would be displayed by this AbstractDetail
  */
-public abstract class AbstractDetail<E extends XmlObject> extends Composite implements IPartListener, FocusListener, Listener {
+public abstract class AbstractDetail<E extends XmlObject> extends Composite implements FocusListener, Listener {
 	
 	/**
 	 * Button which should save the changes of the current displayed object
@@ -47,9 +44,8 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @param parent onto the ReviewDetail Composite will be added
 	 * @param style with which this Composite will be styled
 	 */
-	public AbstractDetail(Composite parent, int style) {
+	protected AbstractDetail(Composite parent, int style) {
 		super(parent, style);
-		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(this);
 		initUI();
 		
 		revertButton.setText("Revert");
@@ -81,66 +77,23 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 */
 	protected abstract void fillContents(E input);
 	
+	/**
+	 * saves every changes made in the current Detail View
+	 * @param part will be forwarded from the {@link DetailView}
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	public void partClosedOrDeactivated(IWorkbenchPart part) {
+		saveChanges();
+		//fire "save" event for persistent storage
+		saveButton.notifyListeners(SWT.Selection, new Event());
+		revertButton.setEnabled(false);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Composite#setFocus()
 	 */
 	public abstract boolean setFocus();
-	
-	/**
-	 * not in use
-	 * @see org.eclipse.ui.IPartListener2#partActivated(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partActivated(IWorkbenchPart part) {
-		
-	}
-	
-	/**
-	 * not in use
-	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partBroughtToTop(IWorkbenchPart part) {
-		
-	}
-	
-	/**
-	 * saves every changes made in the current CommentDetail View
-	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partClosed(IWorkbenchPart part) {
-		if(((WorkbenchPart) part).getPartName().equals(DetailView.getInstance().getPartName()) && !this.isDisposed()) {
-			saveChanges();
-			//fire "save" event for persistent storage
-			saveButton.notifyListeners(SWT.Selection, new Event());
-			revertButton.setEnabled(false);
-		}
-	}
-	
-	/**
-	 * saves every changes made in the current CommentDetail View
-	 * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partDeactivated(IWorkbenchPart part) {
-		if(((WorkbenchPart) part).getPartName().equals(DetailView.getInstance().getPartName()) && !this.isDisposed()) {
-			saveChanges();
-			//fire "save" event for persistent storage
-			saveButton.notifyListeners(SWT.Selection, new Event());
-			revertButton.setEnabled(false);
-		}
-	}
-	
-	/**
-	 * not in use
-	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
-	 */
-	@Override
-	public void partOpened(IWorkbenchPart part) {
-		
-	}
 	
 	/**
 	 * not in use

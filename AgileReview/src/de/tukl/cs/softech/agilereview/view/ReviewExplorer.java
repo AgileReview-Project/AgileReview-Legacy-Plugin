@@ -88,9 +88,9 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 	private Pattern forbiddenCharPattern;
 	
 	/**
-	 * Instance for Singleton-Pattern
+	 * Current Instance used by the ViewPart
 	 */
-	private static ReviewExplorer instance = new ReviewExplorer();
+	private static ReviewExplorer instance;
 	
 	/**
 	 * Returns the current instance of the ReviewExplorer
@@ -101,9 +101,12 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		return instance;
 	}
 	
-	public ReviewExplorer()
-	{
-		
+	/**
+	 * Creates a new instance of ReviewExplorer
+	 * (should not be called of someone self, will be called by eclipse)
+	 */
+	public ReviewExplorer() {
+		ViewControl.registerView(this.getClass());
 	}
 	
 	@Override

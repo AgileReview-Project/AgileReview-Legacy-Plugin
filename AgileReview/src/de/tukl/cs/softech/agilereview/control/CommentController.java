@@ -2,7 +2,6 @@ package de.tukl.cs.softech.agilereview.control;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Observable;
 import java.util.regex.Pattern;
@@ -12,13 +11,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -28,6 +24,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.view.CommentTableView;
 import de.tukl.cs.softech.agilereview.view.DetailView;
 import de.tukl.cs.softech.agilereview.view.ReviewExplorer;
+import de.tukl.cs.softech.agilereview.view.ViewControl;
 import de.tukl.cs.softech.agilereview.view.detail.CommentDetail;
 import de.tukl.cs.softech.agilereview.view.detail.ReviewDetail;
 
@@ -37,7 +34,7 @@ import de.tukl.cs.softech.agilereview.view.detail.ReviewDetail;
  * ReviewID of the ReviewExplorer.<br>
  * Besides this the CommentController provides Listener for any save action according the persistent storage.
  */
-public class CommentController extends Observable implements Listener, ISelectionChangedListener, IPartListener {
+public class CommentController extends Observable implements Listener, ISelectionChangedListener {
 	
 	/**
 	 * unique instance of CommentController
@@ -51,10 +48,6 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * current Selection of CommentTable
 	 */
 	private ArrayList<Comment> currentSelection;
-	/**
-	 * registered ViewParts
-	 */
-	private HashSet<Class<?>> registered = new HashSet<Class<?>>();
 	
 	/**
 	 * returns the unique instance of CommentController
@@ -68,15 +61,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * Creates a new instance of the CommentController
 	 */
 	private CommentController() {
-		//wait until all necessary elements are initialized
-		Display.getCurrent().asyncExec(new Runnable() {		
-			@Override
-			public void run() {
-				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {}
-				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {}
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(CommentController.this);
-			}
-		});
+
 	}
 	
 	/**
@@ -99,9 +84,13 @@ public class CommentController extends Observable implements Listener, ISelectio
 				String user  = PropertiesManager.getInstance().getUser();
 				// TODO: What to do, if user is not valid
 				Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
-				CommentTableView.getInstance().addComment(newComment);
+				if(ViewControl.isOpen(CommentTableView.class)) {
+					CommentTableView.getInstance().addComment(newComment);
+				}
 				// Refresh the Review Explorer
-				ReviewExplorer.getInstance().refresh();
+				if(ViewControl.isOpen(ReviewExplorer.class)) {
+					ReviewExplorer.getInstance().refresh();
+				}
 			}
 			catch (IOException e)
 			{
@@ -120,23 +109,29 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * Deletes the selected comment
 	 */
 	private void deleteComment() {
-		ArrayList<Comment> copy = new ArrayList<Comment>(currentSelection);
-		Iterator<Comment> it = copy.iterator();
-		CommentTableView ctv = CommentTableView.getInstance();
-		while (it.hasNext()) {
-			Comment c = it.next();
-			ctv.deleteComment(c);
-			try {
-				ra.deleteComment(c);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		if(ViewControl.isOpen(CommentTableView.class)) {
+			ArrayList<Comment> copy = new ArrayList<Comment>(currentSelection);
+			Iterator<Comment> it = copy.iterator();
+			CommentTableView ctv = CommentTableView.getInstance();
+			while (it.hasNext()) {
+				Comment c = it.next();
+				ctv.deleteComment(c);
+				try {
+					ra.deleteComment(c);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		DetailView.getInstance().changeParent(DetailView.EMPTY);
+		
+		if(ViewControl.isOpen(DetailView.class)) {
+			DetailView.getInstance().changeParent(DetailView.EMPTY);
+		}
 		// Refresh the Review Explorer
-		// TODO: check if registered, otherwise nullpointer
-		ReviewExplorer.getInstance().refresh();
+		if(ViewControl.isOpen(ReviewExplorer.class)) {
+			ReviewExplorer.getInstance().refresh();
+		}
 	}
 
 	/**
@@ -150,10 +145,9 @@ public class CommentController extends Observable implements Listener, ISelectio
 	public void handleEvent(Event event) {
 		if((event.widget.getData()) instanceof String) {
 			if(((String)event.widget.getData()).equals("save")) {
-				//TODO BUG
-				//if(registered.contains(CommentTableView.getInstance().getClass())) {
+				if(ViewControl.isOpen(CommentTableView.class)) {
 					CommentTableView.getInstance().refreshComments();
-				//}
+				}
 			} else if(((String)event.widget.getData()).equals("delete")) {
 				deleteComment();
 			} else if(((String)event.widget.getData()).equals("add")) {
@@ -185,51 +179,5 @@ public class CommentController extends Observable implements Listener, ISelectio
 				currentSelection.add(selComment);
 			}
 		}
-	}
-
-	/**
-	 * not used
-	 * @see org.eclipse.ui.IPartListener#partActivated(org.eclipse.ui.IWorkbenchPart)
-	 */
-	@Override
-	public void partActivated(IWorkbenchPart part) {
-		
-	}
-	
-	/**
-	 * not used
-	 * @see org.eclipse.ui.IPartListener#partBroughtToTop(org.eclipse.ui.IWorkbenchPart)
-	 */
-	@Override
-	public void partBroughtToTop(IWorkbenchPart part) {
-		
-	}
-	
-	/**
-	 * every ViewPart of this plugin will be deregistered by the CommentController
-	 * @see org.eclipse.ui.IPartListener#partClosed(org.eclipse.ui.IWorkbenchPart)
-	 */
-	@Override
-	public void partClosed(IWorkbenchPart part) {
-		registered.remove(part.getClass());
-	}
-	
-	/**
-	 * not used
-	 * @see org.eclipse.ui.IPartListener#partDeactivated(org.eclipse.ui.IWorkbenchPart)
-	 */
-	@Override
-	public void partDeactivated(IWorkbenchPart part) {
-		
-	}
-	
-	/**
-	 * every ViewPart of this plugin will be registered by the CommentController
-	 * @see org.eclipse.ui.IPartListener#partOpened(org.eclipse.ui.IWorkbenchPart)
-	 */
-	@Override
-	public void partOpened(IWorkbenchPart part) {
-		System.out.println("registered -> "+part.getClass());
-		registered.add(part.getClass());
 	}
 }
