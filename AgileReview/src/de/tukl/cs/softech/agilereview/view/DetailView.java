@@ -55,14 +55,6 @@ public class DetailView extends ViewPart {
 	private static DetailView instance;
 
 	/**
-	 * Creates a new instance of DetailView
-	 * (should not be called of someone self, will be called by eclipse)
-	 */
-	public DetailView() {
-		ViewControl.registerView(this.getClass());
-	}
-
-	/**
 	 * Returns the current instance of the DetailView
 	 * @return the current instance of the DetailView
 	 */
@@ -110,6 +102,9 @@ public class DetailView extends ViewPart {
 		
 		//add help context
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this.parentParent, Activator.PLUGIN_ID+".DetailView");
+		
+		// register view
+		ViewControl.registerView(this.getClass());
 	}
 
 	/*

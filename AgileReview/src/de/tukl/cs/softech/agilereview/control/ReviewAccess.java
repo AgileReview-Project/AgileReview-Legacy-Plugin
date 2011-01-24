@@ -455,7 +455,6 @@ public class ReviewAccess {
 		result.setRecipient("");
 		result.setStatus(0);
 		result.setRevision(0); 
-		result.setPath(path);
 		result.setCreationDate(Calendar.getInstance());
 		result.setLastModified(Calendar.getInstance());
 		

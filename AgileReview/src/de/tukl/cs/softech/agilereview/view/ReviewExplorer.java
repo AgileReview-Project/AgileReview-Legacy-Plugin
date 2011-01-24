@@ -101,14 +101,6 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		return instance;
 	}
 	
-	/**
-	 * Creates a new instance of ReviewExplorer
-	 * (should not be called of someone self, will be called by eclipse)
-	 */
-	public ReviewExplorer() {
-		ViewControl.registerView(this.getClass());
-	}
-	
 	@Override
 	public void createPartControl(Composite parent) 
 	{
@@ -188,6 +180,9 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		String forbiddenChars = props.getInternalProperty(PropertiesManager.INTERNAL_KEYS.FORBIDDEN_CHARS);
 		String regex = "[^"+Pattern.quote(forbiddenChars)+"]*";
 		this.forbiddenCharPattern = Pattern.compile(regex);
+		
+		// register view
+		ViewControl.registerView(this.getClass());
 	}
 	
 	/**

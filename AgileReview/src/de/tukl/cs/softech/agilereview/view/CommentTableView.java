@@ -142,14 +142,6 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 	private HashMap<ITextEditor, AnnotationParser> parserMap = new HashMap<ITextEditor, AnnotationParser>();
 	
 	/**
-	 * Creates a new instance of CommentTableView
-	 * (should not be called of someone self, will be called by eclipse)
-	 */
-	public CommentTableView() {
-		ViewControl.registerView(this.getClass());
-	}
-	
-	/**
 	 * Provides the current used instance of the CommentTableView
 	 * @return instance of CommentTableView
 	 */
@@ -199,6 +191,9 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 		
 		//add help context
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".TableView");
+		
+		// register view
+		ViewControl.registerView(this.getClass());
 		
 	}
 	
