@@ -9,8 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.4.1",
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
- org.eclipse.ltk.core.refactoring;bundle-version="3.4.1",
- org.eclipse.ui;bundle-version="3.6.1"
+ org.eclipse.ui;bundle-version="3.4.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/resolver.jar,
