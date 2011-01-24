@@ -10,6 +10,8 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
+import de.tukl.cs.softech.agilereview.control.ReviewAccess;
+
 /**
  * @author reuter
  *
@@ -95,7 +97,7 @@ public class AgileViewerComparator extends ViewerComparator {
 			rc = c1.getReplies().getReplyArray().length == c2.getReplies().getReplyArray().length ? 0 : (c1.getReplies().getReplyArray().length < c2.getReplies().getReplyArray().length ? -1 : 1);
 			break;
 		case 10:
-			rc = c1.getPath().compareTo(c2.getPath());
+			rc = ReviewAccess.computePath(c1).compareTo(ReviewAccess.computePath(c2));
 			break;
 		default:
 			rc = 0;

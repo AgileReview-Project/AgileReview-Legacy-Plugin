@@ -7,6 +7,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
+import de.tukl.cs.softech.agilereview.control.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
@@ -91,7 +92,7 @@ public class AgileCommentFilter extends ViewerFilter {
 				matches = true;
 			}
 			// match in Path and category ALL or Location
-			if (c.getPath().matches(searchString)&& (restriction.equals("ALL") || restriction.equals("Location"))) {
+			if (ReviewAccess.computePath(c).matches(searchString)&& (restriction.equals("ALL") || restriction.equals("Location"))) {
 				matches = true;
 			}}
 		

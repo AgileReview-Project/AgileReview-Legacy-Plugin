@@ -10,6 +10,8 @@ import java.util.HashSet;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
+import de.tukl.cs.softech.agilereview.control.ReviewAccess;
+
 /**
  * Filters the viewer's model by the selections of the review explorer 
  */
@@ -53,7 +55,7 @@ public class ExplorerSelectionFilter extends ViewerFilter {
 			if (!(containedPaths==null)) {
 				for (String path : containedPaths) {
 					String pathMatcher = ".*"+Pattern.quote(path)+".*";
-					if (comment.getPath().matches(pathMatcher)) {
+					if (ReviewAccess.computePath(comment).matches(pathMatcher)) {
 						matches = true;
 					}	
 				}

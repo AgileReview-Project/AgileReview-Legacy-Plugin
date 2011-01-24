@@ -66,9 +66,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
-import agileReview.softech.tukl.de.ReferenceDocument.Reference;
 import de.tukl.cs.softech.agilereview.Activator;
-import de.tukl.cs.softech.agilereview.control.AnnotationController;
 import de.tukl.cs.softech.agilereview.control.CommentController;
 import de.tukl.cs.softech.agilereview.control.ReviewAccess;
 import de.tukl.cs.softech.agilereview.model.wrapper.AbstractMultipleWrapper;
@@ -219,25 +217,6 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 		}
 		viewer.setInput(this.comments);
 		
-		// create reference for comment
-		comment.setReference(Reference.Factory.newInstance());
-		//Position position = getNewCommentPosition();
-		Position position = getNewCommentPosition();
-		try {
-			position = parserMap.get(getActiveEditor()).addTagsInDocument(comment);
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		comment.getReference().setLength(position.getLength());
-		comment.getReference().setOffset(position.getOffset());
-		
-		// add annotation
-		AnnotationController.getInstance().addAnnotation((ITextEditor) getActiveEditor(), comment);
-		
 		// set selection (to display comment in detail view)
 		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
 		this.parserMap.get(this.getActiveEditor()).reload();
@@ -267,7 +246,6 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		AnnotationController.getInstance().removeAnnotation(comment);
 		this.parserMap.get(this.getActiveEditor()).reload();
 	}
 
@@ -333,7 +311,7 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 			public void doubleClick(DoubleClickEvent event) {
 				Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
 				openEditor(comment);	
-				((ITextEditor)getActiveEditor()).selectAndReveal(comment.getReference().getOffset(), 0);
+				CommentTableView.this.parserMap.get(getActiveEditor()).revealCommentLocation(comment.getId());
 			}
 		});
 
@@ -469,7 +447,7 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 			@Override
 			public String getText(Object element) {
 				Comment c = (Comment) element;
-				return c.getPath();
+				return ReviewAccess.computePath(c);
 			}
 		});
 	}
@@ -566,10 +544,10 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 				commentFilter.setSearchText(text.getText());
 				if (!text.getText().equals("")) {
 					filterComments();
-					AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
+					CommentTableView.this.parserMap.get(getActiveEditor()).reload();
 				} else {
 					filteredComments = comments;
-					AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
+					CommentTableView.this.parserMap.get(getActiveEditor()).reload();
 				}
 				viewer.refresh();		
 			}
@@ -613,7 +591,7 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 					viewer.addFilter(selectionFilter);
 				}
 				filterComments();
-				AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
+				CommentTableView.this.parserMap.get(getActiveEditor()).reload();
 				viewer.refresh();
 			}
 		});
@@ -652,7 +630,7 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 	protected void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor && !this.hideAnnotations) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
-			AnnotationController.getInstance().addAnnotations(editor, this.filteredComments);
+			//AnnotationController.getInstance().addAnnotations(editor, this.filteredComments);
 			if (!this.parserMap.containsKey(editor)) {
 				this.parserMap.put(editor, new AnnotationParser(editor));	
 			} else {
@@ -669,7 +647,7 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 	protected void partHidden(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
-			AnnotationController.getInstance().removeAnnotations(editor);
+			//AnnotationController.getInstance().removeAnnotations(editor);
 		}
 	}
 	
@@ -724,7 +702,7 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 
 				// refresh annotations, update list of filtered comments
 				filterComments();
-				AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
+				//AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
 			}
 		}
 	}
@@ -757,12 +735,12 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 	public void perspectiveActivated(IWorkbenchPage page,
 			IPerspectiveDescriptor perspective) {
 		if (!perspective.getLabel().equals("AgileReview")) {
-			AnnotationController.getInstance().removeAnnotations((ITextEditor) getActiveEditor());
+			//AnnotationController.getInstance().removeAnnotations((ITextEditor) getActiveEditor());
 			this.startup = false;
 			this.hideAnnotations = true;
 		}
 		if (perspective.getLabel().equals("AgileReview") && !this.startup) { 
-			AnnotationController.getInstance().addAnnotations((ITextEditor) getActiveEditor(), this.filteredComments);
+			//AnnotationController.getInstance().addAnnotations((ITextEditor) getActiveEditor(), this.filteredComments);
 			this.hideAnnotations = false;
 		}
 	}
@@ -811,7 +789,7 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 	}
 
 	private void openEditor(Comment comment) {
-		IPath path = new Path(comment.getPath());
+		IPath path = new Path(ReviewAccess.computePath(comment));
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 		try {

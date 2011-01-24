@@ -1,12 +1,7 @@
 package de.tukl.cs.softech.agilereview.model;
 
-import java.lang.reflect.Array;
-import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map.Entry;
-
-import javax.crypto.spec.PSource;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -27,7 +22,7 @@ public class AgileAnnotationModel {
 	/**
 	 * The annotations added by AgileReview to the editor's annotation model 
 	 */
-	private HashMap<Position, ArrayDeque<Annotation>> annotationMap = new HashMap<Position, ArrayDeque<Annotation>>();
+	private HashMap<Position, Annotation> annotationMap = new HashMap<Position, Annotation>();
 	
 	/**
 	 * @param editor The text editor in which the annotations will be displayed
@@ -44,20 +39,6 @@ public class AgileAnnotationModel {
 	public void addAnnotation(Position p) {
 		
 		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "AgileReview Annotation");
-		
-		// there's already an annotation at this position
-		if (this.annotationMap.containsKey(p))
-		{
-			this.annotationMap.get(p).add(annotation);
-		}
-		// there's no annotation at this position
-		else
-		{
-			ArrayDeque<Annotation> tmpQueue = new ArrayDeque<Annotation>();
-			tmpQueue.add(annotation);
-			this.annotationMap.put(p, tmpQueue);
-		}
-		
 		this.annotationModel.addAnnotation(annotation, p);
 		
 	}
@@ -69,35 +50,24 @@ public class AgileAnnotationModel {
 	public void deleteAnnotation(Position p) {
 		
 		// Delete from local savings
-		ArrayDeque<Annotation> currQue = this.annotationMap.get(p);
-		Annotation delAnnotation = currQue.remove();
-
+		Annotation annotation = this.annotationMap.get(p);
+		Position position = this.annotationModel.getPosition(annotation);
 		// Delete from AnnotationModel
-		Position delPosition = this.annotationModel.getPosition(delAnnotation);
-		if (currQue.isEmpty())
-		{
-			this.annotationMap.remove(p);
-			delAnnotation.markDeleted(true);
-			delPosition.delete();
-		}
-		this.annotationModel.removeAnnotation(delAnnotation);
+		this.annotationMap.remove(position);
+		annotation.markDeleted(true);
+		position.delete();
+		this.annotationModel.removeAnnotation(annotation);
 	}
 	
 	/**
 	 * Removes all annotations from the editor's annotation model.
 	 */
-	public void deleteAnnoations() {
+	public void deleteAllAnnoations() {
 		if (!this.annotationMap.isEmpty()) {
 			HashSet<Position> delPos = new HashSet<Position>();
 			delPos.addAll(annotationMap.keySet());
 			for (Position position : delPos) {
-				int numberOfAnnotations = 0;
-				for (Annotation annotation : this.annotationMap.get(position)) {
-					numberOfAnnotations++;
-				}
-				for (int i=0; i<numberOfAnnotations; i++) {
-					deleteAnnotation(position);
-				}
+				deleteAnnotation(position);
 			}
 		}
 	}

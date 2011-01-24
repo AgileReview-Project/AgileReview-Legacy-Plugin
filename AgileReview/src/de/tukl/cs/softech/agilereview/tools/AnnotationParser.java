@@ -325,4 +325,8 @@ public class AnnotationParser {
 	public TreeMap<String, Position> getIdPositionMap() {
 		return idPositionMap;
 	}
+	
+	public void revealCommentLocation(String commentID) {
+		
+	}
 }
