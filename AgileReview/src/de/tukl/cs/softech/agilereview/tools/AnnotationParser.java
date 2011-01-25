@@ -1,7 +1,5 @@
 package de.tukl.cs.softech.agilereview.tools;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
@@ -18,6 +16,8 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import de.tukl.cs.softech.agilereview.model.AgileAnnotationModel;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 
@@ -56,6 +56,9 @@ public class AnnotationParser {
 	 * This map lists every comment tag found in the document with its {@link Position}
 	 */
 	private TreeMap<String, Position> idPositionMap = new TreeMap<String, Position>();
+	/**
+	 * Position map of all tags
+	 */
 	private TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
 	/**
 	 * Document which provides the contents for this instance
@@ -65,6 +68,10 @@ public class AnnotationParser {
 	 * The document of this parser
 	 */
 	private ITextEditor editor;
+	/**
+	 * Annotation model for this parser
+	 */
+	private AgileAnnotationModel annotationModel;
 
 	/**
 	 * Creates a new instance of AnnotationParser with the given input
@@ -83,6 +90,7 @@ public class AnnotationParser {
 		}
 		this.editor = editor;
 		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		this.annotationModel = new AgileAnnotationModel(editor);
 		parseInput();
 	}
 	
@@ -90,6 +98,7 @@ public class AnnotationParser {
 	 * Parses all comment tags and saves them with their {@link Position}
 	 */
 	private void parseInput() {
+		annotationModel.deleteAllAnnoations();
 		idPositionMap.clear();
 		idTagPositions.clear();
 		Matcher matcher;
@@ -180,6 +189,7 @@ public class AnnotationParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		annotationModel.addAnnotations(this.idPositionMap.values());
 	}
 	
 	/**
@@ -326,28 +336,32 @@ public class AnnotationParser {
 		return idPositionMap;
 	}
 	
+	/**
+	 * Jumps to the first line of the given comment
+	 * @param commentID of the displayed comment
+	 */
 	public void revealCommentLocation(String commentID) {
-		
+		editor.selectAndReveal(this.idPositionMap.get(commentID).offset, 0);
 	}
 	
 	/**
 	 * Hides all Comment Annotations of the editor 
 	 */
 	public void hideAnnotations() {
-		
+		//TODO
 	}
 	
 	/**
 	 * Shows all Comment Annotations of the editor
 	 */
 	public void showAnnotations() {
-		
+		//TODO
 	}
 	
 	/**
 	 * Remove all annotations, should be used, when editor is closed 
 	 */
 	public void removeAllAnnotations() {
-		
+		//TODO
 	}
 }

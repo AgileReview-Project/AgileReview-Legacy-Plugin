@@ -1,6 +1,6 @@
 package de.tukl.cs.softech.agilereview.model;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -26,6 +26,7 @@ public class AgileAnnotationModel {
 	private HashMap<Position, Annotation> annotationMap = new HashMap<Position, Annotation>();
 	
 	/**
+	 * Creates a new AgileAnnotationModel
 	 * @param editor The text editor in which the annotations will be displayed
 	 */
 	public AgileAnnotationModel(IEditorPart editor) {
@@ -42,6 +43,16 @@ public class AgileAnnotationModel {
 		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "AgileReview Annotation");
 		this.annotationModel.addAnnotation(annotation, p);
 		
+	}
+	
+	/**
+	 * Adds all annotations of the given collection
+	 * @param ps collection of positions to be added
+	 */
+	public void addAnnotations(Collection<Position> ps) {
+		for(Position p : ps) {
+			addAnnotation(p);
+		}
 	}
 	
 	/**
@@ -89,7 +100,7 @@ public class AgileAnnotationModel {
 	 * Hides all annotation at the given positions instead of removing them completely
 	 * @param positions the positions
 	 */
-	public void hideAllAnnotations(ArrayList<Position> positions) {
+	public void hideAllAnnotations(Collection<Position> positions) {
 		for (Position p : positions) {
 			hideAnnotation(p);
 		}

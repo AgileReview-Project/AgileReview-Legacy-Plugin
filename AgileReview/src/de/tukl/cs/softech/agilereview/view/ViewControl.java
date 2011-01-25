@@ -13,13 +13,12 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.part.ViewPart;
 
 /**
  * The ViewControl provides information about the current displayed ViewPart of
  * this plugin. Furthermore the ViewControl provides and forwards events of the
- * following Listener: {@link ISelectionListener}, {@link IPartListener2}
+ * following Listener: {@link ISelectionListener}, {@link IPartListener2}, {@link IPerspectiveListener3}
  */
 public class ViewControl implements ISelectionListener, IPartListener2, IPerspectiveListener3 {
 	
@@ -37,17 +36,15 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 * Creates a new instance of ViewControl
 	 */
 	private ViewControl() {
-		//wait until the active page is created, then register all listeners
 		Display.getCurrent().asyncExec(new Runnable() {
-			
 			@Override
 			public void run() {
+				//wait until the active page is created, then register all listeners
 				while(PlatformUI.getWorkbench() == null) {}
 				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {}
 				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {}
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(ViewControl.this);
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addSelectionListener(ViewControl.this);
-				// register this class as a perspective listener
 				IPageService service = (IPageService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IPageService.class);
 				service.addPerspectiveListener(ViewControl.this);
 			}
@@ -87,6 +84,12 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	//****** ISelectionListener **************
 	//****************************************
 	
+	
+	/** listens for selectionChanged events and forwards these to following methods:<br>
+	 *  {@link CommentTableView#selectionChanged(IWorkbenchPart, ISelection)}<br>
+	 *  {@link DetailView#selectionChanged(IWorkbenchPart, ISelection)}
+	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if(selection != null && part != null) {
@@ -102,13 +105,20 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	//****************************************
 	//********** IPartListener2 **************
 	//****************************************
-
+	
+	/** not yet used
+	 * @see org.eclipse.ui.IPartListener2#partActivated(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partActivated(IWorkbenchPartReference partRef) {
-		// TODO Auto-generated method stub
 		
 	}
 
+	/**
+	 * listens whether a part was brought to top and forwards this to the following methods:<br>
+	 * {@link CommentTableView#partBroughtToTop(IWorkbenchPartReference)}
+	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if(isOpen(CommentTableView.class)) {
@@ -116,6 +126,12 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 		}
 	}
 
+	/**
+	 * listens whether a part was closed and forwards this to the following methods:<br>
+	 * {@link CommentTableView#partClosed(IWorkbenchPartReference)}<br>
+	 * {@link DetailView#partClosedOrDeactivated(IWorkbenchPart)}
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
 		activeViews.remove(partRef.getPart(false));
@@ -123,97 +139,112 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 		if(isOpen(DetailView.class)) {
 			DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
 		}
-		
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().partClosed(partRef);
 		}
 	}
 
+	/**
+	 * listens whether a part was deactivated and forwards this to the following methods:<br>
+	 * {@link DetailView#partClosedOrDeactivated(IWorkbenchPart)}
+	 * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partDeactivated(IWorkbenchPartReference partRef) {
 		if(isOpen(DetailView.class)) {
 			DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
 		}		
 	}
-
+	
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partOpened(IWorkbenchPartReference partRef) {
-		// TODO Auto-generated method stub
 		
 	}
 
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partHidden(IWorkbenchPartReference partRef) {
-		// TODO Auto-generated method stub
 		
 	}
 
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPartListener2#partVisible(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partVisible(IWorkbenchPartReference partRef) {
-		// TODO Auto-generated method stub
-		
+				
 	}
 
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
+	 */
 	@Override
 	public void partInputChanged(IWorkbenchPartReference partRef) {
-		// TODO Auto-generated method stub
-		
+				
 	}
 	
 	//****************************************
-	//******* IPerspectiveListener3 **********
+	//****** IPerspectiveListener3 ***********
 	//****************************************
 
+	/** 
+	 * not yet used
+	 * @see org.eclipse.ui.IPerspectiveListener2#perspectiveChanged(org.eclipse.ui.IWorkbenchPage, org.eclipse.ui.IPerspectiveDescriptor, org.eclipse.ui.IWorkbenchPartReference, java.lang.String)
+	 */
 	@Override
-	public void perspectiveClosed(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void perspectiveDeactivated(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void perspectiveOpened(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void perspectiveSavedAs(IWorkbenchPage page,
-			IPerspectiveDescriptor oldPerspective,
-			IPerspectiveDescriptor newPerspective) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void perspectiveChanged(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective,
+	public void perspectiveChanged(IWorkbenchPage page,	IPerspectiveDescriptor perspective,
 			IWorkbenchPartReference partRef, String changeId) {
-		// TODO Auto-generated method stub
 		
 	}
 
+	/**
+	 * listens whether a perspective was activated and forwards this to the following methods:<br>
+	 * {@link CommentTableView#perspectiveActivated(IWorkbenchPage, IPerspectiveDescriptor)}
+	 * @see org.eclipse.ui.IPerspectiveListener#perspectiveActivated(org.eclipse.ui.IWorkbenchPage, org.eclipse.ui.IPerspectiveDescriptor)
+	 */
 	@Override
-	public void perspectiveActivated(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
+	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().perspectiveActivated(page, perspective);
 		}
+	}
+
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPerspectiveListener#perspectiveChanged(org.eclipse.ui.IWorkbenchPage, org.eclipse.ui.IPerspectiveDescriptor, java.lang.String)
+	 */
+	@Override
+	public void perspectiveChanged(IWorkbenchPage page,	IPerspectiveDescriptor perspective, String changeId) {
 		
 	}
 
 	@Override
-	public void perspectiveChanged(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective, String changeId) {
-		// TODO Auto-generated method stub
+	public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		
+	}
+
+	@Override
+	public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		
+	}
+
+	@Override
+	public void perspectiveDeactivated(IWorkbenchPage page,	IPerspectiveDescriptor perspective) {
+		
+	}
+
+	@Override
+	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective,
+			IPerspectiveDescriptor newPerspective) {
 		
 	}
 }

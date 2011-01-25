@@ -52,9 +52,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPageService;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IPerspectiveListener3;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -638,7 +636,8 @@ public class CommentTableView extends ViewPart {
 	}
 	
 	/**
-	* @param partRef will be forwarded from the {@link ViewControl}
+	 * Editor has been closed, remove from parserMap
+	 * @param partRef will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	protected void partClosed(IWorkbenchPartReference partRef) {
@@ -731,8 +730,7 @@ public class CommentTableView extends ViewPart {
 		
 	}
 	
-	public void perspectiveActivated(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
+	protected void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		if (!perspective.getLabel().equals("AgileReview")) {
 			//AnnotationController.getInstance().removeAnnotations((ITextEditor) getActiveEditor());
 			this.startup = false;
