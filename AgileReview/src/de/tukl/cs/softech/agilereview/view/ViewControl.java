@@ -13,6 +13,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -47,7 +48,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(ViewControl.this);
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addSelectionListener(ViewControl.this);
 				// register this class as a perspective listener
-				IPageService service = (IPageService) PlatformUI.getWorkbench().getService(IPageService.class);
+				IPageService service = (IPageService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IPageService.class);
 				service.addPerspectiveListener(ViewControl.this);
 			}
 		});
@@ -122,6 +123,10 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 		if(isOpen(DetailView.class)) {
 			DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
 		}
+		
+		if(isOpen(CommentTableView.class)) {
+			CommentTableView.getInstance().partClosed(partRef);
+		}
 	}
 
 	@Override
@@ -139,9 +144,8 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 
 	@Override
 	public void partHidden(IWorkbenchPartReference partRef) {
-		if(isOpen(CommentTableView.class)) {
-			CommentTableView.getInstance().partHidden(partRef);
-		}
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -200,7 +204,9 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	@Override
 	public void perspectiveActivated(IWorkbenchPage page,
 			IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
+		if(isOpen(CommentTableView.class)) {
+			CommentTableView.getInstance().perspectiveActivated(page, perspective);
+		}
 		
 	}
 

@@ -329,4 +329,25 @@ public class AnnotationParser {
 	public void revealCommentLocation(String commentID) {
 		
 	}
+	
+	/**
+	 * Hides all Comment Annotations of the editor 
+	 */
+	public void hideAnnotations() {
+		
+	}
+	
+	/**
+	 * Shows all Comment Annotations of the editor
+	 */
+	public void showAnnotations() {
+		
+	}
+	
+	/**
+	 * Remove all annotations, should be used, when editor is closed 
+	 */
+	public void removeAllAnnotations() {
+		
+	}
 }

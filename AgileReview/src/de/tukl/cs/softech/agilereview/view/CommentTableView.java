@@ -631,24 +631,23 @@ public class CommentTableView extends ViewPart {
 	protected void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor && !this.hideAnnotations) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
-			//AnnotationController.getInstance().addAnnotations(editor, this.filteredComments);
 			if (!this.parserMap.containsKey(editor)) {
-				this.parserMap.put(editor, new AnnotationParser(editor));	
-			} else {
-				this.parserMap.get(editor).reload();
+				this.parserMap.put(editor, new AnnotationParser(editor));
 			}
 		}
 	}
-
+	
 	/**
-	 * Editor has been hidden, remove annotations
-	 * @param partRef will be forwarded from the {@link ViewControl}
-	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
+	* @param partRef will be forwarded from the {@link ViewControl}
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	protected void partHidden(IWorkbenchPartReference partRef) {
+	protected void partClosed(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
-			//AnnotationController.getInstance().removeAnnotations(editor);
+			if (this.parserMap.containsKey(editor)) {
+				this.parserMap.get(editor).removeAllAnnotations();
+				this.parserMap.remove(editor);
+			}
 		}
 	}
 	
@@ -731,7 +730,6 @@ public class CommentTableView extends ViewPart {
 		// TODO Auto-generated method stub
 		
 	}
-
 	
 	public void perspectiveActivated(IWorkbenchPage page,
 			IPerspectiveDescriptor perspective) {
