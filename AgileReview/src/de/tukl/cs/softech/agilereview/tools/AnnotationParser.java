@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.tools;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -195,7 +196,13 @@ public class AnnotationParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		annotationModel.displayAnnotations(this.idPositionMap.values());
+		
+		HashMap<Position, String> toDisplay = new HashMap<Position, String>();
+		for(String s : idPositionMap.keySet()) {
+			toDisplay.put(idPositionMap.get(s), s);
+		}
+		
+		annotationModel.displayAnnotations(toDisplay);
 	}
 	
 	/**
@@ -206,6 +213,8 @@ public class AnnotationParser {
 	 * @throws CoreException 
 	 */
 	public Position addTagsInDocument(Comment comment) throws BadLocationException, CoreException {
+		//TODO debug
+		System.out.println("AnnotationParser -> addTagsInDocument");
 		Position result = null;
 
 		ISelection selection= editor.getSelectionProvider().getSelection();
@@ -267,10 +276,6 @@ public class AnnotationParser {
 			// Save the current document to save the tags
 			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
 		}
-		//add comment to annotation model  //TODO only if in current filter??
-		if(result != null) {
-			this.annotationModel.addAnnotation(result);
-		}
 		parseInput();
 		return result;
 	}
@@ -329,8 +334,8 @@ public class AnnotationParser {
 					cp.add(new ComparablePosition(ps[i]));
 				}
 				tagPositions.addAll(cp);
-				//clean annotation / maps
-				this.annotationModel.deleteAnnotation(this.idPositionMap.get(key));
+				//maps
+				this.annotationModel.deleteAnnotation(key);
 				this.idTagPositions.remove(key);
 				this.idPositionMap.remove(key);
 			}

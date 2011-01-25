@@ -3,6 +3,7 @@ package de.tukl.cs.softech.agilereview.model;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.text.Position;
@@ -24,7 +25,8 @@ public class AgileAnnotationModel {
 	/**
 	 * The annotations added by AgileReview to the editor's annotation model 
 	 */
-	private HashMap<Position, Annotation> annotationMap = new HashMap<Position, Annotation>();
+	private HashMap<String, Annotation> annotationMap = new HashMap<String, Annotation>();
+	private HashMap<String, Position> positionMap = new HashMap<String, Position>();
 	
 	/**
 	 * Creates a new AgileAnnotationModel
@@ -40,19 +42,19 @@ public class AgileAnnotationModel {
 	 * not be displayed any more will be removed and not yet drawn annotations will be added to the annotation model.
 	 * @param positions to be marked as annotations in the editor
 	 */
-	public void displayAnnotations(Collection<Position> positions) {
+	public void displayAnnotations(Map<Position, String> keyPositionMap) {
 		//remove annotations which should not be displayed
-		Set<Position> toDelete = this.annotationMap.keySet();
-		toDelete.removeAll(positions);
-		for(Position p : toDelete) {
-			deleteAnnotation(p);
+		Set<Position> toDelete = new HashSet<Position>(positionMap.values());
+		toDelete.removeAll(keyPositionMap.keySet());
+		if(!toDelete.isEmpty()) {
+			deleteAllAnnoations();
 		}
 		
 		//determine all annotations which should be displayed and have not been displayed yet
-		Set<Position> toDraw = new HashSet<Position>(positions);
+		Set<Position> toDraw = new HashSet<Position>(keyPositionMap.keySet());
 		toDraw.removeAll(this.annotationMap.keySet());
 		for(Position p : toDraw) {
-			addAnnotation(p);
+			addAnnotation(keyPositionMap.get(p), p);
 		}
 	}
 	
@@ -60,23 +62,43 @@ public class AgileAnnotationModel {
 	 * Adds a new annotation at a given position p.
 	 * @param p The position to add the annotation on.
 	 */
-	public void addAnnotation(Position p) {
+	public void addAnnotation(String commentKey, Position p) {
+		//TODO debug
+		System.out.println("add Annotation: "+p);
 		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "AgileReview Annotation");
+		this.annotationMap.put(commentKey, annotation);
 		this.annotationModel.addAnnotation(annotation, p);
+		this.positionMap.put(commentKey, p);
 	}
 	
 	/**
 	 * Deletes an existing annotation at a given position p.
 	 * @param p The position where the annotation will be deleted.
 	 */
-	public void deleteAnnotation(Position p) {
+	public void deleteAnnotation(String commentKey) {
+		//TODO debug
+		System.out.println("delete Annotation: "+commentKey);
 		// Delete from local savings
-		Annotation annotation = this.annotationMap.get(p);
+		Annotation annotation = this.annotationMap.get(commentKey);
 		Position position = this.annotationModel.getPosition(annotation);
 		// Delete from AnnotationModel
-		this.annotationMap.remove(position);
+		this.annotationMap.remove(commentKey);
 		annotation.markDeleted(true);
 		position.delete();
 		this.annotationModel.removeAnnotation(annotation);
+		this.positionMap.remove(commentKey);
+	}
+	
+	/**
+	 * Removes all annotations from the editor's annotation model.
+	 */
+	public void deleteAllAnnoations() {
+		if (!this.positionMap.isEmpty()) {
+			for(String p : positionMap.keySet()) {
+				deleteAnnotation(p);
+			}
+			annotationMap.clear();
+			positionMap.clear();
+		}
 	}
 }
