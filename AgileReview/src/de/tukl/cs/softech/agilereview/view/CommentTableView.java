@@ -80,7 +80,7 @@ import de.tukl.cs.softech.agilereview.view.commenttable.ExplorerSelectionFilter;
 /**
  * Used to provide an overview for review comments using a table
  */
-public class CommentTableView extends ViewPart implements IPerspectiveListener3 {
+public class CommentTableView extends ViewPart {
 
 	/**
 	 * Current Instance used by the ViewPart
@@ -183,15 +183,16 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 		// register this class as a selection provider
 		getSite().setSelectionProvider(viewer);
 		
-		// register this class as a perspective listener
-		IPageService service = (IPageService) getSite().getService(IPageService.class);
-		service.addPerspectiveListener(this);
-		
 		//add help context
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".TableView");
 		
 		// register view
 		ViewControl.registerView(this.getClass());
+		
+		// get editor that is active when opening eclipse
+		if (getActiveEditor() instanceof ITextEditor) {
+			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
+		}
 		
 	}
 	
@@ -731,7 +732,7 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 		
 	}
 
-	@Override
+	
 	public void perspectiveActivated(IWorkbenchPage page,
 			IPerspectiveDescriptor perspective) {
 		if (!perspective.getLabel().equals("AgileReview")) {
@@ -743,49 +744,6 @@ public class CommentTableView extends ViewPart implements IPerspectiveListener3 
 			//AnnotationController.getInstance().addAnnotations((ITextEditor) getActiveEditor(), this.filteredComments);
 			this.hideAnnotations = false;
 		}
-	}
-
-	@Override
-	public void perspectiveDeactivated(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
-				
-	}
-
-	@Override
-	public void perspectiveChanged(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective, String changeId) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void perspectiveClosed(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void perspectiveOpened(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void perspectiveSavedAs(IWorkbenchPage page,
-			IPerspectiveDescriptor oldPerspective,
-			IPerspectiveDescriptor newPerspective) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void perspectiveChanged(IWorkbenchPage page,
-			IPerspectiveDescriptor perspective,
-			IWorkbenchPartReference partRef, String changeId) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void openEditor(Comment comment) {

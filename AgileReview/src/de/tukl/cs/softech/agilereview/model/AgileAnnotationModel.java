@@ -1,5 +1,6 @@
 package de.tukl.cs.softech.agilereview.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -68,6 +69,49 @@ public class AgileAnnotationModel {
 			delPos.addAll(annotationMap.keySet());
 			for (Position position : delPos) {
 				deleteAnnotation(position);
+			}
+		}
+	}
+	
+	/**
+	 * Hides an annotation at a given position instead of removing it completely
+	 * @param position the position
+	 */
+	public void hideAnnotation(Position position) {
+		Annotation annotation = this.annotationMap.get(position);
+		if (annotation!=null) {
+			annotation.markDeleted(true);
+			this.annotationModel.removeAnnotation(annotation);
+		}
+	}
+	
+	/**
+	 * Hides all annotation at the given positions instead of removing them completely
+	 * @param positions the positions
+	 */
+	public void hideAllAnnotations(ArrayList<Position> positions) {
+		for (Position p : positions) {
+			hideAnnotation(p);
+		}
+	}
+	
+	/**
+	 * Displays an annotation at a given position if it was hidden before
+	 * @param position the position
+	 */
+	public void showAnnotation(Position position) {
+		Annotation annotation = this.annotationMap.get(position);
+		if (annotation!=null & annotation.isMarkedDeleted()) {
+			annotation.markDeleted(false);
+			annotationModel.addAnnotation(annotation, position);
+		}
+	}
+	
+	public void showAllAnnoations() {
+		for (Position position : annotationMap.keySet()) {
+			Annotation annotation = this.annotationMap.get(position); 
+			if (annotation.isMarkedDeleted()) {
+				this.annotationModel.addAnnotation(annotation, position);
 			}
 		}
 	}

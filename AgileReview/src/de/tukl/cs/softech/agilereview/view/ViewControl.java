@@ -4,8 +4,12 @@ import java.util.HashSet;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IPageService;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveListener3;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
@@ -16,7 +20,7 @@ import org.eclipse.ui.part.ViewPart;
  * this plugin. Furthermore the ViewControl provides and forwards events of the
  * following Listener: {@link ISelectionListener}, {@link IPartListener2}
  */
-public class ViewControl implements ISelectionListener, IPartListener2 {
+public class ViewControl implements ISelectionListener, IPartListener2, IPerspectiveListener3 {
 	
 	/**
 	 * Set of all active Views
@@ -42,6 +46,9 @@ public class ViewControl implements ISelectionListener, IPartListener2 {
 				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {}
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(ViewControl.this);
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addSelectionListener(ViewControl.this);
+				// register this class as a perspective listener
+				IPageService service = (IPageService) PlatformUI.getWorkbench().getService(IPageService.class);
+				service.addPerspectiveListener(ViewControl.this);
 			}
 		});
 	}
@@ -145,6 +152,61 @@ public class ViewControl implements ISelectionListener, IPartListener2 {
 
 	@Override
 	public void partInputChanged(IWorkbenchPartReference partRef) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	//****************************************
+	//******* IPerspectiveListener3 **********
+	//****************************************
+
+	@Override
+	public void perspectiveClosed(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void perspectiveDeactivated(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void perspectiveOpened(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void perspectiveSavedAs(IWorkbenchPage page,
+			IPerspectiveDescriptor oldPerspective,
+			IPerspectiveDescriptor newPerspective) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void perspectiveChanged(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective,
+			IWorkbenchPartReference partRef, String changeId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void perspectiveActivated(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void perspectiveChanged(IWorkbenchPage page,
+			IPerspectiveDescriptor perspective, String changeId) {
 		// TODO Auto-generated method stub
 		
 	}
