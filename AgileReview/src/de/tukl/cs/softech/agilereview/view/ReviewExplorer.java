@@ -198,9 +198,10 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 			{
 				Review newRev = RA.createNewReview(in.getValue().trim());
 				MultipleReviewWrapper rWrap = new MultipleReviewWrapper(newRev, newRev.getId());
-				// When a new review is created this should be open
+				// When a new review is created this should be open an activated
 				rWrap.setOpen(true);
 				this.props.addToOpenReviews(newRev.getId());
+				this.props.setActiveReview(newRev.getId());
 				
 				root.addReview(rWrap);
 				this.refresh();

@@ -1,8 +1,10 @@
 package de.tukl.cs.softech.agilereview.view.explorer;
 
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
 import de.tukl.cs.softech.agilereview.model.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * Comparator which determines the ordering of elements in the Review Explorer.
@@ -26,6 +28,26 @@ public class REViewerComparator extends ViewerComparator
 			}
 		}
 
+		return result;
+	}
+	
+	@Override
+	public int compare(Viewer viewer, Object e1, Object e2)
+	{
+		int result = super.compare(viewer, e1, e2);
+		if (e1 instanceof MultipleReviewWrapper && e2 instanceof MultipleReviewWrapper)
+		{
+			String activeReview = PropertiesManager.getInstance().getActiveReview();
+			if (activeReview.equals(((MultipleReviewWrapper)e1).getReviewId()))
+			{
+				result = -1;
+			}
+			else if (activeReview.equals(((MultipleReviewWrapper)e2).getReviewId()))
+			{
+				result = 1;
+			}
+		}
+		
 		return result;
 	}
 }
