@@ -1,5 +1,8 @@
 package de.tukl.cs.softech.agilereview.tools;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
@@ -98,7 +101,6 @@ public class AnnotationParser {
 	 * Parses all comment tags and saves them with their {@link Position}
 	 */
 	private void parseInput() {
-		annotationModel.deleteAllAnnoations();
 		idPositionMap.clear();
 		idTagPositions.clear();
 		Matcher matcher;
@@ -119,6 +121,7 @@ public class AnnotationParser {
 						if(tagPositions != null) {
 							//same begin tag already exists
 							document.replace(r.getOffset(), r.getLength(), "");
+							//TODO Debug output
 							System.out.println("currupt: <same begin tag already exists>: "+key);
 							tagDeleted = true;
 						} else {
@@ -134,6 +137,7 @@ public class AnnotationParser {
 							if(tagPositions[1] != null) {
 								//same end tag already exists
 								document.replace(r.getOffset(), r.getLength(), "");
+								//TODO Debug output
 								System.out.println("currupt: <same end tag already exists>: "+key);
 								tagDeleted = true;
 							} else {
@@ -149,6 +153,7 @@ public class AnnotationParser {
 						} else {
 							//end tag without begin tag
 							document.replace(r.getOffset(), r.getLength(), "");
+							//TODO Debug output
 							System.out.println("currupt: <end tag without begin tag>: "+key);
 							tagDeleted = true;
 						}
@@ -178,6 +183,7 @@ public class AnnotationParser {
 				Iterator<Position> it = positionsToDelete.descendingIterator();
 				while(it.hasNext()) {
 					Position tmp = it.next();
+					//TODO debug output
 					System.out.println("currupt: <begin tag without end tag>");
 					document.replace(tmp.getOffset(), tmp.getLength(), "");
 				}
@@ -189,7 +195,7 @@ public class AnnotationParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		annotationModel.addAnnotations(this.idPositionMap.values());
+		annotationModel.displayAnnotations(this.idPositionMap.values());
 	}
 	
 	/**
@@ -261,6 +267,11 @@ public class AnnotationParser {
 			// Save the current document to save the tags
 			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
 		}
+		//add comment to annotation model  //TODO only if in current filter??
+		if(result != null) {
+			this.annotationModel.addAnnotation(result);
+		}
+		parseInput();
 		return result;
 	}
 	
@@ -273,24 +284,30 @@ public class AnnotationParser {
 	 * @throws CoreException  if document can not be saved
 	 */
 	public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {
-		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-		String key = comment.getReviewID()+separator+comment.getAuthor()+separator+comment.getId();
-		Position[] p = idTagPositions.get(key);
-		if(p == null) return;
-		
-		if(p[0].equals(p[1])) {
-			//a single line comment
-			document.replace(p[0].getOffset(), p[0].getLength(), "");
-		} else {
-			//begin and end tag (important: delete first end tag, then begin tag)
-			document.replace(p[1].getOffset(), p[1].getLength(), "");
-			document.replace(p[0].getOffset(), p[0].getLength(), "");
-		}
-		// Save the current document to save the change
-		editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
-		
-		// Parse new
-		parseInput();
+		removeCommentsTags(new HashSet<Comment>(Arrays.asList(new Comment[]{comment})));
+//		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+//		String key = comment.getReviewID()+separator+comment.getAuthor()+separator+comment.getId();
+//		Position[] p = idTagPositions.get(key);
+//		if(p == null) return;
+//		
+//		if(p[0].equals(p[1])) {
+//			//a single line comment
+//			document.replace(p[0].getOffset(), p[0].getLength(), "");
+//		} else {
+//			//begin and end tag (important: delete first end tag, then begin tag)
+//			document.replace(p[1].getOffset(), p[1].getLength(), "");
+//			document.replace(p[0].getOffset(), p[0].getLength(), "");
+//		}
+//		// Save the current document to save the change
+//		editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
+//		
+//		//remove comment from annotation model and all stored maps
+//		this.annotationModel.deleteAnnotation(this.idPositionMap.get(key));
+//		this.idPositionMap.remove(key);
+//		this.idTagPositions.remove(key);
+//		
+//		// Parse new
+//		parseInput();
 	}
 	
 	/**
@@ -299,26 +316,33 @@ public class AnnotationParser {
 	 * @throws BadLocationException if the {@link Position} is corrupted (the document should be reparsed then)
 	 * @throws CoreException if document can not be saved
 	 */
-	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {
-		for (Comment c:comments)
-		{
-			this.removeCommentTags(c);
+	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {		
+		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		TreeSet<Position> tagPositions = new TreeSet<Position>();
+		String key;
+		for(Comment c : comments) {
+			key = c.getReviewID()+separator+c.getAuthor()+separator+c.getId();
+			Position[] ps = idTagPositions.get(key);
+			if(ps != null) {
+				ArrayList<ComparablePosition> cp = new ArrayList<ComparablePosition>();
+				for(int i = 0; i < ps.length; i++) {
+					cp.add(new ComparablePosition(ps[i]));
+				}
+				tagPositions.addAll(cp);
+				//clean annotation / maps
+				this.annotationModel.deleteAnnotation(this.idPositionMap.get(key));
+				this.idTagPositions.remove(key);
+				this.idPositionMap.remove(key);
+			}
 		}
 		
-//		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-//		TreeSet<Position> tagPositions = new TreeSet<Position>();
-//		for(Comment c : comments) {
-//			Position[] ps = idTagPositions.get(c.getReviewID()+separator+c.getAuthor()+separator+c.getId());
-//			if(ps != null) {
-//				tagPositions.addAll(Arrays.asList(ps));
-//			}
-//		}
-//		Iterator<Position> it = tagPositions.descendingIterator();
-//		while(it.hasNext()) {
-//			Position tmp = it.next();
-//			document.replace(tmp.getOffset(), tmp.getLength(), "");
-//		}
-//		parseInput();
+		Iterator<Position> it = tagPositions.descendingIterator();
+		while(it.hasNext()) {
+			Position tmp = it.next();
+			document.replace(tmp.getOffset(), tmp.getLength(), "");
+		}
+		
+		parseInput();
 	}
 	
 	/**
@@ -341,27 +365,29 @@ public class AnnotationParser {
 	 * @param commentID of the displayed comment
 	 */
 	public void revealCommentLocation(String commentID) {
+		//TODO debug output
+		System.out.println("reveal -> "+commentID);
 		editor.selectAndReveal(this.idPositionMap.get(commentID).offset, 0);
 	}
 	
 	/**
 	 * Hides all Comment Annotations of the editor 
 	 */
-	public void hideAnnotations() {
-		//TODO
-	}
+//	public void hideAnnotations() {
+//		//TODO
+//	}
 	
 	/**
 	 * Shows all Comment Annotations of the editor
 	 */
-	public void showAnnotations() {
-		//TODO
-	}
+//	public void showAnnotations() {
+//		//TODO
+//	}
 	
 	/**
 	 * Remove all annotations, should be used, when editor is closed 
 	 */
-	public void removeAllAnnotations() {
-		//TODO
-	}
+//	public void removeAllAnnotations() {
+//		//TODO
+//	}
 }

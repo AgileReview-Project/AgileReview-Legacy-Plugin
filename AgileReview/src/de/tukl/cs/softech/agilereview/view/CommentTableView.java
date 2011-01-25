@@ -16,6 +16,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -78,7 +79,7 @@ import de.tukl.cs.softech.agilereview.view.commenttable.ExplorerSelectionFilter;
 /**
  * Used to provide an overview for review comments using a table
  */
-public class CommentTableView extends ViewPart {
+public class CommentTableView extends ViewPart implements IDoubleClickListener {
 
 	/**
 	 * Current Instance used by the ViewPart
@@ -218,7 +219,17 @@ public class CommentTableView extends ViewPart {
 		
 		// set selection (to display comment in detail view)
 		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
-		this.parserMap.get(this.getActiveEditor()).reload();
+		
+		try {
+			parserMap.get(getActiveEditor()).addTagsInDocument(comment);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**
@@ -236,8 +247,7 @@ public class CommentTableView extends ViewPart {
 		// remove annotation and tags
 		try {
 			openEditor(comment);
-			AnnotationParser annotationParser = parserMap.get(getActiveEditor());
-			annotationParser.removeCommentTags(comment);
+			parserMap.get(getActiveEditor()).removeCommentTags(comment);
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -245,7 +255,6 @@ public class CommentTableView extends ViewPart {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.parserMap.get(this.getActiveEditor()).reload();
 	}
 
 	/**
@@ -304,15 +313,7 @@ public class CommentTableView extends ViewPart {
 		viewer.addSelectionChangedListener(CommentController.getInstance()); // TODO umstellen auf ISelectionListener und dann über SelectionProvider!!!
 		getSite().setSelectionProvider(viewer);
 		
-		viewer.addDoubleClickListener( new IDoubleClickListener() {
-			
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
-				openEditor(comment);	
-				CommentTableView.this.parserMap.get(getActiveEditor()).revealCommentLocation(comment.getId());
-			}
-		});
+		viewer.addDoubleClickListener(this);
 
 		// set layout of the viewer
 		GridData gridData = new GridData();
@@ -644,7 +645,7 @@ public class CommentTableView extends ViewPart {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			if (this.parserMap.containsKey(editor)) {
-				this.parserMap.get(editor).removeAllAnnotations();
+				//this.parserMap.get(editor).removeAllAnnotations();
 				this.parserMap.remove(editor);
 			}
 		}
@@ -752,5 +753,16 @@ public class CommentTableView extends ViewPart {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+
+	@Override
+	public void doubleClick(DoubleClickEvent event) {
+		Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
+		openEditor(comment);
+		//jump to comment in opened editor
+		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
+		this.parserMap.get(getActiveEditor()).revealCommentLocation(commentTag);
 	}
 }

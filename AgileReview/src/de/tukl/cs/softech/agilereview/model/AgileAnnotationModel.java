@@ -3,6 +3,7 @@ package de.tukl.cs.softech.agilereview.model;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -12,7 +13,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
- * This class is used to store annotations for a given text editor
+ * This class is used to draw and manage annotations for a given text editor
  */
 public class AgileAnnotationModel {
 
@@ -35,24 +36,33 @@ public class AgileAnnotationModel {
 	}
 	
 	/**
+	 * Displays the given positions as annotations in the provided editor. Therefore annotations which should
+	 * not be displayed any more will be removed and not yet drawn annotations will be added to the annotation model.
+	 * @param positions to be marked as annotations in the editor
+	 */
+	public void displayAnnotations(Collection<Position> positions) {
+		//remove annotations which should not be displayed
+		Set<Position> toDelete = this.annotationMap.keySet();
+		toDelete.removeAll(positions);
+		for(Position p : toDelete) {
+			deleteAnnotation(p);
+		}
+		
+		//determine all annotations which should be displayed and have not been displayed yet
+		Set<Position> toDraw = new HashSet<Position>(positions);
+		toDraw.removeAll(this.annotationMap.keySet());
+		for(Position p : toDraw) {
+			addAnnotation(p);
+		}
+	}
+	
+	/**
 	 * Adds a new annotation at a given position p.
 	 * @param p The position to add the annotation on.
 	 */
 	public void addAnnotation(Position p) {
-		
 		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "AgileReview Annotation");
 		this.annotationModel.addAnnotation(annotation, p);
-		
-	}
-	
-	/**
-	 * Adds all annotations of the given collection
-	 * @param ps collection of positions to be added
-	 */
-	public void addAnnotations(Collection<Position> ps) {
-		for(Position p : ps) {
-			addAnnotation(p);
-		}
 	}
 	
 	/**
@@ -60,7 +70,6 @@ public class AgileAnnotationModel {
 	 * @param p The position where the annotation will be deleted.
 	 */
 	public void deleteAnnotation(Position p) {
-		
 		// Delete from local savings
 		Annotation annotation = this.annotationMap.get(p);
 		Position position = this.annotationModel.getPosition(annotation);
@@ -70,61 +79,4 @@ public class AgileAnnotationModel {
 		position.delete();
 		this.annotationModel.removeAnnotation(annotation);
 	}
-	
-	/**
-	 * Removes all annotations from the editor's annotation model.
-	 */
-	public void deleteAllAnnoations() {
-		if (!this.annotationMap.isEmpty()) {
-			HashSet<Position> delPos = new HashSet<Position>();
-			delPos.addAll(annotationMap.keySet());
-			for (Position position : delPos) {
-				deleteAnnotation(position);
-			}
-		}
-	}
-	
-	/**
-	 * Hides an annotation at a given position instead of removing it completely
-	 * @param position the position
-	 */
-	public void hideAnnotation(Position position) {
-		Annotation annotation = this.annotationMap.get(position);
-		if (annotation!=null) {
-			annotation.markDeleted(true);
-			this.annotationModel.removeAnnotation(annotation);
-		}
-	}
-	
-	/**
-	 * Hides all annotation at the given positions instead of removing them completely
-	 * @param positions the positions
-	 */
-	public void hideAllAnnotations(Collection<Position> positions) {
-		for (Position p : positions) {
-			hideAnnotation(p);
-		}
-	}
-	
-	/**
-	 * Displays an annotation at a given position if it was hidden before
-	 * @param position the position
-	 */
-	public void showAnnotation(Position position) {
-		Annotation annotation = this.annotationMap.get(position);
-		if (annotation!=null & annotation.isMarkedDeleted()) {
-			annotation.markDeleted(false);
-			annotationModel.addAnnotation(annotation, position);
-		}
-	}
-	
-	public void showAllAnnoations() {
-		for (Position position : annotationMap.keySet()) {
-			Annotation annotation = this.annotationMap.get(position); 
-			if (annotation.isMarkedDeleted()) {
-				this.annotationModel.addAnnotation(annotation, position);
-			}
-		}
-	}
-	
 }

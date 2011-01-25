@@ -6,6 +6,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
@@ -506,6 +507,17 @@ public class ReviewAccess {
 	public void deleteComment (Comment comment) throws IOException
 	{
 		deleteComment(comment.getReviewID(), comment.getAuthor(), comment.getId());
+	}
+	
+	/**
+	 * @see ReviewAccess#deleteComment(String, String, String)
+	 * @param comments
+	 * @throws IOException
+	 */
+	public void deleteComments (Collection<Comment> comments) throws IOException {
+		for(Comment c : comments) {
+			deleteComment(c.getReviewID(), c.getAuthor(), c.getId());
+		}
 	}
 	
 	/**

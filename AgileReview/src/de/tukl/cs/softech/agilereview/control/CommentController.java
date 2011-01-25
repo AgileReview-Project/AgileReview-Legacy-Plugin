@@ -68,39 +68,38 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * Adds a new comment
 	 */
 	private void addNewComment()  {
-		if (!PropertiesManager.getInstance().getActiveReview().isEmpty())
-		{
-			try
-			{
+		if (!PropertiesManager.getInstance().getActiveReview().isEmpty()) {
+			try	{
 				String pathToFile = "";
 				IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-				if ( part instanceof ITextEditor ) {
-					IEditorInput input = part.getEditorInput();
-					if (input != null && input instanceof FileEditorInput) {
-						pathToFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
+				if(part != null) {
+					if ( part instanceof ITextEditor ) {
+						IEditorInput input = part.getEditorInput();
+						if (input != null && input instanceof FileEditorInput) {
+							pathToFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
+						}
 					}
+					String activeReview = PropertiesManager.getInstance().getActiveReview();
+					String user  = PropertiesManager.getInstance().getUser();
+					// TODO: What to do, if user is not valid
+					Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
+					if(ViewControl.isOpen(CommentTableView.class)) {
+						CommentTableView.getInstance().addComment(newComment);
+					}
+					// Refresh the Review Explorer
+					if(ViewControl.isOpen(ReviewExplorer.class)) {
+						ReviewExplorer.getInstance().refresh();
+					}
+				} else {
+					// no open editor
+					MessageDialog.openWarning(null, "Warning: No open file", "Please open a file in an editor before adding comments!");
 				}
-				String activeReview = PropertiesManager.getInstance().getActiveReview();
-				String user  = PropertiesManager.getInstance().getUser();
-				// TODO: What to do, if user is not valid
-				Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
-				if(ViewControl.isOpen(CommentTableView.class)) {
-					CommentTableView.getInstance().addComment(newComment);
-				}
-				// Refresh the Review Explorer
-				if(ViewControl.isOpen(ReviewExplorer.class)) {
-					ReviewExplorer.getInstance().refresh();
-				}
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				//TODO Auto-generated
 				e.printStackTrace();
 			}
 
-		}
-		else
-		{
+		} else {
 			MessageDialog.openWarning(null, "Warning: No active review", "Please activate a review before adding comments!");
 		}
 	}
@@ -111,17 +110,15 @@ public class CommentController extends Observable implements Listener, ISelectio
 	private void deleteComment() {
 		if(ViewControl.isOpen(CommentTableView.class)) {
 			ArrayList<Comment> copy = new ArrayList<Comment>(currentSelection);
-			Iterator<Comment> it = copy.iterator();
 			CommentTableView ctv = CommentTableView.getInstance();
-			while (it.hasNext()) {
-				Comment c = it.next();
+			for(Comment c : copy) {
 				ctv.deleteComment(c);
-				try {
-					ra.deleteComment(c);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			}
+			try {
+				ra.deleteComments(copy);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
