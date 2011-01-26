@@ -570,7 +570,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 					viewer.addFilter(selectionFilter);
 				}
 				filterComments();
-				CommentTableView.this.parserMap.get(getActiveEditor()).reload();
 				viewer.refresh();
 			}
 		});
@@ -698,10 +697,20 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			// filter by search word from text field
 			filteredCommentObjects = Arrays.asList(commentFilter.filter(viewer, this, this.comments.toArray()));	
 		}		
+		
+		//fill filteredComments and filter annotations
 		this.filteredComments = new ArrayList<Comment>();
+		String[] commentKeys = new String[filteredCommentObjects.size()];
+		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		
+		int i = 0;
 		for (Object o : filteredCommentObjects) {
 			filteredComments.add((Comment) o);
+			commentKeys[i] = ((Comment) o).getReviewID()+keySeparator+((Comment) o).getAuthor()+keySeparator+((Comment) o).getId();
+			i++;
 		}
+		
+		this.parserMap.get(this.getActiveEditor()).filter(commentKeys);
 	}
 
 	@Override

@@ -1,12 +1,14 @@
 package de.tukl.cs.softech.agilereview.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.jface.text.source.IAnnotationModelExtension2;
+import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -19,7 +21,7 @@ public class AgileAnnotationModel {
 	/**
 	 * The texteditor's annotation model
 	 */
-	private IAnnotationModelExtension2 annotationModel;
+	private IAnnotationModelExtension annotationModel;
 	/**
 	 * The annotations added by AgileReview to the editor's annotation model 
 	 */
@@ -31,7 +33,7 @@ public class AgileAnnotationModel {
 	 */
 	public AgileAnnotationModel(IEditorPart editor) {
 		IEditorInput input = editor.getEditorInput();
-		this.annotationModel = (IAnnotationModelExtension2) ((ITextEditor)editor).getDocumentProvider().getAnnotationModel(input);
+		this.annotationModel = (IAnnotationModelExtension) ((ITextEditor)editor).getDocumentProvider().getAnnotationModel(input);
 	}
 	
 	/**
@@ -41,18 +43,24 @@ public class AgileAnnotationModel {
 	 */
 	public void displayAnnotations(Map<String, Position> keyPositionMap) {
 		//add annotations that are not already displayed
+		Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
 		for (String s : keyPositionMap.keySet()) {
 			if (!annotationMap.containsKey(s)) {
-				addAnnotation(s, keyPositionMap.get(s));
+				createNewAnnotation(s);
+				annotationsToAdd.put(annotationMap.get(s), keyPositionMap.get(s));
 			}
 		}
 		//remove annotations that should not be displayed
+		ArrayList<Annotation> annotationsToRemove = new ArrayList<Annotation>();
+		ArrayList<String> keysToDelete = new ArrayList<String>();
 		for (String key : annotationMap.keySet()) {
 			if (!keyPositionMap.containsKey(key)) {
-				deleteAnnotation(key);
+				annotationsToRemove.add(annotationMap.get(key));
+				keysToDelete.add(key);
 			}
 		}
-		
+		annotationModel.replaceAnnotations(annotationsToRemove.toArray(new Annotation[0]), annotationsToAdd);
+		annotationMap.keySet().removeAll(keysToDelete);
 	}
 	
 	/**
@@ -63,36 +71,34 @@ public class AgileAnnotationModel {
 	public void addAnnotation(String commentKey, Position p) {
 		//TODO debug
 		System.out.println("add Annotation: "+commentKey);
+		((IAnnotationModel) this.annotationModel).addAnnotation(createNewAnnotation(commentKey), p);
+	}
+	
+	/**
+	 * Deletes all annotations correlating to the given comment keys
+	 * @param commentKeys unique tag keys of the comment annotations which should
+	 * be deleted
+	 */
+	public void deleteAnnotations(List<String> commentKeys) {
+		Annotation[] annotationsToRemove = new Annotation[commentKeys.size()];
+		for(int i = 0; i < commentKeys.size(); i++) {
+			annotationsToRemove[i] = annotationMap.get(commentKeys.get(i));
+			annotationMap.remove(commentKeys.get(i));
+			annotationsToRemove[i].markDeleted(true);
+			//TODO debug
+			System.out.println("delete Annotation: "+commentKeys.get(i));
+		}
+		annotationModel.replaceAnnotations(annotationsToRemove, null);
+	}
+	
+	/**
+	 * Creates a new annotation for a given comment key
+	 * @param commentKey for which an annotation will be created
+	 * @return created annotation
+	 */
+	private Annotation createNewAnnotation(String commentKey) {
 		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "AgileReview Annotation");
 		this.annotationMap.put(commentKey, annotation);
-		((IAnnotationModel) this.annotationModel).addAnnotation(annotation, p);
-	}
-	
-	/**
-	 * Deletes an existing annotation at a given position p.
-	 * @param commentKey unique tag key of the comment
-	 */
-	public void deleteAnnotation(String commentKey) {
-		//TODO debug
-		System.out.println("delete Annotation: "+commentKey);
-		// Delete from local savings
-		Annotation annotation = this.annotationMap.get(commentKey);
-		// Delete from AnnotationModel
-		this.annotationMap.remove(commentKey);
-		annotation.markDeleted(true);
-		//TODO removeAnnotation performance hint!
-		((IAnnotationModel) this.annotationModel).removeAnnotation(annotation);
-	}
-	
-	/**
-	 * Removes all annotations from the editor's annotation model.
-	 */
-	public void deleteAllAnnoations() {
-		if (!this.annotationMap.isEmpty()) {
-			for(String p : annotationMap.keySet()) {
-				deleteAnnotation(p);
-			}
-			annotationMap.clear();
-		}
+		return annotation;
 	}
 }

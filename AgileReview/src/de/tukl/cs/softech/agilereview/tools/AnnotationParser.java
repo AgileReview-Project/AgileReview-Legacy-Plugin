@@ -214,6 +214,24 @@ public class AnnotationParser {
 	}
 	
 	/**
+	 * Filter annotations and display only the given commentKeys
+	 * @param commentKeys
+	 */
+	public void filter(String[] commentKeys) {
+		//parse another time to get the current positions
+		parseInput();
+		HashMap<String, Position> display = new HashMap<String, Position>();
+		for(String s : commentKeys) {
+			if(this.idPositionMap.get(s) != null) {
+				display.put(s, this.idPositionMap.get(s));
+				System.out.println("filter -> show: "+s);
+			}
+		}
+		System.out.println("---------filter finisch------------");
+		this.annotationModel.displayAnnotations(display);
+	}
+	
+	/**
 	 * Adds the Comment tags for the given comment in the currently opened file at the currently selected place
 	 * @param comment Comment for which the tags should be inserted
 	 * @return Position of the added {@link Comment} or null if the selection is no instance of {@link ITextSelection}
@@ -307,6 +325,7 @@ public class AnnotationParser {
 		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		TreeSet<Position> tagPositions = new TreeSet<Position>();
 		String key;
+		ArrayList<String> keyList = new ArrayList<String>();
 		for(Comment c : comments) {
 			key = c.getReviewID()+separator+c.getAuthor()+separator+c.getId();
 			Position[] ps = idTagPositions.get(key);
@@ -316,12 +335,14 @@ public class AnnotationParser {
 					cp.add(new ComparablePosition(ps[i]));
 				}
 				tagPositions.addAll(cp);
-				//maps
-				this.annotationModel.deleteAnnotation(key);
-				this.idTagPositions.remove(key);
-				this.idPositionMap.remove(key);
+				keyList.add(key);
 			}
 		}
+		
+		//delete annotations and map entries
+		this.annotationModel.deleteAnnotations(keyList);
+		this.idTagPositions.keySet().removeAll(keyList);
+		this.idPositionMap.keySet().removeAll(keyList);
 		
 		Iterator<Position> it = tagPositions.descendingIterator();
 		while(it.hasNext()) {
@@ -361,25 +382,4 @@ public class AnnotationParser {
 			throw new BadLocationException();
 		}
 	}
-	
-	/**
-	 * Hides all Comment Annotations of the editor 
-	 */
-//	public void hideAnnotations() {
-//		//TODO
-//	}
-	
-	/**
-	 * Shows all Comment Annotations of the editor
-	 */
-//	public void showAnnotations() {
-//		//TODO
-//	}
-	
-	/**
-	 * Remove all annotations, should be used, when editor is closed 
-	 */
-//	public void removeAllAnnotations() {
-//		//TODO
-//	}
 }
