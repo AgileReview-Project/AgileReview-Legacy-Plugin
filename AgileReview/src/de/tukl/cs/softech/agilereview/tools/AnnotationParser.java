@@ -201,7 +201,16 @@ public class AnnotationParser {
 		for(String s : idPositionMap.keySet()) {
 			toDisplay.put(idPositionMap.get(s), s);
 		}
-		annotationModel.displayAnnotations(toDisplay);
+		
+		// Save the current document to save the tags
+		try {
+			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		annotationModel.displayAnnotations(idPositionMap);
 	}
 	
 	/**
@@ -271,9 +280,6 @@ public class AnnotationParser {
 				result = new Position(document.getLineOffset(selStartLine), 
 						document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
 			}
-			
-			// Save the current document to save the tags
-			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
 		}
 		parseInput();
 		return result;
@@ -289,29 +295,6 @@ public class AnnotationParser {
 	 */
 	public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {
 		removeCommentsTags(new HashSet<Comment>(Arrays.asList(new Comment[]{comment})));
-//		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-//		String key = comment.getReviewID()+separator+comment.getAuthor()+separator+comment.getId();
-//		Position[] p = idTagPositions.get(key);
-//		if(p == null) return;
-//		
-//		if(p[0].equals(p[1])) {
-//			//a single line comment
-//			document.replace(p[0].getOffset(), p[0].getLength(), "");
-//		} else {
-//			//begin and end tag (important: delete first end tag, then begin tag)
-//			document.replace(p[1].getOffset(), p[1].getLength(), "");
-//			document.replace(p[0].getOffset(), p[0].getLength(), "");
-//		}
-//		// Save the current document to save the change
-//		editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
-//		
-//		//remove comment from annotation model and all stored maps
-//		this.annotationModel.deleteAnnotation(this.idPositionMap.get(key));
-//		this.idPositionMap.remove(key);
-//		this.idTagPositions.remove(key);
-//		
-//		// Parse new
-//		parseInput();
 	}
 	
 	/**
@@ -367,11 +350,16 @@ public class AnnotationParser {
 	/**
 	 * Jumps to the first line of the given comment
 	 * @param commentID of the displayed comment
+	 * @throws BadLocationException if no tags for this commentID exists
 	 */
-	public void revealCommentLocation(String commentID) {
+	public void revealCommentLocation(String commentID) throws BadLocationException {
 		//TODO debug output
 		System.out.println("reveal -> "+commentID);
-		editor.selectAndReveal(this.idPositionMap.get(commentID).offset, 0);
+		if(this.idPositionMap.get(commentID) != null) {
+			editor.selectAndReveal(this.idPositionMap.get(commentID).offset, 0);
+		} else {
+			throw new BadLocationException();
+		}
 	}
 	
 	/**

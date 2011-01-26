@@ -743,7 +743,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		}
 	}
 	
-
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
 		Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
@@ -751,6 +750,12 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		//jump to comment in opened editor
 		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
-		this.parserMap.get(getActiveEditor()).revealCommentLocation(commentTag);
+		try {
+			this.parserMap.get(getActiveEditor()).revealCommentLocation(commentTag);
+		} catch (BadLocationException e) {
+			// TODO perhaps this can be done later via the isSetOrphaned flag of comments
+			MessageDialog.openWarning(null, "Warning: This comment is orphaned", "Please chose an other comment to be opened in the editor!");
+			e.printStackTrace();
+		}
 	}
 }
