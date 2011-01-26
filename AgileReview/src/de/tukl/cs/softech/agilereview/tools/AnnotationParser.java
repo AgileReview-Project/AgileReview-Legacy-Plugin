@@ -201,7 +201,6 @@ public class AnnotationParser {
 		for(String s : idPositionMap.keySet()) {
 			toDisplay.put(idPositionMap.get(s), s);
 		}
-		
 		annotationModel.displayAnnotations(toDisplay);
 	}
 	

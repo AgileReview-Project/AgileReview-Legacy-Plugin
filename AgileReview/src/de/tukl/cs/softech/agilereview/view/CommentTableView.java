@@ -19,9 +19,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -158,11 +155,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			this.comments = ReviewAccess.getInstance().getAllComments();
 			this.filteredComments = this.comments;
 		} catch (XmlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			MessageDialog.openWarning(null, "Error", "An error occured while reading comments from local savings:\n"+e.getMessage());
+			// TODO: check if the above is correct an can if this be remove e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			MessageDialog.openWarning(null, "Error", "An error occured while reading comments from local savings:\n"+e.getMessage());
+			//TODO: check if the above is correct an can if this be remove e.printStackTrace();
 		}
 		
 		// set layout of parent
@@ -264,24 +261,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		return getSite().getPage().getActiveEditor();
 	}
 
-	/**
-	 * @return a position representing the currently selected text, or Position(0,0) if nothing or everything is selected
-	 */
-	private Position getNewCommentPosition() {
-		Position result = new Position(0,0);
-		if (getSite().getPage().getActiveEditor() instanceof IEditorPart) {
-			IEditorPart editor = getSite().getPage().getActiveEditor();
-			IDocument document = ((ITextEditor)editor).getDocumentProvider().getDocument(editor.getEditorInput());
-			ISelection selection = ((ITextEditor)editor).getSelectionProvider().getSelection();
-			int length = ((ITextSelection)selection).getLength();
-			int offset = ((ITextSelection)selection).getOffset();
-			if (!(length == document.getLength())) {
-				result = new Position(offset,length);
-			}
-		}
-		return result;
-	}
-	
 	/**
 	 * Reload current table input
 	 */
@@ -731,6 +710,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 	}
 	
+	/**
+	 * Removes all annotations if the AgileReview perspective is closed. The method is invoke by {@link:ViewControl} 
+	 * @param page the workbench page
+	 * @param perspective the activated perspective
+	 */
 	protected void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		if (!perspective.getLabel().equals("AgileReview")) {
 			//AnnotationController.getInstance().removeAnnotations((ITextEditor) getActiveEditor());
@@ -743,6 +727,10 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		}
 	}
 
+	/**
+	 * Opens an editor for a given comment
+	 * @param comment the comment
+	 */
 	private void openEditor(Comment comment) {
 		IPath path = new Path(ReviewAccess.computePath(comment));
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);

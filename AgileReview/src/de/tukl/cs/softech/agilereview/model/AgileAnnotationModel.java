@@ -43,18 +43,17 @@ public class AgileAnnotationModel {
 	 * @param positions to be marked as annotations in the editor
 	 */
 	public void displayAnnotations(Map<Position, String> keyPositionMap) {
-		//remove annotations which should not be displayed
-		Set<Position> toDelete = new HashSet<Position>(positionMap.values());
-		toDelete.removeAll(keyPositionMap.keySet());
-		if(!toDelete.isEmpty()) {
-			deleteAllAnnoations();
+		//add annotations that are not already displayed
+		for (Position position : keyPositionMap.keySet()) {
+			if (!this.positionMap.values().contains(position)) {
+				addAnnotation(keyPositionMap.get(position), position);
+			}
 		}
-		
-		//determine all annotations which should be displayed and have not been displayed yet
-		Set<Position> toDraw = new HashSet<Position>(keyPositionMap.keySet());
-		toDraw.removeAll(this.annotationMap.keySet());
-		for(Position p : toDraw) {
-			addAnnotation(keyPositionMap.get(p), p);
+		//remove annotations that are not to be displayed
+		for (String key : this.positionMap.keySet()) {
+			if (!keyPositionMap.containsKey(this.positionMap.get(key))) {
+				deleteAnnotation(key);
+			}
 		}
 	}
 	
