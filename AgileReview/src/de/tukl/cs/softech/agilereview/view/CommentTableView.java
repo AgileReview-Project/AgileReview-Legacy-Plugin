@@ -738,12 +738,16 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	protected void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		if (!perspective.getLabel().equals("AgileReview")) {
-			//AnnotationController.getInstance().removeAnnotations((ITextEditor) getActiveEditor());
+			for (AnnotationParser parser: this.parserMap.values()) {
+				parser.filter(new String[0]);
+			}
 			this.startup = false;
 			this.hideAnnotations = true;
 		}
 		if (perspective.getLabel().equals("AgileReview") && !this.startup) { 
-			//AnnotationController.getInstance().addAnnotations((ITextEditor) getActiveEditor(), this.filteredComments);
+			for (AnnotationParser parser : this.parserMap.values()) {
+				parser.reload();
+			}
 			this.hideAnnotations = false;
 		}
 	}
