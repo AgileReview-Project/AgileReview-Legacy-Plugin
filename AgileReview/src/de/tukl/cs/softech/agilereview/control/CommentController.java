@@ -143,7 +143,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 		if((event.widget.getData()) instanceof String) {
 			if(((String)event.widget.getData()).equals("save")) {
 				if(ViewControl.isOpen(CommentTableView.class)) {
-					CommentTableView.getInstance().refreshComments();
+					CommentTableView.getInstance().refreshTable();
 				}
 			} else if(((String)event.widget.getData()).equals("delete")) {
 				deleteComment();

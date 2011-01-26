@@ -264,7 +264,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Reload current table input
 	 */
-	public void refreshComments() {
+	public void refreshTable() {
 		viewer.refresh();
 	}
 	
@@ -591,6 +591,18 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	    
 		return toolBar;
 	}
+	
+	/**
+	 * Resets the comments (i.e. after reload)
+	 * @param comments the new comments
+	 */
+	public void resetComments(ArrayList<Comment> comments) {
+		// TODO: check if annotations need to be removed!!!
+		this.comments = comments;
+		filterComments();
+		this.parserMap.get(getActiveEditor()).reload();
+	}
+	
 		
 	/** Used to add images to add/delete button
 	 * @param path path to the image
