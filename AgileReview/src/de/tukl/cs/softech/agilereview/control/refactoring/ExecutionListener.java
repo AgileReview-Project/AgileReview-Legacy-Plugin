@@ -29,7 +29,6 @@ public class ExecutionListener implements IExecutionListener {
 
 	@Override
 	public void postExecuteSuccess(String commandId, Object returnValue) {
-		System.out.println("blubber succ");
 //		if(commandId.equals("org.eclipse.ui.file.save") || commandId.equals("org.eclipse.ui.file.saveAll")) {
 //			try {
 //				ReviewAccess.getInstance().save();
@@ -43,7 +42,6 @@ public class ExecutionListener implements IExecutionListener {
 
 	@Override
 	public void preExecute(String commandId, ExecutionEvent event) {
-		System.out.println("blubber");
 		/*if (commandId.equals("org.eclipse.ui.edit.cut"))
 		{
 			if (event.getApplicationContext() instanceof EvaluationContext)

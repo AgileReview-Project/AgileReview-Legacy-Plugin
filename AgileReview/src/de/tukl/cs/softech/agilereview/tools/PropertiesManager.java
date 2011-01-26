@@ -333,7 +333,8 @@ public class PropertiesManager {
 	 */
 	public String getUser()
 	{
-		return System.getProperty("user.name");
+		String result = System.getProperty("user.name"); // XXX
+		return result;
 	}
 	
 }

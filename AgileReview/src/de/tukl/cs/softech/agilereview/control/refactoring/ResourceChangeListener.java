@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.control.refactoring;
 
 import java.io.IOException;
 
+import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -9,6 +10,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import de.tukl.cs.softech.agilereview.control.ReviewAccess;
+import de.tukl.cs.softech.agilereview.view.CommentTableView;
 
 /**
  * The ResourceChangeListener listens for move and rename refactorings in order to manage 
@@ -64,9 +66,16 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 		
 		if(!oldPath.equals("") && !newPath.equals("") && !refactoringDone) {
 			System.out.println(">"+oldPath+"< - >"+newPath+"< - "+delta.getResource().getType());
-			try {
+			try 
+			{
+				// Do the refactoring
 				ReviewAccess.getInstance().refactorPath(oldPath, newPath, delta.getResource().getType());
+				// Refresh the TableView
+				CommentTableView.getInstance().resetComments(); // XXX doesn't help much here
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (XmlException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

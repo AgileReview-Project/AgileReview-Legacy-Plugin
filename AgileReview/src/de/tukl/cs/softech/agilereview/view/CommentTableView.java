@@ -593,14 +593,17 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	}
 	
 	/**
-	 * Resets the comments (i.e. after reload)
-	 * @param comments the new comments
+	 * Resets the comments (reloading from model)
+	 * @throws IOException 
+	 * @throws XmlException 
 	 */
-	public void resetComments(ArrayList<Comment> comments) {
+	public void resetComments() throws XmlException, IOException {
 		// TODO: check if annotations need to be removed!!!
-		this.comments = comments;
+		this.comments = ReviewAccess.getInstance().getAllComments();
+		this.viewer.setInput(this.comments);
 		filterComments();
 		this.parserMap.get(getActiveEditor()).reload();
+		this.refreshTable();
 	}
 	
 		

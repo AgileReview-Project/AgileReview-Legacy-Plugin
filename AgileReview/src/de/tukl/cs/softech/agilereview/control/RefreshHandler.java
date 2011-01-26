@@ -8,6 +8,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.view.CommentTableView;
 import de.tukl.cs.softech.agilereview.view.DetailView;
 import de.tukl.cs.softech.agilereview.view.ReviewExplorer;
 
@@ -42,18 +43,18 @@ public class RefreshHandler extends AbstractHandler {
 			}
 		}
 		
-		// Refresh the other views
-//		try 
-//		{
-			ReviewExplorer.getInstance().refreshInput();
-			DetailView.getInstance().changeParent(DetailView.EMPTY);
-			// XXX Noch keine besseren Weg dafür
-//			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(CommentTableView.getInstance());
-//			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("de.tukl.cs.softech.agilereview.view.commenttableview.view");
-//		} catch (PartInitException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+
+		ReviewExplorer.getInstance().refreshInput();
+		DetailView.getInstance().changeParent(DetailView.EMPTY);
+		try {
+			CommentTableView.getInstance().resetComments();
+		} catch (XmlException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Return must be null (see API)
 		return null;

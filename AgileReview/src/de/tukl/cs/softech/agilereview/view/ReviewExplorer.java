@@ -15,6 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
@@ -205,6 +206,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 				
 				root.addReview(rWrap);
 				this.refresh();
+				this.treeViewer.setSelection(new StructuredSelection(rWrap), true);
 			} catch (IOException e) 
 			{
 				// TODO: Auto-generated method stub
@@ -238,7 +240,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		treeViewer.getTree().setRedraw(false);
 		for (MultipleReviewWrapper wrap : hsMRW)
 		{
-			// Delete comments of this review from TableView XXX Take the new cool update Tableview routine (not existent yet)
+			// Delete comments of this review from TableView
 			for (Comment c : RA.getComments(wrap.getReviewId()))
 			{
 				CommentTableView.getInstance().deleteComment(c);
@@ -352,6 +354,15 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 					this.props.addToOpenReviews(reviewId);
 				}	
 				this.refresh();
+				try {
+					CommentTableView.getInstance().resetComments();
+				} catch (XmlException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}

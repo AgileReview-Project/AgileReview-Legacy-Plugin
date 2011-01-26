@@ -766,7 +766,7 @@ public class ReviewAccess {
 	
 	
 	/**
-	 * Saves the current xmlBeans objects to files (all in model) TODO: Save on demand
+	 * Saves the current xmlBeans objects to files (all in model)
 	 * @throws IOException 
 	 */
 	public void save() throws IOException

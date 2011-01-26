@@ -9,7 +9,8 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * Comparator which determines the ordering of elements in the Review Explorer.
  * Reviews are firstly ordered by category (category=1 if review is closed, category=0 otherwise) 
- * and then based on their names, all other elements are directly ordered by their names
+ * and then based on their names (except for the active review, which is always on top), 
+ * all other elements are directly ordered by their names
  */
 public class REViewerComparator extends ViewerComparator 
 {
