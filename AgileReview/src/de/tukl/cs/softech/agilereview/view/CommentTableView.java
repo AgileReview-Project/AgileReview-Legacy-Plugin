@@ -618,10 +618,13 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	protected void partBroughtToTop(IWorkbenchPartReference partRef) {
-		if (partRef.getPart(false) instanceof ITextEditor && !this.hideAnnotations) {
+		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			if (!this.parserMap.containsKey(editor)) {
 				this.parserMap.put(editor, new AnnotationParser(editor));
+			}
+			if (this.hideAnnotations) {
+				this.parserMap.get(editor).filter(new String[0]);
 			}
 		}
 	}
