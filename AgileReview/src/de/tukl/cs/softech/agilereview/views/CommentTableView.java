@@ -623,11 +623,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	protected void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
-			if (!this.parserMap.containsKey(editor)) {
+			if (!this.parserMap.containsKey(editor) && !this.hideAnnotations) {
 				this.parserMap.put(editor, new AnnotationParser(editor));
-			}
-			if (this.hideAnnotations) {
-				this.parserMap.get(editor).filter(new String[0]);
 			}
 		}
 	}
@@ -641,7 +638,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			if (this.parserMap.containsKey(editor)) {
-				//this.parserMap.get(editor).removeAllAnnotations();
 				this.parserMap.remove(editor);
 			}
 		}
@@ -747,13 +743,15 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			for (AnnotationParser parser: this.parserMap.values()) {
 				parser.filter(new String[0]);
 			}
+			this.parserMap = new HashMap<ITextEditor, AnnotationParser>();
 			this.startup = false;
 			this.hideAnnotations = true;
 		}
 		if (perspective.getLabel().equals("AgileReview") && !this.startup) { 
-			for (AnnotationParser parser : this.parserMap.values()) {
-				parser.reload();
-			}
+//			for (AnnotationParser parser : this.parserMap.values()) {
+//				parser.reload();
+//			}
+			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
 			this.hideAnnotations = false;
 		}
 	}
