@@ -39,7 +39,7 @@ public class ExplorerSelectionFilter extends ViewerFilter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
-	@Override
+	@Override/*?agilereview|reuter|c11?*/
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		boolean matches = false;
 		if (reviewIDs == null || paths == null || (reviewIDs.isEmpty() && paths.isEmpty())) {
@@ -54,10 +54,10 @@ public class ExplorerSelectionFilter extends ViewerFilter {
 			HashSet<String> containedPaths = paths.get(comment.getReviewID());
 			if (!(containedPaths==null)) {
 				for (String path : containedPaths) {
-					String pathMatcher = ".*"+Pattern.quote(path)+".*";
+					String pathMatcher = ".*"+Pattern.quote(path)+".*";/*?agilereview|reuter|c12*/
 					if (ReviewAccess.computePath(comment).matches(pathMatcher)) {
 						matches = true;
-					}	
+					}	/*agilereview|reuter|c12?*/
 				}
 			}		
 		}

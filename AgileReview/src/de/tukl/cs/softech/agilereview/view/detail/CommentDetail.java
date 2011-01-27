@@ -70,7 +70,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
-	protected void initUI() {
+	protected void initUI() {/*?agilereview|reuter|c5?*/
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 2;
 		gridLayout.numColumns = numColumns;
@@ -178,7 +178,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#saveChanges()
 	 */
-	protected boolean saveChanges() {
+	protected boolean saveChanges() {/*?agilereview|reuter|c6?*/
 		if(attributesChanged()) {
 			editedObject.setLastModified(Calendar.getInstance());
 			return true;
@@ -191,7 +191,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#fillContents(java.lang.Object)
 	 */
-	public void fillContents(Comment comment) {
+	public void fillContents(Comment comment) {/*?agilereview|reuter|c7?*/
 		if(comment != null) {
 			this.backupObject = (Comment)comment.copy();
 			this.editedObject = comment;
@@ -219,7 +219,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#setFocus()
 	 */
-	@Override
+	@Override/*?agilereview|reuter|c8?*/
 	public boolean setFocus() {
 		return this.txt.setFocus();
 	}

@@ -35,7 +35,7 @@ public class RELabelProvider implements ILabelProvider {
 	@Override
 	public void removeListener(ILabelProviderListener listener) {/* not implemented */}
 
-	@Override
+	@Override/*?agilereview|reuter|c1?*/
 	public Image getImage(Object element) {
 		Image result = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(getText(element)).createImage();
 		if ((element instanceof MultipleReviewWrapper))
@@ -62,7 +62,7 @@ public class RELabelProvider implements ILabelProvider {
 		return result;
 	}
 
-	@Override
+	@Override/*?agilereview|reuter|c2?*/
 	public String getText(Object element)
 	{
 		String result = "unknown object";

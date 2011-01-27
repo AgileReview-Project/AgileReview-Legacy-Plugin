@@ -53,8 +53,8 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	    revertButton.setEnabled(false);
 	    revertButton.addListener(SWT.Selection, this);
 	    
-	    saveButton.setText("Save");
-	    saveButton.setData("save");
+	    saveButton.setText("Save");/*?agilereview|reuter|c9*/
+	    saveButton.setData("save");/*agilereview|reuter|c9?*/
 	    saveButton.addListener(SWT.Selection, CommentController.getInstance());
 	}
 
@@ -119,7 +119,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 	 */
-	@Override
+	@Override/*?agilereview|reuter|c10?*/
 	public void handleEvent(Event event) {
 		if(event.widget.getData().equals("revert")) {
 			@SuppressWarnings("unchecked")

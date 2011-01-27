@@ -227,22 +227,22 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 		
 	}
 
-	@Override
+	@Override/*?agilereview|reuter|c17?*/
 	public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		
 	}
 
-	@Override
+	@Override/*?agilereview|reuter|c18?*/
 	public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		
 	}
 
-	@Override
+	@Override/*?agilereview|reuter|c19?*/
 	public void perspectiveDeactivated(IWorkbenchPage page,	IPerspectiveDescriptor perspective) {
 		
 	}
 
-	@Override
+	@Override/*?agilereview|reuter|c20?*/
 	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective,
 			IPerspectiveDescriptor newPerspective) {
 		

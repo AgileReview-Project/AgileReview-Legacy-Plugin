@@ -39,7 +39,7 @@ public class ReplyDialog extends Composite implements Listener {
 	/**
 	 * inserted author text
 	 */
-	private String strReplyAuthor = "";
+	private String strReplyAuthor = "";/*?agilereview|reuter|c3?*/
 	/**
 	 * inserted reply text
 	 */
@@ -118,7 +118,7 @@ public class ReplyDialog extends Composite implements Listener {
 	 * (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 	 */
-	@Override
+	@Override/*?agilereview|reuter|c4?*/
 	public void handleEvent(Event event) {
 		if (event.widget == okButton) {
 			strReplyAuthor = replyAuthorEdit.getText().trim();

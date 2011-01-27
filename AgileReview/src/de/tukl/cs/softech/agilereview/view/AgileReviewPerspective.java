@@ -27,8 +27,8 @@ public class AgileReviewPerspective implements IPerspectiveFactory {
 		
 		IFolderLayout topLeft =	factory.createFolder("left", IPageLayout.LEFT, 0.2f, factory.getEditorArea());
 		topLeft.addView("de.tukl.cs.softech.agilereview.view.reviewnavigator.view");
-		//TODO
-		//topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER);
+		//TODO/*?agilereview|reuter|c0*/
+		//topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER);/*agilereview|reuter|c0?*/
 		
 		factory.addView("de.tukl.cs.softech.agilereview.view.commenttableview.view",
 				IPageLayout.BOTTOM,	0.7f, factory.getEditorArea());
