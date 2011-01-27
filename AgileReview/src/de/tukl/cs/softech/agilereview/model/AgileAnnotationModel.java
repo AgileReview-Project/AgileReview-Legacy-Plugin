@@ -70,7 +70,6 @@ public class AgileAnnotationModel {
 	 */
 	public void addAnnotation(String commentKey, Position p) {
 		//TODO debug
-		System.out.println("add Annotation: "+commentKey);
 		((IAnnotationModel) this.annotationModel).addAnnotation(createNewAnnotation(commentKey), p);
 	}
 	
@@ -86,7 +85,6 @@ public class AgileAnnotationModel {
 			annotationMap.remove(commentKeys.get(i));
 			annotationsToRemove[i].markDeleted(true);
 			//TODO debug
-			System.out.println("delete Annotation: "+commentKeys.get(i));
 		}
 		annotationModel.replaceAnnotations(annotationsToRemove, null);
 	}
