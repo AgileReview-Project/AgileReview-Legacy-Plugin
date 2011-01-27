@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.Preferences;
 
 
-import de.tukl.cs.softech.agilereview.view.DetailView;
+import de.tukl.cs.softech.agilereview.views.DetailView;
 
 /**
  * The PropertiesManager manages the internal configurations (in file: "config/project.properties")
