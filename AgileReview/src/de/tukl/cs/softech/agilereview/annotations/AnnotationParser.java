@@ -21,11 +21,9 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.tools.FileTypeNotSupportedException;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.tools.PropertiesManager.INTERNAL_KEYS;
-
-import agileReview.softech.tukl.de.CommentDocument.Comment;
 
 /**
  * The AnnotationParser analyzes the document of the given editor and provides a mapping
@@ -34,22 +32,30 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 public class AnnotationParser {
 	
 	/**
-	 * Regular Expression to find and differentiate each comment tag in java files
+	 * Key separator for tag creation
 	 */
-	//TODO prove for tag structure including | in order to get more resistance against normal comments
-	private static final String javaTagRegex = "/\\*\\s*(\\??)\\s*([^\\?\\r\\n\\*]*)\\s*(\\??)\\s*\\*/";
+	private static String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 	/**
-	 * Regular Expression to find and differentiate each comment tag in XML files
-	 */	
-	private static final String xmlTagRegex = "<!--\\s*(\\??)\\s*([^\\?\\r\\n\\*]*)\\s*(\\??)\\s*-->";
+	 * Core Regular Expression to find the core tag structure
+	 */
+	private static String rawTagRegex = "\\s*(\\??)"+Pattern.quote(keySeparator)+"\\s*([^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^\\?"+Pattern.quote(keySeparator)+"]*)\\s*"+Pattern.quote(keySeparator)+"(\\??)\\s*";
+	/**
+	 * Regular Expression to find each comment tag in java files
+	 */
+	private static final String javaTagRegex = "/\\*\\s*"+rawTagRegex+"\\s*\\*/";
 	/**
 	 * Pattern to identify comment tags in java files
 	 */
 	private static final Pattern javaTagPattern = Pattern.compile(javaTagRegex);
 	/**
+	 * Regular Expression to find each comment tag in XML files
+	 */
+	private static final String xmlTagRegex = "<!--\\s*"+rawTagRegex+"\\s*-->";
+	/**
 	 * Pattern to identify comment tags in XML files
 	 */
 	private static final Pattern xmlTagPattern = Pattern.compile(xmlTagRegex);
+	
 	/**
 	 * Regular Expression used by this instance
 	 */
@@ -167,7 +173,8 @@ public class AnnotationParser {
 				if(tagDeleted) {
 					startOffset = r.getOffset();
 				} else {
-					startOffset = r.getOffset()+r.getLength();
+					//-1 in oder to ensure that the startOffset will not be greater then the document length
+					startOffset = r.getOffset()+r.getLength()-1;
 				}
 			}
 			
@@ -241,8 +248,6 @@ public class AnnotationParser {
 	 * @throws CoreException 
 	 */
 	public Position addTagsInDocument(Comment comment) throws BadLocationException, CoreException {
-		//TODO debug
-		System.out.println("AnnotationParser -> addTagsInDocument");
 		Position result = null;
 
 		ISelection selection= editor.getSelectionProvider().getSelection();
@@ -250,8 +255,7 @@ public class AnnotationParser {
 			int selStartLine = ((ITextSelection)selection).getStartLine();
 			int selEndLine = ((ITextSelection)selection).getEndLine();
 			
-			String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-			String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
+			String commentTag = keySeparator+comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId()+keySeparator;
 			
 			if (selStartLine == selEndLine)	{
 				// Only one line is selected
@@ -289,8 +293,8 @@ public class AnnotationParser {
 				
 				// Write tags
 				if (editor.getEditorInput().getName().endsWith(".java")) {
-					document.replace(insertEndOffset, 0, "");
-					document.replace(insertStartOffset, 0, "");
+					document.replace(insertEndOffset, 0, "/*"+commentTag+"?*/");
+					document.replace(insertStartOffset, 0, "/*?"+commentTag+"*/");
 					
 				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
 					document.replace(insertEndOffset, 0, "<!--"+commentTag+"?-->");
