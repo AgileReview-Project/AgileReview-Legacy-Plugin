@@ -3,12 +3,10 @@ package de.tukl.cs.softech.agilereview.views;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -42,7 +40,7 @@ import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapp
  * The Review Explorer is the view which shows all reviews as well as 
  * the files and folder which are commented in the corresponding reviews.
  */
-public class ReviewExplorer extends ViewPart implements IDoubleClickListener, IInputValidator {
+public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 
 	/**
 	 * {@link ReviewAccess} for accessing xml data
@@ -83,10 +81,6 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 	 * Properties manager for repeated access 
 	 */
 	private PropertiesManager props = PropertiesManager.getInstance();
-	/**
-	 * Pattern for matching the forbidden characters
-	 */
-	private Pattern forbiddenCharPattern;
 	
 	/**
 	 * Current Instance used by the ViewPart
@@ -177,10 +171,6 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".ReviewExplorer");
 		getSite().setSelectionProvider(treeViewer);
 		
-		// Set inputValidator regex
-		String forbiddenChars = props.getInternalProperty(PropertiesManager.INTERNAL_KEYS.FORBIDDEN_CHARS);
-		String regex = "[^"+Pattern.quote(forbiddenChars)+"]*";
-		this.forbiddenCharPattern = Pattern.compile(regex);
 		
 		// register view
 		ViewControl.registerView(this.getClass());
@@ -191,7 +181,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 	 */
 	private void addNewReview() 
 	{
-		InputDialog in = new InputDialog(null ,"Add new Review", "Please enter a name for the new Review", "", this);
+		InputDialog in = new InputDialog(null ,"Add new Review", "Please enter a name for the new Review", "", PropertiesManager.getInstance());
 		int input = in.open();
 		if (input == Window.OK)
 		{
@@ -202,7 +192,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 				// When a new review is created this should be open an activated
 				rWrap.setOpen(true);
 				this.props.addToOpenReviews(newRev.getId());
-				this.props.setActiveReview(newRev.getId());
+				this.props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, newRev.getId());
 				
 				root.addReview(rWrap);
 				this.refresh();
@@ -250,9 +240,9 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 			RA.deleteReview(wrap.getReviewId());
 			root.deleteReview(wrap);
 			// Check if this was the active review
-			if (props.getActiveReview().equals(wrap.getReviewId()))
+			if (props.getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(wrap.getReviewId()))
 			{
-				props.setActiveReview("");
+				props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, "");
 			}
 			// Remove this review from the list of open reviews (regardless if it was open or not)
 			props.removeFromOpenReviews(wrap.getReviewId());
@@ -299,7 +289,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 			}
 			else
 			{
-				props.setActiveReview(referenceRevId);
+				props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, referenceRevId);
 				this.refresh();
 			}
 		}
@@ -327,13 +317,13 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 					this.props.removeFromOpenReviews(reviewId);
 					
 					// Test if active review may have vanished
-					String activeReview = props.getActiveReview();
+					String activeReview = props.getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 					if (!activeReview.isEmpty())
 					{
 						if (!ReviewAccess.getInstance().isReviewLoaded(activeReview))
 						{
 							// Active review has vanished --> deactivate it
-							props.setActiveReview("");
+							props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, "");
 						}
 					}
 				}
@@ -425,17 +415,6 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener, II
 		}
 	}
 
-	@Override
-	public String isValid(String newText) 
-	{
-		String result = null;
-		if (!this.forbiddenCharPattern.matcher(newText).matches())
-		{
-			result = "Please don't use any of the following characters: "+props.getInternalProperty(PropertiesManager.INTERNAL_KEYS.FORBIDDEN_CHARS);
-		}
-		return result;
-	}
-	
 	@Override
 	public void setFocus() {}
 	

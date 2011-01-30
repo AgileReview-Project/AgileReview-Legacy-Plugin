@@ -48,7 +48,7 @@ public class RELabelProvider implements ILabelProvider {
 			{
 				result = PlatformUI.getWorkbench().getSharedImages().getImage(SharedImages.IMG_OBJ_PROJECT_CLOSED);
 			}
-			else if (elementId.equals(PropertiesManager.getInstance().getActiveReview()))
+			else if (elementId.equals(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW)))
 			{
 				result = AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.REVIEW_OK)).createImage();
 			}
@@ -69,7 +69,7 @@ public class RELabelProvider implements ILabelProvider {
 		if(element instanceof MultipleReviewWrapper) {
 			MultipleReviewWrapper wrap = (MultipleReviewWrapper)element;
 			result = wrap.getReviewId();
-			if (wrap.getReviewId().equals(PropertiesManager.getInstance().getActiveReview()))
+			if (wrap.getReviewId().equals(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW)))
 			{
 				result = result + " (active)";
 			}

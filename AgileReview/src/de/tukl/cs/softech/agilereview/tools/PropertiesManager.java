@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.dialogs.IInputValidator;
 import org.osgi.service.prefs.Preferences;
 
 
@@ -16,10 +17,11 @@ import de.tukl.cs.softech.agilereview.views.DetailView;
  * The PropertiesManager manages the internal configurations (in file: "config/project.properties")
  * as well as the external (workspace-specific) configurations (called preferences)
  */
-public class PropertiesManager {
+public class PropertiesManager implements IInputValidator{
 	
 	/**
 	 * Static class for accessing keys of the internal properties
+	 * Private keys should not be accessed directly but via methods specified in {@link PropertiesManager}
 	 */
 	public static class INTERNAL_KEYS
 	{
@@ -38,7 +40,7 @@ public class PropertiesManager {
 		/**
 		 * Characters which are not allowed in ReviewIds and author names
 		 */
-		public static String FORBIDDEN_CHARS = "forbidden_chars";
+		private static String FORBIDDEN_CHARS = "forbidden_chars";
 		/**
 		 * Possible values for a comment's priority
 		 */
@@ -94,18 +96,24 @@ public class PropertiesManager {
 	
 	/**
 	 * Static class for accessing keys of the external properties (=preferences).
-	 * These preferences are stored in the users workspace and are therefore workspace-specific
+	 * These preferences are stored in the users workspace and are therefore workspace-specific.
+	 * Private keys should not be accessed directly but via methods specified in {@link PropertiesManager}
 	 */
 	public static class EXTERNAL_KEYS
 	{
 		/**
 		 * List of all open review
 		 */
-		public static String OPEN_REVIEWS = "openReviews";
+		private static String OPEN_REVIEWS = "openReviews";
 		/**
 		 * The currently active review
 		 */
 		public static String ACTIVE_REVIEW = "activeReview";
+		/**
+		 * The currently active review
+		 */
+		private static String AUTHOR_NAME = "authorName";
+		
 	}
 	
 	/**
@@ -132,6 +140,10 @@ public class PropertiesManager {
 	 * Strings representing the configured priorities of Comments
 	 */
 	private String[] commentPriorities;
+	/**
+	 * Pattern for detecting forbidden characters
+	 */
+	private Pattern forbiddenCharPattern;
 	
 	/**
 	 * Returns the unique instance of PropertiesManager
@@ -164,6 +176,11 @@ public class PropertiesManager {
 				e.printStackTrace();
 			}
 		}
+		
+		// Set inputValidator regex
+		String forbiddenChars = String.valueOf(this.getForbiddenChars());
+		String regex = "[^"+Pattern.quote(forbiddenChars)+"]*";
+		this.forbiddenCharPattern = Pattern.compile(regex);	
 	}
 	
 	/**
@@ -309,32 +326,51 @@ public class PropertiesManager {
 	}
 	
 	/**
-	 * Saves the given review as "active" review to the workspace-specific preferences
-	 * @param reviewId
+	 * Returns the author name as specified in the preferences or (if no name is specified in the preferences) the System's user name,
+	 * @return author name or null, if user name consists forbidden characters
 	 */
-	public void setActiveReview(String reviewId)
+	public String getAuthor()
 	{
-		this.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, reviewId);
-	}
-	
-	/**
-	 * Returns the "active" review from the workspace-specific preferences
-	 * @return Id of the currently active review
-	 */
-	public String getActiveReview()
-	{
-		return this.getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-	}
-	
-	/**
-	 * Returns the user name as specified in the preferences or the System's user name,
-	 * if user name is not specified in preferences
-	 * @return user name
-	 */
-	public String getUser()
-	{
-		String result = System.getProperty("user.name"); // XXX
+		String result = null;
+		String authorName = this.getExternalPreference(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);
+		String sysName = System.getProperty("user.name"); // TODO: auto-write sysname later to preferences
+
+		if (!authorName.isEmpty() && this.isValid(authorName) == null)
+		{
+			result = authorName;
+		}
+		else if (!sysName.isEmpty() && this.isValid(sysName) == null)
+		{
+			result = sysName;
+		}
+		
 		return result;
 	}
-	
+
+	/**
+	 * Returns the characters which should not be in all keys (reviewId, author, commentId)
+	 * @return all characters which are forbidden
+	 */
+	public char[] getForbiddenChars()
+	{
+		String forbiddenChars = this.getInternalProperty(PropertiesManager.INTERNAL_KEYS.FORBIDDEN_CHARS);
+		String keySeparator = this.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String sequence = forbiddenChars + keySeparator;
+		
+		return sequence.toCharArray();
+	}
+
+	/**
+	 *  @see org.eclipse.jface.dialogs.IInputValidator#isValid(java.lang.String)
+	 */
+	@Override
+	public String isValid(String newText) 
+	{
+		String result = null;
+		if (!this.forbiddenCharPattern.matcher(newText).matches())
+		{
+			result = "Please don't use any of the following characters: "+String.valueOf(this.getForbiddenChars());
+		}
+		return result;
+	}
 }

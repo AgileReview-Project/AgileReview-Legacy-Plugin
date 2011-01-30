@@ -163,6 +163,14 @@ public class ReviewModel {
 		rModel.clear();
 	}
 	
+	/**
+	 * Clears all comments
+	 */
+	public void clearComments()
+	{
+		commentDB.clear();
+	}
+	
 	////////////
 	// Getter //
 	////////////

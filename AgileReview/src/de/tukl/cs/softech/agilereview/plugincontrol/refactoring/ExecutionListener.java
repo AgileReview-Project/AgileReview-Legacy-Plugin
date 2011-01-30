@@ -1,14 +1,9 @@
 package de.tukl.cs.softech.agilereview.plugincontrol.refactoring;
 
-import java.io.IOException;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
-
-import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
-import de.tukl.cs.softech.agilereview.views.CommentTableView;
 
 /**
  * ExecutionListener which methods are executed, if a command is triggered.

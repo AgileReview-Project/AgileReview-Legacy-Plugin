@@ -69,7 +69,8 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * Adds a new comment
 	 */
 	private void addNewComment()  {
-		if (!PropertiesManager.getInstance().getActiveReview().isEmpty()) {
+		String activeReview = PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+		if (!activeReview.isEmpty()) {
 			try	{
 				String pathToFile = "";
 				IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
@@ -80,16 +81,21 @@ public class CommentController extends Observable implements Listener, ISelectio
 							pathToFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
 						}
 					}
-					String activeReview = PropertiesManager.getInstance().getActiveReview();
-					String user  = PropertiesManager.getInstance().getUser();
-					// TODO: What to do, if user is not valid
-					Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
-					if(ViewControl.isOpen(CommentTableView.class)) {
-						CommentTableView.getInstance().addComment(newComment);
+					String user  = PropertiesManager.getInstance().getAuthor();
+					if (user  != null)
+					{
+						Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
+						if(ViewControl.isOpen(CommentTableView.class)) {
+							CommentTableView.getInstance().addComment(newComment);
+						}
+						// Refresh the Review Explorer
+						if(ViewControl.isOpen(ReviewExplorer.class)) {
+							ReviewExplorer.getInstance().refresh();
+						}
 					}
-					// Refresh the Review Explorer
-					if(ViewControl.isOpen(ReviewExplorer.class)) {
-						ReviewExplorer.getInstance().refresh();
+					else
+					{
+						// TODO: Message to the user
 					}
 				} else {
 					// no open editor

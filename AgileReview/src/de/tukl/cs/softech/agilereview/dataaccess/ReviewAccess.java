@@ -265,15 +265,7 @@ public class ReviewAccess {
 				// Open file and read basic information
 				CommentsDocument doc = CommentsDocument.Factory.parse(currFile);
 				this.rFileModel.addXmlDocument(doc, currFile);
-				Comments currComments = doc.getComments();
-				
-				// Find all comments in this file and store them
-				XmlObject[] xPathResult = currComments.selectPath("declare namespace s='http://de.tukl.softech.agileReview'; $this//s:comment");
-				for (int j=0;j<xPathResult.length;j++)
-				{
-					Comment c = (Comment)xPathResult[j];
-					this.rModel.addComment(c);
-				}
+				readCommentsDocument(doc);
 			}
 		}
 	}
@@ -319,6 +311,21 @@ public class ReviewAccess {
 		}
 	}
 
+	/**
+	 * Loads all comments of the given document into the database
+	 * @param doc document to read
+	 */
+	private void readCommentsDocument(CommentsDocument doc) {
+		Comments currComments = doc.getComments();
+
+		// Find all comments in this file and store them
+		XmlObject[] xPathResult = currComments.selectPath("declare namespace s='http://de.tukl.softech.agileReview'; $this//s:comment");
+		for (int j=0;j<xPathResult.length;j++)
+		{
+			Comment c = (Comment)xPathResult[j];
+			this.rModel.addComment(c);
+		}
+	}
 	
 	/**
 	 * Finds the given path in the given CommentsDocument, whereas the last element is of the given type.
@@ -400,7 +407,6 @@ public class ReviewAccess {
 		}	
 		c.dispose();
 	}
-	
 	
 	
 	///////////////////////////////
@@ -685,15 +691,8 @@ public class ReviewAccess {
 			// Open file and read basic information
 			CommentsDocument doc = CommentsDocument.Factory.parse(currFile);
 			this.rFileModel.addXmlDocument(doc, currFile);
-			Comments currComments = doc.getComments();
-	
-			// Find all comments in this file and store them
-			XmlObject[] xPathResult = currComments.selectPath("declare namespace s='http://de.tukl.softech.agileReview'; $this//s:comment");
-			for (int j=0;j<xPathResult.length;j++)
-			{
-				Comment c = (Comment)xPathResult[j];
-				this.rModel.addComment(c);
-			}
+			
+			readCommentsDocument(doc);
 		}
 	}
 	
@@ -782,6 +781,7 @@ public class ReviewAccess {
 	 */
 	public void refactorPath(String oldPath, String newPath, int type) throws IOException
 	{
+		this.rModel.clearComments();
 		for (CommentsDocument cDoc : this.rFileModel.getAllCommentsDocument())
 		{
 			// Find old path
@@ -798,7 +798,10 @@ public class ReviewAccess {
 				// Delete old path
 				cleanXmlPath(oldObject);
 			}
+			// re-read comments
+			this.readCommentsDocument(cDoc);	
 		}
+		
 		this.save();
 	}
 	

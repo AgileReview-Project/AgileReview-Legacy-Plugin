@@ -17,7 +17,9 @@ public class RERootNode {
 	 */
 	private HashSet<MultipleReviewWrapper> reviews = new HashSet<MultipleReviewWrapper>();
 	
-	
+	/**
+	 * Constructor doing nothing
+	 */
 	public RERootNode()
 	{
 		super();

@@ -8,6 +8,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.widgets.Display;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.views.CommentTableView;
@@ -70,12 +71,23 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 			{
 				// Do the refactoring
 				ReviewAccess.getInstance().refactorPath(oldPath, newPath, delta.getResource().getType());
-				// Refresh the TableView
-				CommentTableView.getInstance().resetComments(); // XXX doesn't help much here
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (XmlException e) {
+				// Refresh the TableView (has to be done in the UI-Thread)
+				Display.getDefault().asyncExec(new Runnable(){
+					@Override
+					public void run() {
+						try {
+							CommentTableView.getInstance().resetComments();
+						} catch (XmlException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} 
+					}
+				});
+			}
+			catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
