@@ -20,6 +20,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -204,15 +206,16 @@ public class ReviewAccess {
 		IProject p = workspaceRoot.getProject(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.SOURCE_FOLDER));
 		try
 		{
+			IProgressMonitor progressMonitor = new NullProgressMonitor();
 			// Create a new Project, if necessary
 			if (!p.exists())
 			{
-				p.create(null);
+				p.create(progressMonitor);
 			}
 			// Open the Project, if necessary
 			if (!p.isOpen())
 			{
-				p.open(null);
+				p.open(progressMonitor);
 			}
 		}
 		catch (CoreException e)
