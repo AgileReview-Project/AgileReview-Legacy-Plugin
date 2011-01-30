@@ -724,8 +724,9 @@ public class ReviewAccess {
 		this.clearAllModels();
 		
 		// Fill in new values
-		loadAllComment();
 		loadAllReviews();
+		loadAllComment();
+		
 	}
 	
 	/**
@@ -781,10 +782,14 @@ public class ReviewAccess {
 	 * @param newPath new path of the refactored item
 	 * @param type type of the refactored item (see static fields PROJECT, FOLDER, FILE in {@link IResource})
 	 * @throws IOException 
+	 * @throws XmlException 
 	 */
-	public void refactorPath(String oldPath, String newPath, int type) throws IOException
+	public void refactorPath(String oldPath, String newPath, int type) throws IOException, XmlException
 	{
-		this.rModel.clearComments();
+		// First of all, load the whole database
+		this.fillDatabaseCompletely();
+		
+		// Do the refactoring
 		for (CommentsDocument cDoc : this.rFileModel.getAllCommentsDocument())
 		{
 			// Find old path
@@ -800,12 +805,12 @@ public class ReviewAccess {
 				oldObject.newCursor().moveXmlContents(c);
 				// Delete old path
 				cleanXmlPath(oldObject);
-			}
-			// re-read comments
-			this.readCommentsDocument(cDoc);	
+			}	
 		}
-		
 		this.save();
+		
+		// Load only open reviews again
+		this.fillDatabaseForOpenReviews();
 	}
 	
 }

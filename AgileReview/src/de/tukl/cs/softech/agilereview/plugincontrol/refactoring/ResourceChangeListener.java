@@ -90,6 +90,9 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 			catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (XmlException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			refactoringDone = true;
 		}

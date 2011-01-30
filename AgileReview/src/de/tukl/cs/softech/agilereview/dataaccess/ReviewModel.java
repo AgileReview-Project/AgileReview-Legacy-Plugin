@@ -12,7 +12,7 @@ import java.util.TreeMap;
 /**
  * Model which holds all comments and provides some query functions
  */
-public class ReviewModel {
+class ReviewModel {
 
 	/**
 	 * Database object which stores the comments in the following way: ReviewID.author -> CommentID (without leading "c" for correct ordering) (sorted) -> Comment
@@ -51,7 +51,7 @@ public class ReviewModel {
 	 * Adds a comment to the database
 	 * @param comment Comment to be added
 	 */
-	public void addComment(Comment comment)
+	protected void addComment(Comment comment)
 	{
 		String key1 = comment.getReviewID();
 		String key2 = comment.getAuthor();
@@ -82,19 +82,6 @@ public class ReviewModel {
 			
 			commentDB.put(key1, tmpAuthorMap);
 		}
-		
-//		String key = comment.getReviewID()+"."+comment.getAuthor();
-//		// If entry for specified author and review already exists, put the new comment there
-//		if (commentDB.containsKey(key))
-//		{
-//			commentDB.get(key).put(parseCommentId(comment.getId()), comment);
-//		}
-//		else // create a new entry in the database
-//		{
-//			TreeMap<Integer,Comment> tmpMap = new TreeMap<Integer,Comment>();
-//			tmpMap.put(parseCommentId(comment.getId()), comment);
-//			commentDB.put(key, tmpMap);
-//		}
 	}
 	 
 	/**
@@ -105,7 +92,7 @@ public class ReviewModel {
 	 * @param commentId
 	 * @return <i>true</i> if the deleted comment was the last comment for this review and author, <i>false</i> otherwise
 	 */
-	public boolean removeComment(String reviewId, String author, String commentId)
+	protected boolean removeComment(String reviewId, String author, String commentId)
 	{
 		boolean result = false;	
 		TreeMap<Integer,Comment> tmpMap = commentDB.get(reviewId).get(author);
@@ -127,7 +114,7 @@ public class ReviewModel {
 	 * @param r
 	 * @return <i>false</i> if a review with this name does already exist (review will not be added then). <i>true</i> otherwise.
 	 */
-	public boolean addReview(Review r)
+	protected boolean addReview(Review r)
 	{
 		boolean result = false;
 		if (!rModel.containsKey(r.getId()))
@@ -142,7 +129,7 @@ public class ReviewModel {
 	 * Removes the given review from the model
 	 * @param reviewId
 	 */
-	public void removeReview(String reviewId)
+	protected void removeReview(String reviewId)
 	{
 		// Remove the review itself
 		this.rModel.remove(reviewId);
@@ -157,7 +144,7 @@ public class ReviewModel {
 	/**
 	 * Clears the model
 	 */
-	public void clearModel()
+	protected void clearModel()
 	{
 		commentDB.clear();
 		rModel.clear();
@@ -166,7 +153,7 @@ public class ReviewModel {
 	/**
 	 * Clears all comments
 	 */
-	public void clearComments()
+	protected void clearComments()
 	{
 		commentDB.clear();
 	}
@@ -180,7 +167,7 @@ public class ReviewModel {
 	 * @param author
 	 * @return next free id
 	 */
-	public Integer getNextCommentIdFor(String reviewId, String author)
+	protected Integer getNextCommentIdFor(String reviewId, String author)
 	{
 		Integer result = 0;
 		// If an entry does already exist, give back the highest key+1
@@ -202,7 +189,7 @@ public class ReviewModel {
 	 * @param commentId
 	 * @return Comment specified by the given combination
 	 */
-	public Comment getComment(String reviewId, String author, String commentId)
+	protected Comment getComment(String reviewId, String author, String commentId)
 	{
 		return commentDB.get(reviewId).get(author).get(parseCommentId(commentId));
 	}
@@ -214,7 +201,7 @@ public class ReviewModel {
 	 * @param path 
 	 * @return All Comments as Collection or an empty Collection, if no Comments exist
 	 */
-	public ArrayList<Comment> getComments(String reviewId, String path)
+	protected ArrayList<Comment> getComments(String reviewId, String path)
 	{
 		ArrayList<Comment> result = new ArrayList<Comment>();
 		
@@ -235,7 +222,7 @@ public class ReviewModel {
 	 * @param reviewId
 	 * @return Returns all Comments as Collection or an empty Collection, if no Comments exist
 	 */
-	public ArrayList<Comment> getComments(String reviewId)
+	protected ArrayList<Comment> getComments(String reviewId)
 	{	
 		ArrayList<Comment> result = new ArrayList<Comment>();
 		
@@ -246,16 +233,7 @@ public class ReviewModel {
 			{
 				result.addAll(x.values());
 			}
-		}
-	
-//		Pattern p = Pattern.compile(Pattern.quote(reviewId)+"\\..+");
-//		for(String key : commentDB.keySet()) 
-//		{
-//			if (p.matcher(key).matches())
-//			{
-//				result.addAll(commentDB.get(key).values());
-//			}
-//		}	
+		}	
 		return result;
 	}
 	
@@ -263,7 +241,7 @@ public class ReviewModel {
 	 * Returns all comments, or an empty Collection if no comments exist
 	 * @return All comments or an empty Collection if no comments exist
 	 */
-	public ArrayList<Comment> getAllComments()
+	protected ArrayList<Comment> getAllComments()
 	{
 		ArrayList<Comment> result = new ArrayList<Comment>();
 		
@@ -279,7 +257,7 @@ public class ReviewModel {
 	 * @param reviewId
 	 * @return <i>true</i> if the model contains such a reviewId, <i>false</i> otherwise.
 	 */
-	public boolean containsReview(String reviewId)
+	protected boolean containsReview(String reviewId)
 	{
 		return this.rModel.containsKey(reviewId);
 	}
@@ -288,7 +266,7 @@ public class ReviewModel {
 	 * Returns all reviews being stored in the model
 	 * @return All Reviews stored in this model
 	 */
-	public ArrayList<Review> getAllReviews()
+	protected ArrayList<Review> getAllReviews()
 	{
 		ArrayList<Review> result = new ArrayList<Review>();
 		result.addAll(rModel.values());

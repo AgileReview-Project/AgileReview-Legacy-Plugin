@@ -16,7 +16,7 @@ import agileReview.softech.tukl.de.ReviewDocument;
 /**
  * Model which holds the files in which the comments and reviews are stored and provides saving functions
  */
-public class ReviewFileModel {
+class ReviewFileModel {
 	
 	/**
 	 * Maps the files to the corresponding review document (for saving)
@@ -62,7 +62,7 @@ public class ReviewFileModel {
 	 * @param doc 
 	 * @param path 
 	 */
-	public void addXmlDocument(XmlTokenSource doc, File path)
+	protected void addXmlDocument(XmlTokenSource doc, File path)
 	{
 		if (doc instanceof ReviewDocument)
 		{
@@ -79,7 +79,7 @@ public class ReviewFileModel {
 	 * Removes this file from the model
 	 * @param file
 	 */
-	public void removeXmlDocument(File file)
+	protected void removeXmlDocument(File file)
 	{
 		// Delete the given file
 		this.deleteFile(file);
@@ -103,7 +103,7 @@ public class ReviewFileModel {
 	/**
 	 * Clears this model
 	 */
-	public void clearModel()
+	protected void clearModel()
 	{
 		this.xmlReviewDocuments.clear();
 		this.xmlCommentDocuments.clear();
@@ -114,7 +114,7 @@ public class ReviewFileModel {
 	 * @param f
 	 * @throws IOException
 	 */
-	public void save(File f) throws IOException
+	protected void save(File f) throws IOException
 	{
 		XmlTokenSource document = null;
 		// Try comment-file
@@ -134,7 +134,7 @@ public class ReviewFileModel {
 	 * Saves all files of this model
 	 * @throws IOException
 	 */
-	public void saveAll() throws IOException
+	protected void saveAll() throws IOException
 	{
 		// First the reviews
 		for (Entry<File, ReviewDocument> currEntry :this.xmlReviewDocuments.entrySet())
@@ -157,7 +157,7 @@ public class ReviewFileModel {
 	 * @param file 
 	 * @return Comments document represented by this file
 	 */
-	public CommentsDocument getCommentsDoc(File file)
+	protected CommentsDocument getCommentsDoc(File file)
 	{
 		return this.xmlCommentDocuments.get(file);
 	}
@@ -167,7 +167,7 @@ public class ReviewFileModel {
 	 * @param file
 	 * @return <i>true</i> if this file is stored in this model, <i>false</i> otherwise
 	 */
-	public boolean containsFile(File file)
+	protected boolean containsFile(File file)
 	{
 		return this.xmlCommentDocuments.containsKey(file) || this.xmlReviewDocuments.containsKey(file);
 	}
@@ -176,7 +176,7 @@ public class ReviewFileModel {
 	 * Returns all stored CommentsDocuments
 	 * @return all stored CommentsDocuments
 	 */
-	public Collection<CommentsDocument> getAllCommentsDocument()
+	protected Collection<CommentsDocument> getAllCommentsDocument()
 	{
 		return this.xmlCommentDocuments.values();
 	}
@@ -185,7 +185,7 @@ public class ReviewFileModel {
 	 * Returns all stored ReviewDocuments
 	 * @return all stored ReviewDocuments
 	 */
-	public Collection<ReviewDocument> getAllReviewDocument()
+	protected Collection<ReviewDocument> getAllReviewDocument()
 	{
 		return this.xmlReviewDocuments.values();
 	}
