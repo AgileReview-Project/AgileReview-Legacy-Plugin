@@ -595,6 +595,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		this.comments = ReviewAccess.getInstance().getAllComments();
 		this.viewer.setInput(this.comments);
 		filterComments();
+		//TODO BUGFIX!
 		this.parserMap.get(getActiveEditor()).reload();
 		this.refreshTable();
 	}

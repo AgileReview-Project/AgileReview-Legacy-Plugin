@@ -2,14 +2,25 @@ package de.tukl.cs.softech.agilereview.annotations;
 
 import org.eclipse.jface.text.Position;
 
-public class ComparablePosition extends Position implements Comparable {
+/**
+ * Wrapper for {@link Position} in order to get a comparable Position
+ */
+public class ComparablePosition extends Position implements Comparable<Position> {
 
-	public ComparablePosition(Position p) {
+	/**
+	 * Creates a new ComparablePosition
+	 * @param p {@link Position} which the new ComparablePosition should represent
+	 */
+	protected ComparablePosition(Position p) {
 		super(p.offset, p.length);
 	}
 	
+	/**
+	 * Compares two ComparablePositions based on their offsets
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
-	public int compareTo(Object arg0) {
+	public int compareTo(Position arg0) {
 		if(arg0 instanceof ComparablePosition) {
 			if(offset < ((ComparablePosition)arg0).offset){
 				return -1;

@@ -62,7 +62,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @param parent on which this component should be added
 	 * @param style in which this component should be displayed
 	 */
-	public CommentDetail(Composite parent, int style) {
+	protected CommentDetail(Composite parent, int style) {
 		super(parent, style);
 	}
 
@@ -197,7 +197,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			this.editedObject = comment;
 			authorInstance.setText(comment.getAuthor());
 			recipientText.setText(comment.getRecipient());
-			//comment.getText() == null is the case in a new created Comment
+
 			if(comment.getText() != null) {
 				this.txt.setText(comment.getText());
 			} else {
@@ -286,7 +286,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	/**
 	 * Sets the levels for the status and priority configuration of a comment.
 	 */
-	public void setPropertyConfigurations() {
+	private void setPropertyConfigurations() {
 		PropertiesManager pm = PropertiesManager.getInstance();				
 		String value = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_STATUS);
 		String[] levels = value.split(",");

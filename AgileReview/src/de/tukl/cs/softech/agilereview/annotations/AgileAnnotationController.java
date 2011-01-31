@@ -31,7 +31,7 @@ public class AgileAnnotationController {
 	 * Creates a new AgileAnnotationModel
 	 * @param editor The text editor in which the annotations will be displayed
 	 */
-	public AgileAnnotationController(IEditorPart editor) {
+	protected AgileAnnotationController(IEditorPart editor) {
 		IEditorInput input = editor.getEditorInput();
 		this.annotationModel = (IAnnotationModelExtension) ((ITextEditor)editor).getDocumentProvider().getAnnotationModel(input);
 	}
@@ -41,7 +41,7 @@ public class AgileAnnotationController {
 	 * not be displayed any more will be removed and not yet drawn annotations will be added to the annotation model.
 	 * @param keyPositionMap a map of Positions which should be annotated and the comment keys correlated to the positions
 	 */
-	public void displayAnnotations(Map<String, Position> keyPositionMap) {
+	protected void displayAnnotations(Map<String, Position> keyPositionMap) {
 		//add annotations that are not already displayed
 		Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
 		for (String s : keyPositionMap.keySet()) {
@@ -68,7 +68,7 @@ public class AgileAnnotationController {
 	 * @param commentKey The tag key of the comment for which this annotation holds
 	 * @param p The position to add the annotation on.
 	 */
-	public void addAnnotation(String commentKey, Position p) {
+	protected void addAnnotation(String commentKey, Position p) {
 		//TODO debug
 		((IAnnotationModel) this.annotationModel).addAnnotation(createNewAnnotation(commentKey), p);
 	}
@@ -78,7 +78,7 @@ public class AgileAnnotationController {
 	 * @param commentKeys unique tag keys of the comment annotations which should
 	 * be deleted
 	 */
-	public void deleteAnnotations(List<String> commentKeys) {
+	protected void deleteAnnotations(List<String> commentKeys) {
 		Annotation[] annotationsToRemove = new Annotation[commentKeys.size()];
 		for(int i = 0; i < commentKeys.size(); i++) {
 			annotationsToRemove[i] = annotationMap.get(commentKeys.get(i));

@@ -46,7 +46,7 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	 * @param parent onto the ReviewDetail Composite will be added
 	 * @param style with which this Composite will be styled
 	 */
-	public ReviewDetail(Composite parent, int style) {
+	protected ReviewDetail(Composite parent, int style) {
 		super(parent, style);
 	}
 
@@ -172,27 +172,6 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#fillContents(java.lang.Object)
-	 */
-	public void fillContents(Review review) {
-		if(review != null) {
-			this.backupObject = (Review)review.copy();
-			this.editedObject = review;
-			this.reference.setText(review.getReferenceId());
-			this.authorInstance.setText(review.getPersonInCharge().getName());
-			this.reviewInstance.setText(review.getId());
-			//review.getDescription() == null is the case in a new created Comment
-			if(review.getDescription() != null) {
-				this.txt.setText(review.getDescription());
-			} else {
-				this.txt.setText("");
-			}
-			statusDropDown.select(review.getStatus());
-		}
-	}
-	
-	/*
-	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#setFocus()
 	 */
 	@Override
@@ -214,11 +193,10 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	}
 	
 	/**
-	 * Function which fills the contents of a given Review object
-	 * into the ReviewDetailView
+	 * Fills the contents of a given Review object into the ReviewDetailView
 	 * @param reviewWrapper MultipleReviewWrapper which data should be displayed in the view
 	 */
-	public void fillContents(MultipleReviewWrapper reviewWrapper) {
+	protected void fillContents(MultipleReviewWrapper reviewWrapper) {
 		if(reviewWrapper != null) {
 			Review review = reviewWrapper.getWrappedReview();
 			if(review != null) {
@@ -227,4 +205,24 @@ public class ReviewDetail extends AbstractDetail<Review> {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#fillContents(java.lang.Object)
+	 */
+	protected void fillContents(Review review) {
+		if(review != null) {
+			this.backupObject = (Review)review.copy();
+			this.editedObject = review;
+			this.reference.setText(review.getReferenceId());
+			this.authorInstance.setText(review.getPersonInCharge().getName());
+			this.reviewInstance.setText(review.getId());
+			
+			if(review.getDescription() != null) {
+				this.txt.setText(review.getDescription());
+			} else {
+				this.txt.setText("");
+			}
+			statusDropDown.select(review.getStatus());
+		}
+	}
 }

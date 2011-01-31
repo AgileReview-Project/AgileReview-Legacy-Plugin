@@ -81,7 +81,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @param part will be forwarded from the {@link DetailView}
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	public void partClosedOrDeactivated(IWorkbenchPart part) {
+	protected void partClosedOrDeactivated(IWorkbenchPart part) {
 		saveChanges();
 		//fire "save" event for persistent storage
 		saveButton.notifyListeners(SWT.Selection, new Event());
@@ -114,11 +114,11 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Handle revert functionality
 	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 	 */
-	@Override/*?agilereview|reuter|c10?*/
+	@Override
 	public void handleEvent(Event event) {
 		if(event.widget.getData().equals("revert")) {
 			@SuppressWarnings("unchecked")
