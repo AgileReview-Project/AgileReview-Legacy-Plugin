@@ -1,12 +1,11 @@
-package de.tukl.cs.softech.agilereview.views.explorer;
+package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-import de.tukl.cs.softech.agilereview.views.ReviewExplorer;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * Wrapper class which acts as root node for the tree viewer of the {@link ReviewExplorer}

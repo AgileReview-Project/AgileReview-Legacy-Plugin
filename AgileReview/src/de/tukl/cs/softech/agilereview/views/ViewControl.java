@@ -15,6 +15,10 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+
+
 /**
  * The ViewControl provides information about the current displayed ViewPart of
  * this plugin. Furthermore the ViewControl provides and forwards events of the
@@ -56,7 +60,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 * @param c Class of the {@link ViewPart} to register
 	 * @return true if the registration was successful
 	 */
-	protected static boolean registerView(Class<? extends ViewPart> c) {
+	public static boolean registerView(Class<? extends ViewPart> c) {
 		System.out.println("registered: "+c);
 		return activeViews.add(c);
 	}

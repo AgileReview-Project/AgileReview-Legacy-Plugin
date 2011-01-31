@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.explorer;
+package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -14,7 +14,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
 
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleFileWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFileWrapper;
 
 /**
  * Action to open a file editor out of the Review Explorer

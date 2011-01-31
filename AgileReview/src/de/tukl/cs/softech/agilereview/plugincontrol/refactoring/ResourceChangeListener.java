@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.widgets.Display;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
-import de.tukl.cs.softech.agilereview.views.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
 /**
  * The ResourceChangeListener listens for move and rename refactorings in order to manage 

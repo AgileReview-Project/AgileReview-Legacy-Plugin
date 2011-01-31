@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
-import de.tukl.cs.softech.agilereview.views.DetailView;
 
 /**
  * Abstract class of a Comment or Review representation, which automatically provides IPartListener

@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views;
+package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -28,13 +28,10 @@ import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.explorer.REContentProvider;
-import de.tukl.cs.softech.agilereview.views.explorer.RELabelProvider;
-import de.tukl.cs.softech.agilereview.views.explorer.REOpenAction;
-import de.tukl.cs.softech.agilereview.views.explorer.RERootNode;
-import de.tukl.cs.softech.agilereview.views.explorer.REViewerComparator;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.AbstractMultipleWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * The Review Explorer is the view which shows all reviews as well as 

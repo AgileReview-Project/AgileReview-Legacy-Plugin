@@ -22,12 +22,12 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.DetailView;
-import de.tukl.cs.softech.agilereview.views.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.detail.CommentDetail;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 import de.tukl.cs.softech.agilereview.views.detail.ReviewDetail;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * The CommentController describes an interface for some complex interactions of the different ViewParts.

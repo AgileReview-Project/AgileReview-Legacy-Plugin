@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.explorer;
+package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,12 +10,11 @@ import org.eclipse.jface.viewers.Viewer;
 import agileReview.softech.tukl.de.FileDocument.File;
 import agileReview.softech.tukl.de.FolderDocument.Folder;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
-import de.tukl.cs.softech.agilereview.views.ReviewExplorer;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.AbstractMultipleWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleFileWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleFolderWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleProjectWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFileWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFolderWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleProjectWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * The ReviewExplorerContentProvider provides the content for the tree viewer of the {@link ReviewExplorer} 

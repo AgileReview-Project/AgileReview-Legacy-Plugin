@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Text;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * The ReviewDetail class describes one detail representation of a Review Object

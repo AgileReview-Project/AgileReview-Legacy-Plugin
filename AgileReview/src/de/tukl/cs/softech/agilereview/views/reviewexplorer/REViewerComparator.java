@@ -1,10 +1,10 @@
-package de.tukl.cs.softech.agilereview.views.explorer;
+package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * Comparator which determines the ordering of elements in the Review Explorer.

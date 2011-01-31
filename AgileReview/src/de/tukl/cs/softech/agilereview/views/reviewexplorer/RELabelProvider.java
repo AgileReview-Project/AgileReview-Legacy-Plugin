@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.explorer;
+package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -10,10 +10,10 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.AbstractMultipleWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleFolderWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleProjectWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFolderWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleProjectWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * The LabelProvider specifies how the nodes of the tree viewer should be displayed

@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.explorer.wrapper;
+package de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper;
 
 import agileReview.softech.tukl.de.FileDocument.File;
 import agileReview.softech.tukl.de.FilesDocument.Files;

@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views;
+package de.tukl.cs.softech.agilereview.views.commenttable;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -67,11 +67,10 @@ import de.tukl.cs.softech.agilereview.annotations.AnnotationParser;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.commenttable.AgileCommentFilter;
-import de.tukl.cs.softech.agilereview.views.commenttable.AgileViewerComparator;
-import de.tukl.cs.softech.agilereview.views.commenttable.ExplorerSelectionFilter;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.AbstractMultipleWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * Used to provide an overview for review comments using a table
@@ -614,7 +613,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param partRef will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	protected void partBroughtToTop(IWorkbenchPartReference partRef) {
+	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			if (!this.parserMap.containsKey(editor) && !this.hideAnnotations) {
@@ -628,7 +627,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param partRef will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	protected void partClosed(IWorkbenchPartReference partRef) {
+	public void partClosed(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			if (this.parserMap.containsKey(editor)) {
@@ -642,7 +641,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param selection will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
-	protected void selectionChanged(IWorkbenchPart part, ISelection selection) {
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (linkExplorer && part instanceof ReviewExplorer) {
 			if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
 
@@ -732,7 +731,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param page the workbench page
 	 * @param perspective the activated perspective
 	 */
-	protected void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		if (!perspective.getLabel().equals("AgileReview")) {
 			for (AnnotationParser parser: this.parserMap.values()) {
 				parser.filter(new String[0]);

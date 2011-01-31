@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.explorer.wrapper;
+package de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper;
 
 import org.apache.xmlbeans.XmlObject;
 

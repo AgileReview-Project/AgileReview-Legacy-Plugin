@@ -11,7 +11,7 @@ import org.eclipse.jface.dialogs.IInputValidator;
 import org.osgi.service.prefs.Preferences;
 
 
-import de.tukl.cs.softech.agilereview.views.DetailView;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 
 /**
  * The PropertiesManager manages the internal configurations (in file: "config/project.properties")

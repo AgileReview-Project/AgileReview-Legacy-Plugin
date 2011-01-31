@@ -9,9 +9,9 @@ import org.eclipse.core.commands.ExecutionException;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.DetailView;
-import de.tukl.cs.softech.agilereview.views.ReviewExplorer;
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * Handler for the "refresh" (F5) command for our review

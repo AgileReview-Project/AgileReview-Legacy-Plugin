@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views;
+package de.tukl.cs.softech.agilereview.views.detail;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -9,11 +9,11 @@ import org.eclipse.ui.part.ViewPart;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.Activator;
-import de.tukl.cs.softech.agilereview.views.detail.AbstractDetail;
-import de.tukl.cs.softech.agilereview.views.detail.CommentDetail;
-import de.tukl.cs.softech.agilereview.views.detail.ReviewDetail;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.AbstractMultipleWrapper;
-import de.tukl.cs.softech.agilereview.views.explorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * The DetailView class manages the different UIs which can occur in the detail view
@@ -130,7 +130,7 @@ public class DetailView extends ViewPart {
 	 * @param part will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	protected void partClosedOrDeactivated(IWorkbenchPart part) {
+	public void partClosedOrDeactivated(IWorkbenchPart part) {
 		if(actParent instanceof AbstractDetail && !actParent.isDisposed()) {
 			((AbstractDetail<?>)actParent).partClosedOrDeactivated(part);
 		}
@@ -141,7 +141,7 @@ public class DetailView extends ViewPart {
 	 * @param part will be forwarded from the {@link ViewControl}
 	 * @param selection will be forwarded from the {@link ViewControl}
 	 */
-	protected void selectionChanged(IWorkbenchPart part, ISelection selection) {
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
 			IStructuredSelection sel = (IStructuredSelection) selection;
 			Object e;
