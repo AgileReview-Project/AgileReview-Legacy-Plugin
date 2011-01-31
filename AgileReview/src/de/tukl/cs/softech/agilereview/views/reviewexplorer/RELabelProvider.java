@@ -18,7 +18,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
 /**
  * The LabelProvider specifies how the nodes of the tree viewer should be displayed
  */
-public class RELabelProvider implements ILabelProvider {
+class RELabelProvider implements ILabelProvider {
 	
 	@Override
 	public void addListener(ILabelProviderListener listener) {/* not implemented */}

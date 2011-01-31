@@ -19,7 +19,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
 /**
  * The ReviewExplorerContentProvider provides the content for the tree viewer of the {@link ReviewExplorer} 
  */
-public class REContentProvider implements ITreeContentProvider {
+class REContentProvider implements ITreeContentProvider {
 	
 //	/**
 //	 * The tree viewer to whom the content is provided

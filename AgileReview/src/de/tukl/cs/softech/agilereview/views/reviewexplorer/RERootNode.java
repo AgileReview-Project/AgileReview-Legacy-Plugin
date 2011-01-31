@@ -10,7 +10,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
 /**
  * Wrapper class which acts as root node for the tree viewer of the {@link ReviewExplorer}
  */
-public class RERootNode {
+class RERootNode {
 	/**
 	 * Wrapped {@link Review}s as {@link MultipleReviewWrapper}
 	 */
@@ -19,7 +19,7 @@ public class RERootNode {
 	/**
 	 * Constructor doing nothing
 	 */
-	public RERootNode()
+	protected RERootNode()
 	{
 		super();
 	}
@@ -28,7 +28,7 @@ public class RERootNode {
 	 * Constructs an ReviewExplorerRootNode
 	 * @param reviews wrapped reviews
 	 */
-	public RERootNode(Collection<MultipleReviewWrapper> reviews) {
+	protected RERootNode(Collection<MultipleReviewWrapper> reviews) {
 		this();
 		this.reviews.addAll(reviews);
 	}
@@ -37,7 +37,7 @@ public class RERootNode {
 	 * Adds a review to the node
 	 * @param review Review to be added
 	 */
-	public void addReview(MultipleReviewWrapper review) {
+	protected void addReview(MultipleReviewWrapper review) {
 		this.reviews.add(review);
 	}
 	
@@ -45,7 +45,7 @@ public class RERootNode {
 	 * Deletes a review from the node
 	 * @param review Review to be deleted
 	 */
-	public void deleteReview(MultipleReviewWrapper review)
+	protected void deleteReview(MultipleReviewWrapper review)
 	{
 		this.reviews.remove(review);
 	}
@@ -54,14 +54,14 @@ public class RERootNode {
 	 * Returns the wrapped reviews
 	 * @return Wrapped reviews
 	 */
-	public HashSet<MultipleReviewWrapper> getReviews() {
+	protected HashSet<MultipleReviewWrapper> getReviews() {
 		return this.reviews;
 	}
 	
 	/**
 	 *  Removes all objects from the root node
 	 */
-	public void clear()
+	protected void clear()
 	{
 		this.reviews.clear();
 	}

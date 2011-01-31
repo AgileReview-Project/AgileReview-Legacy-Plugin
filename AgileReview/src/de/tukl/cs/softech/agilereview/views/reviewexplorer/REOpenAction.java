@@ -19,7 +19,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFileW
 /**
  * Action to open a file editor out of the Review Explorer
  */
-public class REOpenAction extends Action {
+class REOpenAction extends Action {
 	
 	/**
 	 * WorkbenchPage on which the action takes place
@@ -40,7 +40,7 @@ public class REOpenAction extends Action {
 	 * @param p The page to use as context to open the editor.
 	 * @param selectionProvider The selection provider 
 	 */
-	public REOpenAction(IWorkbenchPage p, ISelectionProvider selectionProvider) {
+	protected REOpenAction(IWorkbenchPage p, ISelectionProvider selectionProvider) {
 		setText("Open File");
 		page = p;
 		this.provider = selectionProvider;

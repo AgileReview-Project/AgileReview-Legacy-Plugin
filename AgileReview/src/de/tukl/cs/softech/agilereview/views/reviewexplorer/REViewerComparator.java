@@ -12,7 +12,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
  * and then based on their names (except for the active review, which is always on top), 
  * all other elements are directly ordered by their names
  */
-public class REViewerComparator extends ViewerComparator 
+class REViewerComparator extends ViewerComparator 
 {
 	@Override
 	public int category(Object element)
