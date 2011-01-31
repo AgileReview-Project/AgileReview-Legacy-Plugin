@@ -293,8 +293,8 @@ public class AnnotationParser {
 				
 				// Write tags
 				if (editor.getEditorInput().getName().endsWith(".java")) {
-					document.replace(insertEndOffset, 0, "/*"+commentTag+"?*/");
-					document.replace(insertStartOffset, 0, "/*?"+commentTag+"*/");
+					document.replace(insertEndOffset, 0, "");
+					document.replace(insertStartOffset, 0, "");
 					
 				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
 					document.replace(insertEndOffset, 0, "<!--"+commentTag+"?-->");

@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.widgets.Display;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
 /**
@@ -76,7 +77,9 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 					@Override
 					public void run() {
 						try {
-							CommentTableView.getInstance().resetComments();
+							if(ViewControl.isOpen(CommentTableView.class)) {
+								CommentTableView.getInstance().resetComments();
+							}
 						} catch (XmlException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
