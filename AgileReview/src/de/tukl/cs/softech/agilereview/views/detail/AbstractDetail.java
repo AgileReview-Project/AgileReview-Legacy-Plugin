@@ -53,8 +53,8 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	    revertButton.setEnabled(false);
 	    revertButton.addListener(SWT.Selection, this);
 	    
-	    saveButton.setText("Save");/*?agilereview|reuter|c9*/
-	    saveButton.setData("save");/*agilereview|reuter|c9?*/
+	    saveButton.setText("Apply");
+	    saveButton.setData("save");
 	    saveButton.addListener(SWT.Selection, CommentController.getInstance());
 	}
 

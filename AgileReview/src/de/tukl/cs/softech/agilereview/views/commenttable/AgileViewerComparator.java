@@ -15,7 +15,7 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 /**
  * @author reuter
  *
- *//*?agilereview|reuter|c16?*/
+ */
 public class AgileViewerComparator extends ViewerComparator {
 
 	/**
@@ -57,7 +57,7 @@ public class AgileViewerComparator extends ViewerComparator {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
-	@Override/*?agilereview|reuter|c14?*/
+	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		Comment c1 = (Comment) e1;
 		Comment c2 = (Comment) e2;
