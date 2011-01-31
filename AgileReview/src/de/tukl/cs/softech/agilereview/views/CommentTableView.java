@@ -109,7 +109,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Should the content of the table be linked to the selections of the explorer?
 	 */
-	private boolean linkExplorer = true;
+	private boolean linkExplorer = false;
 	/**
 	 * The number of columns of the parent's GridLayout
 	 */
@@ -557,7 +557,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	    ToolItem itemAllComments = new ToolItem(toolBar, SWT.CHECK);
 	    itemAllComments.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.SYNCED)).createImage());
 	    itemAllComments.setText("Link Explorer");
-	    itemAllComments.setSelection(true);
+	    itemAllComments.setSelection(this.linkExplorer);
 	    // add listener to connect and disconnect explorer and table
 	    itemAllComments.addListener(SWT.Selection, new Listener() {
 			
