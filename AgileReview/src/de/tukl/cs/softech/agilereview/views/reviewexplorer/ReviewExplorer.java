@@ -342,7 +342,9 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 				}	
 				this.refresh();
 				try {
-					CommentTableView.getInstance().resetComments();
+					if(ViewControl.isOpen(CommentTableView.class)) {
+						CommentTableView.getInstance().resetComments();
+					}
 				} catch (XmlException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

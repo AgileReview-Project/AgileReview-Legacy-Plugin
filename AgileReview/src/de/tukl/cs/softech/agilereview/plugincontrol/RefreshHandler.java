@@ -9,6 +9,7 @@ import org.eclipse.core.commands.ExecutionException;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
@@ -44,11 +45,16 @@ public class RefreshHandler extends AbstractHandler {
 			}
 		}
 		
-
-		ReviewExplorer.getInstance().refreshInput();
-		DetailView.getInstance().changeParent(DetailView.EMPTY);
+		if(ViewControl.isOpen(ReviewExplorer.class)) {
+			ReviewExplorer.getInstance().refreshInput();
+		}
+		if(ViewControl.isOpen(DetailView.class)) {
+			DetailView.getInstance().changeParent(DetailView.EMPTY);
+		}
 		try {
-			CommentTableView.getInstance().resetComments();
+			if(ViewControl.isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().resetComments();
+			}
 		} catch (XmlException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
