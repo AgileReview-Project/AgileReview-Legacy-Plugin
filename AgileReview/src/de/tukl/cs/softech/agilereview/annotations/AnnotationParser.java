@@ -23,6 +23,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.tools.FileTypeNotSupportedException;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
@@ -110,6 +111,7 @@ public class AnnotationParser {
 	 * Parses all comment tags and saves them with their {@link Position}
 	 */
 	private void parseInput() {
+		PluginLogger.log("AnnotationParser", "parseInput", "triggered");
 		idPositionMap.clear();
 		idTagPositions.clear();
 		Matcher matcher;
@@ -130,8 +132,7 @@ public class AnnotationParser {
 						if(tagPositions != null) {
 							//same begin tag already exists
 							document.replace(r.getOffset(), r.getLength(), "");
-							//TODO Debug output
-							System.out.println("currupt: <same begin tag already exists>: "+key);
+							PluginLogger.log("AnnotationParser", "parseInput", "currupt: <same begin tag already exists>: "+key+" --> deleting");
 							tagDeleted = true;
 						} else {
 							idPositionMap.put(key, new Position(document.getLineOffset(line)));
@@ -146,8 +147,7 @@ public class AnnotationParser {
 							if(tagPositions[1] != null) {
 								//same end tag already exists
 								document.replace(r.getOffset(), r.getLength(), "");
-								//TODO Debug output
-								System.out.println("currupt: <same end tag already exists>: "+key);
+								PluginLogger.log("AnnotationParser", "parseInput", "currupt: <same end tag already exists>: "+key+" --> deleting");
 								tagDeleted = true;
 							} else {
 								//end tag not set
@@ -162,8 +162,7 @@ public class AnnotationParser {
 						} else {
 							//end tag without begin tag
 							document.replace(r.getOffset(), r.getLength(), "");
-							//TODO Debug output
-							System.out.println("currupt: <end tag without begin tag>: "+key);
+							PluginLogger.log("AnnotationParser", "parseInput", "currupt: <end tag without begin tag>: "+key+" --> deleting");
 							tagDeleted = true;
 						}
 					}
@@ -193,8 +192,7 @@ public class AnnotationParser {
 				Iterator<Position> it = positionsToDelete.descendingIterator();
 				while(it.hasNext()) {
 					Position tmp = it.next();
-					//TODO debug output
-					System.out.println("currupt: <begin tag without end tag>");
+					PluginLogger.log("AnnotationParser", "parseInput", "currupt: <begin tag without end tag> --> deleting");
 					document.replace(tmp.getOffset(), tmp.getLength(), "");
 				}
 				//parse the file another time to get the correct positions for the tags
@@ -202,8 +200,7 @@ public class AnnotationParser {
 			}
 			
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError("AnnotationParser", "parseInput", "BadLocationException occurs while parsing the editor: "+editor.getTitle(), e);
 		}
 		
 		HashMap<Position, String> toDisplay = new HashMap<Position, String>();
@@ -215,8 +212,7 @@ public class AnnotationParser {
 		try {
 			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError("AnnotationParser", "parseInput", "CoreException occurs while saving document of editor: "+editor.getTitle(), e);
 		}
 		
 		annotationModel.displayAnnotations(idPositionMap);

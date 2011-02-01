@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
  * Abstract class of a Comment or Review representation, which automatically provides IPartListener
@@ -84,6 +85,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	protected void partClosedOrDeactivated(IWorkbenchPart part) {
 		saveChanges();
 		//fire "save" event for persistent storage
+		PluginLogger.log("AbtractDetail", "partClosedOrDeactivated", "trigger save event");
 		saveButton.notifyListeners(SWT.Selection, new Event());
 		revertButton.setEnabled(false);
 	}

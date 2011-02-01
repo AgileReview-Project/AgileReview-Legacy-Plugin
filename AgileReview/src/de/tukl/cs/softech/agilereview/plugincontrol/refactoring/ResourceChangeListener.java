@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.widgets.Display;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
@@ -41,15 +42,15 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 		if((event.getType() & IResourceChangeEvent.POST_CHANGE) != 0) {
 			try {
 				event.getDelta().accept(this);
-			} catch (final CoreException e) {
+			} catch (CoreException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				PluginLogger.logError("ResourceChangeListener", "resourceChanged", "CoreException occured during acceptance test of event delta", e);
 			}
 		}
 	}
 
 	@Override
-	public boolean visit(final IResourceDelta delta) throws CoreException {
+	public boolean visit(final IResourceDelta delta) throws CoreException{
 		
 		switch(delta.getKind()) {
 		case IResourceDelta.ADDED:
@@ -67,7 +68,7 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 		}
 		
 		if(!oldPath.equals("") && !newPath.equals("") && !refactoringDone) {
-			System.out.println(">"+oldPath+"< - >"+newPath+"< - "+delta.getResource().getType());
+			PluginLogger.log("ResourceChangeListener", "visit", ">oldPath="+oldPath+"< - >newPath="+newPath+"< - type="+delta.getResource().getType());
 			try 
 			{
 				// Do the refactoring
@@ -93,10 +94,10 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 			}
 			catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				PluginLogger.logError("ResourceChangeListener", "visit", "IOException occured during refactoring Path in ReviewAccess", e);
 			} catch (XmlException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				PluginLogger.logError("ResourceChangeListener", "visit", "XmlException occured during refactoring Path in ReviewAccess", e);
 			}
 			refactoringDone = true;
 		}

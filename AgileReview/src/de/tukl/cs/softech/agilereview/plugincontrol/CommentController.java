@@ -21,6 +21,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -69,6 +70,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * Adds a new comment
 	 */
 	private void addNewComment()  {
+		PluginLogger.log("CommentController", "addNewComment", "triggered");
 		String activeReview = PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		if (!activeReview.isEmpty()) {
 			try	{
@@ -100,14 +102,16 @@ public class CommentController extends Observable implements Listener, ISelectio
 				} else {
 					// no open editor
 					MessageDialog.openWarning(null, "Warning: No open file", "Please open a file in an editor before adding comments!");
+					PluginLogger.logWarning("CommentController", "addNewComment", "No open editor!");
 				}
 			} catch (IOException e) {
 				//TODO Auto-generated
-				e.printStackTrace();
+				PluginLogger.logError("CommentController", "addNewComment", "IOException occured while creating a new comment in ReviewAccess", e);
 			}
 
 		} else {
 			MessageDialog.openWarning(null, "Warning: No active review", "Please activate a review before adding comments!");
+			PluginLogger.logWarning("CommentController", "addNewComment", "No active review!");
 		}
 	}
 
@@ -115,6 +119,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 * Deletes the selected comment
 	 */
 	private void deleteComment() {
+		PluginLogger.log("CommentController", "deleteComment", "triggered");
 		if(ViewControl.isOpen(CommentTableView.class)) {
 			ArrayList<Comment> copy = new ArrayList<Comment>(currentSelection);
 			CommentTableView ctv = CommentTableView.getInstance();
@@ -124,8 +129,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 			try {
 				ra.deleteComments(copy);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				PluginLogger.logError("CommentController", "addNewComment", "IOException occured while deleting a comments in ReviewAccess: "+copy, e);
 			}
 		}
 		
@@ -162,8 +166,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 			try {
 				ReviewAccess.getInstance().save();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				PluginLogger.logError("CommentController", "handleEvent", "IOException occured while saving in ReviewAccess: ", e);
 			}
 		}
 	}

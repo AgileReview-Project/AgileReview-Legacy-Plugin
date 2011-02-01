@@ -62,17 +62,17 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 * @return true if the registration was successful
 	 */
 	public static boolean registerView(Class<? extends ViewPart> c) {
-		System.out.println("registered: "+c);
+		PluginLogger.log("ViewControl", "registerView", c.getName());
 		return activeViews.add(c);
 	}
 	
 	/**
-	 * Unregisters a given {@link ViewPart} for the plugin
+	 * Unregisters a given {@link ViewPart} for the plugin. Views will be unregistered automatically when closed
 	 * @param c Class of the {@link ViewPart} to unregister
 	 * @return true if the given {@link ViewPart} was unregistered successfully
 	 */
 	protected static boolean unregisterView(Class<? extends ViewPart> c) {
-		System.out.println("unregistered: "+c);
+		PluginLogger.log("ViewControl", "unregisterView", c.getName());
 		return activeViews.remove(c);
 	}
 	
@@ -98,6 +98,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if(selection != null && part != null) {
+			PluginLogger.log("ViewControl", "selectionChanged", "fired with selection != null && part != null");
 			if(isOpen(CommentTableView.class)) {
 				CommentTableView.getInstance().selectionChanged(part, selection);
 			}
@@ -126,6 +127,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
+		PluginLogger.log("ViewControl", "partBroughtToTop", partRef.getPartName());
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().partBroughtToTop(partRef);
 		}
@@ -139,6 +141,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
+		PluginLogger.log("ViewControl", "partClosed", partRef.getPartName());
 		activeViews.remove(partRef.getPart(false));
 		
 		if(isOpen(DetailView.class)) {
@@ -156,9 +159,10 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partDeactivated(IWorkbenchPartReference partRef) {
+		PluginLogger.log("ViewControl", "partDeactivated", partRef.getPartName());
 		if(isOpen(DetailView.class)) {
 			DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
-		}		
+		}
 	}
 	
 	/**
@@ -218,6 +222,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		PluginLogger.log("ViewControl", "perspectiveChanged", perspective.getLabel());
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().perspectiveActivated(page, perspective);
 		}
@@ -232,24 +237,39 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 		
 	}
 
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPerspectiveListener3#perspectiveOpened(org.eclipse.ui.IWorkbenchPage, org.eclipse.ui.IPerspectiveDescriptor)
+	 */
 	@Override
 	public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		
 	}
 
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPerspectiveListener3#perspectiveClosed(org.eclipse.ui.IWorkbenchPage, org.eclipse.ui.IPerspectiveDescriptor)
+	 */
 	@Override
 	public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		
 	}
 
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPerspectiveListener3#perspectiveDeactivated(org.eclipse.ui.IWorkbenchPage, org.eclipse.ui.IPerspectiveDescriptor)
+	 */
 	@Override
 	public void perspectiveDeactivated(IWorkbenchPage page,	IPerspectiveDescriptor perspective) {
 		
 	}
 
+	/**
+	 * not yet used
+	 * @see org.eclipse.ui.IPerspectiveListener3#perspectiveSavedAs(org.eclipse.ui.IWorkbenchPage, org.eclipse.ui.IPerspectiveDescriptor, org.eclipse.ui.IPerspectiveDescriptor)
+	 */
 	@Override
-	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective,
-			IPerspectiveDescriptor newPerspective) {
+	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
 		
 	}
 }

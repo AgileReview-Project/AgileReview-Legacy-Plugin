@@ -171,7 +171,7 @@ public class PropertiesManager implements IInputValidator{
 	private PropertiesManager() {		
 		
 		// External preferences
-		externalPreferences =  new InstanceScope().getNode("de.tukl.cs.softech.agilereview");		
+		externalPreferences =  new InstanceScope().getNode(getInternalProperty(INTERNAL_KEYS.PLUGIN_ID));		
 		// Internal properties
 		internalProperties = new Properties();
 		InputStream stream = DetailView.class.getClassLoader().getResourceAsStream(internalPropertyFile);
@@ -184,8 +184,7 @@ public class PropertiesManager implements IInputValidator{
 				value = internalProperties.getProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_PRIORITIES);
 				commentPriorities = value.split(",");				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				PluginLogger.logError("PropertiesManager", "constructor", "IOException occurs while loading internal properties from file", e);
 			}
 		}
 		
