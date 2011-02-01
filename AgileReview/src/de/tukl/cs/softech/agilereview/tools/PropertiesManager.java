@@ -30,6 +30,10 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String PLUGIN_ID = "plugin_id";
 		/**
+		 * Log level for logging for this session
+		 */
+		public static String LOG_LEVEL = "log_level";
+		/**
 		 * The source folder where the reviews are stored (path based from Workspace-root)
 		 */
 		public static String SOURCE_FOLDER = "source_folder";
@@ -372,5 +376,13 @@ public class PropertiesManager implements IInputValidator{
 			result = "Please don't use any of the following characters: "+String.valueOf(this.getForbiddenChars());
 		}
 		return result;
+	}
+	
+	/**
+	 * Returns the log level as an integer
+	 * @return the current log level
+	 */
+	public int getLogLevel() {
+		return Integer.parseInt(getInternalProperty(INTERNAL_KEYS.LOG_LEVEL));
 	}
 }
