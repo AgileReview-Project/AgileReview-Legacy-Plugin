@@ -15,7 +15,7 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 /**
  * Startup class in order to start this plug-in on eclipse startup
  */
-public class Startup  implements IStartup {
+public class Startup implements IStartup {
 	
 	/**
 	 * {@link IExecutionListener} for listening relevant Commands
