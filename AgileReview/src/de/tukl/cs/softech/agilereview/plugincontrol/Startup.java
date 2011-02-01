@@ -10,11 +10,12 @@ import org.eclipse.ui.commands.ICommandService;
 
 import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ExecutionListener;
 import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ResourceChangeListener;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
  * Startup class in order to start this plug-in on eclipse startup
  */
-public class Startup  implements IStartup {
+public class Startup implements IStartup {
 	
 	/**
 	 * {@link IExecutionListener} for listening relevant Commands
@@ -28,7 +29,7 @@ public class Startup  implements IStartup {
 	@Override
 	public void earlyStartup() {
 		// add executionlistener to listen to interesting commands
-		System.out.println("register executionListener");
+		PluginLogger.log("Startup", "earlyStartup", "register executionListener & ResourceChangeListener");
 		((ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class)).addExecutionListener(executionListener);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener, IResourceChangeEvent.POST_CHANGE);
 	}
