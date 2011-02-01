@@ -121,6 +121,10 @@ public class PropertiesManager implements IInputValidator{
 		 * The currently active review
 		 */
 		private static String AUTHOR_NAME = "authorName";
+		/**
+		 * Indicates if explorer and table are linked
+		 */
+		public static String LINK_EXPLORER = "linkExplorer";
 		
 	}
 	
