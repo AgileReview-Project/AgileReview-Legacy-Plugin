@@ -595,12 +595,34 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		this.comments = ReviewAccess.getInstance().getAllComments();
 		this.viewer.setInput(this.comments);
 		filterComments();
-		//TODO BUGFIX!
-		this.parserMap.get(getActiveEditor()).reload();
+		IEditorPart editor;
+		if((editor = getActiveEditor()) != null) {
+			if(this.parserMap.containsKey(editor)) {
+				this.parserMap.get(editor).reload();
+			}
+		}
 		this.refreshTable();
 	}
 	
-		
+	/**
+	 * Resets the current parserMap and adds the active editor if some is active.
+	 * This can be done in order to avoid corrupt editors, for example
+	 * after refactoring was done.
+	 */
+	public void resetEditors() {
+		for(AnnotationParser p : this.parserMap.values()) {
+			p.filter(new String[]{});
+		}
+		this.parserMap.clear();
+		System.gc();
+		IEditorPart editor;
+		if((editor = this.getActiveEditor()) != null) {
+			if(editor instanceof ITextEditor) {
+				this.parserMap.put((ITextEditor) editor, new AnnotationParser((ITextEditor) editor));
+			}
+		}
+	}
+	
 	/** Used to add images to add/delete button
 	 * @param path path to the image
 	 * @return an imagedescriptor of the given path
@@ -742,9 +764,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			this.hideAnnotations = true;
 		}
 		if (perspective.getLabel().equals("AgileReview") && !this.startup) { 
-//			for (AnnotationParser parser : this.parserMap.values()) {
-//				parser.reload();
-//			}
 			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
 			this.hideAnnotations = false;
 		}
