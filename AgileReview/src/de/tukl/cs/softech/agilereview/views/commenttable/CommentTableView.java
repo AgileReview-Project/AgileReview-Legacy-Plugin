@@ -766,8 +766,12 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			i++;
 		}
 		PluginLogger.log(this.getClass().toString(), "filterComments", "Starting to filter annotations");
-		this.parserMap.get(this.getActiveEditor()).filter(commentKeys);
-		PluginLogger.log("CommentTableView","filterComments",commentKeys.toString());
+		
+		IEditorPart editor;
+		if((editor = this.getActiveEditor()) != null) {
+			this.parserMap.get(editor).filter(commentKeys);
+		}
+		PluginLogger.log("CommentTableView", "filterComments", commentKeys.toString());
 	}
 
 	/* not used
