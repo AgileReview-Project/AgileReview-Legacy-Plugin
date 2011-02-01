@@ -39,7 +39,7 @@ public class ReplyDialog extends Composite implements Listener {
 	/**
 	 * inserted author text
 	 */
-	private String strReplyAuthor = "";
+	private String strReplyAuthor = PropertiesManager.getInstance().getAuthor();
 	/**
 	 * inserted reply text
 	 */
@@ -63,10 +63,10 @@ public class ReplyDialog extends Composite implements Listener {
 		gridLayout.numColumns = 2;
 		this.setLayout(gridLayout);
 		
-		Label replyAuthorDescLabel = new Label(this, SWT.PUSH); 
-		replyAuthorDescLabel.setText("Reply Author: ");
+		//Label replyAuthorDescLabel = new Label(this, SWT.PUSH); 
+		//replyAuthorDescLabel.setText("Reply Author: ");
 		
-		replyAuthorEdit = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
+		//replyAuthorEdit = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
 		
 		replyText = new StyledText(this, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
 		replyText.setWordWrap(true);
@@ -121,9 +121,8 @@ public class ReplyDialog extends Composite implements Listener {
 	@Override
 	public void handleEvent(Event event) {
 		if (event.widget == okButton) {
-			strReplyAuthor = replyAuthorEdit.getText().trim();
-        	strReplyText = replyText.getText().trim();
-			if(strReplyAuthor.equals("") || strReplyText.equals("")) {
+			strReplyText = replyText.getText().trim();
+			if(strReplyText.equals("")) {
 				MessageDialog.openInformation(this.getShell(), "Information", 
 		        		PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_EMPTY_REPLY_MESSAGE));
 			} else {
