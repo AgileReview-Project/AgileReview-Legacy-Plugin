@@ -170,8 +170,6 @@ public class PropertiesManager implements IInputValidator{
 	 */
 	private PropertiesManager() {		
 		
-		// External preferences
-		externalPreferences =  new InstanceScope().getNode(getInternalProperty(INTERNAL_KEYS.PLUGIN_ID));		
 		// Internal properties
 		internalProperties = new Properties();
 		InputStream stream = DetailView.class.getClassLoader().getResourceAsStream(internalPropertyFile);
@@ -187,6 +185,9 @@ public class PropertiesManager implements IInputValidator{
 				PluginLogger.logError("PropertiesManager", "constructor", "IOException occurs while loading internal properties from file", e);
 			}
 		}
+		
+		// External preferences
+		externalPreferences =  new InstanceScope().getNode(getInternalProperty(INTERNAL_KEYS.PLUGIN_ID));
 		
 		// Set inputValidator regex
 		String forbiddenChars = String.valueOf(this.getForbiddenChars());

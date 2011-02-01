@@ -5,6 +5,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+
 /**
  * ExecutionListener which methods are executed, if a command is triggered.
  */
@@ -33,6 +35,7 @@ public class ExecutionListener implements IExecutionListener {
 //				e1.printStackTrace();
 //			}
 //		}
+		PluginLogger.log("ExecutionListener", "postExecuteSuccess", commandId);
 	}
 
 	@Override
@@ -48,6 +51,7 @@ public class ExecutionListener implements IExecutionListener {
 				}
 			}
 		}*/
+		PluginLogger.log("ExecutionListener", "preExecute", commandId);
 	}
 
 }

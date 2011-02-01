@@ -229,10 +229,10 @@ public class AnnotationParser {
 		for(String s : commentKeys) {
 			if(this.idPositionMap.get(s) != null) {
 				display.put(s, this.idPositionMap.get(s));
-				System.out.println("filter -> show: "+s);
+				PluginLogger.log("AnnotationParser", "filter", "filter -> show: "+s);
 			}
 		}
-		System.out.println("---------filter finisch------------");
+		PluginLogger.log("AnnotationParser", "filter", "---------filter finisched------------");
 		this.annotationModel.displayAnnotations(display);
 	}
 	
