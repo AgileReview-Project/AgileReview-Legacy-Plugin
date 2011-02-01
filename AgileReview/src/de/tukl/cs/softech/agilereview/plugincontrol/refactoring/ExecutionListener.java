@@ -35,7 +35,7 @@ public class ExecutionListener implements IExecutionListener {
 //				e1.printStackTrace();
 //			}
 //		}
-		PluginLogger.log("ExecutionListener", "postExecuteSuccess", commandId);
+		PluginLogger.log(this.getClass().toString(), "postExecuteSuccess", commandId);
 	}
 
 	@Override
@@ -51,7 +51,10 @@ public class ExecutionListener implements IExecutionListener {
 				}
 			}
 		}*/
-		PluginLogger.log("ExecutionListener", "preExecute", commandId);
+		//org.eclipse.jdt.ui.edit.text.java.move.element
+		//org.eclipse.ui.edit.rename
+		//org.eclipse.ltk.ui.refactoring.commands.renameResource
+		PluginLogger.log(this.getClass().toString(), "preExecute", commandId);
 	}
 
 }

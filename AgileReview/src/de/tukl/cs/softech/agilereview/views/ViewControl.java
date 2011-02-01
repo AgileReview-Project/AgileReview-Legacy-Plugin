@@ -62,7 +62,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 * @return true if the registration was successful
 	 */
 	public static boolean registerView(Class<? extends ViewPart> c) {
-		PluginLogger.log("ViewControl", "registerView", c.getName());
+		PluginLogger.log(ViewControl.class.toString(), "registerView", c.getName());
 		return activeViews.add(c);
 	}
 	
@@ -72,7 +72,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 * @return true if the given {@link ViewPart} was unregistered successfully
 	 */
 	protected static boolean unregisterView(Class<? extends ViewPart> c) {
-		PluginLogger.log("ViewControl", "unregisterView", c.getName());
+		PluginLogger.log(ViewControl.class.toString(), "unregisterView", c.getName());
 		return activeViews.remove(c);
 	}
 	
@@ -98,7 +98,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if(selection != null && part != null) {
-			PluginLogger.log("ViewControl", "selectionChanged", "fired with selection != null && part != null");
+			PluginLogger.log(this.getClass().toString(), "selectionChanged", "fired with selection != null && part != null");
 			if(isOpen(CommentTableView.class)) {
 				CommentTableView.getInstance().selectionChanged(part, selection);
 			}
@@ -127,7 +127,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
-		PluginLogger.log("ViewControl", "partBroughtToTop", partRef.getPartName());
+		PluginLogger.log(this.getClass().toString(), "partBroughtToTop", partRef.getPartName());
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().partBroughtToTop(partRef);
 		}
@@ -141,7 +141,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
-		PluginLogger.log("ViewControl", "partClosed", partRef.getPartName());
+		PluginLogger.log(this.getClass().toString(), "partClosed", partRef.getPartName());
 		activeViews.remove(partRef.getPart(false));
 		
 		if(isOpen(DetailView.class)) {
@@ -159,7 +159,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partDeactivated(IWorkbenchPartReference partRef) {
-		PluginLogger.log("ViewControl", "partDeactivated", partRef.getPartName());
+		PluginLogger.log(this.getClass().toString(), "partDeactivated", partRef.getPartName());
 		if(isOpen(DetailView.class)) {
 			DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
 		}
@@ -222,7 +222,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		PluginLogger.log("ViewControl", "perspectiveChanged", perspective.getLabel());
+		PluginLogger.log(this.getClass().toString(), "perspectiveChanged", perspective.getLabel());
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().perspectiveActivated(page, perspective);
 		}

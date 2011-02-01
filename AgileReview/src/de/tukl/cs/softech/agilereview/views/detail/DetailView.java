@@ -74,19 +74,19 @@ public class DetailView extends ViewPart {
 			this.actParent = new Composite(this.parentParent, this.parentStyle);
 			this.setPartName("Detail View");
 			this.currentDisplay = EMPTY;
-			PluginLogger.log("DetailView", "changeParent", "to EMPTY");
+			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
 			this.actParent = new CommentDetail(this.parentParent, this.parentStyle);
 			this.setPartName("Comment Detail");
 			this.currentDisplay = COMMENT_DETAIL;
-			PluginLogger.log("DetailView", "changeParent", "to COMMENT_DETAIL");
+			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
 			this.actParent = new ReviewDetail(this.parentParent, this.parentStyle);
 			this.setPartName("Review Detail");
 			this.currentDisplay = REVIEW_DETAIL;
-			PluginLogger.log("DetailView", "changeParent", "to REVIEW_DETAIL");
+			PluginLogger.log(this.getClass().toString(), "changeParent", "to REVIEW_DETAIL");
 			break;
 		}
 		this.parentParent.layout(true);

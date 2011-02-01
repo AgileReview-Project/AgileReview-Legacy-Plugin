@@ -44,7 +44,7 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 				event.getDelta().accept(this);
 			} catch (CoreException e) {
 				// TODO Auto-generated catch block
-				PluginLogger.logError("ResourceChangeListener", "resourceChanged", "CoreException occured during acceptance test of event delta", e);
+				PluginLogger.logError(this.getClass().toString(), "resourceChanged", "CoreException occured during acceptance test of event delta", e);
 			}
 		}
 	}
@@ -68,7 +68,7 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 		}
 		
 		if(!oldPath.equals("") && !newPath.equals("") && !refactoringDone) {
-			PluginLogger.log("ResourceChangeListener", "visit", ">oldPath="+oldPath+"< - >newPath="+newPath+"< - type="+delta.getResource().getType());
+			PluginLogger.log(this.getClass().toString(), "visit", ">oldPath="+oldPath+"< - >newPath="+newPath+"< - type="+delta.getResource().getType());
 			try 
 			{
 				// Do the refactoring
@@ -94,10 +94,10 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 			}
 			catch (IOException e) {
 				// TODO Auto-generated catch block
-				PluginLogger.logError("ResourceChangeListener", "visit", "IOException occured during refactoring Path in ReviewAccess", e);
+				PluginLogger.logError(this.getClass().toString(), "visit", "IOException occured during refactoring Path in ReviewAccess", e);
 			} catch (XmlException e) {
 				// TODO Auto-generated catch block
-				PluginLogger.logError("ResourceChangeListener", "visit", "XmlException occured during refactoring Path in ReviewAccess", e);
+				PluginLogger.logError(this.getClass().toString(), "visit", "XmlException occured during refactoring Path in ReviewAccess", e);
 			}
 			refactoringDone = true;
 		}

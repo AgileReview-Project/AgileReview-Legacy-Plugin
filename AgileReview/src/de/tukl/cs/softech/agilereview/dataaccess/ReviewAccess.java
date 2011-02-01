@@ -202,7 +202,7 @@ public class ReviewAccess {
 	 */
 	private ReviewAccess()
 	{
-		PluginLogger.log("ReviewAccess", "constructor", "ReviewAccess created");
+		PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
 		// Set the directory where the comments are located
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject p = workspaceRoot.getProject(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.SOURCE_FOLDER));
@@ -233,7 +233,7 @@ public class ReviewAccess {
 	 */
 	private void clearAllModels()
 	{
-		PluginLogger.log("ReviewAccess", "clearAllModels", "All models will be cleared");
+		PluginLogger.log(this.getClass().toString(), "clearAllModels", "All models will be cleared");
 		this.rFileModel.clearModel();
 		this.rModel.clearModel();
 	}
@@ -245,7 +245,7 @@ public class ReviewAccess {
 	 */
 	private void loadAllComment() throws XmlException, IOException
 	{
-		PluginLogger.log("ReviewAccess", "loadAllComments", 
+		PluginLogger.log(this.getClass().toString(), "loadAllComments", 
 				"All comment files will be loaded from file (including closed reviews). Exception thrown when parsing xml-file");
 		// Get all relevant folders in the review repository
 		FileFilter folderFilter = new FileFilter() {
@@ -285,7 +285,7 @@ public class ReviewAccess {
 	 */
 	private void loadAllReviews() throws XmlException, IOException
 	{
-		PluginLogger.log("ReviewAccess", "loadAllReviews", "All reviews will be loaded from files");
+		PluginLogger.log(this.getClass().toString(), "loadAllReviews", "All reviews will be loaded from files");
 		// Get all relevant folders in the review repository
 		FileFilter folderFilter = new FileFilter() {
 			@Override
@@ -436,7 +436,7 @@ public class ReviewAccess {
 	 */
 	public Comment createNewComment(String reviewId, String author, String path) throws IOException 
 	{		
-		PluginLogger.log("ReviewAccess", "createNewComment", "Comment created for:\n reviewId: "+reviewId+" \n author: "+author+" \n path: "+path);
+		PluginLogger.log(this.getClass().toString(), "createNewComment", "Comment created for:\n reviewId: "+reviewId+" \n author: "+author+" \n path: "+path);
 		// Check if file for this author in this review does already exist (assumption: database and file system are synch)
 		File commentFile = ReviewAccess.createCommentFile(reviewId, author);
 		// Check if file for this author does already exist
@@ -494,7 +494,7 @@ public class ReviewAccess {
 	 */
 	public void deleteComment(String reviewId, String author, String commentId) throws IOException
 	{
-		PluginLogger.log("ReviewAccess", "deleteComment", "Following comment deleted:\n reviewId: "+reviewId+" \n author: "+author+" \n commentId: "+commentId);
+		PluginLogger.log(this.getClass().toString(), "deleteComment", "Following comment deleted:\n reviewId: "+reviewId+" \n author: "+author+" \n commentId: "+commentId);
 		// Find comment in database
 		Comment delCom = this.rModel.getComment(reviewId, author, commentId);
 		
@@ -600,7 +600,7 @@ public class ReviewAccess {
 	 */
 	public HashSet<Project> getProjects(String reviewId)
 	{
-		PluginLogger.log("ReviewAccess", "getProjects", "all projects requested");
+		PluginLogger.log(this.getClass().toString(), "getProjects", "all projects requested");
 		HashSet<Project> result = new HashSet<Project>();
 			
 		// Iterate all comments of this review
@@ -625,7 +625,7 @@ public class ReviewAccess {
 	 */
 	public Review createNewReview(String reviewId) throws IOException
 	{
-		PluginLogger.log("ReviewAccess", "createNewReview", "Create new review: "+reviewId);
+		PluginLogger.log(this.getClass().toString(), "createNewReview", "Create new review: "+reviewId);
 		// Create the new review
 		ReviewDocument revDoc = ReviewDocument.Factory.newInstance();
 		Review result = revDoc.addNewReview();
@@ -667,7 +667,7 @@ public class ReviewAccess {
 	 */
 	public void deleteReview(String reviewId) 
 	{	
-		PluginLogger.log("ReviewAccess", "deleteReview", "Delete review: "+reviewId);
+		PluginLogger.log(this.getClass().toString(), "deleteReview", "Delete review: "+reviewId);
 		File delFile = ReviewAccess.createReviewFile(reviewId);
 		
 		// Delete review from Model
@@ -686,7 +686,7 @@ public class ReviewAccess {
 	 */
 	public void loadReviewComments(String reviewId) throws XmlException, IOException
 	{
-		PluginLogger.log("ReviewAccess", "loadReviewComments", "Load comments of review: "+reviewId);
+		PluginLogger.log(this.getClass().toString(), "loadReviewComments", "Load comments of review: "+reviewId);
 		File currFolder = ReviewAccess.createReviewFolder(reviewId);
 		
 		FilenameFilter fileFilter = new FilenameFilter() {
@@ -714,7 +714,7 @@ public class ReviewAccess {
 	 */
 	public void unloadReviewComments(String reviewId)
 	{
-		PluginLogger.log("ReviewAccess", "unloadReviewComments", "Unload comments of review: "+reviewId);
+		PluginLogger.log(this.getClass().toString(), "unloadReviewComments", "Unload comments of review: "+reviewId);
 		// Remove the given review from the models
 		for (Comment c: this.rModel.getComments(reviewId))
 		{
@@ -730,7 +730,7 @@ public class ReviewAccess {
 	 */
 	public void fillDatabaseCompletely() throws XmlException, IOException
 	{
-		PluginLogger.log("ReviewAccess", "fillDatabaseCompletely", "Clear all models and reload everything from file (including closed reviews)");
+		PluginLogger.log(this.getClass().toString(), "fillDatabaseCompletely", "Clear all models and reload everything from file (including closed reviews)");
 		// Clear old values
 		this.clearAllModels();
 		
@@ -749,7 +749,7 @@ public class ReviewAccess {
 	 */
 	public void fillDatabaseForOpenReviews() throws XmlException, IOException
 	{
-		PluginLogger.log("ReviewAccess", "fillDatabaseForOpenReviews", "Clear all models and reload all reviews and all comments of open reviews");
+		PluginLogger.log(this.getClass().toString(), "fillDatabaseForOpenReviews", "Clear all models and reload all reviews and all comments of open reviews");
 		// Clear old models
 		this.clearAllModels();
 		
@@ -784,7 +784,7 @@ public class ReviewAccess {
 	 */
 	public void save() throws IOException
 	{
-		PluginLogger.log("ReviewAccess", "save", "Save all data to disk");
+		PluginLogger.log(this.getClass().toString(), "save", "Save all data to disk");
 		rFileModel.saveAll();
 	}
 	
@@ -799,7 +799,7 @@ public class ReviewAccess {
 	 */
 	public void refactorPath(String oldPath, String newPath, int type) throws IOException, XmlException
 	{
-		PluginLogger.log("ReviewAccess", "refactorPath", "Refactors path \""+oldPath+"\" to \""+newPath+"\"");
+		PluginLogger.log(this.getClass().toString(), "refactorPath", "Refactors path \""+oldPath+"\" to \""+newPath+"\"");
 		// First of all, load the whole database
 		this.fillDatabaseCompletely();
 		

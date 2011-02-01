@@ -111,7 +111,7 @@ public class AnnotationParser {
 	 * Parses all comment tags and saves them with their {@link Position}
 	 */
 	private void parseInput() {
-		PluginLogger.log("AnnotationParser", "parseInput", "triggered");
+		PluginLogger.log(this.getClass().toString(), "parseInput", "triggered");
 		idPositionMap.clear();
 		idTagPositions.clear();
 		Matcher matcher;
@@ -132,7 +132,7 @@ public class AnnotationParser {
 						if(tagPositions != null) {
 							//same begin tag already exists
 							document.replace(r.getOffset(), r.getLength(), "");
-							PluginLogger.log("AnnotationParser", "parseInput", "currupt: <same begin tag already exists>: "+key+" --> deleting");
+							PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <same begin tag already exists>: "+key+" --> deleting");
 							tagDeleted = true;
 						} else {
 							idPositionMap.put(key, new Position(document.getLineOffset(line)));
@@ -147,7 +147,7 @@ public class AnnotationParser {
 							if(tagPositions[1] != null) {
 								//same end tag already exists
 								document.replace(r.getOffset(), r.getLength(), "");
-								PluginLogger.log("AnnotationParser", "parseInput", "currupt: <same end tag already exists>: "+key+" --> deleting");
+								PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <same end tag already exists>: "+key+" --> deleting");
 								tagDeleted = true;
 							} else {
 								//end tag not set
@@ -162,7 +162,7 @@ public class AnnotationParser {
 						} else {
 							//end tag without begin tag
 							document.replace(r.getOffset(), r.getLength(), "");
-							PluginLogger.log("AnnotationParser", "parseInput", "currupt: <end tag without begin tag>: "+key+" --> deleting");
+							PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <end tag without begin tag>: "+key+" --> deleting");
 							tagDeleted = true;
 						}
 					}
@@ -192,7 +192,7 @@ public class AnnotationParser {
 				Iterator<Position> it = positionsToDelete.descendingIterator();
 				while(it.hasNext()) {
 					Position tmp = it.next();
-					PluginLogger.log("AnnotationParser", "parseInput", "currupt: <begin tag without end tag> --> deleting");
+					PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <begin tag without end tag> --> deleting");
 					document.replace(tmp.getOffset(), tmp.getLength(), "");
 				}
 				//parse the file another time to get the correct positions for the tags
@@ -200,7 +200,13 @@ public class AnnotationParser {
 			}
 			
 		} catch (BadLocationException e) {
-			PluginLogger.logError("AnnotationParser", "parseInput", "BadLocationException occurs while parsing the editor: "+editor.getTitle(), e);
+			if(startOffset != 0) {
+				PluginLogger.logError(this.getClass().toString(), "parseInput", "BadLocationException occurs while parsing the editor: "+editor.getTitle(), e);
+			} else {
+				//file out of sync or other reasons, so eclipse cannot open file till refresh --> suppress Exception
+				PluginLogger.log(this.getClass().toString(), "parseInput", "BadLocationException suppressed while parsing the editor: "+editor.getTitle());
+			}
+			
 		}
 		
 		HashMap<Position, String> toDisplay = new HashMap<Position, String>();
@@ -212,7 +218,7 @@ public class AnnotationParser {
 		try {
 			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
 		} catch (CoreException e) {
-			PluginLogger.logError("AnnotationParser", "parseInput", "CoreException occurs while saving document of editor: "+editor.getTitle(), e);
+			PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "+editor.getTitle(), e);
 		}
 		
 		annotationModel.displayAnnotations(idPositionMap);
@@ -229,10 +235,10 @@ public class AnnotationParser {
 		for(String s : commentKeys) {
 			if(this.idPositionMap.get(s) != null) {
 				display.put(s, this.idPositionMap.get(s));
-				PluginLogger.log("AnnotationParser", "filter", "filter -> show: "+s);
+				PluginLogger.log(this.getClass().toString(), "filter", "filter -> show: "+s);
 			}
 		}
-		PluginLogger.log("AnnotationParser", "filter", "---------filter finisched------------");
+		PluginLogger.log(this.getClass().toString(), "filter", "---------filter finisched------------");
 		this.annotationModel.displayAnnotations(display);
 	}
 	

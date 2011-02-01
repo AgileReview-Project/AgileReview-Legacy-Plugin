@@ -771,7 +771,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if((editor = this.getActiveEditor()) != null) {
 			this.parserMap.get(editor).filter(commentKeys);
 		}
-		PluginLogger.log("CommentTableView", "filterComments", commentKeys.toString());
+		PluginLogger.log(this.getClass().toString(), "filterComments", commentKeys.toString());
 	}
 
 	/* not used

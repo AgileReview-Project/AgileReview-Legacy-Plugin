@@ -85,7 +85,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	protected void partClosedOrDeactivated(IWorkbenchPart part) {
 		saveChanges();
 		//fire "save" event for persistent storage
-		PluginLogger.log("AbtractDetail", "partClosedOrDeactivated", "trigger save event");
+		PluginLogger.log(this.getClass().toString(), "partClosedOrDeactivated", "trigger save event");
 		saveButton.notifyListeners(SWT.Selection, new Event());
 		revertButton.setEnabled(false);
 	}

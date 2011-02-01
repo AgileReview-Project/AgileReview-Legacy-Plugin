@@ -182,7 +182,7 @@ public class PropertiesManager implements IInputValidator{
 				value = internalProperties.getProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_PRIORITIES);
 				commentPriorities = value.split(",");				
 			} catch (IOException e) {
-				PluginLogger.logError("PropertiesManager", "constructor", "IOException occurs while loading internal properties from file", e);
+				PluginLogger.logError(this.getClass().toString(), "constructor", "IOException occurs while loading internal properties from file", e);
 			}
 		}
 		

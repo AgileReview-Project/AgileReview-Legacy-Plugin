@@ -29,7 +29,7 @@ public class Startup implements IStartup {
 	@Override
 	public void earlyStartup() {
 		// add executionlistener to listen to interesting commands
-		PluginLogger.log("Startup", "earlyStartup", "register executionListener & ResourceChangeListener");
+		PluginLogger.log(this.getClass().toString(), "earlyStartup", "register executionListener & ResourceChangeListener");
 		((ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class)).addExecutionListener(executionListener);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener, IResourceChangeEvent.POST_CHANGE);
 	}
