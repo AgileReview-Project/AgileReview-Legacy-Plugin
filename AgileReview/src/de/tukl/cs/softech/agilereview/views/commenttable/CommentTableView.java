@@ -500,6 +500,30 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		// create toolbar
 		final ToolBar toolBar = new ToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
 
+		// add "link explorer" button to toolbar
+	    ToolItem itemLinkExplorer = new ToolItem(toolBar, SWT.CHECK);
+	    itemLinkExplorer.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.SYNCED)).createImage());
+	    //itemLinkExplorer.setText("Link Explorer");
+	    itemLinkExplorer.setToolTipText("Link ReviewExplorer. If checked, selections of the ReviewExplorer will be reflected in the table by filtering comments.");
+	    itemLinkExplorer.setSelection(this.linkExplorer);
+	    // add listener to connect and disconnect explorer and table
+	    itemLinkExplorer.addListener(SWT.Selection, new Listener() {
+			
+			@Override
+			public void handleEvent(Event event) {
+				linkExplorer = !linkExplorer;
+				if (!linkExplorer) {
+					viewer.removeFilter(selectionFilter);
+					PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,"false");
+				} else {
+					viewer.addFilter(selectionFilter);
+					PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,"true");
+				}
+				filterComments();
+				viewer.refresh();
+			}
+		});		
+		
 		// add dropdown box to toolbar to select category to filter
 		final ToolItem itemDropDown = new ToolItem(toolBar, SWT.DROP_DOWN);
 	    itemDropDown.setText("Search for ALL");
@@ -551,40 +575,20 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	    
 	    // add "add comment" button to toolbar
 	    ToolItem itemAddComment = new ToolItem(toolBar, SWT.PUSH);
-	    itemAddComment.setText("Add Comment");
+	    //itemAddComment.setText("Add Comment");
+	    itemAddComment.setToolTipText("Add a comment to the selected text area/the whole file.");
 	    itemAddComment.setData("add");
 	    itemAddComment.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.COMMENT_ADD)).createImage());
 	    itemAddComment.addListener(SWT.Selection, CommentController.getInstance());
 	    
 	    // add "delete comment" button to toolbar
 	    ToolItem itemDelComment = new ToolItem(toolBar, SWT.PUSH);
-	    itemDelComment.setText("Delete Comment");
+	    //itemDelComment.setText("Delete Comment");
+	    itemDelComment.setToolTipText("Delete the comment(s) currently selected in the table below.");
 	    itemDelComment.setData("delete");
 	    itemDelComment.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.COMMENT_DELETE)).createImage());
 	    itemDelComment.addListener(SWT.Selection, CommentController.getInstance());
 	    
-	    // add "show all comments" button to toolbar
-	    ToolItem itemAllComments = new ToolItem(toolBar, SWT.CHECK);
-	    itemAllComments.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.SYNCED)).createImage());
-	    itemAllComments.setText("Link Explorer");
-	    itemAllComments.setSelection(this.linkExplorer);
-	    // add listener to connect and disconnect explorer and table
-	    itemAllComments.addListener(SWT.Selection, new Listener() {
-			
-			@Override
-			public void handleEvent(Event event) {
-				linkExplorer = !linkExplorer;
-				if (!linkExplorer) {
-					viewer.removeFilter(selectionFilter);
-					PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,"false");
-				} else {
-					viewer.addFilter(selectionFilter);
-					PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,"true");
-				}
-				filterComments();
-				viewer.refresh();
-			}
-		});
 	    
 	    // add listener to dropdown box to show menu
 	    itemDropDown.addListener(SWT.Selection, new Listener() {

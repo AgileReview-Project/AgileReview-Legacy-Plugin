@@ -172,5 +172,24 @@
          class="de.tukl.cs.softech.agilereview.plugincontrol.Startup">
    </startup>
 </extension>
+<extension
+      point="org.eclipse.ui.newWizards">
+   <category
+         id="AgileReview.AgileReviewCategory"
+         name="AgileReview"
+         parentCategory="org.eclipse.ui.Basic">
+   </category>
+   <wizard
+         canFinishEarly="false"
+         category="AgileReview.AgileReviewCategory"
+         class="de.tukl.cs.softech.agilereview.wizard.NewReviewWizard"
+         finalPerspective="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
+         hasPages="true"
+         icon="icons/agile_icon.png"
+         id="AgileReview.newReviewWizard"
+         name="AgileReview"
+         preferredPerspectives="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+   </wizard>
+</extension>
     
 </plugin>
