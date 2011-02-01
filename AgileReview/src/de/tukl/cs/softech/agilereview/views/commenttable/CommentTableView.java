@@ -66,6 +66,7 @@ import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.annotations.AnnotationParser;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
@@ -741,6 +742,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		}
 		
 		this.parserMap.get(this.getActiveEditor()).filter(commentKeys);
+		PluginLogger.log("CommentTableView","filterComments",filteredCommentObjects.toString());
 	}
 
 	@Override

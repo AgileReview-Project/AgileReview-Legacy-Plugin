@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 

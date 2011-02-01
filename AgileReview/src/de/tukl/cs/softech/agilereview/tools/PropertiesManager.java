@@ -34,6 +34,10 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String LOG_LEVEL = "log_level";
 		/**
+		 * Boolean whether logs should also occur in System.out or not
+		 */
+		public static String LOG_SYSOUT = "log_sysout";
+		/**
 		 * The source folder where the reviews are stored (path based from Workspace-root)
 		 */
 		public static String SOURCE_FOLDER = "source_folder";
@@ -384,5 +388,13 @@ public class PropertiesManager implements IInputValidator{
 	 */
 	public int getLogLevel() {
 		return Integer.parseInt(getInternalProperty(INTERNAL_KEYS.LOG_LEVEL));
+	}
+	
+	/**
+	 * Returns the boolean whether logs should also occur in System.out or not
+	 * @return true, if the logs should also occur in System.out<br>false, otherwise
+	 */
+	public boolean getLogSysout() {
+		return Boolean.parseBoolean(getInternalProperty(INTERNAL_KEYS.LOG_SYSOUT));
 	}
 }
