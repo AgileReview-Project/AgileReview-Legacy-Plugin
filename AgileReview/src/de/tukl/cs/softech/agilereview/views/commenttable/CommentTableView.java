@@ -16,7 +16,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -69,6 +68,7 @@ import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
@@ -149,17 +149,17 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	@Override
 	public void createPartControl(Composite parent) {
 		instance = this;
-		
+		PluginLogger.log(this.getClass().toString(), "createPartControl", "Creating TableView");
 		// get comments from CommentController
 		try {
 			this.comments = ReviewAccess.getInstance().getAllComments();
 			this.filteredComments = this.comments;
 		} catch (XmlException e) {
-			MessageDialog.openWarning(null, "Error", "An error occured while reading comments from local savings:\n"+e.getMessage());
-			// TODO: check if the above is correct an can if this be remove e.printStackTrace();
+			// TODO
+			PluginLogger.logError(this.getClass().toString(), "createPartControl", "XMLException when trying to read comments via ReviewAccess", e);
 		} catch (IOException e) {
-			MessageDialog.openWarning(null, "Error", "An error occured while reading comments from local savings:\n"+e.getMessage());
-			//TODO: check if the above is correct an can if this be remove e.printStackTrace();
+			//TODO
+			PluginLogger.logError(this.getClass().toString(), "createPartControl", "IOException when trying to read comments via ReviewAccess", e);
 		}
 		
 		// set layout of parent
@@ -184,9 +184,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 		// register view
 		ViewControl.registerView(this.getClass());
+		PluginLogger.log(this.getClass().toString(), "createPartControl", "Registering TableView with ViewControl");
 		
 		// get editor that is active when opening eclipse
 		if (getActiveEditor() instanceof ITextEditor) {
+			PluginLogger.log(this.getClass().toString(), "createPartControl", "Start parsing initially opened editor");
 			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
 		}
 		
@@ -200,6 +202,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		this.comments = comments;
 		viewer.setInput(comments);
 		viewer.refresh();
+		PluginLogger.log(this.getClass().toString(), "setTableContent", "Setting table content");
 	}
 	
 	/**
@@ -208,6 +211,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	public void addComment(Comment comment) {
 		// add comment to (un)filtered model
+		PluginLogger.log(this.getClass().toString(), "addComment", "Adding comment to table content");
 		this.comments.add(comment);
 		if (!this.comments.equals(this.filteredComments)) { 
 			this.filteredComments.add(comment);
@@ -218,18 +222,21 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
 		
 		try {
+			PluginLogger.log(this.getClass().toString(), "addComment", "Add tags for currently added comment");
 			parserMap.get(getActiveEditor()).addTagsInDocument(comment);
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(this.getClass().toString(), "addComment", "BadLocationException when trying to add tags", e);
+			//e.printStackTrace();
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.log(this.getClass().toString(), "addComment", "CoreException when trying to add tags", e);
+			//e.printStackTrace();
 		}
 		
-//		if (ViewControl.isOpen(DetailView.class)) {
-//			DetailView.getInstance().selectionChanged(this, new StructuredSelection(comment));	
-//		}	
+		if (ViewControl.isOpen(DetailView.class)) {
+			DetailView.getInstance().selectionChanged(this, new StructuredSelection(comment));	
+		} else {
+			PluginLogger.logWarning(this.getClass().toString(), "addComment", "Could not open added comment in DetailView since DetailView is not registered with ViewController");
+		}
 		
 	}
 	
@@ -238,6 +245,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param comment the comment
 	 */
 	public void deleteComment(Comment comment) {
+
+		PluginLogger.log(this.getClass().toString(), "deleteComment", "Deleting a comment from table content");
 		// add comment to (un)filtered model
 		this.comments.remove(comment);
 		if (this.filteredComments.contains(comment)) {
@@ -247,14 +256,15 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 		// remove annotation and tags
 		try {
+			PluginLogger.log(this.getClass().toString(), "deleteComment", "Starting to remove tags for currently deleted comment");
 			openEditor(comment);
 			parserMap.get(getActiveEditor()).removeCommentTags(comment);
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(this.getClass().toString(), "deleteComment", "BadLocationException when trying to delete comment", e);
+			//e.printStackTrace();
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(this.getClass().toString(), "deleteComment", "CoreException when trying to delete comment", e);
+			//e.printStackTrace();
 		}
 	}
 
@@ -269,6 +279,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * Reload current table input
 	 */
 	public void refreshTable() {
+		PluginLogger.log(this.getClass().toString(), "refreshTable", "Reloading current table input");
 		viewer.refresh();
 	}
 	
@@ -279,6 +290,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	private TableViewer createViewer(Composite parent) {
 
+		PluginLogger.log(this.getClass().toString(), "createViewer", "Starting to create viewer");
 		// create viewer
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		createColumns(parent, viewer);
@@ -294,6 +306,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 
 		// provide access to selections of table rows
 		viewer.addSelectionChangedListener(CommentController.getInstance()); // TODO umstellen auf ISelectionListener und dann über SelectionProvider!!!
+		PluginLogger.log(this.getClass().toString(), "createViewer", "Registering as SelectionProvider");
 		getSite().setSelectionProvider(viewer);
 		
 		viewer.addDoubleClickListener(this);
@@ -319,7 +332,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param viewer The viewer who's columns are to be created
 	 */
 	private void createColumns(Composite parent, TableViewer viewer) {
-		
 		// ReviewID
 		TableViewerColumn col = createColumn(titles[0], bounds[0], 0);
 		col.setLabelProvider(new ColumnLabelProvider() {
@@ -598,6 +610,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @throws XmlException 
 	 */
 	public void resetComments() throws XmlException, IOException {
+		PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
 		// TODO: check if annotations need to be removed!!!
 		this.comments = ReviewAccess.getInstance().getAllComments();
 		this.viewer.setInput(this.comments);
@@ -617,6 +630,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * after refactoring was done.
 	 */
 	public void resetEditors() {
+		PluginLogger.log(this.getClass().toString(), "resetEditor", "Droping old editors, reparsing active editor");
 		for(AnnotationParser p : this.parserMap.values()) {
 			p.filter(new String[]{});
 		}
@@ -675,6 +689,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if (linkExplorer && part instanceof ReviewExplorer) {
 			if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
 
+				PluginLogger.log(this.getClass().toString(), "selectionChanged", "Selection of ReviewExplorer changed");
 				// if there is a selectionFilter, remove it
 				if (this.selectionFilter != null) {
 					viewer.removeFilter(this.selectionFilter);
@@ -710,6 +725,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 					}
 				}
 
+				PluginLogger.log(this.getClass().toString(), "selectionChanged", "Adding new filter regarding selection of ReviewExplorer");
 				// add a new filter by the given criteria to the viewer
 				this.selectionFilter = new ExplorerSelectionFilter(reviewIDs,
 						paths);
@@ -726,12 +742,15 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * Filter comments by criteria received from explorer and search field
 	 */
 	private void filterComments() {
+		PluginLogger.log(this.getClass().toString(), "filterComments", "Starting to filter comments");
 		List<Object> filteredCommentObjects;
 		if (linkExplorer) {
 			// filter by selections from explorer and search word from text field
+			PluginLogger.log(this.getClass().toString(), "filterComments", "Filter by textfield and ReviewExplorer selection");
 			filteredCommentObjects = Arrays.asList(selectionFilter.filter(viewer, this, commentFilter.filter(viewer, this, this.comments.toArray())));
 		} else {
 			// filter by search word from text field
+			PluginLogger.log(this.getClass().toString(), "filterComments", "Filter by textfield");
 			filteredCommentObjects = Arrays.asList(commentFilter.filter(viewer, this, this.comments.toArray()));	
 		}		
 		
@@ -746,16 +765,17 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			commentKeys[i] = ((Comment) o).getReviewID()+keySeparator+((Comment) o).getAuthor()+keySeparator+((Comment) o).getId();
 			i++;
 		}
-		
+		PluginLogger.log(this.getClass().toString(), "filterComments", "Starting to filter annotations");
 		this.parserMap.get(this.getActiveEditor()).filter(commentKeys);
 		PluginLogger.log("CommentTableView","filterComments",commentKeys.toString());
 	}
 
+	/* not used
+	 *  (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void setFocus() { /* TODO Auto-generated method stub */}
 	
 	/**
 	 * Removes all annotations if the AgileReview perspective is closed. The method is invoke by {@link:ViewControl} 
@@ -764,6 +784,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		if (!perspective.getLabel().equals("AgileReview")) {
+			PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Hiding annotations since current perspective is not 'AgileReview'");
 			for (AnnotationParser parser: this.parserMap.values()) {
 				parser.filter(new String[0]);
 			}
@@ -771,7 +792,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			this.startup = false;
 			this.hideAnnotations = true;
 		}
-		if (perspective.getLabel().equals("AgileReview") && !this.startup) { 
+		if (perspective.getLabel().equals("AgileReview") && !this.startup) {
+			PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Adding annotations since AgileReview perspective has been activated");
 			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
 			this.hideAnnotations = false;
 		}
@@ -782,14 +804,15 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param comment the comment
 	 */
 	private void openEditor(Comment comment) {
+		PluginLogger.log(this.getClass().toString(), "openEditor", "Opening editor for the given comment");
 		IPath path = new Path(ReviewAccess.computePath(comment));
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 		try {
 			getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
 		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
+			//e.printStackTrace();
 		}
 	}
 	
@@ -801,10 +824,10 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 		try {
+			PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
 			this.parserMap.get(getActiveEditor()).revealCommentLocation(commentTag);
 		} catch (BadLocationException e) {
-			// TODO perhaps this can be done later via the isSetOrphaned flag of comments
-			MessageDialog.openWarning(null, "Warning: This comment is orphaned", "Please chose an other comment to be opened in the editor!");
+			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
 			e.printStackTrace();
 		}
 	}
