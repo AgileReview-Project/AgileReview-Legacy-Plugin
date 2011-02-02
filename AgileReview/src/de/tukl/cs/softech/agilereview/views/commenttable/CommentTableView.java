@@ -1,6 +1,5 @@
 package de.tukl.cs.softech.agilereview.views.commenttable;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -151,16 +149,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		instance = this;
 		PluginLogger.log(this.getClass().toString(), "createPartControl", "Creating TableView");
 		// get comments from CommentController
-		try {
-			this.comments = ReviewAccess.getInstance().getAllComments();
-			this.filteredComments = this.comments;
-		} catch (XmlException e) {
-			// TODO
-			PluginLogger.logError(this.getClass().toString(), "createPartControl", "XMLException when trying to read comments via ReviewAccess", e);
-		} catch (IOException e) {
-			//TODO
-			PluginLogger.logError(this.getClass().toString(), "createPartControl", "IOException when trying to read comments via ReviewAccess", e);
-		}
+		this.comments = ReviewAccess.getInstance().getAllComments();
+		this.filteredComments = this.comments;
+
 		
 		// set layout of parent
 		GridLayout layout = new GridLayout(layoutCols, false);
@@ -610,10 +601,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	
 	/**
 	 * Resets the comments (reloading from model)
-	 * @throws IOException 
-	 * @throws XmlException 
 	 */
-	public void resetComments() throws XmlException, IOException {
+	public void resetComments() {
 		PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
 		// TODO: check if annotations need to be removed!!!
 		this.comments = ReviewAccess.getInstance().getAllComments();

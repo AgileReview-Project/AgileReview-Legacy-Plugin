@@ -27,13 +27,11 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFileWrapper;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFolderWrapper;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleProjectWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -99,6 +97,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	@Override
 	public void createPartControl(Composite parent) 
 	{
+		PluginLogger.log("ReviewExplorer", "createPartControl", "ReviewExplorer will be created.");
 		instance = this;
 		
 		// Create the treeview
@@ -181,6 +180,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	private void addNewReview() 
 	{
+		PluginLogger.log("ReviewExplorer", "addNewReview", "A new Review will be created.");
 		InputDialog in = new InputDialog(null ,"Add new Review", "Please enter a name for the new Review", "", PropertiesManager.getInstance());
 		int input = in.open();
 		if (input == Window.OK)
@@ -200,6 +200,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 			} catch (IOException e) 
 			{
 				// TODO: Auto-generated method stub
+				PluginLogger.logError("ReviewExplorer", "addNewReview", "Exception thrown while created a new Review", e);
 				e.printStackTrace();
 			}
 		}
@@ -210,6 +211,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	private void deleteSelectedReviews()
 	{
+		PluginLogger.log("ReviewExplorer", "deleteSelectedReviews", "All reviews selected in the ReviewExplorer (including their comments) will be deleted.");
 		if (treeViewer.getSelection().isEmpty()) {
 			return;
 		}
@@ -257,6 +259,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	private void activateSelectedReview()
 	{
+		PluginLogger.log("ReviewExplorer", "activateSelectedReview", "Selected review will be activated");
 		IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 		if (!selection.isEmpty())
 		{	
@@ -281,11 +284,13 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 			// If not all selected items belong to the same review, give a warning
 			if (!sameReview)
 			{
-				MessageDialog.openWarning(null, "Error occured: Could not activate review", "Only one review can be \"active\" at a time");
+				MessageDialog.openWarning(null, "Warning: Could not activate review", "Only one review can be \"active\" at a time");
+				PluginLogger.logWarning("ReviewExplorer", "activateSelectedReview", "Could not activate review: Multiple reviews are selected");
 			}
 			else if (!props.isReviewOpen(referenceRevId))
 			{
-				MessageDialog.openWarning(null, "Error occured: Could not activate review", "Only open reviews can be activated");
+				MessageDialog.openWarning(null, "Warning: Could not activate review", "Only open reviews can be activated");
+				PluginLogger.logWarning("ReviewExplorer", "activateSelectedReview", "Could not activate review: closed review is selected");
 			}
 			else
 			{
@@ -301,6 +306,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	private void openCloseReview()
 	{
+		PluginLogger.log("ReviewExplorer", "openCloseReview", "open/close review triggered");
 		IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 		if (selection.size()==1)
 		{	
@@ -312,6 +318,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 				if (selectedWrap.isOpen())
 				{	
 					// Review is open --> close it
+					PluginLogger.log("ReviewExplorer", "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be closed");
 					selectedWrap.setOpen(false);
 					ReviewAccess.getInstance().unloadReviewComments(reviewId);
 					this.props.removeFromOpenReviews(reviewId);
@@ -330,30 +337,23 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 				else
 				{
 					// Review is closed --> open it
+					PluginLogger.log("ReviewExplorer", "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be opened");
 					selectedWrap.setOpen(true);
 					try 
 					{
 						ReviewAccess.getInstance().loadReviewComments(reviewId);
 					} catch (XmlException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						PluginLogger.logError("ReviewExplorer", "openCloseReview", "Review "+selectedWrap.getReviewId()+" could not be opened", e);				
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						PluginLogger.logError("ReviewExplorer", "openCloseReview", "Review "+selectedWrap.getReviewId()+" could not be opened", e);
 					}
 					this.props.addToOpenReviews(reviewId);
 				}	
 				this.refresh();
-				try {
-					if(ViewControl.isOpen(CommentTableView.class)) {
-						CommentTableView.getInstance().resetComments();
-					}
-				} catch (XmlException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(ViewControl.isOpen(CommentTableView.class)) {
+					CommentTableView.getInstance().resetComments();
 				}
 			}
 		}
@@ -364,6 +364,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	public void refresh()
 	{
+		PluginLogger.log(this.getClass().toString(), "refresh", "Refreshing the ReviewExplorer viewer (without reloading the input)");
 		this.treeViewer.getControl().setRedraw(false);
 		Object[] expandedElements = this.treeViewer.getExpandedElements();
 		this.treeViewer.refresh();
@@ -382,6 +383,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	public void refreshInput()
 	{
+		PluginLogger.log(this.getClass().toString(), "refreshInput", "Refreshing the ReviewExplorer viewer (with reloading the input)");
 		// Save expansion state
 		this.treeViewer.getControl().setRedraw(false);
 		TreePath[] expandedElements = this.treeViewer.getExpandedTreePaths();
@@ -412,6 +414,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
+		PluginLogger.log(this.getClass().toString(), "doubleClick", "Doubleclick in ReviewExplorer detected");
 		if(openFileAction.isEnabled()){
 			openFileAction.run();
 		}

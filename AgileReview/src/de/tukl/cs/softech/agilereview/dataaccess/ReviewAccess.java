@@ -535,10 +535,8 @@ public class ReviewAccess {
 	/**
 	 * Returns all Comments, or an empty List if no comments are found
 	 * @return all Comments
-	 * @throws IOException 
-	 * @throws XmlException 
 	 */
-	public ArrayList<Comment> getAllComments() throws XmlException, IOException
+	public ArrayList<Comment> getAllComments()
 	{		
 		return this.rModel.getAllComments();
 	}

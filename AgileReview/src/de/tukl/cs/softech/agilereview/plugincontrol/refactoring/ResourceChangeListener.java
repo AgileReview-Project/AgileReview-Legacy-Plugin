@@ -77,18 +77,10 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 				Display.getDefault().asyncExec(new Runnable(){
 					@Override
 					public void run() {
-						try {
-							if(ViewControl.isOpen(CommentTableView.class)) {
-								CommentTableView.getInstance().resetEditors();
-								CommentTableView.getInstance().resetComments();
-							}
-						} catch (XmlException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} 
+						if(ViewControl.isOpen(CommentTableView.class)) {
+							CommentTableView.getInstance().resetEditors();
+							CommentTableView.getInstance().resetComments();
+						}
 					}
 				});
 			}

@@ -51,17 +51,10 @@ public class RefreshHandler extends AbstractHandler {
 		if(ViewControl.isOpen(DetailView.class)) {
 			DetailView.getInstance().changeParent(DetailView.EMPTY);
 		}
-		try {
-			if(ViewControl.isOpen(CommentTableView.class)) {
-				CommentTableView.getInstance().resetComments();
-			}
-		} catch (XmlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(ViewControl.isOpen(CommentTableView.class)) {
+			CommentTableView.getInstance().resetComments();
 		}
+
 
 		// Return must be null (see API)
 		return null;
