@@ -8,6 +8,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -22,16 +23,14 @@ public class RefreshHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException 
 	{
-		System.out.println("Refresh triggered");
+		PluginLogger.log(this.getClass().toString(), "execute", "Refresh triggered");
 		// Refill the database
 		try {
 			ReviewAccess.getInstance().fillDatabaseForOpenReviews();
 		} catch (XmlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(this.getClass().toString(), "execute", "XMLException is thrown", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(this.getClass().toString(), "execute", "IOException is thrown", e);
 		}
 		
 		// Test if active review may have vanished

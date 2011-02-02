@@ -233,7 +233,6 @@ public class ReviewAccess {
 	 */
 	private void clearAllModels()
 	{
-		PluginLogger.log(this.getClass().toString(), "clearAllModels", "All models will be cleared");
 		this.rFileModel.clearModel();
 		this.rModel.clearModel();
 	}

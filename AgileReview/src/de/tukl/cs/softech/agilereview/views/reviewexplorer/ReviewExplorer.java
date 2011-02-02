@@ -101,7 +101,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	@Override
 	public void createPartControl(Composite parent) 
 	{
-		PluginLogger.log("ReviewExplorer", "createPartControl", "ReviewExplorer will be created.");
+		PluginLogger.log(this.getClass().toString(), "createPartControl", "ReviewExplorer will be created.");
 		instance = this;
 		this.parent = parent;
 		
@@ -220,7 +220,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	private void deleteSelectedReviews()
 	{
-		PluginLogger.log("ReviewExplorer", "deleteSelectedReviews", "All reviews selected in the ReviewExplorer (including their comments) will be deleted.");
+		PluginLogger.log(this.getClass().toString(), "deleteSelectedReviews", "All reviews selected in the ReviewExplorer (including their comments) will be deleted.");
 		if (treeViewer.getSelection().isEmpty()) {
 			return;
 		}
@@ -242,11 +242,14 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		for (MultipleReviewWrapper wrap : hsMRW)
 		{
 			// Delete comments of this review from TableView
-			for (Comment c : RA.getComments(wrap.getReviewId()))
+			if (ViewControl.isOpen(CommentTableView.class))
 			{
-				CommentTableView.getInstance().deleteComment(c);
+				for (Comment c : RA.getComments(wrap.getReviewId()))
+				{
+					CommentTableView.getInstance().deleteComment(c);
+				}
 			}
-			
+	
 			// Delete the selected review
 			RA.deleteReview(wrap.getReviewId());
 			root.deleteReview(wrap);
@@ -268,7 +271,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	private void activateSelectedReview()
 	{
-		PluginLogger.log("ReviewExplorer", "activateSelectedReview", "Selected review will be activated");
+		PluginLogger.log(this.getClass().toString(), "activateSelectedReview", "Selected review will be activated");
 		IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 		if (!selection.isEmpty())
 		{	
@@ -315,7 +318,6 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 */
 	private void openCloseReview()
 	{
-		PluginLogger.log("ReviewExplorer", "openCloseReview", "open/close review triggered");
 		IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 		if (selection.size()==1)
 		{	
@@ -327,7 +329,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 				if (selectedWrap.isOpen())
 				{	
 					// Review is open --> close it
-					PluginLogger.log("ReviewExplorer", "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be closed");
+					PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be closed");
 					selectedWrap.setOpen(false);
 					ReviewAccess.getInstance().unloadReviewComments(reviewId);
 					this.props.removeFromOpenReviews(reviewId);
@@ -346,17 +348,17 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 				else
 				{
 					// Review is closed --> open it
-					PluginLogger.log("ReviewExplorer", "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be opened");
+					PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be opened");
 					selectedWrap.setOpen(true);
 					try 
 					{
 						ReviewAccess.getInstance().loadReviewComments(reviewId);
 					} catch (XmlException e) {
 						// TODO Auto-generated catch block
-						PluginLogger.logError("ReviewExplorer", "openCloseReview", "Review "+selectedWrap.getReviewId()+" could not be opened", e);				
+						PluginLogger.logError(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" could not be opened", e);				
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						PluginLogger.logError("ReviewExplorer", "openCloseReview", "Review "+selectedWrap.getReviewId()+" could not be opened", e);
+						PluginLogger.logError(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" could not be opened", e);
 					}
 					this.props.addToOpenReviews(reviewId);
 				}	

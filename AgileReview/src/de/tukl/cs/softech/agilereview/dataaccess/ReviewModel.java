@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+
 
 /**
  * Model which holds all comments and provides some query functions
@@ -146,6 +148,7 @@ class ReviewModel {
 	 */
 	protected void clearModel()
 	{
+		PluginLogger.log(this.getClass().toString(), "clearModel", "Review and Comment model cleared");
 		commentDB.clear();
 		rModel.clear();
 	}
@@ -155,6 +158,7 @@ class ReviewModel {
 	 */
 	protected void clearComments()
 	{
+		PluginLogger.log(this.getClass().toString(), "clearComments", "Comment model cleared");
 		commentDB.clear();
 	}
 	

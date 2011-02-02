@@ -10,6 +10,8 @@ import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlTokenSource;
 import org.eclipse.jface.dialogs.MessageDialog;
 
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+
 import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.ReviewDocument;
 
@@ -105,6 +107,7 @@ class ReviewFileModel {
 	 */
 	protected void clearModel()
 	{
+		PluginLogger.log(this.getClass().toString(), "clearModel", "Review and Comment file model cleared");
 		this.xmlReviewDocuments.clear();
 		this.xmlCommentDocuments.clear();
 	}

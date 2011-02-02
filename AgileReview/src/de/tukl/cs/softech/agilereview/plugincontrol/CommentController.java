@@ -153,12 +153,15 @@ public class CommentController extends Observable implements Listener, ISelectio
 	public void handleEvent(Event event) {
 		if((event.widget.getData()) instanceof String) {
 			if(((String)event.widget.getData()).equals("save")) {
+				PluginLogger.log(this.getClass().toString(), "handleEvent", "save event triggered");
 				if(ViewControl.isOpen(CommentTableView.class)) {
 					CommentTableView.getInstance().refreshTable();
 				}
 			} else if(((String)event.widget.getData()).equals("delete")) {
+				PluginLogger.log(this.getClass().toString(), "handleEvent", "delete event triggered");
 				deleteComment();
 			} else if(((String)event.widget.getData()).equals("add")) {
+				PluginLogger.log(this.getClass().toString(), "handleEvent", "add event triggered");
 				addNewComment();
 			}
 			
