@@ -81,7 +81,7 @@ public class NewReviewWizardPage extends WizardPage implements KeyListener {
 		
 		// not valid label + check
 		lValid = new Label(container, SWT.NULL);
-		lValid.setText("Review-ID is mandatory and has to be set");
+		lValid.setText("*) Review-ID is mandatory and has to be set");
 		
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		id.setLayoutData(gd);
@@ -138,12 +138,12 @@ public class NewReviewWizardPage extends WizardPage implements KeyListener {
 			}
 			else {
 				setPageComplete(false);
-				lValid.setText(validMessage);
+				lValid.setText("*) "+validMessage);
 			}
 		}
 		else {
 			setPageComplete(false);
-			lValid.setText("Review-ID is mandatory and has to be set");
+			lValid.setText("*) Review-ID is mandatory and has to be set");
 		}	
 		
 		lValid.redraw();

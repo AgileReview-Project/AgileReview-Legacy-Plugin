@@ -176,8 +176,7 @@
       point="org.eclipse.ui.newWizards">
    <category
          id="AgileReview.AgileReviewCategory"
-         name="AgileReview"
-         parentCategory="org.eclipse.ui.Basic">
+         name="AgileReview">
    </category>
    <wizard
          canFinishEarly="false"
