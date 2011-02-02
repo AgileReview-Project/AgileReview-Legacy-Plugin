@@ -79,6 +79,6 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	@Override
-	public void init(IWorkbench workbench, IStructuredSelection selection) { /* TODO Auto-generated method stub */ }
+	public void init(IWorkbench workbench, IStructuredSelection selection) { /* Do nothing */ }
 
 }

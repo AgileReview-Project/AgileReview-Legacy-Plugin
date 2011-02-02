@@ -775,7 +775,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
-	public void setFocus() { /* TODO Auto-generated method stub */}
+	public void setFocus() { /* Do nothing */}
 	
 	/**
 	 * Removes all annotations if the AgileReview perspective is closed. The method is invoke by {@link:ViewControl} 

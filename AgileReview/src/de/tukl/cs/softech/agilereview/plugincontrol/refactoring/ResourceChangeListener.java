@@ -44,7 +44,6 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 			try {
 				event.getDelta().accept(this);
 			} catch (CoreException e) {
-				// TODO Auto-generated catch block
 				PluginLogger.logError(this.getClass().toString(), "resourceChanged", "CoreException occured during acceptance test of event delta", e);
 			}
 		}

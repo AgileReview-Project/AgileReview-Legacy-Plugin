@@ -105,7 +105,6 @@ public class CommentController extends Observable implements Listener, ISelectio
 					PluginLogger.logWarning(this.getClass().toString(), "addNewComment", "No open editor!");
 				}
 			} catch (IOException e) {
-				//TODO Auto-generated
 				PluginLogger.logError(this.getClass().toString(), "addNewComment", "IOException occured while creating a new comment in ReviewAccess", e);
 			}
 

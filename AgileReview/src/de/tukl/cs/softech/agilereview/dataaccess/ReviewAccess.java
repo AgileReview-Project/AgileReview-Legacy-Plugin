@@ -222,8 +222,7 @@ public class ReviewAccess {
 		}
 		catch (CoreException e)
 		{
-			e.printStackTrace();
-			// TODO: Auto-generated
+			PluginLogger.logError(this.getClass().toString(), "Constructor", "CoreException in ReviewAccess constructor", e);
 		}
 		REVIEW_REPO_FOLDER = p.getLocation().toFile();
 	}

@@ -15,10 +15,7 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 public class ExecutionListener implements IExecutionListener {
 
 	@Override
-	public void notHandled(String commandId, NotHandledException exception) {
-		// TODO Auto-generated method stub
-
-	}
+	public void notHandled(String commandId, NotHandledException exception) {/* Do nothing */}
 
 	@Override
 	public void postExecuteFailure(String commandId, ExecutionException exception) {

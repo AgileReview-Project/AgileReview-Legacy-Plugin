@@ -207,7 +207,6 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 				this.treeViewer.setSelection(new StructuredSelection(rWrap), true);
 			} catch (IOException e) 
 			{
-				// TODO: Auto-generated method stub
 				PluginLogger.logError("ReviewExplorer", "addNewReview", "Exception thrown while created a new Review", e);
 				e.printStackTrace();
 			}
@@ -354,10 +353,8 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 					{
 						ReviewAccess.getInstance().loadReviewComments(reviewId);
 					} catch (XmlException e) {
-						// TODO Auto-generated catch block
 						PluginLogger.logError(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" could not be opened", e);				
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						PluginLogger.logError(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" could not be opened", e);
 					}
 					this.props.addToOpenReviews(reviewId);
