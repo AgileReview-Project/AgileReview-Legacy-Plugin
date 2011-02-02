@@ -22,7 +22,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.CommentsDocument;
@@ -224,7 +223,23 @@ public class ReviewAccess {
 		{
 			PluginLogger.logError(this.getClass().toString(), "Constructor", "CoreException in ReviewAccess constructor", e);
 		}
+		
+		// XXX Does this help?
 		REVIEW_REPO_FOLDER = p.getLocation().toFile();
+		while (REVIEW_REPO_FOLDER == null) {
+			REVIEW_REPO_FOLDER = p.getLocation().toFile();
+		}
+		
+		// Load open reviews initially
+		try {
+			fillDatabaseForOpenReviews();
+		} catch (XmlException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -752,23 +767,33 @@ public class ReviewAccess {
 		loadAllReviews();
 		
 		// Load all comments from open reviews
+		boolean activeReviewFound = false;
+		String activeReview = PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		for (String currReview: PropertiesManager.getInstance().getOpenReviews())
 		{
+			
 			if (rModel.containsReview(currReview))
 			{
 				this.loadReviewComments(currReview);
+				// Test for active review
+				activeReviewFound = activeReviewFound || currReview.equals(activeReview);
 			}
 			else
 			{
-				// A not existent review is marked as open
-				// Ask the user, if he/she wants to delete it	
-				if (MessageDialog.openQuestion(null, "Missing Review found", "Review \""+currReview+"\" cannot be found, but is marked as \"open\". Do you want to remove it from the list of open reviews?"))
-				{
-					// Yes
-					PropertiesManager.getInstance().removeFromOpenReviews(currReview);
-				}
-				// Else do nothing
-			}
+				// Just remove open, but not existent reviews
+				PropertiesManager.getInstance().removeFromOpenReviews(currReview);
+//				// A not existent review is marked as open
+//				// Ask the user, if he/she wants to delete it	
+//				if (MessageDialog.openQuestion(null, "Missing Review found", "Review \""+currReview+"\" cannot be found, but is marked as \"open\". Do you want to remove it from the list of open reviews?"))
+//				{
+//					// Yes
+//					PropertiesManager.getInstance().removeFromOpenReviews(currReview);
+//				}
+//				// Else do nothing
+			}	
+		}
+		if (!activeReviewFound){
+			PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, "");
 		}
 	}
 	

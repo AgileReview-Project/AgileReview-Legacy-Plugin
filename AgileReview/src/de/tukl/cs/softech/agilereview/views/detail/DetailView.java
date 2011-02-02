@@ -98,6 +98,7 @@ public class DetailView extends ViewPart {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
+		PluginLogger.log(this.getClass().toString(), "createPartControl", "DetailView will be created");
 		instance = this;
 
 		this.actParent = parent;

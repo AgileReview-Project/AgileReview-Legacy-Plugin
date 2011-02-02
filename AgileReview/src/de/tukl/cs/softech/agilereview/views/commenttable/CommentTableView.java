@@ -146,6 +146,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
+		PluginLogger.log(this.getClass().toString(), "createPartControl", "CommentTableView will be created");
 		instance = this;
 		// get comments from CommentController
 		this.comments = ReviewAccess.getInstance().getAllComments();

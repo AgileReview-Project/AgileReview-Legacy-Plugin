@@ -220,6 +220,10 @@ public class CommentDetail extends AbstractDetail<Comment> {
 //			}
 			priorityDropDown.select(comment.getPriority());
 			statusDropDown.select(comment.getStatus());
+			
+			// Give the focus to the comment text field
+			// TODO: Will later be done only, if we know that it is an inital comment
+			this.txt.setFocus();
 		}
 	}
 	
