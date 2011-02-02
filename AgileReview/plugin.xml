@@ -176,7 +176,7 @@
       point="org.eclipse.ui.newWizards">
    <category
          id="AgileReview.AgileReviewCategory"
-         name="AgileReview">
+         name="%category.name.0">
    </category>
    <wizard
          canFinishEarly="false"
@@ -186,7 +186,7 @@
          hasPages="true"
          icon="icons/agile_icon.png"
          id="AgileReview.newReviewWizard"
-         name="AgileReview"
+         name="%wizard.name"
          preferredPerspectives="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
    </wizard>
 </extension>
