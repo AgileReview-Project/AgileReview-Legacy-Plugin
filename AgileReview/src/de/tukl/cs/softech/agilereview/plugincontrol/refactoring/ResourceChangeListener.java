@@ -79,7 +79,6 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 					@Override
 					public void run() {
 						if(ViewControl.isOpen(CommentTableView.class)) {
-							CommentTableView.getInstance().resetEditors();
 							CommentTableView.getInstance().resetComments();
 						}
 					}

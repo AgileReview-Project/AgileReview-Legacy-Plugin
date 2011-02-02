@@ -6,6 +6,8 @@ import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
 /**
  * ExecutionListener which methods are executed, if a command is triggered.
@@ -20,41 +22,37 @@ public class ExecutionListener implements IExecutionListener {
 
 	@Override
 	public void postExecuteFailure(String commandId, ExecutionException exception) {
-		// TODO Auto-generated method stub
-		System.out.println("blubber fail");
+		PluginLogger.log(this.getClass().toString(), "postExecuteFailure", commandId);
+		if(commandId.equals("org.eclipse.jdt.ui.edit.text.java.move.element")
+				|| commandId.equals("org.eclipse.ltk.ui.refactoring.commands.renameResource")
+				|| commandId.equals("org.eclipse.ui.edit.rename")) {
+			if(ViewControl.isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().resetEditorReferences();
+			}
+		}
 	}
 
 	@Override
 	public void postExecuteSuccess(String commandId, Object returnValue) {
-//		if(commandId.equals("org.eclipse.ui.file.save") || commandId.equals("org.eclipse.ui.file.saveAll")) {
-//			try {
-//				ReviewAccess.getInstance().save();
-//				CommentTableView.getInstance().refreshComments();
-//			} catch (IOException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//		}
 		PluginLogger.log(this.getClass().toString(), "postExecuteSuccess", commandId);
+		if(commandId.equals("org.eclipse.jdt.ui.edit.text.java.move.element")
+				|| commandId.equals("org.eclipse.ltk.ui.refactoring.commands.renameResource")
+				|| commandId.equals("org.eclipse.ui.edit.rename")) {
+			if(ViewControl.isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().resetEditorReferences();
+			}
+		}
 	}
 
 	@Override
 	public void preExecute(String commandId, ExecutionEvent event) {
-		/*if (commandId.equals("org.eclipse.ui.edit.cut"))
-		{
-			if (event.getApplicationContext() instanceof EvaluationContext)
-			{
-				EvaluationContext evalContext = (EvaluationContext)event.getApplicationContext();
-				if (evalContext.getDefaultVariable() instanceof Set)
-				{
-					ITextSelection selectedText = (ITextSelection)((Set)evalContext.getDefaultVariable()).toArray()[0];	
-				}
-			}
-		}*/
-		//org.eclipse.jdt.ui.edit.text.java.move.element
-		//org.eclipse.ui.edit.rename
-		//org.eclipse.ltk.ui.refactoring.commands.renameResource
 		PluginLogger.log(this.getClass().toString(), "preExecute", commandId);
+		if(commandId.equals("org.eclipse.jdt.ui.edit.text.java.move.element")
+				|| commandId.equals("org.eclipse.ltk.ui.refactoring.commands.renameResource")
+				|| commandId.equals("org.eclipse.ui.edit.rename")) {
+			if(ViewControl.isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().cleanEditorReferences();
+			}
+		}
 	}
-
 }

@@ -608,27 +608,30 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		this.comments = ReviewAccess.getInstance().getAllComments();
 		this.viewer.setInput(this.comments);
 		filterComments();
-		IEditorPart editor;
-		if((editor = getActiveEditor()) != null) {
-			if(this.parserMap.containsKey(editor)) {
-				this.parserMap.get(editor).reload();
-			}
-		}
 		this.refreshTable();
 	}
 	
 	/**
-	 * Resets the current parserMap and adds the active editor if some is active.
-	 * This can be done in order to avoid corrupt editors, for example
-	 * after refactoring was done.
+	 * Clears the current parserMap and deletes all done Annotations.<br>
+	 * This should be done before refactoring was initiated!
 	 */
-	public void resetEditors() {
-		PluginLogger.log(this.getClass().toString(), "resetEditor", "Droping old editors, reparsing active editor");
+	public void cleanEditorReferences() {
+		PluginLogger.log(this.getClass().toString(), "cleanEditorReferences", "Droping old editors, reparsing active editor");
+		//delete all annotations
 		for(AnnotationParser p : this.parserMap.values()) {
-			p.filter(new String[]{});
+			p.clearAnnotations();
 		}
 		this.parserMap.clear();
 		System.gc();
+		PluginLogger.log(this.getClass().toString(), "cleanEditorReferences", "Clear ParserMap -> Garbage Collector");
+	}
+	
+	/**
+	 * Adds the active editor if some is active to the parserMap an creates the respective AnnotationParser for
+	 * the normal annotation behavior. <br>This should be done after refactoring.
+	 */
+	public void resetEditorReferences() {
+		PluginLogger.log(this.getClass().toString(), "resetEditorReferences", "Adding and reparsing active editor");
 		IEditorPart editor;
 		if((editor = this.getActiveEditor()) != null) {
 			if(editor instanceof ITextEditor) {
@@ -758,13 +761,13 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			commentKeys[i] = ((Comment) o).getReviewID()+keySeparator+((Comment) o).getAuthor()+keySeparator+((Comment) o).getId();
 			i++;
 		}
-		PluginLogger.log(this.getClass().toString(), "filterComments", "Starting to filter annotations");
-		
+
 		IEditorPart editor;
 		if((editor = this.getActiveEditor()) != null) {
-			this.parserMap.get(editor).filter(commentKeys);
+			if(this.parserMap.get(editor) != null) {
+				this.parserMap.get(editor).filter(commentKeys);
+			}
 		}
-		PluginLogger.log(this.getClass().toString(), "filterComments", commentKeys.toString());
 	}
 
 	/* not used

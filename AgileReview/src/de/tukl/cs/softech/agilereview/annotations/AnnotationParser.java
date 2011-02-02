@@ -102,6 +102,7 @@ public class AnnotationParser {
 			throw new FileTypeNotSupportedException();
 		}
 		this.editor = editor;
+		//TODO prove for NullPointer
 		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		this.annotationModel = new AgileAnnotationController(editor);
 		parseInput();
@@ -111,6 +112,7 @@ public class AnnotationParser {
 	 * Parses all comment tags and saves them with their {@link Position}
 	 */
 	private void parseInput() {
+		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		PluginLogger.log(this.getClass().toString(), "parseInput", "triggered");
 		idPositionMap.clear();
 		idTagPositions.clear();
@@ -213,7 +215,7 @@ public class AnnotationParser {
 		for(String s : idPositionMap.keySet()) {
 			toDisplay.put(idPositionMap.get(s), s);
 		}
-		
+
 		// Save the current document to save the tags
 		try {
 			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
@@ -229,17 +231,23 @@ public class AnnotationParser {
 	 * @param commentKeys
 	 */
 	public void filter(String[] commentKeys) {
+		PluginLogger.log(this.getClass().toString(), "filter", "triggered");
 		//parse another time to get the current positions
-		parseInput();
+		//TODO think about it is necessary parseInput();
 		HashMap<String, Position> display = new HashMap<String, Position>();
 		for(String s : commentKeys) {
 			if(this.idPositionMap.get(s) != null) {
 				display.put(s, this.idPositionMap.get(s));
-				PluginLogger.log(this.getClass().toString(), "filter", "filter -> show: "+s);
 			}
 		}
-		PluginLogger.log(this.getClass().toString(), "filter", "---------filter finisched------------");
 		this.annotationModel.displayAnnotations(display);
+	}
+	
+	/**
+	 * deletes all current displayed Annotations
+	 */
+	public void clearAnnotations() {
+		filter(new String[]{});
 	}
 	
 	/**

@@ -13,6 +13,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+
 /**
  * This class is used to draw and manage annotations for a given text editor
  */
@@ -42,6 +44,7 @@ public class AgileAnnotationController {
 	 * @param keyPositionMap a map of Positions which should be annotated and the comment keys correlated to the positions
 	 */
 	protected void displayAnnotations(Map<String, Position> keyPositionMap) {
+		PluginLogger.log(this.getClass().toString(), "displayAnnotations", "display: "+keyPositionMap.keySet().toString());
 		//add annotations that are not already displayed
 		Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
 		for (String s : keyPositionMap.keySet()) {

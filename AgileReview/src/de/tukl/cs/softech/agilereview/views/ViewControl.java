@@ -127,7 +127,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
-		PluginLogger.log(this.getClass().toString(), "partBroughtToTop", partRef.getPartName());
+		PluginLogger.log(this.getClass().toString(), "partBroughtToTop", partRef.getPart(false).getTitle());
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().partBroughtToTop(partRef);
 		}
@@ -141,8 +141,9 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
-		PluginLogger.log(this.getClass().toString(), "partClosed", partRef.getPartName());
-		activeViews.remove(partRef.getPart(false));
+		if(activeViews.remove(partRef.getPart(false).getClass())) {
+			PluginLogger.log(this.getClass().toString(), "partClosed", "unregister: "+partRef.getPart(false).getTitle());
+		}
 		
 		if(isOpen(DetailView.class)) {
 			DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
@@ -159,7 +160,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partDeactivated(IWorkbenchPartReference partRef) {
-		PluginLogger.log(this.getClass().toString(), "partDeactivated", partRef.getPartName());
+		PluginLogger.log(this.getClass().toString(), "partDeactivated", partRef.getPart(false).getTitle());
 		if(isOpen(DetailView.class)) {
 			DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
 		}
