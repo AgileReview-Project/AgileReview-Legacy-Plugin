@@ -83,11 +83,13 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	protected void partClosedOrDeactivated(IWorkbenchPart part) {
-		saveChanges();
-		//fire "save" event for persistent storage
-		PluginLogger.log(this.getClass().toString(), "partClosedOrDeactivated", "trigger save event");
-		saveButton.notifyListeners(SWT.Selection, new Event());
-		revertButton.setEnabled(false);
+		if(part instanceof DetailView) {
+			saveChanges();
+			//fire "save" event for persistent storage
+			PluginLogger.log(this.getClass().toString(), "partClosedOrDeactivated", "trigger save event");
+			saveButton.notifyListeners(SWT.Selection, new Event());
+			revertButton.setEnabled(false);
+		}
 	}
 	
 	/*

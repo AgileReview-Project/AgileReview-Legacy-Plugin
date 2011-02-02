@@ -147,7 +147,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	@Override
 	public void createPartControl(Composite parent) {
 		instance = this;
-		PluginLogger.log(this.getClass().toString(), "createPartControl", "Creating TableView");
 		// get comments from CommentController
 		this.comments = ReviewAccess.getInstance().getAllComments();
 		this.filteredComments = this.comments;
@@ -175,11 +174,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 		// register view
 		ViewControl.registerView(this.getClass());
-		PluginLogger.log(this.getClass().toString(), "createPartControl", "Registering TableView with ViewControl");
 		
 		// get editor that is active when opening eclipse
 		if (getActiveEditor() instanceof ITextEditor) {
-			PluginLogger.log(this.getClass().toString(), "createPartControl", "Start parsing initially opened editor");
 			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
 		}
 		
@@ -281,7 +278,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	private TableViewer createViewer(Composite parent) {
 
-		PluginLogger.log(this.getClass().toString(), "createViewer", "Starting to create viewer");
 		// create viewer
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		createColumns(parent, viewer);
@@ -297,7 +293,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 
 		// provide access to selections of table rows
 		viewer.addSelectionChangedListener(CommentController.getInstance()); // TODO umstellen auf ISelectionListener und dann über SelectionProvider!!!
-		PluginLogger.log(this.getClass().toString(), "createViewer", "Registering as SelectionProvider");
 		getSite().setSelectionProvider(viewer);
 		
 		viewer.addDoubleClickListener(this);

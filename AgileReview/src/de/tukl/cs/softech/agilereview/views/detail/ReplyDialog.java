@@ -8,9 +8,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
@@ -19,10 +17,6 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
  */
 public class ReplyDialog extends Composite implements Listener {
 	
-	/**
-	 * TextField to insert the author
-	 */
-	private Text replyAuthorEdit;
 	/**
 	 * TextBox to insert the reply text
 	 */
@@ -62,11 +56,6 @@ public class ReplyDialog extends Composite implements Listener {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
 		this.setLayout(gridLayout);
-		
-		//Label replyAuthorDescLabel = new Label(this, SWT.PUSH); 
-		//replyAuthorDescLabel.setText("Reply Author: ");
-		
-		//replyAuthorEdit = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
 		
 		replyText = new StyledText(this, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
 		replyText.setWordWrap(true);
