@@ -7,7 +7,6 @@ import java.util.Iterator;
 import org.apache.xmlbeans.XmlException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -16,7 +15,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE.SharedImages;
@@ -33,6 +32,7 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
+import de.tukl.cs.softech.agilereview.wizard.NewReviewWizard;
 
 /**
  * The Review Explorer is the view which shows all reviews as well as 
@@ -79,6 +79,10 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	 * Properties manager for repeated access 
 	 */
 	private PropertiesManager props = PropertiesManager.getInstance();
+	/**
+	 * Parent Composite of this part (for access in inner classes)
+	 */
+	private Composite parent;
 	
 	/**
 	 * Current Instance used by the ViewPart
@@ -99,6 +103,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	{
 		PluginLogger.log("ReviewExplorer", "createPartControl", "ReviewExplorer will be created.");
 		instance = this;
+		this.parent = parent;
 		
 		// Create the treeview
 		treeViewer = new TreeViewer(parent);
@@ -111,7 +116,9 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		// Define the actions for toolbar
 		addReviewAction = new Action("Add review"){
 			public void run() {
-				addNewReview();
+				NewReviewWizard newRevWizard = new NewReviewWizard();
+				WizardDialog dialog = new WizardDialog(ReviewExplorer.this.parent.getShell(), newRevWizard);
+				dialog.open();
 			}
 		};
 		addReviewAction.setToolTipText("Add a new review");
@@ -178,6 +185,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Creates a new review and displays it in the tree
 	 */
+	/*
 	private void addNewReview() 
 	{
 		PluginLogger.log("ReviewExplorer", "addNewReview", "A new Review will be created.");
@@ -205,6 +213,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 			}
 		}
 	}
+	*/
 	
 	/**
 	 * Deletes the selected reviews
@@ -407,6 +416,23 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		this.treeViewer.getControl().setRedraw(true);
 		this.treeViewer.getControl().redraw();
 	}
+	
+	/**
+	 * Adds the given review to the viewer
+	 * @param r the new Review
+	 */
+	public void addNewReview(Review r) {
+		MultipleReviewWrapper rWrap = new MultipleReviewWrapper(r, r.getId());
+		// When a new review is created this should be open an activated
+		rWrap.setOpen(true);
+		this.props.addToOpenReviews(r.getId());
+		this.props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, r.getId());
+		
+		root.addReview(rWrap);
+		this.refresh();
+		this.treeViewer.setSelection(new StructuredSelection(rWrap), true);
+	}
+	
 	
 	/*
 	 * (non-Javadoc)

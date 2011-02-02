@@ -5,6 +5,7 @@ import agileReview.softech.tukl.de.ReviewDocument.Review;
 import java.util.Collection;
 import java.util.HashSet;
 
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -63,6 +64,7 @@ class RERootNode {
 	 */
 	protected void clear()
 	{
+		PluginLogger.log(this.getClass().toString(), "clear", "ReviewExplorer root node cleared");
 		this.reviews.clear();
 	}
 }

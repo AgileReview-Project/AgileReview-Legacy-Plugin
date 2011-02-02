@@ -10,10 +10,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+
 /**
  * The single page of the NewReview Wizard
  */
-public class NewReviewWizard1 extends WizardPage {
+public class NewReviewWizardPage extends WizardPage implements KeyListener {
 
 	/**
 	 * the text field for retrieving the id
@@ -31,11 +33,15 @@ public class NewReviewWizard1 extends WizardPage {
 	 * the text field for retrieving the description
 	 */
 	private Text description;
+	/**
+	 * Label to show an message to the user, if the reviewId is invlaid
+	 */
+	private Label lValid;
 	
 	/**
 	 * Creates a new page
 	 */
-	protected NewReviewWizard1() {
+	protected NewReviewWizardPage() {
 		super("NewReviewWizard1");
 		setTitle("New Review");
 		setDescription("This wizard creates a new AgileReview.");
@@ -55,20 +61,7 @@ public class NewReviewWizard1 extends WizardPage {
 
 		id = new Text(container, SWT.BORDER | SWT.SINGLE);
 		id.setText("");
-		id.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if (!id.getText().isEmpty()) {
-					setPageComplete(true);
-				}
-			}
-
-		});
+		id.addKeyListener(this);
 		
 		// external reference
 		Label lReference = new Label(container, SWT.NULL);
@@ -86,19 +79,21 @@ public class NewReviewWizard1 extends WizardPage {
 		//Text descTextField = new Text(container, SWT.BORDER | SWT.SINGLE);
 		description = new Text(container, SWT.BORDER | SWT.H_SCROLL | SWT.MULTI);
 		
-		// mandatory hint
-		Label lMandatory = new Label(container, SWT.NULL);
-		lMandatory.setText("*) Review-ID is mandatory.");
+		// not valid label + check
+		lValid = new Label(container, SWT.NULL);
+		lValid.setText("Review-ID is mandatory and has to be set");
 		
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		id.setLayoutData(gd);
 		reference.setLayoutData(gd);
 		responsibility.setLayoutData(gd);
 		description.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData gdValid = new GridData(GridData.FILL_HORIZONTAL);
+		gdValid.horizontalSpan = 2;
+		lValid.setLayoutData(gdValid);
 		// Required to avoid an error in the system
 		setControl(container);
 		setPageComplete(false);
-
 	}
 	
 	/**
@@ -129,4 +124,28 @@ public class NewReviewWizard1 extends WizardPage {
 		return this.description.getText();
 	}
 
+
+	@Override
+	public void keyPressed(KeyEvent e) {/* Do nothing */}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		String validMessage = PropertiesManager.getInstance().isValid(id.getText());
+		if (!id.getText().isEmpty()) {
+			if (validMessage == null){
+				setPageComplete(true);
+				lValid.setText("");
+			}
+			else {
+				setPageComplete(false);
+				lValid.setText(validMessage);
+			}
+		}
+		else {
+			setPageComplete(false);
+			lValid.setText("Review-ID is mandatory and has to be set");
+		}	
+		
+		lValid.redraw();
+	}
 }

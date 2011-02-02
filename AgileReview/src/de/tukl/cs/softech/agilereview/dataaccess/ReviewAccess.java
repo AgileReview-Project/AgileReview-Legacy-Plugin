@@ -598,7 +598,7 @@ public class ReviewAccess {
 	 */
 	public HashSet<Project> getProjects(String reviewId)
 	{
-		PluginLogger.log(this.getClass().toString(), "getProjects", "all projects requested");
+		PluginLogger.log(this.getClass().toString(), "getProjects", "all projects of review \""+reviewId+"\" requested");
 		HashSet<Project> result = new HashSet<Project>();
 			
 		// Iterate all comments of this review
@@ -747,7 +747,6 @@ public class ReviewAccess {
 	 */
 	public void fillDatabaseForOpenReviews() throws XmlException, IOException
 	{
-		PluginLogger.log(this.getClass().toString(), "fillDatabaseForOpenReviews", "Clear all models and reload all reviews and all comments of open reviews");
 		// Clear old models
 		this.clearAllModels();
 		

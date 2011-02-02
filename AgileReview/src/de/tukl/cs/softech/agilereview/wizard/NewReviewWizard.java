@@ -1,9 +1,18 @@
 package de.tukl.cs.softech.agilereview.wizard;
 
+import java.io.IOException;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
+
+import agileReview.softech.tukl.de.PersonInChargeDocument.PersonInCharge;
+import agileReview.softech.tukl.de.ReviewDocument.Review;
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * Provides a wizard for creating a new Review via the NewWizard
@@ -13,7 +22,7 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 	/**
 	 * The first and sole page of the wizard 
 	 */
-	NewReviewWizard1 page1;
+	NewReviewWizardPage page1;
 	
 	/**
 	 * creates a new wizard
@@ -30,7 +39,7 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 	 */
 	@Override
 	public void addPages() {
-		page1 = new NewReviewWizard1();
+		page1 = new NewReviewWizardPage();
 		addPage(page1);
 	}
 
@@ -41,19 +50,28 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
-	public boolean performFinish() {
-//		try {
-//			Review newReview = ReviewAccess.getInstance().createNewReview(page1.getReviewID());
-//			newReview.setDescription(page1.getDescription());
-//			PersonInCharge responsibility = PersonInCharge.Factory.newInstance();
-//			responsibility.setName(page1.getReviewResponsibility());
-//			newReview.setReferenceId(page1.getReviewReference());
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+	public boolean performFinish() 
+	{
+		boolean result = true;
+		try 
+		{
+			Review newRev = ReviewAccess.getInstance().createNewReview(this.page1.getReviewID());
+			newRev.setReferenceId(this.page1.getReviewReference());
+			newRev.setDescription(this.page1.getReviewDescription());
+			PersonInCharge piC = PersonInCharge.Factory.newInstance();
+			piC.setName(this.page1.getReviewResponsibility());
+			newRev.setPersonInCharge(piC);
+			
+			if (ViewControl.isOpen(ReviewExplorer.class)){
+				ReviewExplorer.getInstance().addNewReview(newRev);
+			}
+		} catch (IOException e) 
+		{
+			PluginLogger.logError(this.getClass().toString(), "performFinish", "Exception thrown while created a new Review", e);
+			result = false;
+		}
 		
-		return true;
+		return result;
 	}
 
 	/* not needed

@@ -8,6 +8,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
@@ -85,11 +86,11 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 				});
 			}
 			catch (IOException e) {
-				// TODO Auto-generated catch block
 				PluginLogger.logError(this.getClass().toString(), "visit", "IOException occured during refactoring Path in ReviewAccess", e);
 			} catch (XmlException e) {
-				// TODO Auto-generated catch block
 				PluginLogger.logError(this.getClass().toString(), "visit", "XmlException occured during refactoring Path in ReviewAccess", e);
+			} catch (SWTException e) {
+				PluginLogger.logError(this.getClass().toString(), "visit", "SWTException occured during asynchronous execution in the UI-Thread", e);
 			}
 			refactoringDone = true;
 		}
