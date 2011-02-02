@@ -93,7 +93,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    statusDropDown.setLayoutData(gridData);
-	    statusDropDown.addFocusListener(this);
+	    statusDropDown.addFocusListener(this);	    
 	    
 	    Label priority = new Label(this, SWT.PUSH);
 	    priority.setText("Priority: ");
@@ -104,7 +104,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.horizontalSpan = numColumns-1;
 	    priorityDropDown.setLayoutData(gridData);
 	    priorityDropDown.addFocusListener(this);
-	    
+	    	
 	    Label recipient = new Label(this, SWT.PUSH);
 	    recipient.setText("Recipient: ");
 	    
@@ -196,7 +196,12 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			this.backupObject = (Comment)comment.copy();
 			this.editedObject = comment;
 			authorInstance.setText(comment.getAuthor());
-			recipientText.setText(comment.getRecipient());
+
+		    if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED)) && comment.getRecipient().equals("")) {
+		    	recipientText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT));
+		    } else {
+		    	recipientText.setText(comment.getRecipient());
+		    }
 
 			if(comment.getText() != null) {
 				this.txt.setText(comment.getText());
@@ -209,7 +214,10 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			for(int i = 0; i < replys.length; i++) {
 				addReply(replys[i].getAuthor(), replys[i].newCursor().getTextValue().trim());
 			}
-			
+
+//			if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED))) {
+//				priorityDropDown.select(Integer.parseInt(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_PRIORITY)));
+//			}
 			priorityDropDown.select(comment.getPriority());
 			statusDropDown.select(comment.getStatus());
 		}
@@ -268,12 +276,14 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		
 		if(editedObject.getPriority() != this.priorityDropDown.getSelectionIndex()) {
 			editedObject.setPriority(this.priorityDropDown.getSelectionIndex());
+			PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_PRIORITY, String.valueOf(this.priorityDropDown.getSelectionIndex()));
 			result = true;
 		} else if(editedObject.getStatus() != this.statusDropDown.getSelectionIndex()) {
 			editedObject.setStatus(this.statusDropDown.getSelectionIndex());
 			result = true;
 		} else if(!editedObject.getRecipient().equals(this.recipientText.getText().trim())) {
 			editedObject.setRecipient(this.recipientText.getText().trim());
+			PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT, recipientText.getText().trim());
 			result = true;
 		} else if(!editedObject.getText().equals(this.txt.getText().trim())) {
 			editedObject.setText(this.txt.getText().trim());

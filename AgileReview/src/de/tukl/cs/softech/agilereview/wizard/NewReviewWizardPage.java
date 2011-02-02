@@ -100,28 +100,28 @@ public class NewReviewWizardPage extends WizardPage implements KeyListener {
 	 * @return the review ID entered
 	 */
 	public String getReviewID() {
-		return this.id.getText();
+		return this.id.getText().trim();
 	}
 	
 	/**
 	 * @return the review reference entered
 	 */
 	public String getReviewReference() {
-		return this.reference.getText();
+		return this.reference.getText().trim();
 	}
 	
 	/**
 	 * @return the responsible person entered
 	 */
 	public String getReviewResponsibility() {
-		return this.responsibility.getText();
+		return this.responsibility.getText().trim();
 	}
 	
 	/**
 	 * @return the review description entered
 	 */
 	public String getReviewDescription() {
-		return this.description.getText();
+		return this.description.getText().trim();
 	}
 
 

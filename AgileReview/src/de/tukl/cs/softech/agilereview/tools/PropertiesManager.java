@@ -125,6 +125,18 @@ public class PropertiesManager implements IInputValidator{
 		 * Indicates if explorer and table are linked
 		 */
 		public static String LINK_EXPLORER = "linkExplorer";
+		/**
+		 * The recipient that was entered the last time
+		 */
+		public static String LAST_RECIPIENT = "lastRecipient";
+		/**
+		 * The priority that was entered in the DetailView the last time
+		 */
+		public static String LAST_PRIORITY = "lastPriority";
+		/**
+		 * Indicates whether the last recipient and priority are to be preset for new comments
+		 */
+		public static String SUGGESTIONS_ENABLED = "enableSuggestions";
 		
 	}
 	
