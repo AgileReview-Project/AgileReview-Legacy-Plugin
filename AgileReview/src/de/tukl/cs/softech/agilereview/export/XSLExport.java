@@ -1,6 +1,5 @@
 package de.tukl.cs.softech.agilereview.export;
 
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,14 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import net.sf.jxls.exception.ParsePropertyException;
 import net.sf.jxls.transformer.Configuration;
 import net.sf.jxls.transformer.XLSTransformer;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 
@@ -43,7 +39,7 @@ public class XSLExport {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		
 		//collect all files which have been reviewed
-		ArrayList<File> reviewFiles = new ArrayList<File>();
+		ArrayList<FileExportWrapper> reviewFiles = new ArrayList<FileExportWrapper>();
 		ArrayList<java.io.File> projects = new ArrayList<java.io.File>();
 		for(Review r : reviews) {
 			for(Project p : ra.getProjects(r.getId())) {
@@ -52,18 +48,18 @@ public class XSLExport {
 					projects.add(workspaceRoot.getProject().getLocation().toFile());
 				}
 				
-				reviewFiles.addAll(Arrays.asList(p.getFileArray()));
+				reviewFiles.addAll(convertFilesToWrappedFiles(Arrays.asList(p.getFileArray()), r.getId(), p.getName()));
 				for(Folder f : p.getFolderArray()) {
-					reviewFiles.addAll(Arrays.asList(f.getFileArray()));
+					reviewFiles.addAll(getAllWrappedFiles(f, r.getId(), p.getName()));
 				}
 			}
 		}
 		beans.put("reviewFiles", reviewFiles);
 		
 		//collect all files which are in a project which has been reviewed partially
-		ArrayList<java.io.File> projectFiles = new ArrayList<java.io.File>();
+		ArrayList<FileExportWrapper> projectFiles = new ArrayList<FileExportWrapper>();
 		for(java.io.File f : projects) {
-			projectFiles.addAll(getAllFiles(f));
+			projectFiles.addAll(getAllWrappedFiles(f, f.getName()));
 		}
 		beans.put("projectFiles", projectFiles);
 		beans.put("reviews", reviews);
@@ -73,16 +69,37 @@ public class XSLExport {
 		transformer.transformXLS(templatePath, beans, outputPath);
 	}
 	
-	private static ArrayList<java.io.File> getAllFiles(java.io.File file) {
-		ArrayList<java.io.File> files = new ArrayList<java.io.File>();
+	private static ArrayList<FileExportWrapper> getAllWrappedFiles(Folder folder, String review, String project) {
+		ArrayList<FileExportWrapper> files = new ArrayList<FileExportWrapper>();
+		
+		files.addAll(convertFilesToWrappedFiles(Arrays.asList(folder.getFileArray()), review, project));
+		for(Folder f : folder.getFolderArray()) {
+			files.addAll(getAllWrappedFiles(f, review, project));
+		}
+		
+		return files;
+	}
+	
+	private static ArrayList<FileExportWrapper> getAllWrappedFiles(java.io.File file, String project) {
+		ArrayList<FileExportWrapper> files = new ArrayList<FileExportWrapper>();
 		
 		java.io.File[] fs = file.listFiles();
 		for(java.io.File f : fs) {
 			if(f.isFile()) {
-				files.add(f);
+				files.add(new FileExportWrapper(f, project));
 			} else if(f.isDirectory()) {
-				getAllFiles(f);
+				getAllWrappedFiles(f, project);
 			}
+		}
+		
+		return files;
+	}
+	
+	private static ArrayList<FileExportWrapper> convertFilesToWrappedFiles(List<File> input, String review, String project) {
+		ArrayList<FileExportWrapper> files = new ArrayList<FileExportWrapper>();
+		
+		for(File f : input) {
+			files.add(new FileExportWrapper(f, review, project));
 		}
 		
 		return files;

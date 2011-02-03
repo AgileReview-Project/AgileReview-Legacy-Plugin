@@ -15,6 +15,7 @@ import javax.xml.namespace.QName;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlTokenSource;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -172,6 +173,26 @@ public class ReviewAccess {
 	public static String computePath(Comment comment)
 	{  
 		XmlCursor c = comment.newCursor();
+		c.toParent();
+		String path = c.getAttributeText(new QName("name"));
+		
+		while(c.toParent() && !(c.getObject() instanceof Files))
+		{
+			path = c.getAttributeText(new QName("name"))+System.getProperty("file.separator")+path;
+		}
+		c.dispose();
+		
+		return path;
+	}
+	
+	/**
+	 * Computes the path for a given file
+	 * @param file comment for which the path should be returned
+	 * @return path of the file
+	 */
+	public static String computePath(agileReview.softech.tukl.de.FileDocument.File file)
+	{  
+		XmlCursor c = file.newCursor();
 		c.toParent();
 		String path = c.getAttributeText(new QName("name"));
 		
