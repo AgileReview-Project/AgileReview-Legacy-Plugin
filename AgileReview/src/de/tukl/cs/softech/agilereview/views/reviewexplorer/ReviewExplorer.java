@@ -32,7 +32,7 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
-import de.tukl.cs.softech.agilereview.wizard.NewReviewWizard;
+import de.tukl.cs.softech.agilereview.wizards.newreview.NewReviewWizard;
 
 /**
  * The Review Explorer is the view which shows all reviews as well as 

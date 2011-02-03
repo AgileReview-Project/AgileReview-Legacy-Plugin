@@ -137,6 +137,10 @@ public class PropertiesManager implements IInputValidator{
 		 * Indicates whether the last recipient and priority are to be preset for new comments
 		 */
 		public static String SUGGESTIONS_ENABLED = "enableSuggestions";
+		/**
+		 * The path for the export template
+		 */
+		public static String TEMPLATE_PATH = "templatePath";
 		
 	}
 	

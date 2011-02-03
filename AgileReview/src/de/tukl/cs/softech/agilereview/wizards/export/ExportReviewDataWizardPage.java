@@ -1,21 +1,12 @@
-package de.tukl.cs.softech.agilereview.wizard;
+package de.tukl.cs.softech.agilereview.wizards.export;
 
-import java.awt.Checkbox;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -23,6 +14,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -30,7 +22,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
-
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
@@ -39,26 +30,51 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
  */
 public class ExportReviewDataWizardPage extends WizardPage implements SelectionListener {
 
-	private boolean pathSelected = false;
+	/**
+	 * indicates whether a path for exporting has been selected or not
+	 */
+	private boolean pathsSelected = false;
+	/**
+	 * indicates if one or more review(s) have been selected for exporting
+	 */
 	private boolean reviewsSelected = false;
+	/**
+	 * a label that displays the person in charge of the review that is selected
+	 */
 	private Label responsibility;
+	/**
+	 * a label that displays the description of the review that is selected
+	 */
 	private Label description;
+	/**
+	 * The textfield containing the path for the export template
+	 */
+	private Text templatePathText;
 	/**
 	 * The textfield containing the path
 	 */
-	private Text pathText;
+	private Text exportPathText;
 	/**
-	 * represents the reviews selected in the checkboxtreeview
+	 * a map of all reviews that are currently opened and their ids
 	 */
 	private HashMap<String, Review> reviews = new HashMap<String, Review>();
+	/**
+	 * all reviews that are selected in the wizard
+	 */
 	private ArrayList<String> selectedReviews = new ArrayList<String>();
-	private Composite parent;
 	
 	/**
 	 * @return the path selected for exporting review data
 	 */
-	public String getPath() {
-		return pathText.getText();
+	public String getExportPath() {
+		return exportPathText.getText();
+	}
+	
+	/**
+	 * @return the path selected for export template
+	 */
+	public String getTemplatePath() {
+		return templatePathText.getText();
 	}
 
 	/**
@@ -66,6 +82,17 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 */
 	public ArrayList<String> getSelectedReviewIDs() {
 		return selectedReviews;
+	}
+	
+	/**
+	 * @return the reviews currently selected in the checkboxtreeviewer
+	 */
+	public ArrayList<Review> getSelectedReviews() {
+		ArrayList<Review> result = new ArrayList<Review>();
+		for (String id : selectedReviews) {
+			result.add(reviews.get(id));
+		}
+		return result;
 	}
 
 	/**
@@ -82,39 +109,55 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		this.parent = parent;
 		
+		//get reviews from ReviewAccess
 		for (Review review : ReviewAccess.getInstance().getAllReviews()) {
 			reviews.put(review.getId(), review);
 		}
 		
+		// create page ui
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		container.setLayout(layout);
 		layout.numColumns = 3;
 		
+		// ui elements for template selection
+		Label templateLabel = new Label(container, SWT.NULL);
+		templateLabel.setText("Select template for export:");
+		
+		templatePathText = new Text(container, SWT.BORDER | SWT.SINGLE);
+		templatePathText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH));
+		templatePathText.setEditable(false);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		templatePathText.setLayoutData(gd);
+		Button browseButtonTemplate = new Button(container, SWT.NULL);
+		browseButtonTemplate.setText("Browse...");
+		browseButtonTemplate.setData("template");
+		browseButtonTemplate.addSelectionListener(this);
+		
+		// ui elements for selecting export path
 		Label pathLabel = new Label(container, SWT.NULL);
 		pathLabel.setText("Export location:");
 		
-		pathText = new Text(container, SWT.BORDER | SWT.SINGLE);
-		pathText.setEditable(false);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		pathText.setLayoutData(gd);
+		exportPathText = new Text(container, SWT.BORDER | SWT.SINGLE);
+		exportPathText.setEditable(false);
+		exportPathText.setLayoutData(gd);
 		
 		Button browseButton = new Button(container, SWT.NULL);
 		browseButton.setText("Browse...");
+		browseButton.setData("path");
 		browseButton.addSelectionListener(this);
-		
+		// spacer to generate some space between path and review selection
 		GridData rlGD = new GridData(GridData.FILL_HORIZONTAL);
 		rlGD.horizontalSpan = 3;
 		Label spacer = new Label(container, SWT.NULL);
 		spacer.setText("");
 		spacer.setLayoutData(rlGD);
 		
+		// ui elements for selecting reviews
 		Label reviewLabel = new Label(container, SWT.NULL);
 		reviewLabel.setText("Select AgileReviews to export:");
 		reviewLabel.setLayoutData(rlGD);
-
 		
 		CheckboxTreeViewer cbtreeviewer = new CheckboxTreeViewer(container);
 		cbtreeviewer.setContentProvider(new ExportTreeViewContentProvider());
@@ -152,45 +195,62 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {}
 
+	/* 
+	 * Browse-button was pressed or review selection changed
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+	 */
 	@Override
 	public void widgetSelected(SelectionEvent e) {
+		// browse button pressed
 		if (e.widget instanceof Button) {
-			DirectoryDialog dlg = new DirectoryDialog(new Shell());
+			// browse button for template pressed
+			if (e.widget.getData().equals("template")) {
+				FileDialog dlg = new FileDialog(new Shell());
 
-			// Set the initial filter path according
-			// to anything they've selected or typed in
-			dlg.setFilterPath(pathText.getText());
+				// Change the title bar text
+				dlg.setText("AgileReview Export");
+				String[] filterExtensions = {"*.xls", "*.xlsx"};
+				dlg.setFilterExtensions(filterExtensions);
 
-			// Change the title bar text
-			dlg.setText("AgileReview Export");
+				// Calling open() will open and run the dialog.
+				// It will return the selected directory, or
+				// null if user cancels
+				String dir = dlg.open();
+				if (dir != null) {
+					templatePathText.setText(dir);
+				}
+			} else if (e.widget.getData().equals("path")) {
+			// browse button for export path pressed
+				DirectoryDialog dlg = new DirectoryDialog(new Shell());
 
-			// Customizable message displayed in the dialog
-			dlg.setMessage("Select export location");
+				// Change the title bar text
+				dlg.setText("AgileReview Export");
 
-			// Calling open() will open and run the dialog.
-			// It will return the selected directory, or
-			// null if user cancels
-			String dir = dlg.open();
-			if (dir != null) {
-				// Set the text box to the new selection
-				pathText.setText(dir);
+				// Calling open() will open and run the dialog.
+				// It will return the selected directory, or
+				// null if user cancels
+				String dir = dlg.open();
+				if (dir != null) {
+					exportPathText.setText(dir);
+				}
 			}
-			if (!pathText.getText().isEmpty()) {
-				pathSelected = true;
-			}
-			
+			pathsSelected = !exportPathText.getText().isEmpty() && !templatePathText.getText().isEmpty();
 		} else if (e.widget instanceof Tree) {
-			
+		// selection of reviews changed	
 			if (((Tree) e.widget).getSelection().length == 1) {
 				TreeItem selectedTI = (TreeItem) e.item;
 				String selectedReviewID = selectedTI.getText();
 				if (selectedTI.getChecked()) {
+					// review not in list and checked, add it
 					if (!selectedReviews.contains(selectedReviewID)) {
 						selectedReviews.add(selectedReviewID);
 					}
 				} else if (selectedReviews.contains(selectedReviewID)) {
+					// review is in list, but not checked, remove it
 					selectedReviews.remove(selectedReviewID);
 				}
+				// adapt labels for responsibility and description
 				responsibility.setText("Responsibility: "+reviews.get(selectedReviewID).getPersonInCharge().getName());
 				description.setText("Description:\n"+reviews.get(selectedReviewID).getDescription());
 				
@@ -200,7 +260,8 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	
 		}
 		
-		setPageComplete(reviewsSelected && pathSelected);
+		// page complete if >0 reviews and path selected
+		setPageComplete(reviewsSelected && pathsSelected);
 		
 	}
 	

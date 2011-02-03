@@ -1,19 +1,17 @@
-package de.tukl.cs.softech.agilereview.wizard;
+package de.tukl.cs.softech.agilereview.wizards.export;
 
 import java.io.IOException;
 
+import net.sf.jxls.exception.ParsePropertyException;
+
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
-import agileReview.softech.tukl.de.PersonInChargeDocument.PersonInCharge;
-import agileReview.softech.tukl.de.ReviewDocument.Review;
-import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.export.XSLExport;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
-import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * Provides a wizard for creating a new Review via the NewWizard
@@ -51,6 +49,15 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 	@Override
 	public boolean performFinish() 
 	{
+		try {
+			XSLExport.exportReviews(page1.getSelectedReviews(), page1.getTemplatePath(), page1.getExportPath());
+		} catch (ParsePropertyException e) {
+			PluginLogger.logError(this.getClass().toString(),"performFinish", "ParsePropertyException", e);
+		} catch (InvalidFormatException e) {
+			PluginLogger.logError(this.getClass().toString(),"performFinish", "InvalidFormatExceptionException", e);
+		} catch (IOException e) {
+			PluginLogger.logError(this.getClass().toString(),"performFinish", "IOException", e);
+		}
 		return true;
 	}
 

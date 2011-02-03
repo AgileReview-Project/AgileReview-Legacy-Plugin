@@ -127,7 +127,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * indicates whether annotations are displayed or not
 	 */
-	private boolean hideAnnotations = false; 
+	private boolean perspectiveNotActive = false; 
 	/**
 	 * map of currently opened editors and their annotation parsers
 	 */
@@ -652,7 +652,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof ITextEditor) {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
-			if (!this.parserMap.containsKey(editor) && !this.hideAnnotations) {
+			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
 				this.parserMap.put(editor, new AnnotationParser(editor));
 			}
 		}
@@ -786,12 +786,12 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 			this.parserMap = new HashMap<ITextEditor, AnnotationParser>();
 			this.startup = false;
-			this.hideAnnotations = true;
+			this.perspectiveNotActive = true;
 		}
 		if (perspective.getLabel().equals("AgileReview") && !this.startup) {
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Adding annotations since AgileReview perspective has been activated");
 			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
-			this.hideAnnotations = false;
+			this.perspectiveNotActive = false;
 		}
 	}
 

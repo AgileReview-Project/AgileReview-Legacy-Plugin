@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.wizard;
+package de.tukl.cs.softech.agilereview.wizards.newreview;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -42,7 +42,7 @@ public class NewReviewWizardPage extends WizardPage implements KeyListener {
 	 * Creates a new page
 	 */
 	protected NewReviewWizardPage() {
-		super("NewReviewWizard1");
+		super("New Review");
 		setTitle("New Review");
 		setDescription("This wizard creates a new AgileReview.");
 	}

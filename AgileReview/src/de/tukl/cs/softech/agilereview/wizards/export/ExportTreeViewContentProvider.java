@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.wizard;
+package de.tukl.cs.softech.agilereview.wizards.export;
 
 import java.util.ArrayList;
 
