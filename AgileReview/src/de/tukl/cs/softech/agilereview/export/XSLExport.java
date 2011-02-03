@@ -1,8 +1,11 @@
 package de.tukl.cs.softech.agilereview.export;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +48,7 @@ public class XSLExport {
 			for(Project p : ra.getProjects(r.getId())) {
 
 				if(workspaceRoot.getProject(p.getName()).exists()) {
-					projects.add(workspaceRoot.getProject().getLocation().toFile());
+					projects.add(workspaceRoot.getProject(p.getName()).getLocation().toFile());
 				}
 				
 				reviewFiles.addAll(convertFilesToWrappedFiles(Arrays.asList(p.getFileArray()), r.getId(), p.getName()));
@@ -66,7 +69,9 @@ public class XSLExport {
 		
         Configuration config = new Configuration();
         XLSTransformer transformer = new XLSTransformer( config );
-		transformer.transformXLS(templatePath, beans, outputPath);
+        DateFormat df = new SimpleDateFormat( "yy-mm-dd_HH-mm-ss" );
+        String filetype = templatePath.substring(templatePath.lastIndexOf("."));
+		transformer.transformXLS(templatePath, beans, outputPath+"agilereview_export_"+df.format(Calendar.getInstance().getTime())+"."+filetype);
 	}
 	
 	private static ArrayList<FileExportWrapper> getAllWrappedFiles(Folder folder, String review, String project) {
@@ -88,7 +93,7 @@ public class XSLExport {
 			if(f.isFile()) {
 				files.add(new FileExportWrapper(f, project));
 			} else if(f.isDirectory()) {
-				getAllWrappedFiles(f, project);
+				files.addAll(getAllWrappedFiles(f, project));
 			}
 		}
 		
