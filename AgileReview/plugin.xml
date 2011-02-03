@@ -190,5 +190,19 @@
          preferredPerspectives="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
    </wizard>
 </extension>
+<extension
+      point="org.eclipse.ui.exportWizards">
+   <category
+         id="AgileReview.AgileReviewCategory"
+         name="%category.name.0">
+   </category>
+   <wizard
+         category="AgileReview.AgileReviewCategory"
+         class="de.tukl.cs.softech.agilereview.wizard.ExportReviewDataWizard"
+         icon="icons/agile_icon.png"
+         id="AgileReview.exportReviewDataWizard"
+         name="%wizard.name">
+   </wizard>
+</extension>
     
 </plugin>
