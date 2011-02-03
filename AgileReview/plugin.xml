@@ -181,7 +181,7 @@
    <wizard
          canFinishEarly="false"
          category="AgileReview.AgileReviewCategory"
-         class="de.tukl.cs.softech.agilereview.wizard.NewReviewWizard"
+         class="de.tukl.cs.softech.agilereview.wizards.newreview.NewReviewWizard"
          finalPerspective="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
          hasPages="true"
          icon="icons/agile_icon.png"
@@ -198,7 +198,7 @@
    </category>
    <wizard
          category="AgileReview.AgileReviewCategory"
-         class="de.tukl.cs.softech.agilereview.wizard.ExportReviewDataWizard"
+         class="de.tukl.cs.softech.agilereview.wizards.export.ExportReviewDataWizard"
          icon="icons/agile_icon.png"
          id="AgileReview.exportReviewDataWizard"
          name="%wizard.name">
