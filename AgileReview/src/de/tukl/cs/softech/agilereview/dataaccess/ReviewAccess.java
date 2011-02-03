@@ -63,6 +63,8 @@ public class ReviewAccess {
 	 */
 	private ReviewFileModel rFileModel = new ReviewFileModel();
 	
+	private boolean projectCreated = false;
+	private boolean projectOpened = false;
 	
 	
 	
@@ -207,17 +209,18 @@ public class ReviewAccess {
 		IProject p = workspaceRoot.getProject(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.SOURCE_FOLDER));
 		try
 		{
-			IProgressMonitor progressMonitor = new NullProgressMonitor();
 			// Create a new Project, if necessary
 			if (!p.exists())
 			{
-				p.create(progressMonitor);
+				p.create(null);
 			}
+			while (!p.exists()){}			
 			// Open the Project, if necessary
 			if (!p.isOpen())
 			{
-				p.open(progressMonitor);
+				p.open(null);
 			}
+			while (!p.isOpen()){}	
 		}
 		catch (CoreException e)
 		{
@@ -226,9 +229,6 @@ public class ReviewAccess {
 		
 		// XXX Does this help?
 		REVIEW_REPO_FOLDER = p.getLocation().toFile();
-		while (REVIEW_REPO_FOLDER == null) {
-			REVIEW_REPO_FOLDER = p.getLocation().toFile();
-		}
 		
 		// Load open reviews initially
 		try {

@@ -32,9 +32,8 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 		setNeedsProgressMonitor(true);
 	}
 	
-	/* 
+	/**
 	 * adds all needed pages to the wizard
-	 * (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.Wizard#addPages()
 	 */
 	@Override
@@ -44,9 +43,8 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 	}
 
 
-	/* 
+	/**
 	 * Execute the actual wizard command after all information was collected
-	 * (non-Javadoc)
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
@@ -74,8 +72,8 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 		return result;
 	}
 
-	/* not needed
-	 *  (non-Javadoc)
+	/**
+	 * not needed
 	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	@Override
