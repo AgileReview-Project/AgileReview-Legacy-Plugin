@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Text;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReplyDocument.Reply;
+import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
@@ -197,7 +198,8 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			this.editedObject = comment;
 			authorInstance.setText(comment.getAuthor());
 
-		    if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED)) && comment.getRecipient().equals("")) {
+		   //  if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED)) && comment.getRecipient().equals("")) {
+			 if (Activator.getDefault().getPreferenceStore().getBoolean(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED) && comment.getRecipient().isEmpty()) {
 		    	recipientText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT));
 		    } else {
 		    	recipientText.setText(comment.getRecipient());

@@ -55,7 +55,7 @@
        <specification
              annotationType="AgileReview.comment.annotation"
              colorPreferenceKey="Comment_Annotation"
-             colorPreferenceValue="200,0,0"
+             colorPreferenceValue="%annotations.default.color"
              contributesToHeader="false"
              highlightPreferenceKey="Comment"
              highlightPreferenceValue="true"
@@ -203,6 +203,20 @@
          id="AgileReview.exportReviewDataWizard"
          name="%wizard.name">
    </wizard>
+</extension>
+<extension
+      point="org.eclipse.ui.preferencePages">
+   <page
+         class="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         id="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         name="AgileReview">
+   </page>
+</extension>
+<extension
+      point="org.eclipse.core.runtime.preferences">
+   <initializer
+         class="de.tukl.cs.softech.agilereview.preferences.PreferenceInitializer">
+   </initializer>
 </extension>
     
 </plugin>

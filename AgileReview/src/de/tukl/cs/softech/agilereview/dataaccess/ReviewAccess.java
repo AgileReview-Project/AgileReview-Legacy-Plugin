@@ -59,9 +59,7 @@ public class ReviewAccess {
 	/**
 	 * Instance of the review file model
 	 */
-	private ReviewFileModel rFileModel = new ReviewFileModel();
-	
-	
+	private ReviewFileModel rFileModel = new ReviewFileModel();	
 	
 	////////////////////
 	// static methods //
@@ -159,34 +157,54 @@ public class ReviewAccess {
 		return f;
 	}
 	
-	/**
-	 * Computes the path for a given comment
-	 * @param comment comment for which the path should be returned
-	 * @return path of the file, to which this comment belongs
-	 */
-	public static String computePath(Comment comment)
-	{  
-		XmlCursor c = comment.newCursor();
-		c.toParent();
-		String path = c.getAttributeText(new QName("name"));
-		
-		while(c.toParent() && !(c.getObject() instanceof Files))
-		{
-			path = c.getAttributeText(new QName("name"))+System.getProperty("file.separator")+path;
-		}
-		c.dispose();
-		
-		return path;
-	}
+//	/**
+//	 * Computes the path for a given comment
+//	 * @param comment comment for which the path should be returned
+//	 * @return path of the file, to which this comment belongs
+//	 */
+//	public static String computePath(Comment comment)
+//	{  
+//		XmlCursor c = comment.newCursor();
+//		c.toParent();
+//		String path = c.getAttributeText(new QName("name"));
+//		
+//		while(c.toParent() && !(c.getObject() instanceof Files))
+//		{
+//			path = c.getAttributeText(new QName("name"))+System.getProperty("file.separator")+path;
+//		}
+//		c.dispose();
+//		
+//		return path;
+//	}
+//	
+//	/**
+//	 * Computes the path for a given file
+//	 * @param file comment for which the path should be returned
+//	 * @return path of the file
+//	 */
+//	public static String computePath(agileReview.softech.tukl.de.FileDocument.File file)
+//	{  
+//		XmlCursor c = file.newCursor();
+//		c.toParent();
+//		String path = c.getAttributeText(new QName("name"));
+//		
+//		while(c.toParent() && !(c.getObject() instanceof Files))
+//		{
+//			path = c.getAttributeText(new QName("name"))+System.getProperty("file.separator")+path;
+//		}
+//		c.dispose();
+//		
+//		return path;
+//	}
 	
 	/**
-	 * Computes the path for a given file
-	 * @param file comment for which the path should be returned
-	 * @return path of the file
+	 * Computes the path for a given comment, file or folder
+	 * @param item comment for which the path should be returned
+	 * @return path of the item (excluding the item itself)
 	 */
-	public static String computePath(agileReview.softech.tukl.de.FileDocument.File file)
+	public static String computePath(XmlObject item)
 	{  
-		XmlCursor c = file.newCursor();
+		XmlCursor c = item.newCursor();
 		c.toParent();
 		String path = c.getAttributeText(new QName("name"));
 		
@@ -221,7 +239,8 @@ public class ReviewAccess {
 		PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
 		// Set the directory where the comments are located
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IProject p = workspaceRoot.getProject(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.SOURCE_FOLDER));
+		// TODO: Make the source-folder selectable in the preferences later
+		IProject p = workspaceRoot.getProject(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_SOURCE_FOLDER));
 		try
 		{
 			// Create a new Project, if necessary

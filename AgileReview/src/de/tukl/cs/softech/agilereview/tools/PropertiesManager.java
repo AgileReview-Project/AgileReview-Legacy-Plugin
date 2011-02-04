@@ -38,10 +38,6 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String LOG_SYSOUT = "log_sysout";
 		/**
-		 * The source folder where the reviews are stored (path based from Workspace-root)
-		 */
-		public static String SOURCE_FOLDER = "source_folder";
-		/**
 		 * The separator character to combine reviewId, author and commentId
 		 */
 		public static String KEY_SEPARATOR = "key_separator";
@@ -65,6 +61,11 @@ public class PropertiesManager implements IInputValidator{
 		 * Message the display when saving a reply on a comment, without all fields filled out
 		 */
 		public static String COMMENT_EMPTY_REPLY_MESSAGE = "reply_inf_completeness";
+		/**
+		 * The source folder where the reviews are stored (path based from Workspace-root)
+		 */
+		public static String DEFAULT_SOURCE_FOLDER = "default_source_folder";
+		
 		
 		/**
 		 * Static subclass: clustering of icon keys
@@ -120,7 +121,11 @@ public class PropertiesManager implements IInputValidator{
 		/**
 		 * The currently active review
 		 */
-		private static String AUTHOR_NAME = "authorName";
+		public static String AUTHOR_NAME = "author";
+		/**
+		 * The source folder where the reviews are stored (path based from Workspace-root)
+		 */
+		public static String SOURCE_FOLDER = "source_folder";
 		/**
 		 * Indicates if explorer and table are linked
 		 */
@@ -138,6 +143,10 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String SUGGESTIONS_ENABLED = "enableSuggestions";
 		/**
+		 * The color of the annotations
+		 */
+		public static String ANNOTATION_COLOR = "annotationColor";
+		/**
 		 * The path for the export template
 		 */
 		public static String TEMPLATE_PATH = "templatePath";
@@ -145,6 +154,7 @@ public class PropertiesManager implements IInputValidator{
 		 * The default export location
 		 */
 		public static String EXPORT_PATH = "exportPath";
+		
 		
 	}
 	
@@ -355,28 +365,6 @@ public class PropertiesManager implements IInputValidator{
 			prio = this.commentPriorities[ID];
 		}
 		return prio; 
-	}
-	
-	/**
-	 * Returns the author name as specified in the preferences or (if no name is specified in the preferences) the System's user name,
-	 * @return author name or null, if user name consists forbidden characters
-	 */
-	public String getAuthor()
-	{
-		String result = null;
-		String authorName = this.getExternalPreference(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);
-		String sysName = System.getProperty("user.name"); // TODO: auto-write sysname later to preferences
-
-		if (!authorName.isEmpty() && this.isValid(authorName) == null)
-		{
-			result = authorName;
-		}
-		else if (!sysName.isEmpty() && this.isValid(sysName) == null)
-		{
-			result = sysName;
-		}
-		
-		return result;
 	}
 
 	/**

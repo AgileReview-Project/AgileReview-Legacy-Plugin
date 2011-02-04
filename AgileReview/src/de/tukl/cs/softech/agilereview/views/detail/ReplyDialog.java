@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
@@ -33,7 +34,7 @@ public class ReplyDialog extends Composite implements Listener {
 	/**
 	 * inserted author text
 	 */
-	private String strReplyAuthor = PropertiesManager.getInstance().getAuthor();
+	private String strReplyAuthor = Activator.getDefault().getPreferenceStore().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);;
 	/**
 	 * inserted reply text
 	 */
