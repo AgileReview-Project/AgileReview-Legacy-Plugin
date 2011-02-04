@@ -89,25 +89,10 @@
              name="AgileReview.comment.annotation">
        </type>
     </extension>
-    <extension
-          point="org.eclipse.core.filebuffers.annotationModelCreation">
-       <factory
-             class="agilereview.AnnotationModelFactory1"
-             extensions="*">
-       </factory>
-    </extension>
     <extension point="org.eclipse.help.contexts">
     <contexts file="help/contexts.xml">
     </contexts>
 </extension>
-    <extension
-          point="org.eclipse.ui.editors.markerUpdaters">
-       <updater
-             class="agilereview.Updater1"
-             id="AgileReview.updater1"
-             markerType="comment.marker">
-       </updater>
-    </extension>
 <extension point="org.eclipse.ui.cheatsheets.cheatSheetContent">
    <category
          id="AgileReview.category1"
@@ -127,38 +112,7 @@
          id="AgileReview.cheatsheet2"
          name="Delete Comment">
    </cheatsheet>
-</extension>
-<extension
-      point="org.eclipse.ui.navigator.viewer">
-   <viewer
-         viewerId="de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
-   </viewer>
-   <viewerContentBinding
-         viewerId="de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
-      <includes>
-         <contentExtension
-               pattern="de.tukl.cs.softech.agilereview.view.reviewnavigator.contentextension">
-         </contentExtension>
-      </includes>
-   </viewerContentBinding>
-</extension>
-<extension
-      point="org.eclipse.ui.navigator.navigatorContent">
-   <navigatorContent
-         activeByDefault="true"
-         contentProvider="de.tukl.cs.softech.agilereview.views.reviewexplorer.REContentProvider"
-         icon="%agileReview.icon"
-         id="de.tukl.cs.softech.agilereview.view.reviewnavigator.contentextension"
-         labelProvider="de.tukl.cs.softech.agilereview.views.reviewexplorer.RELabelProvider"
-         name="%navigatorContent.name"
-         priority="normal">
-      <triggerPoints>
-         <instanceof
-               value="de.tukl.cs.softech.agilereview.views.reviewexplorer.RERootNode">
-         </instanceof>
-      </triggerPoints>
-   </navigatorContent>
-</extension>
+</extension>n
 <extension
       point="org.eclipse.ui.handlers">
    <handler
