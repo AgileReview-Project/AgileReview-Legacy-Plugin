@@ -126,7 +126,10 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		templateLabel.setText("Select template for export:");
 		
 		templatePathText = new Text(container, SWT.BORDER | SWT.SINGLE);
-		templatePathText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH));
+		// TODO Thilo, do what ever you want ^^
+		if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED))) {
+			templatePathText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH));	
+		}		
 		templatePathText.setEditable(false);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		templatePathText.setLayoutData(gd);
@@ -140,6 +143,9 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		pathLabel.setText("Export location:");
 		
 		exportPathText = new Text(container, SWT.BORDER | SWT.SINGLE);
+		if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED))) {
+			exportPathText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH));	
+		}
 		exportPathText.setEditable(false);
 		exportPathText.setLayoutData(gd);
 		

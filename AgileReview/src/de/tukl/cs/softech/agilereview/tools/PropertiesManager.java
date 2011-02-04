@@ -141,6 +141,10 @@ public class PropertiesManager implements IInputValidator{
 		 * The path for the export template
 		 */
 		public static String TEMPLATE_PATH = "templatePath";
+		/**
+		 * The default export location
+		 */
+		public static String EXPORT_PATH = "exportPath";
 		
 	}
 	
