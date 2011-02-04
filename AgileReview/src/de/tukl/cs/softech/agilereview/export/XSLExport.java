@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +26,22 @@ import agileReview.softech.tukl.de.ProjectDocument.Project;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 
+/**
+ * This class represents the interface to jxls for exporting reviews and comments to xls, xlsx sheets
+ */
 public class XSLExport {
 
+	
+	/**
+	 * This function provides the functionality for exporting the given Reviews to the outputPath by using the xls/xlsx template
+	 * specified in the templatePath
+	 * @param reviews which should be exported
+	 * @param templatePath path to the xls/xlsx template
+	 * @param outputPath directory to which the data should exported
+	 * @throws ParsePropertyException occurs during the transfomation process of jxls
+	 * @throws InvalidFormatException occurs during the transfomation process of jxls
+	 * @throws IOException occurs during the transfomation process of jxls
+	 */
 	public static void exportReviews(List<Review> reviews, String templatePath, String outputPath) throws ParsePropertyException, InvalidFormatException, IOException {
 		
 		ReviewAccess ra = ReviewAccess.getInstance();
@@ -43,7 +58,7 @@ public class XSLExport {
 		
 		//collect all files which have been reviewed
 		ArrayList<FileExportWrapper> reviewFiles = new ArrayList<FileExportWrapper>();
-		ArrayList<java.io.File> projects = new ArrayList<java.io.File>();
+		HashSet<java.io.File> projects = new HashSet<java.io.File>();
 		for(Review r : reviews) {
 			for(Project p : ra.getProjects(r.getId())) {
 
@@ -69,11 +84,18 @@ public class XSLExport {
 		
         Configuration config = new Configuration();
         XLSTransformer transformer = new XLSTransformer( config );
-        DateFormat df = new SimpleDateFormat( "yy-mm-dd_HH-mm-ss" );
+        DateFormat df = new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss" );
         String filetype = templatePath.substring(templatePath.lastIndexOf("."));
 		transformer.transformXLS(templatePath, beans, outputPath+"agilereview_export_"+df.format(Calendar.getInstance().getTime())+"."+filetype);
 	}
 	
+	/**
+	 * Searches recursively for all files under the given folder and wraps them into a {@link FileExportWrapper} object
+	 * @param folder root node of the search process
+	 * @param review to which these files correlate
+	 * @param project to which these files correlate
+	 * @return a list of all found and wrapped {@link FileExportWrapper} objects
+	 */
 	private static ArrayList<FileExportWrapper> getAllWrappedFiles(Folder folder, String review, String project) {
 		ArrayList<FileExportWrapper> files = new ArrayList<FileExportWrapper>();
 		
@@ -85,14 +107,21 @@ public class XSLExport {
 		return files;
 	}
 	
+	/**
+	 * Searches recursively for all files under the given file and wraps them into a {@link FileExportWrapper} object
+	 * @param file root node of the search process
+	 * @param project to which these files correlate
+	 * @return a list of all found and wrapped {@link FileExportWrapper} objects
+	 */
 	private static ArrayList<FileExportWrapper> getAllWrappedFiles(java.io.File file, String project) {
 		ArrayList<FileExportWrapper> files = new ArrayList<FileExportWrapper>();
 		
+		//TODO exclude via preferences
 		java.io.File[] fs = file.listFiles();
 		for(java.io.File f : fs) {
-			if(f.isFile()) {
+			if(f.isFile() && !f.getName().equals(".project") && !f.getName().equals(".classpath")) {
 				files.add(new FileExportWrapper(f, project));
-			} else if(f.isDirectory()) {
+			} else if(f.isDirectory() && !f.getName().equals("bin") && !f.getName().equals(".settings")) {
 				files.addAll(getAllWrappedFiles(f, project));
 			}
 		}
@@ -100,6 +129,13 @@ public class XSLExport {
 		return files;
 	}
 	
+	/**
+	 * Converts a given list of files in a given review and project to the respective {@link FileExportWrapper} representation
+	 * @param input files which should be wrapped
+	 * @param review in which the given files are in
+	 * @param project under which the given files are lying
+	 * @return a list of all wrapped {@link FileExportWrapper}
+	 */
 	private static ArrayList<FileExportWrapper> convertFilesToWrappedFiles(List<File> input, String review, String project) {
 		ArrayList<FileExportWrapper> files = new ArrayList<FileExportWrapper>();
 		
