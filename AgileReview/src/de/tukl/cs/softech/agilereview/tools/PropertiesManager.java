@@ -12,7 +12,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import de.tukl.cs.softech.agilereview.Activator;
 
 /**
- * The PropertiesManager manages the internal configurations (in file: "config/project.properties")
+ * The PropertiesManager manages the internal configurations (in file: "OSGI-INF/l10n/bundle.properties")
  * as well as the external (workspace-specific) configurations (called preferences)
  */
 public class PropertiesManager implements IInputValidator{
