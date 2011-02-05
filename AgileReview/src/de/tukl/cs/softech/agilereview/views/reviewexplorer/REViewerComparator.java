@@ -38,7 +38,7 @@ class REViewerComparator extends ViewerComparator
 		int result = super.compare(viewer, e1, e2);
 		if (e1 instanceof MultipleReviewWrapper && e2 instanceof MultipleReviewWrapper)
 		{
-			String activeReview = PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+			String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 			if (activeReview.equals(((MultipleReviewWrapper)e1).getReviewId()))
 			{
 				result = -1;

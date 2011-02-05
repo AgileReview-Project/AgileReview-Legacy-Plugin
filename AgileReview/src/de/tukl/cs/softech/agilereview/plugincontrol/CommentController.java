@@ -20,7 +20,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
-import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -72,7 +71,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 	 */
 	private void addNewComment()  {
 		PluginLogger.log(this.getClass().toString(), "addNewComment", "triggered");
-		String activeReview = PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		if (!activeReview.isEmpty()) {
 			try	{
 				String pathToFile = "";
@@ -84,8 +83,7 @@ public class CommentController extends Observable implements Listener, ISelectio
 							pathToFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
 						}
 					}
-					// String user  = PropertiesManager.getInstance().getAuthor();
-					String user  = Activator.getDefault().getPreferenceStore().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);
+					String user  = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);
 					if (user  != null)
 					{
 						Comment newComment = ra.createNewComment(activeReview , user, pathToFile);

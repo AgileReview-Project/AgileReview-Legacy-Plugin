@@ -253,9 +253,9 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 			RA.deleteReview(wrap.getReviewId());
 			root.deleteReview(wrap);
 			// Check if this was the active review
-			if (props.getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(wrap.getReviewId()))
+			if (PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(wrap.getReviewId()))
 			{
-				props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, "");
+				PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 			}
 			// Remove this review from the list of open reviews (regardless if it was open or not)
 			props.removeFromOpenReviews(wrap.getReviewId());
@@ -305,7 +305,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 			}
 			else
 			{
-				props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, referenceRevId);
+				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, referenceRevId);
 				this.refresh();
 			}
 		}
@@ -334,13 +334,13 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 					this.props.removeFromOpenReviews(reviewId);
 					
 					// Test if active review may have vanished
-					String activeReview = props.getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+					String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 					if (!activeReview.isEmpty())
 					{
 						if (!ReviewAccess.getInstance().isReviewLoaded(activeReview))
 						{
 							// Active review has vanished --> deactivate it
-							props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, "");
+							PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 						}
 					}
 				}
@@ -425,7 +425,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		// When a new review is created this should be open an activated
 		rWrap.setOpen(true);
 		this.props.addToOpenReviews(r.getId());
-		this.props.setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, r.getId());
+		PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, r.getId());
 		
 		root.addReview(rWrap);
 		this.refresh();

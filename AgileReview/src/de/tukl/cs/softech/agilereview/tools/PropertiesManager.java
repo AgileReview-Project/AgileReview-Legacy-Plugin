@@ -6,11 +6,10 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IInputValidator;
-import org.osgi.service.prefs.Preferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-
+import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 
 /**
@@ -171,10 +170,6 @@ public class PropertiesManager implements IInputValidator{
 	 */
 	private Properties internalProperties;
 	/**
-	 * loaded external properties
-	 */
-	private Preferences externalPreferences; 
-	/**
 	 * Strings representing the configured status of Comments
 	 */
 	private String[] commentStates;
@@ -216,9 +211,6 @@ public class PropertiesManager implements IInputValidator{
 			}
 		}
 		
-		// External preferences
-		externalPreferences =  new InstanceScope().getNode(getInternalProperty(INTERNAL_KEYS.PLUGIN_ID));
-		
 		// Set inputValidator regex
 		String forbiddenChars = String.valueOf(this.getForbiddenChars());
 		String regex = "[^"+Pattern.quote(forbiddenChars)+"]*";
@@ -235,22 +227,12 @@ public class PropertiesManager implements IInputValidator{
 	}
 	
 	/**
-	 * Returns the value mapped to this key in the workspace-specific preferences of this plugin
-	 * @param key key which is mapped to the given value
-	 * @return value which is mapped to the given key or an empty String if no mapping is found
+	 * Returns the PreferencesStore to store/retrieve the workspace-specific preferences of this plugin
+	 * @return PreferencesStore of this plugin
 	 */
-	public String getExternalPreference(String key)
+	public static IPreferenceStore getPreferences()
 	{
-		return externalPreferences.get(key, "");
-	}
-	/**
-	 * Set this key/value pair in the workspace-specific preferences of this plugin
-	 * @param key
-	 * @param value
-	 */
-	public void setExternalPreference(String key, String value)
-	{
-		externalPreferences.put(key, value);
+		return Activator.getDefault().getPreferenceStore();
 	}
 	/**
 	 * Adds the given review to the list of open reviews in the workspace-specific preferences of this plugin
@@ -259,18 +241,18 @@ public class PropertiesManager implements IInputValidator{
 	public void addToOpenReviews(String reviewId)
 	{
 		String strKey = PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS;
-		String oldValue = getExternalPreference(strKey);
+		String oldValue = getPreferences().getString(strKey);
 		
 		if (oldValue.isEmpty())
 		{
 			// This mapping does not exist
-			setExternalPreference(strKey, reviewId);
+			getPreferences().setValue(strKey, reviewId);
 		}
 		else
 		{
 			// Mapping is existent
 			String newValue = oldValue + this.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR) + reviewId;
-			setExternalPreference(strKey, newValue);
+			getPreferences().setValue(strKey, newValue);
 		}
 	}
 	
@@ -281,7 +263,7 @@ public class PropertiesManager implements IInputValidator{
 	public void removeFromOpenReviews(String reviewId)
 	{
 		String keySeparator = this.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-		String oldValue = getExternalPreference(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS);
+		String oldValue = getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS);
 		String[] group = oldValue.split(Pattern.quote(keySeparator));
 		
 		String newValue = "";
@@ -299,7 +281,7 @@ public class PropertiesManager implements IInputValidator{
 				}
 			}
 		}
-		setExternalPreference(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS, newValue);
+		getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS, newValue);
 	}
 	
 	
@@ -310,7 +292,7 @@ public class PropertiesManager implements IInputValidator{
 	public String[] getOpenReviews()
 	{
 		String[] result;
-		String val = getExternalPreference(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS);
+		String val = getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS);
 		
 		if (val.isEmpty())
 		{
@@ -387,9 +369,12 @@ public class PropertiesManager implements IInputValidator{
 	public String isValid(String newText) 
 	{
 		String result = null;
+		if (newText.isEmpty()){
+			result = "Value must not be empty";
+		}
 		if (!this.forbiddenCharPattern.matcher(newText).matches())
 		{
-			result = "Please don't use any of the following characters: "+String.valueOf(this.getForbiddenChars());
+			result = "Value must not contain any of the following characters: "+String.valueOf(this.getForbiddenChars());
 		}
 		return result;
 	}

@@ -802,7 +802,7 @@ public class ReviewAccess {
 		
 		// Load all comments from open reviews
 		boolean activeReviewFound = false;
-		String activeReview = PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		for (String currReview: PropertiesManager.getInstance().getOpenReviews())
 		{
 			
@@ -827,7 +827,7 @@ public class ReviewAccess {
 			}	
 		}
 		if (!activeReviewFound){
-			PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, "");
+			PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		}
 	}
 	

@@ -107,7 +107,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Should the content of the table be linked to the selections of the explorer?
 	 */
-	private boolean linkExplorer = PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER).isEmpty() ? false : Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER));
+	private boolean linkExplorer = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER);
+	// private boolean linkExplorer = PropertiesManager.getInstance().getExternalPreference().isEmpty() ? false : Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER));
 	/**
 	 * The number of columns of the parent's GridLayout
 	 */
@@ -501,10 +502,10 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 				linkExplorer = !linkExplorer;
 				if (!linkExplorer) {
 					viewer.removeFilter(selectionFilter);
-					PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,"false");
+					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,false);
 				} else {
 					viewer.addFilter(selectionFilter);
-					PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,"true");
+					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,true);
 				}
 				filterComments();
 				viewer.refresh();

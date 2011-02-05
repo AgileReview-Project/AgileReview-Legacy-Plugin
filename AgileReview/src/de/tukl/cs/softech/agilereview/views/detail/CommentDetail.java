@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Text;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReplyDocument.Reply;
-import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
@@ -199,8 +198,8 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			authorInstance.setText(comment.getAuthor());
 
 		   //  if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED)) && comment.getRecipient().equals("")) {
-			 if (Activator.getDefault().getPreferenceStore().getBoolean(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED) && comment.getRecipient().isEmpty()) {
-		    	recipientText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT));
+			 if (PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED) && comment.getRecipient().isEmpty()) {
+		    	recipientText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT));
 		    } else {
 		    	recipientText.setText(comment.getRecipient());
 		    }
@@ -282,14 +281,14 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		
 		if(editedObject.getPriority() != this.priorityDropDown.getSelectionIndex()) {
 			editedObject.setPriority(this.priorityDropDown.getSelectionIndex());
-			PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_PRIORITY, String.valueOf(this.priorityDropDown.getSelectionIndex()));
+			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LAST_PRIORITY, String.valueOf(this.priorityDropDown.getSelectionIndex()));
 			result = true;
 		} else if(editedObject.getStatus() != this.statusDropDown.getSelectionIndex()) {
 			editedObject.setStatus(this.statusDropDown.getSelectionIndex());
 			result = true;
 		} else if(!editedObject.getRecipient().equals(this.recipientText.getText().trim())) {
 			editedObject.setRecipient(this.recipientText.getText().trim());
-			PropertiesManager.getInstance().setExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT, recipientText.getText().trim());
+			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT, recipientText.getText().trim());
 			result = true;
 		} else if(!editedObject.getText().equals(this.txt.getText().trim())) {
 			editedObject.setText(this.txt.getText().trim());

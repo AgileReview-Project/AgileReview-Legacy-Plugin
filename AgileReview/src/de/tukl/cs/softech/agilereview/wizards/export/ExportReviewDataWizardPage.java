@@ -123,13 +123,10 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		
 		// ui elements for template selection
 		Label templateLabel = new Label(container, SWT.NULL);
-		templateLabel.setText("Select template for export:");
+		templateLabel.setText("Template for XLS export:");
 		
 		templatePathText = new Text(container, SWT.BORDER | SWT.SINGLE);
-		// TODO Thilo, do what ever you want ^^
-		if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED))) {
-			templatePathText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH));	
-		}		
+		templatePathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH));			
 		templatePathText.setEditable(false);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		templatePathText.setLayoutData(gd);
@@ -140,12 +137,10 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		
 		// ui elements for selecting export path
 		Label pathLabel = new Label(container, SWT.NULL);
-		pathLabel.setText("Export location:");
+		pathLabel.setText("XLS export location:");
 		
 		exportPathText = new Text(container, SWT.BORDER | SWT.SINGLE);
-		if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED))) {
-			exportPathText.setText(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH));	
-		}
+		exportPathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH));	
 		exportPathText.setEditable(false);
 		exportPathText.setLayoutData(gd);
 		
@@ -216,7 +211,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 
 				// Change the title bar text
 				dlg.setText("AgileReview Export");
-				String[] filterExtensions = {"*.xls", "*.xlsx"};
+				String[] filterExtensions = {"*.xls*"};
 				dlg.setFilterExtensions(filterExtensions);
 
 				// Calling open() will open and run the dialog.

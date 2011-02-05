@@ -2,8 +2,8 @@ package de.tukl.cs.softech.agilereview.wizards.newreview;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -15,7 +15,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * The single page of the NewReview Wizard
  */
-public class NewReviewWizardPage extends WizardPage implements KeyListener {
+public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 
 	/**
 	 * the text field for retrieving the id
@@ -61,7 +61,9 @@ public class NewReviewWizardPage extends WizardPage implements KeyListener {
 
 		id = new Text(container, SWT.BORDER | SWT.SINGLE);
 		id.setText("");
-		id.addKeyListener(this);
+//		id.addKeyListener(this);
+		id.addModifyListener(this);
+//		id.addVerifyListener(this);
 		
 		// external reference
 		Label lReference = new Label(container, SWT.NULL);
@@ -81,7 +83,7 @@ public class NewReviewWizardPage extends WizardPage implements KeyListener {
 		
 		// not valid label + check
 		lValid = new Label(container, SWT.NULL);
-		lValid.setText("*) Review-ID is mandatory and has to be set");
+		// lValid.setText("*) Review-ID is mandatory and has to be set");
 		
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		id.setLayoutData(gd);
@@ -93,7 +95,8 @@ public class NewReviewWizardPage extends WizardPage implements KeyListener {
 		lValid.setLayoutData(gdValid);
 		// Required to avoid an error in the system
 		setControl(container);
-		setPageComplete(false);
+		this.modifyText(null);
+		//setPageComplete(false);
 	}
 	
 	/**
@@ -124,28 +127,17 @@ public class NewReviewWizardPage extends WizardPage implements KeyListener {
 		return this.description.getText().trim();
 	}
 
-
 	@Override
-	public void keyPressed(KeyEvent e) {/* Do nothing */}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
+	public void modifyText(ModifyEvent e) 
+	{
 		String validMessage = PropertiesManager.getInstance().isValid(id.getText());
-		if (!id.getText().isEmpty()) {
-			if (validMessage == null){
-				setPageComplete(true);
-				lValid.setText("");
-			}
-			else {
-				setPageComplete(false);
-				lValid.setText("*) "+validMessage);
-			}
+		if (validMessage == null){
+			setPageComplete(true);
+			lValid.setText("");
 		}
 		else {
 			setPageComplete(false);
-			lValid.setText("*) Review-ID is mandatory and has to be set");
-		}	
-		
-		lValid.redraw();
+			lValid.setText("*) "+validMessage);
+		}
 	}
 }
