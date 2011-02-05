@@ -85,8 +85,8 @@ public class AgileReviewPreferencePage
 		
 //		addField(new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, 
 //				"agileReviews-folder:", getFieldEditorParent()));
-//		addField(new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, 
-//				"agileReviews-folder:", getFieldEditorParent()));
+		addField(new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, 
+				"agileReviews-folder:", getFieldEditorParent()));
 		
 		// colorfieldeditor for annotations-color
 		colorAnnotationField = new ColorFieldEditor (PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "commentcolor:",

@@ -239,8 +239,7 @@ public class ReviewAccess {
 		PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
 		// Set the directory where the comments are located
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		// TODO: Make the source-folder selectable in the preferences later
-		IProject p = workspaceRoot.getProject(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_SOURCE_FOLDER));
+		IProject p = workspaceRoot.getProject(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
 		try
 		{
 			// Create a new Project, if necessary

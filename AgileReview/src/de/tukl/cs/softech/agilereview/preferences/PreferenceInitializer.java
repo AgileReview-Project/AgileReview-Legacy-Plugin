@@ -1,5 +1,6 @@
 package de.tukl.cs.softech.agilereview.preferences;
 
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -23,16 +24,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME,
 				System.getProperty("user.name"));
 		
-//		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER,
-//				Platform.getLocation()+"/"+PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER)); //need an absolute path
-//		
-//		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER,
-//				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_SOURCE_FOLDER)); //need an absolute path
+		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER,
+				"AgileReviews"); //TODO need an absolute path
 		
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, true);
 		
 		//initial color value and transferation of the color to the other preference
-		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR,"0,255,128");
+		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR,
+				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_ANNOTATION_COLOR));
 		
 		// TODO Think of good defaults
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, "");

@@ -10,7 +10,6 @@ import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.tukl.cs.softech.agilereview.Activator;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 
 /**
  * The PropertiesManager manages the internal configurations (in file: "config/project.properties")
@@ -27,7 +26,7 @@ public class PropertiesManager implements IInputValidator{
 		/**
 		 * The plugin id
 		 */
-		public static String PLUGIN_ID = "plugin_id";
+		public static String PLUGIN_ID = "plugin.id";
 		/**
 		 * Log level for logging for this session
 		 */
@@ -57,14 +56,13 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String REVIEW_STATUS = "review_status";
 		/**
+		 * Default color of AgileReview annotations
+		 */
+		public static String DEFAULT_ANNOTATION_COLOR = "annotations.default.color";
+		/**
 		 * Message the display when saving a reply on a comment, without all fields filled out
 		 */
 		public static String COMMENT_EMPTY_REPLY_MESSAGE = "reply_inf_completeness";
-		/**
-		 * The source folder where the reviews are stored (path based from Workspace-root)
-		 */
-		public static String DEFAULT_SOURCE_FOLDER = "default_source_folder";
-		
 		
 		/**
 		 * Static subclass: clustering of icon keys
@@ -162,10 +160,6 @@ public class PropertiesManager implements IInputValidator{
 	 */
 	private static final PropertiesManager instance = new PropertiesManager();
 	/**
-	 * path to the internal properties file
-	 */
-	private static final String internalPropertyFile = "config/project.properties";
-	/**
 	 * loaded internal properties
 	 */
 	private Properties internalProperties;
@@ -181,7 +175,7 @@ public class PropertiesManager implements IInputValidator{
 	 * Pattern for detecting forbidden characters
 	 */
 	private Pattern forbiddenCharPattern;
-	
+
 	/**
 	 * Returns the unique instance of PropertiesManager
 	 * @return the unique instance of PropertiesManager
@@ -197,8 +191,13 @@ public class PropertiesManager implements IInputValidator{
 		
 		// Internal properties
 		internalProperties = new Properties();
-		InputStream stream = DetailView.class.getClassLoader().getResourceAsStream(internalPropertyFile);
-		if(stream != null) {
+		// TODO: Is there a better way to access the bundle properties?
+		String path = "OSGI-INF/l10n/bundle.properties";
+		InputStream stream = PropertiesManager.class.getClassLoader().getResourceAsStream(path);
+		// InputStream stream = new FileInputStream("OSGI-INF"+System.getProperty("file.separator")+"l10n"+System.getProperty("file.separator")+"bundle.properties");
+		// InputStream stream = new FileInputStream(internalPropertyFile);
+		if (stream != null)
+		{
 			try {
 				internalProperties.load(stream);
 				stream.close();
