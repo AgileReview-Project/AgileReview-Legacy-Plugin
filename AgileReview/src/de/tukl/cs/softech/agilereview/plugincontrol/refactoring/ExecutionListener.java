@@ -32,6 +32,9 @@ public class ExecutionListener implements IExecutionListener {
 	@Override
 	public void postExecuteSuccess(String commandId, Object returnValue) {
 		PluginLogger.log(this.getClass().toString(), "postExecuteSuccess", commandId);
+		if(commandId.equals("org.eclipse.ui.file.save") || commandId.equals("org.eclipse.ui.file.saveAll")) {
+			
+		}
 		if(commandId.equals("org.eclipse.jdt.ui.edit.text.java.move.element")
 				|| commandId.equals("org.eclipse.ltk.ui.refactoring.commands.renameResource")
 				|| commandId.equals("org.eclipse.ui.edit.rename")) {

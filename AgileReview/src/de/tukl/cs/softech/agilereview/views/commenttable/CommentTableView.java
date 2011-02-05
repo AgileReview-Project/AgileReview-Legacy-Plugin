@@ -142,48 +142,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		return instance;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	public void createPartControl(Composite parent) {
-		PluginLogger.log(this.getClass().toString(), "createPartControl", "CommentTableView will be created");
-		instance = this;
-		// get comments from CommentController
-		this.comments = ReviewAccess.getInstance().getAllComments();
-		this.filteredComments = this.comments;
-
-		
-		// set layout of parent
-		GridLayout layout = new GridLayout(layoutCols, false);
-		parent.setLayout(layout);
-		
-		// create UI elements (filter, add-/delete-button)
-		createToolBar(parent);
-		createViewer(parent);
-		
-		// set comparator (sorting order of columns) and filter
-		comparator = new AgileViewerComparator();
-		viewer.setComparator(comparator);
-		commentFilter = new AgileCommentFilter("ALL");
-		viewer.addFilter(commentFilter);
-		
-		// register this class as a selection provider
-		getSite().setSelectionProvider(viewer);
-		
-		//add help context
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".TableView");
-		
-		// register view
-		ViewControl.registerView(this.getClass());
-		
-		// get editor that is active when opening eclipse
-		if (getActiveEditor() instanceof ITextEditor) {
-			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
-		}
-		
-	}
-	
 	/**
 	 * Used to set a new model
 	 * @param comments
@@ -259,18 +217,105 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	}
 
 	/**
-	 * @return the currently active editor
-	 */
-	private IEditorPart getActiveEditor() {
-		return getSite().getPage().getActiveEditor();
-	}
-
-	/**
 	 * Reload current table input
 	 */
 	public void refreshTable() {
 		PluginLogger.log(this.getClass().toString(), "refreshTable", "Reloading current table input");
 		viewer.refresh();
+	}
+	
+	/**
+	 * Resets the comments (reloading from model)
+	 */
+	public void resetComments() {
+		PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
+		// TODO: check if annotations need to be removed!!!
+		this.comments = ReviewAccess.getInstance().getAllComments();
+		this.viewer.setInput(this.comments);
+		filterComments();
+		this.refreshTable();
+	}
+	
+	/**
+	 * Filter comments by criteria received from explorer and search field
+	 */
+	private void filterComments() {
+		PluginLogger.log(this.getClass().toString(), "filterComments", "Starting to filter comments");
+		List<Object> filteredCommentObjects;
+		if (linkExplorer) {
+			// filter by selections from explorer and search word from text field
+			PluginLogger.log(this.getClass().toString(), "filterComments", "Filter by textfield and ReviewExplorer selection");
+			filteredCommentObjects = Arrays.asList(selectionFilter.filter(viewer, this, commentFilter.filter(viewer, this, this.comments.toArray())));
+		} else {
+			// filter by search word from text field
+			PluginLogger.log(this.getClass().toString(), "filterComments", "Filter by textfield");
+			filteredCommentObjects = Arrays.asList(commentFilter.filter(viewer, this, this.comments.toArray()));	
+		}		
+		
+		//fill filteredComments and filter annotations
+		this.filteredComments = new ArrayList<Comment>();
+		String[] commentKeys = new String[filteredCommentObjects.size()];
+		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		
+		int i = 0;
+		for (Object o : filteredCommentObjects) {
+			filteredComments.add((Comment) o);
+			commentKeys[i] = ((Comment) o).getReviewID()+keySeparator+((Comment) o).getAuthor()+keySeparator+((Comment) o).getId();
+			i++;
+		}
+
+		IEditorPart editor;
+		if((editor = this.getActiveEditor()) != null) {
+			if(this.parserMap.get(editor) != null) {
+				this.parserMap.get(editor).filter(commentKeys);
+			}
+		}
+	}
+	
+	//###############################################################################
+	//################ functions which creates the view parts #######################
+	//###############################################################################
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	public void createPartControl(Composite parent) {
+		PluginLogger.log(this.getClass().toString(), "createPartControl", "CommentTableView will be created");
+		instance = this;
+		// get comments from CommentController
+		this.comments = ReviewAccess.getInstance().getAllComments();
+		this.filteredComments = this.comments;
+
+		
+		// set layout of parent
+		GridLayout layout = new GridLayout(layoutCols, false);
+		parent.setLayout(layout);
+		
+		// create UI elements (filter, add-/delete-button)
+		createToolBar(parent);
+		createViewer(parent);
+		
+		// set comparator (sorting order of columns) and filter
+		comparator = new AgileViewerComparator();
+		viewer.setComparator(comparator);
+		commentFilter = new AgileCommentFilter("ALL");
+		viewer.addFilter(commentFilter);
+		
+		// register this class as a selection provider
+		getSite().setSelectionProvider(viewer);
+		
+		//add help context
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".TableView");
+		
+		// register view
+		ViewControl.registerView(this.getClass());
+		
+		// get editor that is active when opening eclipse
+		if (getActiveEditor() instanceof ITextEditor) {
+			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
+		}
+		
 	}
 	
 	/**
@@ -312,6 +357,123 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		viewer.setColumnProperties(this.titles);
 		
 		return viewer;
+	}
+	
+	/**
+	 * create the toolbar containing filter and add/delete buttons
+	 * @param parent the toolsbar's parent
+	 * @return the toolbar
+	 */
+	private ToolBar createToolBar(Composite parent) {
+		// create toolbar
+		final ToolBar toolBar = new ToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+
+		// add "link explorer" button to toolbar
+	    ToolItem itemLinkExplorer = new ToolItem(toolBar, SWT.CHECK);
+	    itemLinkExplorer.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.SYNCED)).createImage());
+	    //itemLinkExplorer.setText("Link Explorer");
+	    itemLinkExplorer.setToolTipText("Link ReviewExplorer. If checked, selections of the ReviewExplorer will be reflected in the table by filtering comments.");
+	    itemLinkExplorer.setSelection(this.linkExplorer);
+	    // add listener to connect and disconnect explorer and table
+	    itemLinkExplorer.addListener(SWT.Selection, new Listener() {
+			
+			@Override
+			public void handleEvent(Event event) {
+				linkExplorer = !linkExplorer;
+				if (!linkExplorer) {
+					viewer.removeFilter(selectionFilter);
+					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,false);
+				} else {
+					viewer.addFilter(selectionFilter);
+					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,true);
+				}
+				filterComments();
+				viewer.refresh();
+			}
+		});		
+		
+		// add dropdown box to toolbar to select category to filter
+		final ToolItem itemDropDown = new ToolItem(toolBar, SWT.DROP_DOWN);
+	    itemDropDown.setText("Search for ALL");
+	    itemDropDown.setToolTipText("Click here to select the filter option");
+
+	    // create listener to submit category changes to dropdown box and filter
+	    Listener selectionListener = new Listener() {
+	    	public void handleEvent(Event event) {
+	    		MenuItem item = (MenuItem)event.widget;
+	    		viewer.removeFilter(commentFilter);
+	    		commentFilter = new AgileCommentFilter(item.getText());
+	    		viewer.addFilter(commentFilter);
+		    	itemDropDown.setText("Search for "+item.getText());
+		    	toolBar.pack();
+		    }
+		};
+		
+	    // create menu for dropdown box
+	    final Menu menu = new Menu(parent.getShell(), SWT.POP_UP);
+	    
+	    // add menu items
+	    MenuItem item = new MenuItem(menu, SWT.PUSH);
+    	item.setText("ALL");
+    	item.addListener(SWT.Selection, selectionListener);
+    	item = new MenuItem(menu, SWT.SEPARATOR);
+	    for (int i=0; i<titles.length; i++) {
+	    	item = new MenuItem(menu, SWT.PUSH);
+	    	item.setText(titles[i]);
+		    item.addListener(SWT.Selection, selectionListener);
+	    }
+	    
+	    // add text field for filter to toolbar
+	    ToolItem itemSeparator = new ToolItem(toolBar, SWT.SEPARATOR);
+	    final Text text = new Text(toolBar, SWT.BORDER | SWT.SINGLE);
+	    text.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent ke) {
+				commentFilter.setSearchText(text.getText());
+				filterComments();
+				viewer.refresh();		
+			}
+
+		});
+	    text.pack();
+	    itemSeparator.setWidth(text.getBounds().width);
+	    itemSeparator.setControl(text);	   
+	    
+	    // add seperator to toolbar
+	    itemSeparator = new ToolItem(toolBar, SWT.SEPARATOR);
+	    
+	    // add "add comment" button to toolbar
+	    ToolItem itemAddComment = new ToolItem(toolBar, SWT.PUSH);
+	    //itemAddComment.setText("Add Comment");
+	    itemAddComment.setToolTipText("Add a comment to the selected text area/the whole file.");
+	    itemAddComment.setData("add");
+	    itemAddComment.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.COMMENT_ADD)).createImage());
+	    itemAddComment.addListener(SWT.Selection, CommentController.getInstance());
+	    
+	    // add "delete comment" button to toolbar
+	    ToolItem itemDelComment = new ToolItem(toolBar, SWT.PUSH);
+	    //itemDelComment.setText("Delete Comment");
+	    itemDelComment.setToolTipText("Delete the comment(s) currently selected in the table below.");
+	    itemDelComment.setData("delete");
+	    itemDelComment.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.COMMENT_DELETE)).createImage());
+	    itemDelComment.addListener(SWT.Selection, CommentController.getInstance());
+	    
+	    
+	    // add listener to dropdown box to show menu
+	    itemDropDown.addListener(SWT.Selection, new Listener() {
+		      public void handleEvent(Event event) {
+		        if(event.detail == SWT.ARROW || event.detail == 0) {
+		          Rectangle bounds = itemDropDown.getBounds();
+		          Point point = toolBar.toDisplay(bounds.x, bounds.y + bounds.height);
+		          menu.setLocation(point);
+		          menu.setVisible(true);
+		          text.setFocus();
+		        }
+		      }
+		    });
+	    
+	    toolBar.pack();
+	    
+		return toolBar;
 	}
 	
 	/**
@@ -453,14 +615,17 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		return viewerColumn;
 	}
 	
+	//###############################################################################
+	//############################## some helper functions ##########################
+	//###############################################################################
+	
 	/**
 	 * Get the selection adapter of a given column
 	 * @param column the column 
 	 * @param index the column's index
 	 * @return the columns selection adapter
 	 */
-	private SelectionAdapter getSelectionAdapter(final TableColumn column,
-			final int index) {
+	private SelectionAdapter getSelectionAdapter(final TableColumn column, final int index) {
 		SelectionAdapter selectionAdapter = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				comparator.setColumn(index);
@@ -478,135 +643,41 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		};
 		return selectionAdapter;
 	}
-
+	
 	/**
-	 * create the toolbar containing filter and add/delete buttons
-	 * @param parent the toolsbar's parent
-	 * @return the toolbar
+	 * @return the currently active editor
 	 */
-	private ToolBar createToolBar(Composite parent) {
-		// create toolbar
-		final ToolBar toolBar = new ToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
-
-		// add "link explorer" button to toolbar
-	    ToolItem itemLinkExplorer = new ToolItem(toolBar, SWT.CHECK);
-	    itemLinkExplorer.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.SYNCED)).createImage());
-	    //itemLinkExplorer.setText("Link Explorer");
-	    itemLinkExplorer.setToolTipText("Link ReviewExplorer. If checked, selections of the ReviewExplorer will be reflected in the table by filtering comments.");
-	    itemLinkExplorer.setSelection(this.linkExplorer);
-	    // add listener to connect and disconnect explorer and table
-	    itemLinkExplorer.addListener(SWT.Selection, new Listener() {
-			
-			@Override
-			public void handleEvent(Event event) {
-				linkExplorer = !linkExplorer;
-				if (!linkExplorer) {
-					viewer.removeFilter(selectionFilter);
-					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,false);
-				} else {
-					viewer.addFilter(selectionFilter);
-					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER,true);
-				}
-				filterComments();
-				viewer.refresh();
-			}
-		});		
-		
-		// add dropdown box to toolbar to select category to filter
-		final ToolItem itemDropDown = new ToolItem(toolBar, SWT.DROP_DOWN);
-	    itemDropDown.setText("Search for ALL");
-	    itemDropDown.setToolTipText("Click here to select the filter option");
-
-	    // create listener to submit category changes to dropdown box and filter
-	    Listener selectionListener = new Listener() {
-	    	public void handleEvent(Event event) {
-	    		MenuItem item = (MenuItem)event.widget;
-	    		viewer.removeFilter(commentFilter);
-	    		commentFilter = new AgileCommentFilter(item.getText());
-	    		viewer.addFilter(commentFilter);
-		    	itemDropDown.setText("Search for "+item.getText());
-		    	toolBar.pack();
-		    }
-		};
-		
-	    // create menu for dropdown box
-	    final Menu menu = new Menu(parent.getShell(), SWT.POP_UP);
-	    
-	    // add menu items
-	    MenuItem item = new MenuItem(menu, SWT.PUSH);
-    	item.setText("ALL");
-    	item.addListener(SWT.Selection, selectionListener);
-    	item = new MenuItem(menu, SWT.SEPARATOR);
-	    for (int i=0; i<titles.length; i++) {
-	    	item = new MenuItem(menu, SWT.PUSH);
-	    	item.setText(titles[i]);
-		    item.addListener(SWT.Selection, selectionListener);
-	    }
-	    
-	    // add text field for filter to toolbar
-	    ToolItem itemSeparator = new ToolItem(toolBar, SWT.SEPARATOR);
-	    final Text text = new Text(toolBar, SWT.BORDER | SWT.SINGLE);
-	    text.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent ke) {
-				commentFilter.setSearchText(text.getText());
-				filterComments();
-				viewer.refresh();		
-			}
-
-		});
-	    text.pack();
-	    itemSeparator.setWidth(text.getBounds().width);
-	    itemSeparator.setControl(text);	   
-	    
-	    // add seperator to toolbar
-	    itemSeparator = new ToolItem(toolBar, SWT.SEPARATOR);
-	    
-	    // add "add comment" button to toolbar
-	    ToolItem itemAddComment = new ToolItem(toolBar, SWT.PUSH);
-	    //itemAddComment.setText("Add Comment");
-	    itemAddComment.setToolTipText("Add a comment to the selected text area/the whole file.");
-	    itemAddComment.setData("add");
-	    itemAddComment.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.COMMENT_ADD)).createImage());
-	    itemAddComment.addListener(SWT.Selection, CommentController.getInstance());
-	    
-	    // add "delete comment" button to toolbar
-	    ToolItem itemDelComment = new ToolItem(toolBar, SWT.PUSH);
-	    //itemDelComment.setText("Delete Comment");
-	    itemDelComment.setToolTipText("Delete the comment(s) currently selected in the table below.");
-	    itemDelComment.setData("delete");
-	    itemDelComment.setImage(createImageDescriptor(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ICONS.COMMENT_DELETE)).createImage());
-	    itemDelComment.addListener(SWT.Selection, CommentController.getInstance());
-	    
-	    
-	    // add listener to dropdown box to show menu
-	    itemDropDown.addListener(SWT.Selection, new Listener() {
-		      public void handleEvent(Event event) {
-		        if(event.detail == SWT.ARROW || event.detail == 0) {
-		          Rectangle bounds = itemDropDown.getBounds();
-		          Point point = toolBar.toDisplay(bounds.x, bounds.y + bounds.height);
-		          menu.setLocation(point);
-		          menu.setVisible(true);
-		          text.setFocus();
-		        }
-		      }
-		    });
-	    
-	    toolBar.pack();
-	    
-		return toolBar;
+	private IEditorPart getActiveEditor() {
+		return getSite().getPage().getActiveEditor();
 	}
 	
 	/**
-	 * Resets the comments (reloading from model)
+	 * Opens an editor for a given comment
+	 * @param comment the comment
 	 */
-	public void resetComments() {
-		PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
-		// TODO: check if annotations need to be removed!!!
-		this.comments = ReviewAccess.getInstance().getAllComments();
-		this.viewer.setInput(this.comments);
-		filterComments();
-		this.refreshTable();
+	private void openEditor(Comment comment) {
+		PluginLogger.log(this.getClass().toString(), "openEditor", "Opening editor for the given comment");
+		IPath path = new Path(ReviewAccess.computePath(comment));
+		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+		try {
+			getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
+		} catch (PartInitException e) {
+			PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
+		}
 	}
+	
+	/** Used to add images to add/delete button
+	 * @param path path to the image
+	 * @return an imagedescriptor of the given path
+	 */
+	private static ImageDescriptor createImageDescriptor(String path) {
+	    return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, path);
+	}
+	
+	//###############################################################################
+	//######### functions which provide functionality for AnnotationParser ##########
+	//###############################################################################
 	
 	/**
 	 * Clears the current parserMap and deletes all done Annotations.<br>
@@ -637,41 +708,30 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		}
 	}
 	
-	/** Used to add images to add/delete button
-	 * @param path path to the image
-	 * @return an imagedescriptor of the given path
-	 */
-	private static ImageDescriptor createImageDescriptor(String path) {
-	    return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, path);
-	}
-
 	/**
-	 * Editor has been brought to top, add annotations
-	 * @param partRef will be forwarded from the {@link ViewControl}
-	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
+	 * Triggers the {@link AnnotationParser} of the currently active editor to reparse its file
 	 */
-	public void partBroughtToTop(IWorkbenchPartReference partRef) {
-		if (partRef.getPart(false) instanceof ITextEditor) {
-			ITextEditor editor = (ITextEditor) partRef.getPart(false);
-			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
-				this.parserMap.put(editor, new AnnotationParser(editor));
+	public void reparseActiveEditor() {
+		IEditorPart editor;
+		if((editor = this.getActiveEditor()) != null) {
+			if(editor instanceof ITextEditor) {
+				this.parserMap.get(editor).reload();
 			}
 		}
 	}
 	
 	/**
-	 * Editor has been closed, remove from parserMap
-	 * @param partRef will be forwarded from the {@link ViewControl}
-	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
+	 * Triggers all {@link AnnotationParser} in the parser map to reparse its file
 	 */
-	public void partClosed(IWorkbenchPartReference partRef) {
-		if (partRef.getPart(false) instanceof ITextEditor) {
-			ITextEditor editor = (ITextEditor) partRef.getPart(false);
-			if (this.parserMap.containsKey(editor)) {
-				this.parserMap.remove(editor);
-			}
+	public void reparseAllEditors() {
+		for(AnnotationParser p : this.parserMap.values()) {
+			p.reload();
 		}
 	}
+	
+	//###############################################################################
+	//############ implemented and listener triggered functions #####################
+	//###############################################################################
 	
 	/** Selection of ReviewExplorer changed, filter comments
 	 * @param part will be forwarded from the {@link ViewControl}
@@ -688,8 +748,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 					viewer.removeFilter(this.selectionFilter);
 				}
 
-				// get selection, selection's iterator, initialize reviewIDs and
-				// paths
+				// get selection, selection's iterator, initialize reviewIDs and paths
 				IStructuredSelection sel = (IStructuredSelection) selection;
 				Iterator<?> it = sel.iterator();
 				ArrayList<String> reviewIDs = new ArrayList<String>();
@@ -720,59 +779,44 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 
 				PluginLogger.log(this.getClass().toString(), "selectionChanged", "Adding new filter regarding selection of ReviewExplorer");
 				// add a new filter by the given criteria to the viewer
-				this.selectionFilter = new ExplorerSelectionFilter(reviewIDs,
-						paths);
+				this.selectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
 				viewer.addFilter(this.selectionFilter);
 
 				// refresh annotations, update list of filtered comments
 				filterComments();
-				//AnnotationController.getInstance().refreshAnnotations((ITextEditor) getActiveEditor(), CommentTableView.this.filteredComments);
 			}
 		}
 	}
 	
 	/**
-	 * Filter comments by criteria received from explorer and search field
+	 * Editor has been closed, remove from parserMap
+	 * @param partRef will be forwarded from the {@link ViewControl}
+	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	private void filterComments() {
-		PluginLogger.log(this.getClass().toString(), "filterComments", "Starting to filter comments");
-		List<Object> filteredCommentObjects;
-		if (linkExplorer) {
-			// filter by selections from explorer and search word from text field
-			PluginLogger.log(this.getClass().toString(), "filterComments", "Filter by textfield and ReviewExplorer selection");
-			filteredCommentObjects = Arrays.asList(selectionFilter.filter(viewer, this, commentFilter.filter(viewer, this, this.comments.toArray())));
-		} else {
-			// filter by search word from text field
-			PluginLogger.log(this.getClass().toString(), "filterComments", "Filter by textfield");
-			filteredCommentObjects = Arrays.asList(commentFilter.filter(viewer, this, this.comments.toArray()));	
-		}		
-		
-		//fill filteredComments and filter annotations
-		this.filteredComments = new ArrayList<Comment>();
-		String[] commentKeys = new String[filteredCommentObjects.size()];
-		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-		
-		int i = 0;
-		for (Object o : filteredCommentObjects) {
-			filteredComments.add((Comment) o);
-			commentKeys[i] = ((Comment) o).getReviewID()+keySeparator+((Comment) o).getAuthor()+keySeparator+((Comment) o).getId();
-			i++;
-		}
-
-		IEditorPart editor;
-		if((editor = this.getActiveEditor()) != null) {
-			if(this.parserMap.get(editor) != null) {
-				this.parserMap.get(editor).filter(commentKeys);
+	public void partClosed(IWorkbenchPartReference partRef) {
+		if (partRef.getPart(false) instanceof ITextEditor) {
+			ITextEditor editor = (ITextEditor) partRef.getPart(false);
+			if (this.parserMap.containsKey(editor)) {
+				this.parserMap.remove(editor);
 			}
 		}
 	}
-
-	/* not used
-	 *  (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	
+	/**
+	 * Editor has been brought to top, add annotations
+	 * @param partRef will be forwarded from the {@link ViewControl}
+	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	@Override
-	public void setFocus() { /* Do nothing */}
+	public void partBroughtToTop(IWorkbenchPartReference partRef) {
+		if (partRef.getPart(false) instanceof ITextEditor) {
+			ITextEditor editor = (ITextEditor) partRef.getPart(false);
+			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
+				this.parserMap.put(editor, new AnnotationParser(editor));
+				//TODO can be done better, but for short new filter action to let the parser show the filtered comments
+				//filterComments();
+			}
+		}
+	}
 	
 	/**
 	 * Removes all annotations if the AgileReview perspective is closed. The method is invoke by {@link:ViewControl} 
@@ -795,24 +839,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			this.perspectiveNotActive = false;
 		}
 	}
-
-	/**
-	 * Opens an editor for a given comment
-	 * @param comment the comment
-	 */
-	private void openEditor(Comment comment) {
-		PluginLogger.log(this.getClass().toString(), "openEditor", "Opening editor for the given comment");
-		IPath path = new Path(ReviewAccess.computePath(comment));
-		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
-		try {
-			getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
-		} catch (PartInitException e) {
-			PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
-			//e.printStackTrace();
-		}
-	}
 	
+	/**
+	 * Open correspondent editor of the comment and jump to beginning of that comment on doubleclick
+	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
+	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
 		Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
@@ -825,7 +856,12 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			this.parserMap.get(getActiveEditor()).revealCommentLocation(commentTag);
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
-			e.printStackTrace();
 		}
 	}
+	
+	/** not yet used
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
+	@Override
+	public void setFocus() { /* Do nothing */}
 }

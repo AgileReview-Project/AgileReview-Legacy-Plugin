@@ -223,6 +223,7 @@ public class AnnotationParser {
 			PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "+editor.getTitle(), e);
 		}
 		
+		//TODO delete if filter every time done
 		annotationModel.displayAnnotations(idPositionMap);
 	}
 	
