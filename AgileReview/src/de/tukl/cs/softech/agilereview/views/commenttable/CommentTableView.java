@@ -254,20 +254,15 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 		//fill filteredComments and filter annotations
 		this.filteredComments = new ArrayList<Comment>();
-		String[] commentKeys = new String[filteredCommentObjects.size()];
-		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		
-		int i = 0;
 		for (Object o : filteredCommentObjects) {
 			filteredComments.add((Comment) o);
-			commentKeys[i] = ((Comment) o).getReviewID()+keySeparator+((Comment) o).getAuthor()+keySeparator+((Comment) o).getId();
-			i++;
 		}
 
 		IEditorPart editor;
 		if((editor = this.getActiveEditor()) != null) {
 			if(this.parserMap.get(editor) != null) {
-				this.parserMap.get(editor).filter(commentKeys);
+				this.parserMap.get(editor).filter(filteredComments);
 			}
 		}
 	}
@@ -314,6 +309,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		// get editor that is active when opening eclipse
 		if (getActiveEditor() instanceof ITextEditor) {
 			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
+			this.parserMap.get((ITextEditor) getActiveEditor()).filter(filteredComments);
 		}
 		
 	}
@@ -691,7 +687,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		}
 		this.parserMap.clear();
 		System.gc();
-		PluginLogger.log(this.getClass().toString(), "cleanEditorReferences", "Clear ParserMap -> Garbage Collector");
+		PluginLogger.log(this.getClass().toString(), "cleanEditorReferences", "Clear parser map and run garbage collector");
 	}
 	
 	/**
@@ -704,6 +700,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if((editor = this.getActiveEditor()) != null) {
 			if(editor instanceof ITextEditor) {
 				this.parserMap.put((ITextEditor) editor, new AnnotationParser((ITextEditor) editor));
+				this.parserMap.get((ITextEditor) editor).filter(filteredComments);
 			}
 		}
 	}
@@ -716,6 +713,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if((editor = this.getActiveEditor()) != null) {
 			if(editor instanceof ITextEditor) {
 				this.parserMap.get(editor).reload();
+				this.parserMap.get(editor).filter(filteredComments);
 			}
 		}
 	}
@@ -726,6 +724,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void reparseAllEditors() {
 		for(AnnotationParser p : this.parserMap.values()) {
 			p.reload();
+			p.filter(filteredComments);
 		}
 	}
 	
@@ -812,8 +811,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			ITextEditor editor = (ITextEditor) partRef.getPart(false);
 			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
 				this.parserMap.put(editor, new AnnotationParser(editor));
-				//TODO can be done better, but for short new filter action to let the parser show the filtered comments
-				//filterComments();
+				this.parserMap.get(editor).filter(filteredComments);
 			}
 		}
 	}
@@ -827,15 +825,18 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if (!perspective.getLabel().equals("AgileReview")) {
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Hiding annotations since current perspective is not 'AgileReview'");
 			for (AnnotationParser parser: this.parserMap.values()) {
-				parser.filter(new String[0]);
+				parser.clearAnnotations();
 			}
-			this.parserMap = new HashMap<ITextEditor, AnnotationParser>();
+			this.parserMap.clear();
 			this.startup = false;
 			this.perspectiveNotActive = true;
+			System.gc();
+			PluginLogger.log(this.getClass().toString(), "perspectiveActivatedperspectiveActivated", "Clear parser map and run garbage collector");
 		}
 		if (perspective.getLabel().equals("AgileReview") && !this.startup) {
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Adding annotations since AgileReview perspective has been activated");
 			this.parserMap.put((ITextEditor) getActiveEditor(), new AnnotationParser((ITextEditor) getActiveEditor()));
+			this.parserMap.get((ITextEditor) getActiveEditor()).filter(filteredComments);
 			this.perspectiveNotActive = false;
 		}
 	}

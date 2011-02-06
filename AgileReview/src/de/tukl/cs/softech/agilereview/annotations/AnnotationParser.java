@@ -116,6 +116,7 @@ public class AnnotationParser {
 		PluginLogger.log(this.getClass().toString(), "parseInput", "triggered");
 		idPositionMap.clear();
 		idTagPositions.clear();
+		HashSet<String> corruptedCommentKeys = new HashSet<String>();
 		Matcher matcher;
 		FindReplaceDocumentAdapter fra = new FindReplaceDocumentAdapter(document);
 		IRegion r;
@@ -133,6 +134,7 @@ public class AnnotationParser {
 						//begin tag
 						if(tagPositions != null) {
 							//same begin tag already exists
+							corruptedCommentKeys.add(key);
 							document.replace(r.getOffset(), r.getLength(), "");
 							PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <same begin tag already exists>: "+key+" --> deleting");
 							tagDeleted = true;
@@ -148,6 +150,7 @@ public class AnnotationParser {
 						if(tagPositions != null) {
 							if(tagPositions[1] != null) {
 								//same end tag already exists
+								corruptedCommentKeys.add(key);
 								document.replace(r.getOffset(), r.getLength(), "");
 								PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <same end tag already exists>: "+key+" --> deleting");
 								tagDeleted = true;
@@ -163,6 +166,7 @@ public class AnnotationParser {
 							}
 						} else {
 							//end tag without begin tag
+							corruptedCommentKeys.add(key);
 							document.replace(r.getOffset(), r.getLength(), "");
 							PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <end tag without begin tag>: "+key+" --> deleting");
 							tagDeleted = true;
@@ -182,8 +186,11 @@ public class AnnotationParser {
 			//check for begin tags without end tags
 			boolean curruptedBeginTagExists = false;
 			TreeSet<Position> positionsToDelete = new TreeSet<Position>();
-			for(Position[] ps : idTagPositions.values()) {
+			for(String key : idTagPositions.keySet()) {
+				Position[] ps = idTagPositions.get(key);
 				if(ps[1] == null) {
+					PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <begin tag without end tag>: "+key+" --> deleting");
+					corruptedCommentKeys.add(key);
 					positionsToDelete.add(ps[0]);
 					curruptedBeginTagExists = true;
 				}
@@ -194,9 +201,10 @@ public class AnnotationParser {
 				Iterator<Position> it = positionsToDelete.descendingIterator();
 				while(it.hasNext()) {
 					Position tmp = it.next();
-					PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <begin tag without end tag> --> deleting");
 					document.replace(tmp.getOffset(), tmp.getLength(), "");
 				}
+				//delete corrupted annotations
+				this.annotationModel.deleteAnnotations(corruptedCommentKeys);
 				//parse the file another time to get the correct positions for the tags
 				parseInput();
 			}
@@ -222,18 +230,18 @@ public class AnnotationParser {
 		} catch (CoreException e) {
 			PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "+editor.getTitle(), e);
 		}
-		
-		//TODO delete if filter every time done
-		annotationModel.displayAnnotations(idPositionMap);
 	}
 	
 	/**
-	 * Filter annotations and display only the given commentKeys
-	 * @param commentKeys
+	 * Filter annotations and display only the given comments
+	 * @param comments which should be displayed
 	 */
-	public void filter(String[] commentKeys) {
+	public void filter(ArrayList<Comment> comments) {
 		PluginLogger.log(this.getClass().toString(), "filter", "triggered");
-		//parse another time to get the current positions
+		String[] commentKeys = new String[comments.size()];
+		for(int i = 0; i < comments.size(); i++) {
+			commentKeys[i] = comments.get(i).getReviewID()+keySeparator+comments.get(i).getAuthor()+keySeparator+comments.get(i).getId();
+		}
 		//TODO think about it is necessary parseInput();
 		HashMap<String, Position> display = new HashMap<String, Position>();
 		for(String s : commentKeys) {
@@ -248,7 +256,7 @@ public class AnnotationParser {
 	 * deletes all current displayed Annotations
 	 */
 	public void clearAnnotations() {
-		filter(new String[]{});
+		filter(new ArrayList<Comment>());
 	}
 	
 	/**
@@ -342,7 +350,7 @@ public class AnnotationParser {
 		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		TreeSet<Position> tagPositions = new TreeSet<Position>();
 		String key;
-		ArrayList<String> keyList = new ArrayList<String>();
+		HashSet<String> keyList = new HashSet<String>();
 		for(Comment c : comments) {
 			key = c.getReviewID()+separator+c.getAuthor()+separator+c.getId();
 			Position[] ps = idTagPositions.get(key);

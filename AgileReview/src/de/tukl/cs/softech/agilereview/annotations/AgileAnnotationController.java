@@ -2,8 +2,8 @@ package de.tukl.cs.softech.agilereview.annotations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -72,7 +72,6 @@ public class AgileAnnotationController {
 	 * @param p The position to add the annotation on.
 	 */
 	protected void addAnnotation(String commentKey, Position p) {
-		//TODO debug
 		((IAnnotationModel) this.annotationModel).addAnnotation(createNewAnnotation(commentKey), p);
 	}
 	
@@ -81,13 +80,14 @@ public class AgileAnnotationController {
 	 * @param commentKeys unique tag keys of the comment annotations which should
 	 * be deleted
 	 */
-	protected void deleteAnnotations(List<String> commentKeys) {
+	protected void deleteAnnotations(Set<String> commentKeys) {
 		Annotation[] annotationsToRemove = new Annotation[commentKeys.size()];
-		for(int i = 0; i < commentKeys.size(); i++) {
-			annotationsToRemove[i] = annotationMap.get(commentKeys.get(i));
-			annotationMap.remove(commentKeys.get(i));
+		int i = 0;
+		for(String key : commentKeys) {
+			annotationsToRemove[i] = annotationMap.get(key);
+			annotationMap.remove(key);
 			annotationsToRemove[i].markDeleted(true);
-			//TODO debug
+			i++;
 		}
 		annotationModel.replaceAnnotations(annotationsToRemove, null);
 	}
