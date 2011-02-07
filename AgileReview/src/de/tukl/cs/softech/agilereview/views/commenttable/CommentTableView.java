@@ -170,14 +170,15 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
 		
 		try {
-			PluginLogger.log(this.getClass().toString(), "addComment", "Add tags for currently added comment");
-			parserMap.get(getActiveEditor()).addTagsInDocument(comment);
+			IEditorPart editor;
+			if((editor = getActiveEditor()) != null) {
+				PluginLogger.log(this.getClass().toString(), "addComment", "Add tags for currently added comment");
+				parserMap.get(editor).addTagsInDocument(comment);
+			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "addComment", "BadLocationException when trying to add tags", e);
-			//e.printStackTrace();
 		} catch (CoreException e) {
 			PluginLogger.log(this.getClass().toString(), "addComment", "CoreException when trying to add tags", e);
-			//e.printStackTrace();
 		}
 		
 		if (ViewControl.isOpen(DetailView.class)) {

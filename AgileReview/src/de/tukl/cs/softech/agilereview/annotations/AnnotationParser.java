@@ -274,7 +274,8 @@ public class AnnotationParser {
 			int selStartLine = ((ITextSelection)selection).getStartLine();
 			int selEndLine = ((ITextSelection)selection).getEndLine();
 			
-			String commentTag = keySeparator+comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId()+keySeparator;
+			String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
+			String commentTag = keySeparator+commentKey+keySeparator;
 			
 			if (selStartLine == selEndLine)	{
 				// Only one line is selected
@@ -323,8 +324,9 @@ public class AnnotationParser {
 				result = new Position(document.getLineOffset(selStartLine), 
 						document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
 			}
+			parseInput();
+			this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
 		}
-		parseInput();
 		return result;
 	}
 	
