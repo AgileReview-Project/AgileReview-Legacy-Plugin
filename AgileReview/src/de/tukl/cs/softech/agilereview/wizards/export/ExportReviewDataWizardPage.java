@@ -184,6 +184,8 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		description.setText("Description:");
 		description.setLayoutData(descGridData);
 		
+		pathsSelected = !templatePathText.getText().isEmpty() && !exportPathText.getText().isEmpty();
+				
 		// Required to avoid an error in the system
 		setControl(container);
 		setPageComplete(false);
