@@ -1,8 +1,10 @@
 package de.tukl.cs.softech.agilereview.wizards.export;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.wizard.WizardPage;
@@ -184,7 +186,12 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		description.setText("Description:");
 		description.setLayoutData(descGridData);
 		
-		pathsSelected = !templatePathText.getText().isEmpty() && !exportPathText.getText().isEmpty();
+		File templatePath = new File(templatePathText.getText());
+		File exportPath = new File(exportPathText.getText());
+		if (!templatePath.exists() || !exportPath.exists()) {
+			MessageDialog.openWarning(parent.getShell(), "Paths incorrect!", "One or more of the selected paths do not exist. Maybee you should update the predefined values in the AgileReview preferences dialog!");
+		}
+		pathsSelected = !templatePathText.getText().isEmpty() && !exportPathText.getText().isEmpty() && templatePath.exists() && exportPath.exists();
 				
 		// Required to avoid an error in the system
 		setControl(container);
