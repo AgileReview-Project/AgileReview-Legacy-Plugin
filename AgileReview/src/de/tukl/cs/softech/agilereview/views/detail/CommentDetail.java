@@ -197,8 +197,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			this.editedObject = comment;
 			authorInstance.setText(comment.getAuthor());
 
-		   //  if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED)) && comment.getRecipient().equals("")) {
-			 if (PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED) && comment.getRecipient().isEmpty()) {
+			if (PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED) && comment.getLastModified() == null) {
 		    	recipientText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT));
 		    } else {
 		    	recipientText.setText(comment.getRecipient());
@@ -216,9 +215,6 @@ public class CommentDetail extends AbstractDetail<Comment> {
 				addReply(replys[i].getAuthor(), replys[i].newCursor().getTextValue().trim());
 			}
 
-//			if (Boolean.valueOf(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED))) {
-//				priorityDropDown.select(Integer.parseInt(PropertiesManager.getInstance().getExternalPreference(PropertiesManager.EXTERNAL_KEYS.LAST_PRIORITY)));
-//			}
 			priorityDropDown.select(comment.getPriority());
 			statusDropDown.select(comment.getStatus());
 			

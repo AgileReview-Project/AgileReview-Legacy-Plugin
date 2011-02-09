@@ -566,8 +566,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		col = createColumn(titles[8], bounds[8], 8);
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
-			public String getText(Object element) {
+			public String getText(Object element) { 
 				Comment c = (Comment) element;
+				if(c.getLastModified() == null) return "";
 				DateFormat df = new SimpleDateFormat( "dd.M.yyyy', 'HH:mm:ss" );
 				return df.format(c.getLastModified().getTime());
 			}
