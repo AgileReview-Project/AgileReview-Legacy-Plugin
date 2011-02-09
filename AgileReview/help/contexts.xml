@@ -1,0 +1,14 @@
+<contexts>
+	<context id="DetailView" title="DetailView">
+		<description> This editor creates or changes a comment, which belongs to a special review.</description>
+        <topic href="help/context/detailview.htm" label="Detailview"/>
+	</context>
+	<context id="TableView" title="TableView">
+		<description> This view shows a (selected) set of all comments of the selected review.</description>
+        <topic href="help/context/Tableview.htm" label="Tableview"/>
+	</context>
+ <context id="ReviewExplorer" title="ReviewExplorer">
+    <description>This view shows the different reviews and the folder and files belonging to them,</description>
+    <topic href="help/context/reviewexplorer.htm" label="ReviewExplorer"/>
+ </context>
+</contexts> 

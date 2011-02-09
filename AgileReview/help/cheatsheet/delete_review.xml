@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Delete Comment">
+<intro>
+<description>This tutorial guides you through the deletion of one or more review(s).</description>
+</intro>
+<item skip="false" title="Select review">
+   <description>
+      Before you can delete one or more review(s) you have to select them in the AgileReview-Explorer.
+   </description>
+</item>
+<item skip="false" title="Delete Review">
+   <description>
+      With pressing the "-"-button in the Explorerview you can delete the selected review(s).
+   </description>
+</item>
+</cheatsheet>

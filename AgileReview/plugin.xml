@@ -1,0 +1,175 @@
+<?eclipse version="3.2"?>
+<plugin>
+<extension
+      point="org.eclipse.ui.perspectives">
+   <perspective
+         class="de.tukl.cs.softech.agilereview.views.AgileReviewPerspective"
+         fixed="false"
+         icon="%agileReview.icon"
+         id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
+         name="%perspective.name">
+   </perspective>
+</extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="de.tukl.cs.softech.agilereview.category"
+            class="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView"
+            icon="%agileReview.icon"
+            id="de.tukl.cs.softech.agilereview.view.commenttableview.view"
+            name="%view.name"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="de.tukl.cs.softech.agilereview.category"
+            class="de.tukl.cs.softech.agilereview.views.detail.DetailView"
+            icon="%agileReview.icon"
+            id="de.tukl.cs.softech.agilereview.view.commentdetailview.view"
+            name="%view.name.0"
+            restorable="true">
+      </view>
+      <category
+            id="de.tukl.cs.softech.agilereview.category"
+            name="%category.name"
+            parentCategory="de.tukl.cs.softech.agilereview.category">
+      </category>
+      <view
+            allowMultiple="false"
+            category="de.tukl.cs.softech.agilereview.category"
+            class="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer"
+            icon="%agileReview.icon"
+            id="de.tukl.cs.softech.agilereview.view.reviewnavigator.view"
+            name="%view.name.1"
+            restorable="true">
+      </view>
+   </extension>
+    <extension point="org.eclipse.help.toc">
+        <toc file="help/toc.xml" primary="true"/>
+    </extension>
+    <extension
+          id="AgileReview.CommentSpecification"
+          point="org.eclipse.ui.editors.markerAnnotationSpecification">
+       <specification
+             annotationType="AgileReview.comment.annotation"
+             colorPreferenceKey="Comment_Annotation"
+             colorPreferenceValue="%annotations.default.color"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment"
+             highlightPreferenceValue="true"
+             icon="%agileReview.editor.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label"
+             overviewRulerPreferenceKey="Comment_Annotation"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation"
+             verticalRulerPreferenceValue="true">
+       </specification>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.AnnotationType"
+          point="org.eclipse.ui.editors.annotationTypes">
+       <type
+             markerType="AgileReview.ResourceMarker"
+             name="AgileReview.comment.annotation">
+       </type>
+    </extension>
+    <extension point="org.eclipse.help.contexts">
+    <contexts file="help/contexts.xml">
+    </contexts>
+</extension>
+<extension point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+   <category
+         id="AgileReview.category1"
+         name="AgileReview">
+   </category>
+   <cheatsheet
+         category="AgileReview.category1"
+         composite="false"
+         contentFile="help/cheatsheet/insert_comment.xml"
+         id="AgileReview.cheatsheet1"
+         name="Insert Comment">
+   </cheatsheet>
+   <cheatsheet
+         category="AgileReview.category1"
+         composite="false"
+         contentFile="help/cheatsheet/delete_comment.xml"
+         id="AgileReview.cheatsheet2"
+         name="Delete Comment">
+   </cheatsheet>
+</extension>n
+<extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.RefreshHandler"
+         commandId="org.eclipse.ui.file.refresh">
+   </handler>
+</extension>
+<extension
+      point="org.eclipse.ui.startup">
+   <startup
+         class="de.tukl.cs.softech.agilereview.plugincontrol.Startup">
+   </startup>
+</extension>
+<extension
+      point="org.eclipse.ui.newWizards">
+   <category
+         id="AgileReview.AgileReviewCategory"
+         name="%category.name.0">
+   </category>
+   <wizard
+         canFinishEarly="false"
+         category="AgileReview.AgileReviewCategory"
+         class="de.tukl.cs.softech.agilereview.wizards.newreview.NewReviewWizard"
+         finalPerspective="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
+         hasPages="true"
+         icon="icons/agile_icon.png"
+         id="AgileReview.newReviewWizard"
+         name="%wizard.name"
+         preferredPerspectives="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+   </wizard>
+</extension>
+<extension
+      point="org.eclipse.ui.exportWizards">
+   <category
+         id="AgileReview.AgileReviewCategory"
+         name="%category.name.0">
+   </category>
+   <wizard
+         category="AgileReview.AgileReviewCategory"
+         class="de.tukl.cs.softech.agilereview.wizards.export.ExportReviewDataWizard"
+         icon="icons/agile_icon.png"
+         id="AgileReview.exportReviewDataWizard"
+         name="%wizard.name">
+   </wizard>
+</extension>
+<extension
+      point="org.eclipse.ui.preferencePages">
+   <page
+         class="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         id="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         name="AgileReview">
+   </page>
+</extension>
+<extension
+      point="org.eclipse.core.runtime.preferences">
+   <initializer
+         class="de.tukl.cs.softech.agilereview.preferences.PreferenceInitializer">
+   </initializer>
+</extension>
+    
+</plugin>

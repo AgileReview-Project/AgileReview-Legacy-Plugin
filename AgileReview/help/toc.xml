@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="agileReview">
+	<topic href="help/guide/intro.htm" label="Introduction to agileReview">
+ </topic>
+ <topic href="help/guide/faq.htm" label="FAQ&apos;s">
+ </topic>
+ <topic href="help/guide/credits.htm" label="Credits">
+ </topic>
+</toc>
