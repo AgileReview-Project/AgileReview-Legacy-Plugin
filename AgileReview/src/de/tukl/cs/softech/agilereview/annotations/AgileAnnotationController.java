@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.annotations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -81,15 +82,16 @@ public class AgileAnnotationController {
 	 * be deleted
 	 */
 	protected void deleteAnnotations(Set<String> commentKeys) {
-		Annotation[] annotationsToRemove = new Annotation[commentKeys.size()];
-		int i = 0;
+		HashSet<Annotation> annotationsToRemove = new HashSet<Annotation>();
+		Annotation a;
 		for(String key : commentKeys) {
-			annotationsToRemove[i] = annotationMap.get(key);
-			annotationMap.remove(key);
-			annotationsToRemove[i].markDeleted(true);
-			i++;
+			a = annotationMap.remove(key);
+			if(a != null) {
+				a.markDeleted(true);
+				annotationsToRemove.add(a);
+			}
 		}
-		annotationModel.replaceAnnotations(annotationsToRemove, null);
+		annotationModel.replaceAnnotations(annotationsToRemove.toArray(new Annotation[0]), null);
 	}
 	
 	/**
