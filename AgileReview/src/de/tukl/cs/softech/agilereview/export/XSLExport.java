@@ -86,7 +86,12 @@ public class XSLExport {
         XLSTransformer transformer = new XLSTransformer( config );
         DateFormat df = new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss" );
         String filetype = templatePath.substring(templatePath.lastIndexOf("."));
-		transformer.transformXLS(templatePath, beans, outputPath+"agilereview_export_"+df.format(Calendar.getInstance().getTime())+"."+filetype);
+        
+        if(!outputPath.endsWith(System.getProperty("file.separator"))) {
+        	outputPath += System.getProperty("file.separator");
+        }
+        
+		transformer.transformXLS(templatePath, beans, outputPath+"agilereview_export_"+df.format(Calendar.getInstance().getTime())+filetype);
 	}
 	
 	/**
