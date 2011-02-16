@@ -1,10 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="agileReview">
-	<topic href="help/guide/intro.htm" label="Introduction to agileReview">
+<toc label="AgileReview">
+	<topic href="help/guide/intro.htm" label="Agilereview overview">
  </topic>
- <topic href="help/guide/faq.htm" label="FAQ&apos;s">
+ <topic label="Getting Started">
+    <topic label="tutorial">
+    </topic>
+ </topic>
+ <topic label="Concepts">
+    <topic href="help/guide/gettingStarted/review.htm" label="Review concept">
+    </topic>
+    <topic href="help/guide/gettingStarted/comment.htm" label="Comment concept">
+    </topic>
+    <topic href="help/guide/gettingStarted/storage.htm" label="Storage concept">
+    </topic>
+    <topic label="Views">
+    </topic>
+    <topic href="help/guide/gettingStarted/perspective.htm" label="Agilereview perspective">
+    </topic>
+ </topic>
+ <topic label="Tasks">
+ </topic>
+ <topic href="help/guide/tips.htm" label="Tips and tricks">
+ </topic>
+ <topic href="help/guide/new.htm" label="What&apos;s new">
+ </topic>
+ <topic href="help/guide/faq.htm" label="FAQ">
+ </topic>
+ <topic href="help/guide/legal.htm" label="Legal">
  </topic>
  <topic href="help/guide/credits.htm" label="Credits">
  </topic>
