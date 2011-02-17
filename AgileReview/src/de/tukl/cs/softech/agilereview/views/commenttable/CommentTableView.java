@@ -181,11 +181,12 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			PluginLogger.log(this.getClass().toString(), "addComment", "CoreException when trying to add tags", e);
 		}
 		
-		if (ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().selectionChanged(this, new StructuredSelection(comment));	
-		} else {
-			PluginLogger.logWarning(this.getClass().toString(), "addComment", "Could not open added comment in DetailView since DetailView is not registered with ViewController");
-		}
+		// TODO: remove -> unnecessary
+//		if (ViewControl.isOpen(DetailView.class)) {
+//			DetailView.getInstance().selectionChanged(this, new StructuredSelection(comment));	
+//		} else {
+//			PluginLogger.logWarning(this.getClass().toString(), "addComment", "Could not open added comment in DetailView since DetailView is not registered with ViewController");
+//		}
 		
 	}
 	

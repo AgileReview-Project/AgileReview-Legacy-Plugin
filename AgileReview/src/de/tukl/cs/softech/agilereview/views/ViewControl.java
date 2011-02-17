@@ -98,7 +98,8 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if(selection != null && part != null) {
-			PluginLogger.log(this.getClass().toString(), "selectionChanged", "fired with selection != null && part != null");
+			// TODO: the following logging line makes reading logs impossible 
+			// PluginLogger.log(this.getClass().toString(), "selectionChanged", "fired with selection != null && part != null");
 			if(isOpen(CommentTableView.class)) {
 				CommentTableView.getInstance().selectionChanged(part, selection);
 			}

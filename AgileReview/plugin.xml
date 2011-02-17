@@ -115,6 +115,22 @@
 <extension
       point="org.eclipse.ui.handlers">
    <handler
+         class="de.tukl.cs.softech.agilereview.commands.handler.CleanupHandler"
+         commandId="AgileReview.Cleanup">
+      <activeWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="org.eclipse.jdt.core.IJavaProject">
+               </instanceof>
+            </iterate>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
          class="de.tukl.cs.softech.agilereview.plugincontrol.RefreshHandler"
          commandId="org.eclipse.ui.file.refresh">
    </handler>
@@ -170,6 +186,26 @@
    <initializer
          class="de.tukl.cs.softech.agilereview.preferences.PreferenceInitializer">
    </initializer>
+</extension>
+<extension
+      point="org.eclipse.ui.commands">
+   <command
+         id="AgileReview.Cleanup"
+         name="Cleanup">
+   </command>
+</extension>
+<extension
+      point="org.eclipse.ui.menus">
+   <menuContribution
+         locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+      <command
+            commandId="AgileReview.Cleanup"
+            icon="icons/agile_icon.png"
+            label="CleanUp"
+            style="push"
+            tooltip="Remove AgileReview comments tags from all files of this project">
+      </command>
+   </menuContribution>
 </extension>
     
 </plugin>
