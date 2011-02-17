@@ -58,7 +58,7 @@ public class AgileReviewPreferencePage
 	public AgileReviewPreferencePage() {
 		super(GRID);
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		setDescription("General AgileReview setting:");
+		setDescription("General AgileReview settings");
 	}
 	
 	/**
