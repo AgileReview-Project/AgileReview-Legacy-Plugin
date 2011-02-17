@@ -4,8 +4,20 @@
 <toc label="AgileReview">
 	<topic href="help/guide/intro.htm" label="Agilereview overview">
  </topic>
+ <topic href="help/guide/install.htm" label="Installation and update">
+ </topic>
  <topic label="Getting Started">
-    <topic label="tutorial">
+    <topic label="The workbench">
+    </topic>
+    <topic label="A simple review">
+    </topic>
+    <topic label="A simple comment">
+    </topic>
+    <topic label="Navigating">
+    </topic>
+    <topic label="Importing">
+    </topic>
+    <topic label="Exporting">
     </topic>
  </topic>
  <topic label="Concepts">
@@ -16,15 +28,21 @@
     <topic href="help/guide/gettingStarted/storage.htm" label="Storage concept">
     </topic>
     <topic label="Views">
+       <topic label="ReviewExplorer">
+       </topic>
+       <topic label="CommentDetail view">
+       </topic>
+       <topic label="CommentTable view">
+       </topic>
     </topic>
     <topic href="help/guide/gettingStarted/perspective.htm" label="Agilereview perspective">
     </topic>
  </topic>
- <topic label="Tasks">
- </topic>
  <topic href="help/guide/tips.htm" label="Tips and tricks">
  </topic>
- <topic href="help/guide/new.htm" label="What&apos;s new">
+ <topic href="help/guide/preferences.htm" label="Preferences">
+ </topic>
+ <topic label="What&apos;s new">
  </topic>
  <topic href="help/guide/faq.htm" label="FAQ">
  </topic>
