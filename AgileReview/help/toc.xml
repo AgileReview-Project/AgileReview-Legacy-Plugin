@@ -21,11 +21,11 @@
     </topic>
  </topic>
  <topic label="Concepts">
-    <topic href="help/guide/gettingStarted/review.htm" label="Review concept">
+    <topic href="help/guide/concepts/review.htm" label="Review concept">
     </topic>
-    <topic href="help/guide/gettingStarted/comment.htm" label="Comment concept">
+    <topic href="help/guide/concepts/comment.htm" label="Comment concept">
     </topic>
-    <topic href="help/guide/gettingStarted/storage.htm" label="Storage concept">
+    <topic href="help/guide/concepts/storage.htm" label="Storage concept">
     </topic>
     <topic label="Views">
        <topic label="ReviewExplorer">
@@ -35,7 +35,7 @@
        <topic label="CommentTable view">
        </topic>
     </topic>
-    <topic href="help/guide/gettingStarted/perspective.htm" label="Agilereview perspective">
+    <topic href="help/guide/concepts/perspective.htm" label="Agilereview perspective">
     </topic>
  </topic>
  <topic href="help/guide/tips.htm" label="Tips and tricks">
