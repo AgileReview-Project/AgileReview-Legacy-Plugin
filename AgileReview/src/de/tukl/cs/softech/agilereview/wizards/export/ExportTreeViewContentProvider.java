@@ -40,8 +40,9 @@ public class ExportTreeViewContentProvider implements ITreeContentProvider {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked") /* elements can only be reviews, no check needed */
 	@Override
-	public Object[] getElements(Object inputElement) {
+	public Object[] getElements(Object inputElement) {		
 		ArrayList<Review> reviews = (ArrayList<Review>) inputElement;
 		ArrayList<String> reviewIDs = new ArrayList<String>(); 
 		for (Review review : reviews) {

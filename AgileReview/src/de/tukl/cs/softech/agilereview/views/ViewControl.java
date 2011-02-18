@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IPageService;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener3;
@@ -42,10 +41,6 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@SuppressWarnings("unused")
 	private static ViewControl instance = new ViewControl();
-	/**
-	 * Boolean helper var, as perspective activated is not called on startup
-	 */
-	private boolean startup = true;
 	
 	/**
 	 * Creates a new instance of ViewControl

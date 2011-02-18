@@ -1,8 +1,5 @@
 package de.tukl.cs.softech.agilereview;
 
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.contexts.IContextActivation;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -21,10 +18,6 @@ public class Activator extends AbstractUIPlugin {
 	 * The shared instance
 	 */
 	private static Activator plugin;
-	/**
-	 * ContextActivation for later deactivation
-	 */
-	private IContextActivation contextActivation;
 	
 	/**
 	 * The constructor
