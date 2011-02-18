@@ -68,16 +68,20 @@ public class CleanupHandler extends AbstractHandler {
 		if (firstElement instanceof IAdaptable) {
 			
 			boolean success = true;
-			// ask user whether to delete comments and tags or only tags
-			
-			// TODO: change MessageDialog.open(...) to the following
-//			MessageBox messageDialog = new MessageBox(HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-//			messageDialog.setText("My info");
-//			messageDialog.setMessage("Do you really want to do this.");
-//			System.out.println(messageDialog.open() + SWT.CANCEL);
 
-			
-			boolean deleteComments = MessageDialog.open(MessageDialog.QUESTION, HandlerUtil.getActiveShell(event), "Cleanup", "Delete comments when removing tags?", SWT.NONE);
+			// ask user whether to delete comments and tags or only tags
+			boolean deleteComments = true;
+			MessageBox messageDialog = new MessageBox(HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			messageDialog.setText("AgileReview Cleanup");
+			messageDialog.setMessage("Delete comments when removing tags?");
+			int result = messageDialog.open();
+
+			if (result==SWT.CANCEL) {
+				// cancel selected -> quit method
+				return null;
+			} else if (result==SWT.NO) {
+				deleteComments = false;
+			}
 			
 			// get selected project
 			IProject selProject = (IProject)((IAdaptable)firstElement).getAdapter(IProject.class);
