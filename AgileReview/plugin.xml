@@ -210,7 +210,7 @@
       </enabledWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.views.detail.handlers.DetailViewHandler"
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.RevertHandler"
          commandId="de.tukl.cs.softech.agilereview.views.detail.revert">
       <enabledWhen>
          <with
@@ -283,7 +283,7 @@
       </enabledWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.views.detail.handlers.DetailViewHandler"
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.NewReplyHandler"
          commandId="de.tukl.cs.softech.agilereview.views.detail.newReply">
       <enabledWhen>
          <with
@@ -323,7 +323,7 @@
       </enabledWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.views.detail.handlers.DetailViewHandler"
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.DeleteHandler"
          commandId="de.tukl.cs.softech.agilereview.views.detail.delete">
       <enabledWhen>
          <with
@@ -433,6 +433,15 @@
             icon="icons/comment/comment_newReply_15x15.png"
             label="new Reply"
             style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
       </command>
       <separator
             name="AgileReview.detailview.separator1"

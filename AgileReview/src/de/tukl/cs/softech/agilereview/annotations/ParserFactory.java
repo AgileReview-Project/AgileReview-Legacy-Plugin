@@ -2,7 +2,6 @@ package de.tukl.cs.softech.agilereview.annotations;
 
 import java.util.HashMap;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.tukl.cs.softech.agilereview.tools.NoDocumentFoundException;
@@ -14,6 +13,9 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
  */
 public class ParserFactory {
 	
+	/**
+	 * Supported files mapping to the corresponding comment tags
+	 */
 	private static final HashMap<String, String[]> supportedFiles = PropertiesManager.getInstance().getParserFileendingsAndTags();
 	
 	/**

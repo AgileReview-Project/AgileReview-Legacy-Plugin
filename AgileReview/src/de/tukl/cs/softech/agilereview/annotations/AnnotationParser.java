@@ -231,7 +231,7 @@ public class AnnotationParser implements IAnnotationParser {
 		for(int i = 0; i < comments.size(); i++) {
 			commentKeys[i] = comments.get(i).getReviewID()+keySeparator+comments.get(i).getAuthor()+keySeparator+comments.get(i).getId();
 		}
-		//TODO think about it is necessary parseInput();
+
 		HashMap<String, Position> display = new HashMap<String, Position>();
 		for(String s : commentKeys) {
 			if(this.idPositionMap.get(s) != null) {

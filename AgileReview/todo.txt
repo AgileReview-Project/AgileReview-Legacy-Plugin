@@ -1,6 +1,0 @@
-- bei eclipse schließung nach nicht gespeicherten kommentaren überprüfen
-- Bug im AnnotationController
-- asynchroner start des Listeners im CommentController verfehlt zweck 
-	-> merkt nicht wenn CommentTableView sich öffnet
-- Wenn keine Datei gespeichert werden muss werden die execution post methods nicht aufgerufen
-	-> muss beachtet werden, da sonst keine änderungen nur an kommentaren möglich ist
