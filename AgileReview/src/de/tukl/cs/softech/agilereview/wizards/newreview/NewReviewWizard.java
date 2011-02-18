@@ -61,7 +61,7 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 			newRev.setPersonInCharge(piC);
 			
 			if (ViewControl.isOpen(ReviewExplorer.class)){
-				ReviewExplorer.getInstance().addNewReview(newRev);
+				ReviewExplorer.getInstance().addReview(newRev);
 			}
 		} catch (IOException e) 
 		{

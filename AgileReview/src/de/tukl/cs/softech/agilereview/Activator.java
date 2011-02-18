@@ -1,5 +1,8 @@
 package de.tukl.cs.softech.agilereview;
 
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -18,6 +21,10 @@ public class Activator extends AbstractUIPlugin {
 	 * The shared instance
 	 */
 	private static Activator plugin;
+	/**
+	 * ContextActivation for later deactivation
+	 */
+	private IContextActivation contextActivation;
 	
 	/**
 	 * The constructor
@@ -33,9 +40,9 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		
-		// Load all comments of all "open" reviews
-		// ReviewAccess.getInstance().fillDatabaseForOpenReviews();
+		// Activate the agilereview loaded context
+//		IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
+//		this.contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.loaded");
 	}
 
 	/*
@@ -45,6 +52,11 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
+//		if (this.contextActivation != null) {
+//			IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
+//			contextService.deactivateContext(this.contextActivation);
+//			this.contextActivation = null;
+//		}
 	}
 
 	/**

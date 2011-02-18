@@ -152,16 +152,7 @@ class ReviewModel {
 		commentDB.clear();
 		rModel.clear();
 	}
-	
-	/**
-	 * Clears all comments
-	 */
-	protected void clearComments()
-	{
-		PluginLogger.log(this.getClass().toString(), "clearComments", "Comment model cleared");
-		commentDB.clear();
-	}
-	
+		
 	////////////
 	// Getter //
 	////////////

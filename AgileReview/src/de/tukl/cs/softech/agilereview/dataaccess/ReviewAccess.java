@@ -282,6 +282,7 @@ public class ReviewAccess {
 	{
 		this.rFileModel.clearModel();
 		this.rModel.clearModel();
+		System.gc();
 	}
 	
 	/**

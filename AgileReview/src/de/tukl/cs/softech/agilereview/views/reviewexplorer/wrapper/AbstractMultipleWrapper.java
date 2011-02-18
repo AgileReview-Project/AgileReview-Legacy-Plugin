@@ -11,7 +11,7 @@ import org.apache.xmlbeans.XmlObject;
  * Abstract implementation of a Wrapper which can wrap multiple xml-nodes 
  * which represent the same file path. 
  */
-public abstract class AbstractMultipleWrapper
+public abstract class AbstractMultipleWrapper implements Comparable<AbstractMultipleWrapper>
 {
 	/**
 	 * Name of the wrapper (representing the wrapped objects)
@@ -122,5 +122,11 @@ public abstract class AbstractMultipleWrapper
 	public String toString()
 	{
 		return this.getName();
+	}
+	
+	@Override
+	public int compareTo(AbstractMultipleWrapper o)
+	{
+		return this.reviewId.compareTo(o.getReviewId());
 	}
 }

@@ -4,6 +4,7 @@ import agileReview.softech.tukl.de.ReviewDocument.Review;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
@@ -15,7 +16,7 @@ class RERootNode {
 	/**
 	 * Wrapped {@link Review}s as {@link MultipleReviewWrapper}
 	 */
-	private HashSet<MultipleReviewWrapper> reviews = new HashSet<MultipleReviewWrapper>();
+	private TreeSet<MultipleReviewWrapper> reviews = new TreeSet<MultipleReviewWrapper>();
 	
 	/**
 	 * Constructor doing nothing
@@ -55,7 +56,7 @@ class RERootNode {
 	 * Returns the wrapped reviews
 	 * @return Wrapped reviews
 	 */
-	protected HashSet<MultipleReviewWrapper> getReviews() {
+	protected TreeSet<MultipleReviewWrapper> getReviews() {
 		return this.reviews;
 	}
 	

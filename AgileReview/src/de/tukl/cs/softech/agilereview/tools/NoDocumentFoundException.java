@@ -3,7 +3,7 @@ package de.tukl.cs.softech.agilereview.tools;
 /**
  * Exception which will be thrown, if a file type is not supported by AgileReview
  */
-public class FileTypeNotSupportedException extends IllegalArgumentException {
+public class NoDocumentFoundException extends IllegalArgumentException {
 
 	/**
 	 * generated serial version ID

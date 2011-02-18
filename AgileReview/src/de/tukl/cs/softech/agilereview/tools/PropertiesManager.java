@@ -3,6 +3,7 @@ package de.tukl.cs.softech.agilereview.tools;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -32,10 +33,6 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String LOG_LEVEL = "log_level";
 		/**
-		 * Boolean whether logs should also occur in System.out or not
-		 */
-		public static String LOG_SYSOUT = "log_sysout";
-		/**
 		 * The separator character to combine reviewId, author and commentId
 		 */
 		public static String KEY_SEPARATOR = "key_separator";
@@ -63,6 +60,18 @@ public class PropertiesManager implements IInputValidator{
 		 * Message the display when saving a reply on a comment, without all fields filled out
 		 */
 		public static String COMMENT_EMPTY_REPLY_MESSAGE = "reply_inf_completeness";
+		/**
+		 * File endings supported by the parser
+		 */
+		public static String PARSER_FILEENDINGS = "parser_fileendings";
+		/**
+		 * Correlated comment begin tags for every set of file endings representing the same language
+		 */
+		public static String PARSER_COMMENT_BEGIN_TAG ="parser_comment_begin_tag";
+		/**
+		 * Correlated comment end tags for every set of file endings representing the same language
+		 */
+		public static String PARSER_COMMENT_END_TAG = "parser_comment_end_tag";
 		
 		/**
 		 * Static subclass: clustering of icon keys
@@ -123,10 +132,6 @@ public class PropertiesManager implements IInputValidator{
 		 * The source folder where the reviews are stored (path based from Workspace-root)
 		 */
 		public static String SOURCE_FOLDER = "source_folder";
-		/**
-		 * Indicates if explorer and table are linked
-		 */
-		public static String LINK_EXPLORER = "linkExplorer";
 		/**
 		 * The recipient that was entered the last time
 		 */
@@ -283,7 +288,6 @@ public class PropertiesManager implements IInputValidator{
 		getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.OPEN_REVIEWS, newValue);
 	}
 	
-	
 	/**
 	 * Returns all reviews which are declared to be "open" in the workspace-specific preferences of this plugin
 	 * @return Array of IDs of all review which are "open"
@@ -387,10 +391,22 @@ public class PropertiesManager implements IInputValidator{
 	}
 	
 	/**
-	 * Returns the boolean whether logs should also occur in System.out or not
-	 * @return true, if the logs should also occur in System.out<br>false, otherwise
+	 * Returns a map of all supported file endings with the correlated comment tags (first begin, then end tag)
+	 * @return map of all supported file endings with the correlated comment tags
 	 */
-	public boolean getLogSysout() {
-		return Boolean.parseBoolean(getInternalProperty(INTERNAL_KEYS.LOG_SYSOUT));
+	public HashMap<String, String[]> getParserFileendingsAndTags() {
+		HashMap<String, String[]> result = new HashMap<String, String[]>();
+		String[] languages = getInternalProperty(INTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
+		String[] beginTags = getInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
+		String[] endTags = getInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
+		
+		for(int i = 0; i < languages.length; i++) {
+			String[] endings = languages[i].split("\\s");
+			for(String e : endings) {
+				result.put(e, new String[]{beginTags[i], endTags[i]});
+			}
+		}
+		
+		return result;
 	}
 }

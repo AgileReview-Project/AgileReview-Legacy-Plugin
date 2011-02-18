@@ -12,11 +12,9 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
@@ -24,7 +22,6 @@ import org.eclipse.swt.widgets.Text;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReplyDocument.Reply;
-import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
@@ -146,11 +143,6 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    replys.setEditable(false);
 	    replys.setWordWrap(true);
 	    replys.addFocusListener(this);
-	    
-	    Button replyButton = new Button(this, SWT.PUSH);
-	    replyButton.setText("new Reply");
-	    replyButton.setData("reply");
-	    replyButton.addListener(SWT.Selection, this);
 
 	    Composite g = new Composite(this, SWT.NONE);
 	    GridLayout glayout = new GridLayout(3, false);
@@ -159,17 +151,6 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.horizontalAlignment = GridData.END;
 	    gridData.horizontalSpan = numColumns-1;
 	    g.setLayoutData(gridData);
-	    
-	    Button delButton = new Button(g, SWT.PUSH);
-	    delButton.setText("Delete");
-	    delButton.setData("delete");
-	    delButton.addListener(SWT.Selection, CommentController.getInstance());
-	    
-	    revertButton = new Button(g, SWT.PUSH);
-	    //listener and settings will be set in AbstractDetail
-	    
-	    saveButton = new Button(g, SWT.PUSH);
-	    //listener and settings will be set in AbstractDetail
 	    
 	    setPropertyConfigurations();
 	}
@@ -197,12 +178,16 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			this.editedObject = comment;
 			authorInstance.setText(comment.getAuthor());
 
-			if (PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED) && comment.getLastModified() == null) {
-		    	recipientText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT));
-		    } else {
-		    	recipientText.setText(comment.getRecipient());
-		    }
-
+			// Proof if the comment is loaded for the first time
+			recipientText.setText(comment.getRecipient());
+			if (comment.getLastModified() == null) {
+				if (PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED)) {
+			    	recipientText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT));
+				}
+				// Give the focus to the comment text field
+				this.txt.setFocus();
+			}
+			
 			if(comment.getText() != null) {
 				this.txt.setText(comment.getText());
 			} else {
@@ -217,10 +202,6 @@ public class CommentDetail extends AbstractDetail<Comment> {
 
 			priorityDropDown.select(comment.getPriority());
 			statusDropDown.select(comment.getStatus());
-			
-			// Give the focus to the comment text field
-			// TODO: Will later be done only, if we know that it is an inital comment
-			//this.txt.setFocus();
 		}
 	}
 	
@@ -234,11 +215,31 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	}
 	
 	/**
+	 * Starts the wizard for adding a reply and adds it to the view
+	 */
+	public void addReply() {
+		Shell shell = new Shell(this.getShell());
+		ReplyDialog dialog = new ReplyDialog(shell, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM | SWT.SHELL_TRIM);
+		dialog.setSize(250, 150);
+	    shell.pack();
+	    shell.open();
+		while (!shell.isDisposed()) {
+			if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
+	    }
+		
+		if(dialog.getSaved()) {
+			saveChanges();
+			addReply(dialog.getReplyAuthor(), dialog.getReplyText());
+		}
+	}
+	
+	/**
 	 * adds a reply to the reply list shown in the view
 	 * @param author of the reply
 	 * @param text of the reply
 	 */
 	private void addReply(String author, String text) {
+		
 		String replyText = this.replys.getText();
 		DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
 		replyText += (replyText.equals("") ? "" : "\n\n") + "----- "+author+":"
@@ -311,30 +312,6 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		priorityDropDown.removeAll();
 		for(int i = 0; i < levels.length; i++) {
 			priorityDropDown.add(levels[i]);
-		}
-	}
-
-	/**
-	 * handles actions of "revert" and "new reply" button
-	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-	 */
-	@Override
-	public void handleEvent(Event event) {
-		super.handleEvent(event);
-		if(event.widget.getData().equals("reply")) {
-			Shell shell = new Shell(this.getShell());
-			ReplyDialog dialog = new ReplyDialog(shell, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM | SWT.SHELL_TRIM);
-			dialog.setSize(250, 150);
-		    shell.pack();
-		    shell.open();
-			while (!shell.isDisposed()) {
-				if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
-		    }
-			
-			if(dialog.getSaved()) {
-				saveChanges();
-				addReply(dialog.getReplyAuthor(), dialog.getReplyText());
-			}
 		}
 	}
 }

@@ -1,17 +1,17 @@
 package de.tukl.cs.softech.agilereview.views.detail;
 
 import org.apache.xmlbeans.XmlObject;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.services.ISourceProviderService;
 
-import de.tukl.cs.softech.agilereview.plugincontrol.CommentController;
+import de.tukl.cs.softech.agilereview.dataaccess.SaveHandler;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider;
 
 /**
  * Abstract class of a Comment or Review representation, which automatically provides IPartListener
@@ -19,16 +19,7 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
  * for a revert action by setting the object Data to "revert" and for a save action by setting the object Data to "save"
  * @param <E> type which would be displayed by this AbstractDetail
  */
-public abstract class AbstractDetail<E extends XmlObject> extends Composite implements FocusListener, Listener {
-	
-	/**
-	 * Button which should save the changes of the current displayed object
-	 */
-	protected Button saveButton;
-	/**
-	 * Button which should revert the changes of the current displayed object
-	 */
-	protected Button revertButton;
+public abstract class AbstractDetail<E extends XmlObject> extends Composite implements FocusListener {
 	
 	/**
 	 * current displayed object which will be modified
@@ -47,15 +38,6 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	protected AbstractDetail(Composite parent, int style) {
 		super(parent, style);
 		initUI();
-		
-		revertButton.setText("Revert");
-	    revertButton.setData("revert");
-	    revertButton.setEnabled(false);
-	    revertButton.addListener(SWT.Selection, this);
-	    
-	    saveButton.setText("Apply");
-	    saveButton.setData("save");
-	    saveButton.addListener(SWT.Selection, CommentController.getInstance());
 	}
 
 	/**
@@ -72,6 +54,14 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	protected abstract boolean saveChanges();
 	
 	/**
+	 * Returns the current content representation
+	 * @return current content representation
+	 */
+	protected E getContent() {
+		return backupObject;
+	}
+	
+	/**
 	 * fills all contents of the given input into the detail view
 	 * @param input which should be displayed
 	 */
@@ -82,14 +72,41 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @param part will be forwarded from the {@link DetailView}
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
+	@SuppressWarnings("unchecked")
 	protected void partClosedOrDeactivated(IWorkbenchPart part) {
 		if(part instanceof DetailView) {
 			saveChanges();
-			//fire "save" event for persistent storage
+			
+			//fire "save" command for persistent storage
+			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+			try {
+				handlerService.executeCommand(SaveHandler.SAVE_COMMAND_ID, null);
+			} catch (Exception ex) {
+				PluginLogger.logError(this.getClass().toString(), "partClosedOrDeactivated", "Error occured while triggering save command", ex);
+			}
+			this.backupObject = (E)this.editedObject.copy();
 			PluginLogger.log(this.getClass().toString(), "partClosedOrDeactivated", "trigger save event");
-			saveButton.notifyListeners(SWT.Selection, new Event());
-			revertButton.setEnabled(false);
+			
+			//get SourceProvider for configuration
+			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
+			sp.setRevertable(false);
 		}
+	}
+	
+	/**
+	 * Reverts all unsaved changes
+	 */
+	public void revert() {
+		@SuppressWarnings("unchecked")
+		E copy = (E)backupObject.copy();
+		this.editedObject.set(copy);
+		fillContents(backupObject);
+		
+		//get SourceProvider for configuration
+		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
+		sp.setRevertable(false);
 	}
 	
 	/*
@@ -114,22 +131,9 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	@Override
 	public void focusLost(FocusEvent e) {
 		if(saveChanges()) {
-			revertButton.setEnabled(true);
-		}
-	}
-	
-	/**
-	 * Handle revert functionality
-	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-	 */
-	@Override
-	public void handleEvent(Event event) {
-		if(event.widget.getData().equals("revert")) {
-			@SuppressWarnings("unchecked")
-			E copy = (E)backupObject.copy();
-			this.editedObject.set(copy);
-			fillContents(backupObject);
-			revertButton.setEnabled(false);
+			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
+			sp.setRevertable(true);
 		}
 	}
 }

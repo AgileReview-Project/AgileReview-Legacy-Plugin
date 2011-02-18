@@ -6,12 +6,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
@@ -69,27 +71,81 @@ public class DetailView extends ViewPart {
 	 */
 	public void changeParent(int type) {
 		this.actParent.dispose();
+		
+		//get SourceProvider for configuration
+		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+		SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.REPLY_POSSIBLE);
+		SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTENT_AVAILABLE);		
+		
 		switch(type) {
 		case EMPTY:
 			this.actParent = new Composite(this.parentParent, this.parentStyle);
 			this.setPartName("Detail View");
 			this.currentDisplay = EMPTY;
+			sp1.setReplyPossible(false);
+			sp2.setContentAvailable(false);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
 			this.actParent = new CommentDetail(this.parentParent, this.parentStyle);
-			this.setPartName("Comment Detail");
+			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
+			sp1.setReplyPossible(true);
+			sp2.setContentAvailable(true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
 			this.actParent = new ReviewDetail(this.parentParent, this.parentStyle);
-			this.setPartName("Review Detail");
+			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
+			sp1.setReplyPossible(false);
+			sp2.setContentAvailable(true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to REVIEW_DETAIL");
 			break;
 		}
 		this.parentParent.layout(true);
+	}
+	
+	/**
+	 * Returns whether the current parent is revertable or not
+	 * @return true, if the current parent is revertable<br>false, otherwise
+	 */
+	public boolean isRevertable() {
+		if(actParent instanceof AbstractDetail) {
+			return ((AbstractDetail<?>) actParent).isReparentable();
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Add Reply if and only if the comment detail part is opened
+	 */
+	public void addReply() {
+		if(currentDisplay == COMMENT_DETAIL) {
+			((CommentDetail) actParent).addReply();
+		}
+	}
+
+	/**
+	 * Reverts all unsaved changes
+	 */
+	public void revert() {
+		if(actParent instanceof AbstractDetail) {
+			((AbstractDetail<?>) actParent).revert();
+		}
+	}
+	
+	/**
+	 * Returns the current content representation
+	 * @return current content representation or null if no content is displayed
+	 */
+	public Object getContent() {
+		if(actParent instanceof AbstractDetail) {
+			return ((AbstractDetail<?>) actParent).getContent();
+		} else {
+			return null;
+		}
 	}
 	
 	/*

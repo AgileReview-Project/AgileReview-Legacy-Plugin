@@ -13,6 +13,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.ViewPart;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
@@ -32,10 +34,18 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	private static HashSet<Class<? extends ViewPart>> activeViews = new HashSet<Class<? extends ViewPart>>();
 	/**
+	 * contextActivation for later deactivating
+	 */
+	private IContextActivation contextActivation;
+	/**
 	 * Instance of ViewControl in order to add all listeners
 	 */
 	@SuppressWarnings("unused")
 	private static ViewControl instance = new ViewControl();
+	/**
+	 * Boolean helper var, as perspective activated is not called on startup
+	 */
+	private boolean startup = true;
 	
 	/**
 	 * Creates a new instance of ViewControl
@@ -214,7 +224,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	@Override
 	public void perspectiveChanged(IWorkbenchPage page,	IPerspectiveDescriptor perspective,
 			IWorkbenchPartReference partRef, String changeId) {
-		
+		PluginLogger.log(this.getClass().toString(), "perspectiveChanged1", perspective.getLabel());
 	}
 
 	/**
@@ -224,7 +234,19 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		PluginLogger.log(this.getClass().toString(), "perspectiveChanged", perspective.getLabel());
+		PluginLogger.log(this.getClass().toString(), "perspectiveActivated", perspective.getLabel());
+		if (perspective.getLabel().equals("AgileReview")) {
+			// activate context
+			IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
+			this.contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
+		} else {
+			// deactivate context
+			if (this.contextActivation != null) {
+				IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
+				contextService.deactivateContext(this.contextActivation);
+				this.contextActivation = null;
+			}
+		}
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().perspectiveActivated(page, perspective);
 		}
@@ -236,7 +258,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveChanged(IWorkbenchPage page,	IPerspectiveDescriptor perspective, String changeId) {
-		
+		PluginLogger.log(this.getClass().toString(), "perspectiveChanged2", perspective.getLabel());
 	}
 
 	/**
@@ -245,7 +267,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		
+		PluginLogger.log(this.getClass().toString(), "perspectiveOpened", perspective.getLabel());
 	}
 
 	/**
@@ -254,7 +276,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		
+		PluginLogger.log(this.getClass().toString(), "perspectiveClosed", perspective.getLabel());
 	}
 
 	/**
@@ -263,7 +285,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveDeactivated(IWorkbenchPage page,	IPerspectiveDescriptor perspective) {
-		
+		PluginLogger.log(this.getClass().toString(), "perspectiveDeactivated", perspective.getLabel());
 	}
 
 	/**
@@ -272,6 +294,6 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
-		
+		PluginLogger.log(this.getClass().toString(), "perspectiveSavedAs", oldPerspective.getLabel()+"-->"+newPerspective.getLabel());
 	}
 }

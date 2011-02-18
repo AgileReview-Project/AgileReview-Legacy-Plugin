@@ -3,6 +3,7 @@ package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -114,7 +115,7 @@ class REContentProvider implements ITreeContentProvider {
 		// Special case: the root node
 		if(parentElement instanceof RERootNode) 
 		{
-			HashSet<MultipleReviewWrapper> wrapSet = ((RERootNode)parentElement).getReviews();
+			TreeSet<MultipleReviewWrapper> wrapSet = ((RERootNode)parentElement).getReviews();
 			result = wrapSet.toArray();
 		} 
 		// else wrap the children

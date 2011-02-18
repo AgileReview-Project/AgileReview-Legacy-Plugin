@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
-import de.tukl.cs.softech.agilereview.tools.FileTypeNotSupportedException;
+import de.tukl.cs.softech.agilereview.tools.NoDocumentFoundException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
@@ -30,7 +30,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
  * The AnnotationParser analyzes the document of the given editor and provides a mapping
  * of comment tags and their {@link Position}s
  */
-public class AnnotationParser {
+public class AnnotationParser implements IAnnotationParser {
 	
 	/**
 	 * Key separator for tag creation
@@ -40,70 +40,59 @@ public class AnnotationParser {
 	 * Core Regular Expression to find the core tag structure
 	 */
 	private static String rawTagRegex = "\\s*(\\??)"+Pattern.quote(keySeparator)+"\\s*([^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^\\?"+Pattern.quote(keySeparator)+"]*)\\s*"+Pattern.quote(keySeparator)+"(\\??)\\s*";
-	/**
-	 * Regular Expression to find each comment tag in java files
-	 */
-	private static final String javaTagRegex = "/\\*\\s*"+rawTagRegex+"\\s*\\*/";
-	/**
-	 * Pattern to identify comment tags in java files
-	 */
-	private static final Pattern javaTagPattern = Pattern.compile(javaTagRegex);
-	/**
-	 * Regular Expression to find each comment tag in XML files
-	 */
-	private static final String xmlTagRegex = "<!--\\s*"+rawTagRegex+"\\s*-->";
-	/**
-	 * Pattern to identify comment tags in XML files
-	 */
-	private static final Pattern xmlTagPattern = Pattern.compile(xmlTagRegex);
 	
 	/**
 	 * Regular Expression used by this instance
 	 */
-	private String tagRegex;
+	protected String tagRegex;
 	/**
 	 * Pattern used by this instance
 	 */
-	private Pattern tagPattern;
+	protected Pattern tagPattern;
 	/**
 	 * This map lists every comment tag found in the document with its {@link Position}
 	 */
-	private TreeMap<String, Position> idPositionMap = new TreeMap<String, Position>();
+	protected TreeMap<String, Position> idPositionMap = new TreeMap<String, Position>();
 	/**
 	 * Position map of all tags
 	 */
-	private TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
+	protected TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
 	/**
 	 * Document which provides the contents for this instance
 	 */
-	private IDocument document;
+	protected IDocument document;
 	/**
 	 * The document of this parser
 	 */
-	private ITextEditor editor;
+	protected ITextEditor editor;
 	/**
 	 * Annotation model for this parser
 	 */
-	private AgileAnnotationController annotationModel;
+	protected AgileAnnotationController annotationModel;
 
 	/**
 	 * Creates a new instance of AnnotationParser with the given input
 	 * @param editor the editor which contents should be analyzed
-	 * @throws FileTypeNotSupportedException will be thrown, if the file type which this editor represents is not supported
+	 * @param commentBeginTag begin tag for comments in this document
+	 * @param commentEndTag end tag for comments in this document
+	 * @throws NoDocumentFoundException will be thrown, if the file type which this editor represents is not supported
 	 */
-	public AnnotationParser(ITextEditor editor) throws FileTypeNotSupportedException {
-		if(editor.getEditorInput().getName().endsWith("java")) {
-			tagRegex = javaTagRegex;
-			tagPattern = javaTagPattern;
-		} else if(editor.getEditorInput().getName().endsWith("xml")) {
-			tagRegex = xmlTagRegex;
-			tagPattern = xmlTagPattern;
-		} else {
-			throw new FileTypeNotSupportedException();
-		}
+	protected AnnotationParser(ITextEditor editor, String commentBeginTag, String commentEndTag) throws NoDocumentFoundException {
+		
+		tagRegex = Pattern.quote(commentBeginTag)+rawTagRegex+Pattern.quote(commentEndTag);
+		tagPattern = Pattern.compile(tagRegex);
+		
 		this.editor = editor;
-		//TODO prove for NullPointer
-		this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+
+		if(editor.getDocumentProvider() != null) {
+			this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+			if(this.document == null) {
+				throw new NoDocumentFoundException();
+			}
+		} else {
+			throw new NoDocumentFoundException();
+		}
+		
 		this.annotationModel = new AgileAnnotationController(editor);
 		parseInput();
 	}
@@ -232,9 +221,9 @@ public class AnnotationParser {
 		}
 	}
 	
-	/**
-	 * Filter annotations and display only the given comments
-	 * @param comments which should be displayed
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#filter(java.util.ArrayList)
 	 */
 	public void filter(ArrayList<Comment> comments) {
 		PluginLogger.log(this.getClass().toString(), "filter", "triggered");
@@ -252,22 +241,20 @@ public class AnnotationParser {
 		this.annotationModel.displayAnnotations(display);
 	}
 	
-	/**
-	 * deletes all current displayed Annotations
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#clearAnnotations()
 	 */
 	public void clearAnnotations() {
 		filter(new ArrayList<Comment>());
 	}
 	
-	/**
-	 * Adds the Comment tags for the given comment in the currently opened file at the currently selected place
-	 * @param comment Comment for which the tags should be inserted
-	 * @return Position of the added {@link Comment} or null if the selection is no instance of {@link ITextSelection}
-	 * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
-	 * @throws CoreException 
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#addTagsInDocument(agileReview.softech.tukl.de.CommentDocument.Comment)
 	 */
-	public Position addTagsInDocument(Comment comment) throws BadLocationException, CoreException {
-		Position result = null;
+	public void addTagsInDocument(Comment comment) throws BadLocationException, CoreException {
+		//Position result = null;
 
 		ISelection selection= editor.getSelectionProvider().getSelection();
 		if (selection instanceof ITextSelection) {
@@ -293,7 +280,7 @@ public class AnnotationParser {
 					document.replace(insertOffset, 0, "<!--?"+commentTag+"?-->");
 				}
 				
-				result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
+				//result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
 			} else {
 				// Calculate insert position for start line
 				String lineDelimiter = document.getLineDelimiter(selStartLine);
@@ -321,32 +308,26 @@ public class AnnotationParser {
 					document.replace(insertStartOffset, 0, "<!--?"+commentTag+"-->");
 				}
 				
-				result = new Position(document.getLineOffset(selStartLine), 
-						document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
+				//result = new Position(document.getLineOffset(selStartLine), 
+				//		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
 			}
 			parseInput();
 			this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
 		}
-		return result;
+		//return result;
 	}
 	
-	/**
-	 * Removes the tags for one comment. Attention: if you want to delete more then one {@link Comment} in a row
-	 * use the {@code removeCommentsTags(Set<Comment> comments} function, because after every deletion the document
-	 * will be reparsed
-	 * @param comment which should be deleted
-	 * @throws BadLocationException if the {@link Position} is corrupted (the document should be reparsed then)
-	 * @throws CoreException  if document can not be saved
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentTags(agileReview.softech.tukl.de.CommentDocument.Comment)
 	 */
 	public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {
 		removeCommentsTags(new HashSet<Comment>(Arrays.asList(new Comment[]{comment})));
 	}
 	
-	/**
-	 * Removes all tags of the given comments. After this is done the document will be reparsed
-	 * @param comments which should be deleted
-	 * @throws BadLocationException if the {@link Position} is corrupted (the document should be reparsed then)
-	 * @throws CoreException if document can not be saved
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentsTags(java.util.Set)
 	 */
 	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {		
 		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
@@ -380,29 +361,19 @@ public class AnnotationParser {
 		parseInput();
 	}
 	
-	/**
-	 * Parses the document another time
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#reload()
 	 */
 	public void reload() {
 		parseInput();
 	}
 	
-	/**
-	 * Returns the Map of existing comment tags in this document and their {@link Position}
-	 * @return a {@link TreeMap} of existing comment tags in this document and their {@link Position}
-	 */
-	public TreeMap<String, Position> getIdPositionMap() {
-		return idPositionMap;
-	}
-	
-	/**
-	 * Jumps to the first line of the given comment
-	 * @param commentID of the displayed comment
-	 * @throws BadLocationException if no tags for this commentID exists
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#revealCommentLocation(java.lang.String)
 	 */
 	public void revealCommentLocation(String commentID) throws BadLocationException {
-		//TODO debug output
-		System.out.println("reveal -> "+commentID);
 		if(this.idPositionMap.get(commentID) != null) {
 			editor.selectAndReveal(this.idPositionMap.get(commentID).offset, 0);
 		} else {

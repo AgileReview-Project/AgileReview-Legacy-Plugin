@@ -4,7 +4,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -40,7 +39,7 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	 * TextArea to edit an external reference to this Review
 	 */
 	private Text reference;
-
+ 
 	/**
 	 * Creates a new ReviewDetail Composite onto the given parent with the specified SWT styles
 	 * @param parent onto the ReviewDetail Composite will be added
@@ -123,11 +122,6 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	    gridData.grabExcessVerticalSpace = true;
 	    gridData.grabExcessHorizontalSpace = true;
 	    txt.setLayoutData(gridData);
-
-	    /*Button delButton = new Button(this, SWT.PUSH);
-	    delButton.setText("Delete");
-	    delButton.setData("delete_review");
-	    delButton.addListener(SWT.Selection, CommentController.getInstance());*/
 	    
 	    Composite g = new Composite(this, SWT.NONE);
 	    GridLayout glayout = new GridLayout(3, false);
@@ -136,12 +130,6 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	    gridData.horizontalAlignment = GridData.END;
 	    gridData.horizontalSpan = numColumns;
 	    g.setLayoutData(gridData);
-	    
-	    revertButton = new Button(g, SWT.PUSH);
-	    //listener and settings will be set in AbstractDetail
-	    
-	    saveButton = new Button(g, SWT.PUSH);
-	    //listener and settings will be set in AbstractDetail
 	    
 	    setPropertyConfigurations();
 	}

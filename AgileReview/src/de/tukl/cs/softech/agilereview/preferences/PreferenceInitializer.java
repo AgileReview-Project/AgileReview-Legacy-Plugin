@@ -39,9 +39,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		
 		// active review
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, "");
-		
-		// Link explorer
-		store.setDefault(PropertiesManager.EXTERNAL_KEYS.LINK_EXPLORER, false);
 	}
 
 }
