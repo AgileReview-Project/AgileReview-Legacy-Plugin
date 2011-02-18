@@ -115,11 +115,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * The titles of the table's columns, also used to fill the filter menu 
 	 */
-	private String[] titles = { "ReviewID", "CommentID", "Author", "Recipient", "Status", "Priority", "Revision", "Date created", "Date modified", "Replies", "Location" };
+	private String[] titles = { "ReviewName", "CommentID", "Author", "Recipient", "Status", "Priority", "Date created", "Date modified", "Replies", "Location" };
 	/**
 	 * The width of the table's columns
 	 */
-	private int[] bounds = { 60, 70, 70, 70, 70, 70, 55, 120, 120, 50, 100 };
+	private int[] bounds = { 60, 70, 70, 70, 70, 70, 120, 120, 50, 100 };
 	/**
 	 * indicates whether Eclipse was just started or not
 	 */
@@ -496,18 +496,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		});
 		
-		// Revision
-		col = createColumn(titles[6], bounds[6], 6);
-		col.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				Comment c = (Comment) element;
-				return String.valueOf(c.getRevision());
-			}
-		});
-		
 		// Date created
-		col = createColumn(titles[7], bounds[7], 7);
+		col = createColumn(titles[6], bounds[6], 6);
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -518,7 +508,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		});
 		
 		// Date modified
-		col = createColumn(titles[8], bounds[8], 8);
+		col = createColumn(titles[7], bounds[7], 7);
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) { 
@@ -530,7 +520,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		});
 		
 		// Number of relplies
-		col = createColumn(titles[9], bounds[9], 9);
+		col = createColumn(titles[8], bounds[8], 8);
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -540,7 +530,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		});
 		
 		// Location
-		col = createColumn(titles[10], bounds[10], 10);
+		col = createColumn(titles[9], bounds[9], 9);
 		col.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
