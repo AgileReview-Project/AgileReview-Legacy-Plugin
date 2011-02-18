@@ -60,8 +60,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {}
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(ViewControl.this);
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addSelectionListener(ViewControl.this);
-				IPageService service = (IPageService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IPageService.class);
-				service.addPerspectiveListener(ViewControl.this);
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(ViewControl.this);
 			}
 		});
 	}

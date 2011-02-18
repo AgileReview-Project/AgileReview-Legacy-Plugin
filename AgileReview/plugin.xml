@@ -260,26 +260,10 @@
             </iterate>
          </with>
       </enabledWhen>
-      <activeWhen>
-         <with
-               variable="activePart">
-            <instanceof
-                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
-            </instanceof>
-         </with>
-      </activeWhen>
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ActivateReviewHandler"
          commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate">
-      <activeWhen>
-         <with
-               variable="activePart">
-            <instanceof
-                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
-            </instanceof>
-         </with>
-      </activeWhen>
       <enabledWhen>
          <with
                variable="selection">

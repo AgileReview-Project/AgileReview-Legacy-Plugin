@@ -3,7 +3,6 @@ package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;

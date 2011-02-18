@@ -160,7 +160,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#saveChanges()
 	 */
 	protected boolean saveChanges() {
-		if(attributesChanged()) {
+		if(attributesChanged() || editedObject.getLastModified()==null) {
 			editedObject.setLastModified(Calendar.getInstance());
 			return true;
 		} else {

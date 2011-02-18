@@ -2,7 +2,6 @@ package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
