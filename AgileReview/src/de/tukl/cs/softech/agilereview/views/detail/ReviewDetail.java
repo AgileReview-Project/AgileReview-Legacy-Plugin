@@ -9,9 +9,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -88,6 +91,7 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	    gridData.horizontalSpan = numColumns-1;
 	    authorInstance.setLayoutData(gridData);
 	    authorInstance.addFocusListener(this);
+	    authorInstance.addModifyListener(this);
 	    
 	    Label status = new Label(this, SWT.PUSH);
 	    status.setText("Status: ");
@@ -98,6 +102,7 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	    gridData.horizontalSpan = numColumns-1;
 	    statusDropDown.setLayoutData(gridData);
 	    statusDropDown.addFocusListener(this);
+	    statusDropDown.addModifyListener(this);
 	    
 	    new Sash(this, SWT.PUSH);
 	    
@@ -114,6 +119,7 @@ public class ReviewDetail extends AbstractDetail<Review> {
 		txt.setEditable(true);
 		txt.setEnabled(true);
 	    txt.addFocusListener(this);
+	    txt.addModifyListener(this);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.verticalAlignment = GridData.FILL;
@@ -212,5 +218,9 @@ public class ReviewDetail extends AbstractDetail<Review> {
 			}
 			statusDropDown.select(review.getStatus());
 		}
+		//set revertable to false because it was set from the ModificationListener while inserting inital content
+		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
+		sp.setRevertable(false);
 	}
 }

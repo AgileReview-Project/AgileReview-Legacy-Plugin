@@ -19,10 +19,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReplyDocument.Reply;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider;
 
 /**
  * The CommentDetail class describes one detail representation of a Comment Object
@@ -90,7 +93,8 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    statusDropDown.setLayoutData(gridData);
-	    statusDropDown.addFocusListener(this);	    
+	    statusDropDown.addFocusListener(this);
+	    statusDropDown.addModifyListener(this);
 	    
 	    Label priority = new Label(this, SWT.PUSH);
 	    priority.setText("Priority: ");
@@ -101,6 +105,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.horizontalSpan = numColumns-1;
 	    priorityDropDown.setLayoutData(gridData);
 	    priorityDropDown.addFocusListener(this);
+	    priorityDropDown.addModifyListener(this);
 	    	
 	    Label recipient = new Label(this, SWT.PUSH);
 	    recipient.setText("Recipient: ");
@@ -111,6 +116,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.horizontalSpan = numColumns-1;
 	    recipientText.setLayoutData(gridData);
 	    recipientText.addFocusListener(this);
+	    recipientText.addModifyListener(this);
 	    
 	    new Sash(this, SWT.PUSH);
 	    
@@ -137,12 +143,14 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		txt.setEditable(true);
 		txt.setEnabled(true);
 	    txt.addFocusListener(this);
+	    txt.addModifyListener(this);
 	    
 	    replys = new StyledText(texts, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
 	    replys.setVisible(true);
 	    replys.setEditable(false);
 	    replys.setWordWrap(true);
 	    replys.addFocusListener(this);
+	    replys.addModifyListener(this);
 
 	    Composite g = new Composite(this, SWT.NONE);
 	    GridLayout glayout = new GridLayout(3, false);
@@ -203,6 +211,10 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			priorityDropDown.select(comment.getPriority());
 			statusDropDown.select(comment.getStatus());
 		}
+		//set revertable to false because it was set from the ModificationListener while inserting inital content
+		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
+		sp.setRevertable(false);
 	}
 	
 	/*
@@ -314,4 +326,5 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			priorityDropDown.add(levels[i]);
 		}
 	}
+
 }

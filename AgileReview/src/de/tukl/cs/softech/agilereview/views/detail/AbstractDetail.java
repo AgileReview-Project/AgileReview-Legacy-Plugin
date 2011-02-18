@@ -3,6 +3,8 @@ package de.tukl.cs.softech.agilereview.views.detail;
 import org.apache.xmlbeans.XmlObject;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -19,7 +21,7 @@ import de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider;
  * for a revert action by setting the object Data to "revert" and for a save action by setting the object Data to "save"
  * @param <E> type which would be displayed by this AbstractDetail
  */
-public abstract class AbstractDetail<E extends XmlObject> extends Composite implements FocusListener {
+public abstract class AbstractDetail<E extends XmlObject> extends Composite implements FocusListener, ModifyListener {
 	
 	/**
 	 * current displayed object which will be modified
@@ -135,5 +137,12 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
 			sp.setRevertable(true);
 		}
+	}
+	
+	@Override
+	public void modifyText(ModifyEvent e) {
+		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
+		sp.setRevertable(true);
 	}
 }
