@@ -79,11 +79,11 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		treeViewer.setLabelProvider(new RELabelProvider());
 		treeViewer.setComparator(new REViewerComparator());
 		treeViewer.setInput(this.root);
+		treeViewer.addSelectionChangedListener(ViewControl.getInstance());
 		refreshInput();
 				
 		openFileAction = new REOpenAction(this.getSite().getPage(), treeViewer);
-		
-		
+				
 		treeViewer.addDoubleClickListener(this);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".ReviewExplorer");
 		
@@ -94,7 +94,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		treeViewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuManager, treeViewer);
 		getSite().setSelectionProvider(treeViewer);
-		
+	
 		// register view
 		ViewControl.registerView(this.getClass());
 	}

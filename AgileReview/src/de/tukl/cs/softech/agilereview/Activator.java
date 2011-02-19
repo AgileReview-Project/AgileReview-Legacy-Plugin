@@ -33,9 +33,6 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		// Activate the agilereview loaded context
-//		IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
-//		this.contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.loaded");
 	}
 
 	/*
@@ -45,11 +42,6 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
-//		if (this.contextActivation != null) {
-//			IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
-//			contextService.deactivateContext(this.contextActivation);
-//			this.contextActivation = null;
-//		}
 	}
 
 	/**

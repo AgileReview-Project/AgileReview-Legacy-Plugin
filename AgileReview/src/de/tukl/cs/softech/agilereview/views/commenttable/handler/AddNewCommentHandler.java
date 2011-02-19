@@ -9,8 +9,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.part.FileEditorInput;
 
@@ -29,13 +27,7 @@ public class AddNewCommentHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		PluginLogger.log(this.getClass().toString(), "execute", "Command \"Add new Comment\" triggered");
-		IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
-		for (Object o :contextService.getActiveContextIds())
-		{
-			System.out.println(o);
-		}
-		
+		PluginLogger.log(this.getClass().toString(), "execute", "Command \"Add new Comment\" triggered");			
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		if (!activeReview.isEmpty()) {
 			try	{

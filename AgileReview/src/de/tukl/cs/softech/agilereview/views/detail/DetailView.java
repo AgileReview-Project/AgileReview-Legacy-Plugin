@@ -1,7 +1,7 @@
 package de.tukl.cs.softech.agilereview.views.detail;
 
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -199,28 +199,23 @@ public class DetailView extends ViewPart {
 
 	/**
 	 * Reaction of selection changes in {@link CommentTableView} or {@link ReviewExplorer}
-	 * @param part will be forwarded from the {@link ViewControl}
-	 * @param selection will be forwarded from the {@link ViewControl}
+	 * @param event will be forwarded from the {@link ViewControl}
 	 */
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
-			IStructuredSelection sel = (IStructuredSelection) selection;
-			Object e;
+	public void selectionChanged(SelectionChangedEvent event) {
+		if(event.getSelection() instanceof IStructuredSelection && !event.getSelection().isEmpty()) {
+			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+			Object e = sel.getFirstElement();
 			
-			if(part instanceof ReviewExplorer) {
-				if((e = sel.getFirstElement()) instanceof MultipleReviewWrapper) {
-					if(!(this.actParent instanceof ReviewDetail)) {
-						this.changeParent(DetailView.REVIEW_DETAIL);
-					}
-					((ReviewDetail)this.actParent).fillContents((MultipleReviewWrapper)e);
-				} else if((e = sel.getFirstElement()) instanceof AbstractMultipleWrapper) {
-					this.changeParent(EMPTY);
+			if(e instanceof MultipleReviewWrapper) {
+				if(!(this.actParent instanceof ReviewDetail)) {
+					this.changeParent(DetailView.REVIEW_DETAIL);
 				}
-			} else if(part instanceof CommentTableView) {
+				((ReviewDetail)this.actParent).fillContents((MultipleReviewWrapper)e);
+			} else if(e instanceof AbstractMultipleWrapper) {
+				this.changeParent(EMPTY);
+			} else if(e instanceof Comment) {
 				if(!(this.actParent instanceof CommentDetail)) {
 					this.changeParent(DetailView.COMMENT_DETAIL);
-				}
-				if((e = sel.getFirstElement()) instanceof Comment) {
 					((CommentDetail)this.actParent).fillContents((Comment)e);
 				}
 			}

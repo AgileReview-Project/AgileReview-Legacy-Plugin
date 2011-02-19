@@ -4,6 +4,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFileWrapper;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFolderWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -19,16 +21,19 @@ class REViewerComparator extends ViewerComparator
 	{
 		int result = 0;
 		// Set category only if element is a ReviewWrapper
-		if (element instanceof MultipleReviewWrapper)
-		{
+		if (element instanceof MultipleReviewWrapper){
 			MultipleReviewWrapper reviewWrap = (MultipleReviewWrapper)element;
 			// Closed reviews are category 1 -> sorted below open reviews
 			if (!reviewWrap.isOpen())
 			{
 				result = 1;
 			}
+		} else if (element instanceof MultipleFolderWrapper) {
+			result = 2;
+		} else if (element instanceof MultipleFileWrapper) {
+			result = 3;
 		}
-
+		// Sorting order by category is then: Reviews, Folder, Files
 		return result;
 	}
 	

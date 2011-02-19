@@ -2,7 +2,8 @@ package de.tukl.cs.softech.agilereview.views;
 
 import java.util.HashSet;
 
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -26,21 +27,28 @@ import de.tukl.cs.softech.agilereview.views.detail.DetailView;
  * this plugin. Furthermore the ViewControl provides and forwards events of the
  * following Listener: {@link ISelectionListener}, {@link IPartListener2}, {@link IPerspectiveListener3}
  */
-public class ViewControl implements ISelectionListener, IPartListener2, IPerspectiveListener3 {
+public class ViewControl implements ISelectionChangedListener, IPartListener2, IPerspectiveListener3 {
 	
 	/**
 	 * Set of all active Views
 	 */
-	private static HashSet<Class<? extends ViewPart>> activeViews = new HashSet<Class<? extends ViewPart>>();
+	private static HashSet<Class<? extends IWorkbenchPart>> activeViews = new HashSet<Class<? extends IWorkbenchPart>>();
 	/**
 	 * contextActivation for later deactivating
 	 */
-	private IContextActivation contextActivation;
+	private static IContextActivation contextActivation;
 	/**
 	 * Instance of ViewControl in order to add all listeners
 	 */
-	@SuppressWarnings("unused")
 	private static ViewControl instance = new ViewControl();
+	
+	/**
+	 * Singleton Pattern
+	 * @return the only instance of ViewControl
+	 */
+	public static ViewControl getInstance() {
+		return instance;
+	}
 	
 	/**
 	 * Creates a new instance of ViewControl
@@ -54,8 +62,28 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {}
 				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {}
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(ViewControl.this);
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addSelectionListener(ViewControl.this);
+				// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addSelectionListener(ViewControl.this);
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(ViewControl.this);
+				// If our perspective is loaded, activate its context
+				if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective().getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
+					IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
+					contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
+					PluginLogger.log(ViewControl.class.toString(), "Constructor", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" activated");
+					// TODO: Should not be done this way
+//					IBindingService bindingService = (IBindingService)PlatformUI.getWorkbench().getService(IBindingService.class);
+//					CommandManager commandManager = new CommandManager();
+//					ContextManager contextManager = new ContextManager();
+//					BindingManager bindingManager = new BindingManager(contextManager, commandManager);
+//					Scheme scheme = bindingService.getScheme("de.tukl.cs.softech.agilereview.keyscheme");
+//					if (scheme.isDefined()) {
+//						try {
+//							bindingManager.setActiveScheme(scheme);
+//						} catch (NotDefinedException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//					}
+				}
 			}
 		});
 	}
@@ -65,9 +93,10 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 * @param c Class of the {@link ViewPart} to register
 	 * @return true if the registration was successful
 	 */
-	public static boolean registerView(Class<? extends ViewPart> c) {
+	public static boolean registerView(Class<? extends IWorkbenchPart> c) {
 		PluginLogger.log(ViewControl.class.toString(), "registerView", c.getName());
 		return activeViews.add(c);
+		
 	}
 	
 	/**
@@ -75,7 +104,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 * @param c Class of the {@link ViewPart} to unregister
 	 * @return true if the given {@link ViewPart} was unregistered successfully
 	 */
-	protected static boolean unregisterView(Class<? extends ViewPart> c) {
+	private static boolean unregisterView(Class<? extends IWorkbenchPart> c) {
 		PluginLogger.log(ViewControl.class.toString(), "unregisterView", c.getName());
 		return activeViews.remove(c);
 	}
@@ -90,28 +119,37 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	}
 	
 	//****************************************
-	//****** ISelectionListener **************
+	//****** ISelectionChangedListener *******
 	//****************************************
 	
-	
-	/** listens for selectionChanged events and forwards these to following methods:<br>
-	 *  {@link CommentTableView#selectionChanged(IWorkbenchPart, ISelection)}<br>
-	 *  {@link DetailView#selectionChanged(IWorkbenchPart, ISelection)}
-	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
-	 */
 	@Override
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if(selection != null && part != null) {
-			// TODO: the following logging line makes reading logs impossible 
-			// PluginLogger.log(this.getClass().toString(), "selectionChanged", "fired with selection != null && part != null");
-			if(isOpen(CommentTableView.class)) {
-				CommentTableView.getInstance().selectionChanged(part, selection);
-			}
-			if(isOpen(DetailView.class)) {
-				DetailView.getInstance().selectionChanged(part, selection);
-			}
+	public void selectionChanged(SelectionChangedEvent event) {
+		if(isOpen(CommentTableView.class)) {
+			CommentTableView.getInstance().selectionChanged(event);
+		}
+		if(isOpen(DetailView.class)) {
+			DetailView.getInstance().selectionChanged(event);
 		}
 	}
+	
+//	/** listens for selectionChanged events and forwards these to following methods:<br>
+//	 *  {@link CommentTableView#selectionChanged(IWorkbenchPart, ISelection)}<br>
+//	 *  {@link DetailView#selectionChanged(IWorkbenchPart, ISelection)}
+//	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+//	 */
+//	@Override
+//	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+//		if(selection != null && part != null) {
+//			// TODO: the following logging line makes reading logs impossible 
+//			// PluginLogger.log(this.getClass().toString(), "selectionChanged", "fired with selection != null && part != null");
+//			if(isOpen(CommentTableView.class)) {
+//				CommentTableView.getInstance().selectionChanged(part, selection);
+//			}
+//			if(isOpen(DetailView.class)) {
+//				DetailView.getInstance().selectionChanged(part, selection);
+//			}
+//		}
+//	}
 	
 	//****************************************
 	//********** IPartListener2 **************
@@ -146,7 +184,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
-		if(activeViews.remove(partRef.getPart(false).getClass())) {
+		if(ViewControl.unregisterView(partRef.getPart(false).getClass())) {
 			PluginLogger.log(this.getClass().toString(), "partClosed", "unregister: "+partRef.getPart(false).getTitle());
 		}
 		
@@ -218,7 +256,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	@Override
 	public void perspectiveChanged(IWorkbenchPage page,	IPerspectiveDescriptor perspective,
 			IWorkbenchPartReference partRef, String changeId) {
-		PluginLogger.log(this.getClass().toString(), "perspectiveChanged1", perspective.getLabel());
+		// PluginLogger.log(this.getClass().toString(), "perspectiveChanged1", perspective.getLabel());
 	}
 
 	/**
@@ -229,18 +267,16 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	@Override
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		PluginLogger.log(this.getClass().toString(), "perspectiveActivated", perspective.getLabel());
-		if (perspective.getLabel().equals("AgileReview")) {
-			// activate context
+		if (perspective.getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
 			IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
-			this.contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
+			contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
+			PluginLogger.log(ViewControl.class.toString(), "perspectiveActivated", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" activated");
 		} else {
-			// deactivate context
-			if (this.contextActivation != null) {
-				IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
-				contextService.deactivateContext(this.contextActivation);
-				this.contextActivation = null;
-			}
+			IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
+			contextService.deactivateContext(contextActivation);
+			PluginLogger.log(ViewControl.class.toString(), "perspectiveActivated", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" deactivated");
 		}
+		
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().perspectiveActivated(page, perspective);
 		}
@@ -252,7 +288,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveChanged(IWorkbenchPage page,	IPerspectiveDescriptor perspective, String changeId) {
-		PluginLogger.log(this.getClass().toString(), "perspectiveChanged2", perspective.getLabel());
+		// PluginLogger.log(this.getClass().toString(), "perspectiveChanged2", perspective.getLabel());
 	}
 
 	/**
@@ -261,7 +297,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		PluginLogger.log(this.getClass().toString(), "perspectiveOpened", perspective.getLabel());
+		// PluginLogger.log(this.getClass().toString(), "perspectiveOpened", perspective.getLabel());
 	}
 
 	/**
@@ -270,7 +306,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		PluginLogger.log(this.getClass().toString(), "perspectiveClosed", perspective.getLabel());
+		// PluginLogger.log(this.getClass().toString(), "perspectiveClosed", perspective.getLabel());
 	}
 
 	/**
@@ -279,7 +315,7 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveDeactivated(IWorkbenchPage page,	IPerspectiveDescriptor perspective) {
-		PluginLogger.log(this.getClass().toString(), "perspectiveDeactivated", perspective.getLabel());
+		// PluginLogger.log(this.getClass().toString(), "perspectiveDeactivated", perspective.getLabel());
 	}
 
 	/**
@@ -288,6 +324,6 @@ public class ViewControl implements ISelectionListener, IPartListener2, IPerspec
 	 */
 	@Override
 	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
-		PluginLogger.log(this.getClass().toString(), "perspectiveSavedAs", oldPerspective.getLabel()+"-->"+newPerspective.getLabel());
+		// PluginLogger.log(this.getClass().toString(), "perspectiveSavedAs", oldPerspective.getLabel()+"-->"+newPerspective.getLabel());
 	}
 }

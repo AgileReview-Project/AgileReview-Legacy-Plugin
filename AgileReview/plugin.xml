@@ -436,6 +436,12 @@
          id="AgileReview.Cleanup"
          name="Cleanup">
    </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            defaultHandler="de.tukl.cs.softech.agilereview.views.commenttable.handler.FilterCommentsHandler"
+            id="de.tukl.cs.softech.agilereview.views.commenttable.filter"
+            name="Filter comments">
+      </command>
 </extension>
 <extension
       point="org.eclipse.ui.menus">
@@ -584,18 +590,31 @@
 </extension>
 <extension
       point="org.eclipse.ui.bindings">
+   <scheme
+         id="de.tukl.cs.softech.agilereview.keyscheme"
+         name="AgileReview in use"
+         parentId="org.eclipse.ui.defaultAcceleratorConfiguration">
+   </scheme>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.commenttable.filter"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="de.tukl.cs.softech.agilereview.keyscheme"
+         sequence="M1+M2+F">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="de.tukl.cs.softech.agilereview.keyscheme"
+         sequence="M1+M2+M">
+   </key>
 </extension>
 <extension
       point="org.eclipse.ui.contexts">
    <context
-         description="AgileReview extension is loaded"
-         id="de.tukl.cs.softech.agilereview.loaded"
-         name="AgileReview.loaded">
-   </context>
-   <context
          description="AgileReview Extension is in use"
          id="de.tukl.cs.softech.agilereview.perspective.open"
-         name="AgileReview.perspective.open">
+         name="AgileReview in use"
+         parentId="org.eclipse.ui.textEditorScope">
    </context>
 </extension>
 <extension

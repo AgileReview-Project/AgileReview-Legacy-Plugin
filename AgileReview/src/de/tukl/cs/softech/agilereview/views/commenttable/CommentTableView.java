@@ -18,8 +18,8 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -48,7 +48,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -66,8 +65,6 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
@@ -167,14 +164,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		viewer.setInput(this.comments);
 		
 		// set selection (to display comment in detail view)
-		getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));	
-		// XXX Hier bitte nur eins der beiden. Tun das gleiche. Würde zum oberen tendieren
-		if (ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().selectionChanged(this, new StructuredSelection(comment));	
-		} else {
-			PluginLogger.logWarning(this.getClass().toString(), "addComment", "Could not open added comment in DetailView since DetailView is not registered with ViewController");
-		}
-		
+		// getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
+		viewer.setSelection(new StructuredSelection(comment), true);
 		// TODO: Das hier vlt auslagern -> macht CTV dümmer, außerdem liegen z.B. Editor und Selection im Handler vor 
 		try {
 			IEditorPart editor;
@@ -291,10 +282,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		comparator = new AgileViewerComparator();
 		viewer.setComparator(comparator);
 		commentFilter = new AgileCommentFilter("ALL");
-		viewer.addFilter(commentFilter);
+		viewer.addFilter(commentFilter);	
 		
-		// register this class as a selection provider
-		getSite().setSelectionProvider(viewer);
 		
 		//add help context
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".TableView");
@@ -332,6 +321,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 
 		// provide access to selections of table rows
 		getSite().setSelectionProvider(viewer);
+		viewer.addSelectionChangedListener(ViewControl.getInstance());
 		
 		viewer.addDoubleClickListener(this);
 
@@ -672,20 +662,19 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	//###############################################################################
 	
 	/** Selection of ReviewExplorer changed, filter comments
-	 * @param part will be forwarded from the {@link ViewControl}
-	 * @param selection will be forwarded from the {@link ViewControl}
-	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 * @param event will be forwarded from the {@link ViewControl}
+	 * @see  org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(SelectionChangedEvent)
 	 */
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if (part instanceof ReviewExplorer) {
-			if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+	public void selectionChanged(SelectionChangedEvent event) {
+		if (event.getSelection() instanceof IStructuredSelection && !event.getSelection().isEmpty()) {
+			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+			if (sel.getFirstElement() instanceof AbstractMultipleWrapper) {
 				PluginLogger.log(this.getClass().toString(), "selectionChanged", "Selection of ReviewExplorer changed");
 				// get selection, selection's iterator, initialize reviewIDs and paths
-				IStructuredSelection sel = (IStructuredSelection) selection;
 				Iterator<?> it = sel.iterator();
 				ArrayList<String> reviewIDs = new ArrayList<String>();
 				HashMap<String, HashSet<String>> paths = new HashMap<String, HashSet<String>>();
-
+	
 				// get all selected reviews and paths
 				while (it.hasNext()) {
 					Object next = it.next();
@@ -708,7 +697,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 						}
 					}
 				}
-
+	
 				// Remove the old filter, then create the new filter, 
 				// so it can be applied directly when needed
 				viewer.removeFilter(this.selectionFilter);
@@ -766,7 +755,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		// XXX: The whole method should be treated somerwhere else in my opinion
-		if (!perspective.getLabel().equals("AgileReview")) {
+		if (!perspective.getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Hiding annotations since current perspective is not 'AgileReview'");
 			for (IAnnotationParser parser: this.parserMap.values()) {
 				parser.clearAnnotations();
@@ -777,7 +766,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			System.gc();
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivatedperspectiveActivated", "Clear parser map and run garbage collector");
 		}
-		if (perspective.getLabel().equals("AgileReview")) {
+		if (perspective.getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
 			if (!this.startup) {
 				PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Adding annotations since AgileReview perspective has been activated");
 				this.parserMap.put((ITextEditor) getActiveEditor(), ParserFactory.createParser((ITextEditor) getActiveEditor()));

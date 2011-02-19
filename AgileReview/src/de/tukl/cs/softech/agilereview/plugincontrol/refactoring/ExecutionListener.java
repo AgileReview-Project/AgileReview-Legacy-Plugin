@@ -15,7 +15,7 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 public class ExecutionListener implements IExecutionListener {
 
 	@Override
-	public void notHandled(String commandId, NotHandledException exception) {/* Do nothing */}
+	public void notHandled(String commandId, NotHandledException exception) {System.out.println("blubb");/* Do nothing */}
 
 	@Override
 	public void postExecuteFailure(String commandId, ExecutionException exception) {
