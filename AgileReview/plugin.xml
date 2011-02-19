@@ -111,6 +111,20 @@
          id="AgileReview.cheatsheet2"
          name="Delete Comment">
    </cheatsheet>
+   <cheatsheet
+         category="AgileReview.category1"
+         composite="false"
+         contentFile="help/cheatsheet/insert_review.xml"
+         id="AgileReview.cheatsheet3"
+         name="Insert review">
+   </cheatsheet>
+   <cheatsheet
+         category="AgileReview.category1"
+         composite="false"
+         contentFile="help/cheatsheet/delete_review.xml"
+         id="AgileReview.cheatsheet4"
+         name="Delete Review">
+   </cheatsheet>
 </extension>
 <extension
       point="org.eclipse.ui.startup">
