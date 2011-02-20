@@ -4,21 +4,9 @@
 <toc label="AgileReview">
 	<topic href="help/guide/intro.htm" label="Agilereview overview">
  </topic>
- <topic href="help/guide/install.htm" label="Installation and update">
+ <topic href="help/guide/quickstart.htm" label="Quickstart">
  </topic>
- <topic label="Getting Started">
-    <topic label="The workbench">
-    </topic>
-    <topic label="A simple review">
-    </topic>
-    <topic label="A simple comment">
-    </topic>
-    <topic label="Navigating">
-    </topic>
-    <topic label="Importing">
-    </topic>
-    <topic label="Exporting">
-    </topic>
+ <topic href="help/guide/install.htm" label="Installation and update">
  </topic>
  <topic label="Concepts">
     <topic href="help/guide/concepts/review.htm" label="Review concept">

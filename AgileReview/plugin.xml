@@ -92,7 +92,9 @@
     <contexts file="help/contexts.xml">
     </contexts>
 </extension>
-<extension point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+<extension
+      id="agilereview"
+      point="org.eclipse.ui.cheatsheets.cheatSheetContent">
    <category
          id="AgileReview.category1"
          name="AgileReview">

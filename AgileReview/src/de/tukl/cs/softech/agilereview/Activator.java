@@ -25,7 +25,7 @@ public class Activator extends AbstractUIPlugin {
 	public Activator() {
 
 	}
-
+/*?|safAFS|Philipp|c0|?*//*?|safAFS|Philipp|c1|?*/
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
