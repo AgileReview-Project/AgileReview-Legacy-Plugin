@@ -172,7 +172,12 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			editedObject.setLastModified(Calendar.getInstance());
 			return true;
 		} else {
-			return false;
+			if(editedObject.getLastModified().equals(editedObject.getCreationDate())) {
+				editedObject.setLastModified(Calendar.getInstance());
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 	

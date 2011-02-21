@@ -111,7 +111,7 @@ public class DetailView extends ViewPart {
 	 * @return true, if the current parent is revertable<br>false, otherwise
 	 */
 	public boolean isRevertable() {
-		if(actParent instanceof AbstractDetail) {
+		if(actParent instanceof AbstractDetail<?>) {
 			return ((AbstractDetail<?>) actParent).isReparentable();
 		} else {
 			return false;
@@ -131,7 +131,7 @@ public class DetailView extends ViewPart {
 	 * Reverts all unsaved changes
 	 */
 	public void revert() {
-		if(actParent instanceof AbstractDetail) {
+		if(actParent instanceof AbstractDetail<?>) {
 			((AbstractDetail<?>) actParent).revert();
 		}
 	}
@@ -141,7 +141,7 @@ public class DetailView extends ViewPart {
 	 * @return current content representation or null if no content is displayed
 	 */
 	public Object getContent() {
-		if(actParent instanceof AbstractDetail) {
+		if(actParent instanceof AbstractDetail<?>) {
 			return ((AbstractDetail<?>) actParent).getContent();
 		} else {
 			return null;
@@ -192,7 +192,7 @@ public class DetailView extends ViewPart {
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	public void partClosedOrDeactivated(IWorkbenchPart part) {
-		if(actParent instanceof AbstractDetail && !actParent.isDisposed()) {
+		if(actParent instanceof AbstractDetail<?> && !actParent.isDisposed()) {
 			((AbstractDetail<?>)actParent).partClosedOrDeactivated(part);
 		}
 	}
