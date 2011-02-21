@@ -1,11 +1,9 @@
 package de.tukl.cs.softech.agilereview.dataaccess.handler;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,7 +11,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import org.apache.poi.util.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
