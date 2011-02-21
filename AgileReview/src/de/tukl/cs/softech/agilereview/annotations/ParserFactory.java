@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.annotations;
 
 import java.util.HashMap;
 
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.tukl.cs.softech.agilereview.tools.NoDocumentFoundException;
@@ -23,22 +24,27 @@ public class ParserFactory {
 	 * @param editor for which an {@link IAnnotationParser} should be created
 	 * @return a fitting {@link IAnnotationParser} or the {@link NullParser} if no support was found
 	 */
-	public static IAnnotationParser createParser(ITextEditor editor) {
+	public static IAnnotationParser createParser(IEditorPart editor) {
 		IAnnotationParser parser;
-		String fileType = editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1);
-		String[] tags = supportedFiles.get(fileType);
-		
-		if(tags != null) {
-			try {
-				parser = new AnnotationParser(editor, tags[0], tags[1]);
-			} catch(NoDocumentFoundException ex) {
-				PluginLogger.logWarning(ParserFactory.class.toString(), "createParser", "Error occured while creating an AnnotationParser for: "+editor.getTitle(), ex);
+		if (editor instanceof ITextEditor) {
+			String fileType = editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1);
+			String[] tags = supportedFiles.get(fileType);
+
+			if(tags != null) {
+				try {
+					parser = new AnnotationParser((ITextEditor)editor, tags[0], tags[1]);
+				} catch(NoDocumentFoundException ex) {
+					PluginLogger.logWarning(ParserFactory.class.toString(), "createParser", "Error occured while creating an AnnotationParser for: "+editor.getTitle(), ex);
+					parser = new NullParser();
+				}
+			} else {
 				parser = new NullParser();
 			}
 		} else {
 			parser = new NullParser();
 		}
-		
 		return parser;
+		
 	}
+	
 }

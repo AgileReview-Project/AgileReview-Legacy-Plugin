@@ -54,7 +54,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.Activator;
@@ -128,7 +127,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * map of currently opened editors and their annotation parsers
 	 */
-	private HashMap<ITextEditor, IAnnotationParser> parserMap = new HashMap<ITextEditor, IAnnotationParser>();
+	private HashMap<IEditorPart, IAnnotationParser> parserMap = new HashMap<IEditorPart, IAnnotationParser>();
 
 	
 	/**
@@ -292,9 +291,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		ViewControl.registerView(this.getClass());
 		
 		// get editor that is active when opening eclipse
-		if (getActiveEditor() instanceof ITextEditor) {
-			this.parserMap.put((ITextEditor) getActiveEditor(), ParserFactory.createParser((ITextEditor) getActiveEditor()));
-			this.parserMap.get((ITextEditor) getActiveEditor()).filter(filteredComments);
+		if (getActiveEditor() instanceof IEditorPart) {
+			this.parserMap.put((IEditorPart) getActiveEditor(), ParserFactory.createParser((IEditorPart) getActiveEditor()));
+			this.parserMap.get((IEditorPart) getActiveEditor()).filter(filteredComments);
 		}
 		
 	}
@@ -627,9 +626,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		PluginLogger.log(this.getClass().toString(), "resetEditorReferences", "Adding and reparsing active editor");
 		IEditorPart editor;
 		if((editor = this.getActiveEditor()) != null) {
-			if(editor instanceof ITextEditor) {
-				this.parserMap.put((ITextEditor) editor, ParserFactory.createParser((ITextEditor) editor));
-				this.parserMap.get((ITextEditor) editor).filter(filteredComments);
+			if(editor instanceof IEditorPart) {
+				this.parserMap.put((IEditorPart) editor, ParserFactory.createParser((IEditorPart) editor));
+				this.parserMap.get((IEditorPart) editor).filter(filteredComments);
 			}
 		}
 	}
@@ -640,7 +639,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void reparseActiveEditor() {
 		IEditorPart editor;
 		if((editor = this.getActiveEditor()) != null) {
-			if(editor instanceof ITextEditor) {
+			if(editor instanceof IEditorPart) {
 				this.parserMap.get(editor).reload();
 				this.parserMap.get(editor).filter(filteredComments);
 			}
@@ -725,8 +724,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	public void partClosed(IWorkbenchPartReference partRef) {
-		if (partRef.getPart(false) instanceof ITextEditor) {
-			ITextEditor editor = (ITextEditor) partRef.getPart(false);
+		if (partRef.getPart(false) instanceof IEditorPart) {
+			IEditorPart editor = (IEditorPart) partRef.getPart(false);
 			if (this.parserMap.containsKey(editor)) {
 				this.parserMap.remove(editor);
 			}
@@ -739,8 +738,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
-		if (partRef.getPart(false) instanceof ITextEditor) {
-			ITextEditor editor = (ITextEditor) partRef.getPart(false);
+		if (partRef.getPart(false) instanceof IEditorPart) {
+			IEditorPart editor = (IEditorPart) partRef.getPart(false);
 			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
 				this.parserMap.put(editor, ParserFactory.createParser(editor));
 				this.parserMap.get(editor).filter(filteredComments);
@@ -769,8 +768,10 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if (perspective.getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
 			if (!this.startup) {
 				PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Adding annotations since AgileReview perspective has been activated");
-				this.parserMap.put((ITextEditor) getActiveEditor(), ParserFactory.createParser((ITextEditor) getActiveEditor()));
-				this.parserMap.get((ITextEditor) getActiveEditor()).filter(filteredComments);
+				if (getActiveEditor() instanceof IEditorPart) {
+						this.parserMap.put((IEditorPart) getActiveEditor(), ParserFactory.createParser((IEditorPart) getActiveEditor()));
+						this.parserMap.get((IEditorPart) getActiveEditor()).filter(filteredComments);
+				}
 				this.perspectiveNotActive = false;
 			}
 		}

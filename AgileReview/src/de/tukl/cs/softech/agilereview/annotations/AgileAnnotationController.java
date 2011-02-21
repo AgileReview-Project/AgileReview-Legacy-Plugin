@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -15,6 +16,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * This class is used to draw and manage annotations for a given text editor
@@ -100,7 +102,8 @@ public class AgileAnnotationController {
 	 * @return created annotation
 	 */
 	private Annotation createNewAnnotation(String commentKey) {
-		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "AgileReview Annotation");
+		String[] commentData = commentKey.split(Pattern.quote(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
+		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);
 		this.annotationMap.put(commentKey, annotation);
 		return annotation;
 	}

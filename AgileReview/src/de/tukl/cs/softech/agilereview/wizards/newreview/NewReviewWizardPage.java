@@ -45,7 +45,7 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 	protected NewReviewWizardPage() {
 		super("New Review");
 		setTitle("New Review");
-		setDescription("This wizard creates a new AgileReview.");
+		setDescription("This wizard creates a new Review.");
 	}
 
 	/* (non-Javadoc)
@@ -58,7 +58,7 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 		container.setLayout(layout);
 		layout.numColumns = 2;
 		Label lReviewId = new Label(container, SWT.NULL);
-		lReviewId.setText("Review-ID*:");
+		lReviewId.setText("Review-Name*:");
 
 		id = new Text(container, SWT.BORDER | SWT.SINGLE);
 		id.setText("");

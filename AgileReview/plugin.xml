@@ -58,17 +58,17 @@
              contributesToHeader="false"
              highlightPreferenceKey="Comment"
              highlightPreferenceValue="true"
-             icon="%agileReview.editor.icon"
+             icon="%agileReview.icon"
              includeOnPreferencePage="true"
              isGoToPreviousNavigationTarget="false"
              label="%specification.label"
-             overviewRulerPreferenceKey="Comment_Annotation"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview"
              overviewRulerPreferenceValue="true"
              showInNextPrevDropdownToolbarAction="false"
              symbolicIcon="info"
-             textPreferenceKey="Comment_Annotation"
+             textPreferenceKey="Comment_Annotation_Text"
              textPreferenceValue="true"
-             verticalRulerPreferenceKey="Comment_Annotation"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical"
              verticalRulerPreferenceValue="true">
        </specification>
     </extension>
@@ -582,13 +582,21 @@
    </menuContribution>
    <menuContribution
          locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+      <separator
+            name="AgileReview.PackageExplorer.separator1"
+            visible="true">
+      </separator>
       <command
             commandId="AgileReview.Cleanup"
             icon="icons/agile_icon.png"
-            label="CleanUp"
+            label="AgileReview Project CleanUp"
             style="push"
             tooltip="Remove AgileReview comments tags from all files of this project">
       </command>
+      <separator
+            name="AgileReview.PackageExplorer.separator2"
+            visible="true">
+      </separator>
    </menuContribution>
 </extension>
 <extension
