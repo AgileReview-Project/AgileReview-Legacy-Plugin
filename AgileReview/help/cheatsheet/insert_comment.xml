@@ -26,10 +26,16 @@ Comments Summary-View at bottom and Comment Details on the right side.
 <subitem
             label="The first possibility is to insert a comment for the file. This is done pushing the &quot;Add Comment&quot; button in the &quot;Comments Summary&quot;."
             skip="true">
+   <command
+         required="false"
+         serialization="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment"/>
 </subitem>
 <subitem
             label="The second possibility is to mark a piece of code and them press the &quot;Add comment&quot; button in the &quot;Common Summary&quot;."
             skip="true">
+   <command
+         required="false"
+         serialization="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment"/>
 </subitem>
 </item>
 <item

@@ -204,19 +204,22 @@ public class DetailView extends ViewPart {
 	public void selectionChanged(SelectionChangedEvent event) {
 		if(event.getSelection() instanceof IStructuredSelection && !event.getSelection().isEmpty()) {
 			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
-			Object e = sel.getFirstElement();
-			
-			if(e instanceof MultipleReviewWrapper) {
-				if(!(this.actParent instanceof ReviewDetail)) {
-					this.changeParent(DetailView.REVIEW_DETAIL);
-				}
-				((ReviewDetail)this.actParent).fillContents((MultipleReviewWrapper)e);
-			} else if(e instanceof AbstractMultipleWrapper) {
-				this.changeParent(EMPTY);
-			} else if(e instanceof Comment) {
-				if(!(this.actParent instanceof CommentDetail)) {
-					this.changeParent(DetailView.COMMENT_DETAIL);
-					((CommentDetail)this.actParent).fillContents((Comment)e);
+			if(sel.isEmpty()) {
+				this.changeParent(DetailView.EMPTY);
+			} else {
+				Object e = sel.getFirstElement();
+				if(e instanceof MultipleReviewWrapper) {
+					if(!(this.actParent instanceof ReviewDetail)) {
+						this.changeParent(DetailView.REVIEW_DETAIL);
+					}
+					((ReviewDetail)this.actParent).fillContents((MultipleReviewWrapper)e);
+				} else if(e instanceof AbstractMultipleWrapper) {
+					this.changeParent(EMPTY);
+				} else if(e instanceof Comment) {
+					if(!(this.actParent instanceof CommentDetail)) {
+						this.changeParent(DetailView.COMMENT_DETAIL);
+						((CommentDetail)this.actParent).fillContents((Comment)e);
+					}
 				}
 			}
 		}
