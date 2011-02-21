@@ -16,6 +16,7 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -246,21 +247,25 @@ public class ReviewAccess {
 			if (!p.exists())
 			{
 				p.create(null);
+				while (!p.exists()){}				
 			}
-			while (!p.exists()){}			
+					
 			// Open the Project, if necessary
 			if (!p.isOpen())
 			{
 				p.open(null);
 			}
 			while (!p.isOpen()){}	
+			// Set project description
+			IProjectDescription projectDesc = p.getDescription();
+			projectDesc.setNatureIds(new String[] {"de.tukl.cs.softech.agilereview.nature"});
+			p.setDescription(projectDesc, null);
 		}
 		catch (CoreException e)
 		{
 			PluginLogger.logError(this.getClass().toString(), "Constructor", "CoreException in ReviewAccess constructor", e);
 		}
 		
-		// XXX Does this help?
 		REVIEW_REPO_FOLDER = p.getLocation().toFile();
 		
 		// Load open reviews initially

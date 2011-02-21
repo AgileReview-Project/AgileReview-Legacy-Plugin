@@ -316,7 +316,7 @@
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.views.commenttable.handler.DeleteCommentHandler"
-         commandId="org.eclipse.ui.edit.delete">
+         commandId="de.tukl.cs.softech.agilereview.views.commenttable.delete">
       <activeWhen>
          <with
                variable="activePart">
@@ -341,14 +341,14 @@
    <handler
          class="de.tukl.cs.softech.agilereview.views.detail.handlers.DeleteHandler"
          commandId="de.tukl.cs.softech.agilereview.views.detail.delete">
-      <enabledWhen>
+      <activeWhen>
          <with
                variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
             <equals
                   value="true">
             </equals>
          </with>
-      </enabledWhen>
+      </activeWhen>
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.commands.handler.CleanupHandler"
@@ -430,7 +430,7 @@
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-         description="Delete Resource"
+         description="Delete Resource in DetailView"
          id="de.tukl.cs.softech.agilereview.views.detail.delete"
          name="de.tukl.cs.softech.agilereview.views.detail.delete">
    </command>
@@ -443,6 +443,11 @@
             defaultHandler="de.tukl.cs.softech.agilereview.views.commenttable.handler.FilterCommentsHandler"
             id="de.tukl.cs.softech.agilereview.views.commenttable.filter"
             name="Filter comments">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            id="de.tukl.cs.softech.agilereview.views.commenttable.delete"
+            name="Delete comments in CommentTableView">
       </command>
 </extension>
 <extension
@@ -574,7 +579,7 @@
             style="push">
       </command>
       <command
-            commandId="de.tukl.cs.softech.agilereview.views.detail.delete"
+            commandId="de.tukl.cs.softech.agilereview.views.commenttable.delete"
             icon="icons/comment/comment_del_15x15.png"
             label="Delete comments"
             style="push">
@@ -618,6 +623,12 @@
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M1+M2++">
    </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.commenttable.delete"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="DEL">
+   </key>
 </extension>
 <extension
       point="org.eclipse.ui.contexts">
@@ -645,5 +656,25 @@
             priorityLevel="workbench">
       </variable>
    </sourceProvider>
+</extension>
+<extension
+      id="de.tukl.cs.softech.agilereview.nature"
+      point="org.eclipse.core.resources.natures">
+   <runtime>
+      <run
+            class="de.tukl.cs.softech.agilereview.plugincontrol.AgileReviewNature">
+      </run>
+   </runtime>
+   <one-of-nature
+         id="de.tukl.cs.softech.agilereview.naturegroup">
+   </one-of-nature>
+</extension>
+<extension
+      point="org.eclipse.ui.ide.projectNatureImages">
+   <image
+         icon="icons/agile_icon.png"
+         id="de.tukl.cs.softech.agilereview.nature.image"
+         natureId="de.tukl.cs.softech.agilereview.nature">
+   </image>
 </extension>n
 </plugin>
