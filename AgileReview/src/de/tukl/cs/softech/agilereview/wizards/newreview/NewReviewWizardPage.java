@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
@@ -132,10 +133,15 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 	{
 		String validMessage = PropertiesManager.getInstance().isValid(id.getText());
 		if (validMessage == null){
-			setPageComplete(true);
-			lValid.setText("");
-		}
-		else {
+			// Try if reviewId is already existent
+			if (!ReviewAccess.getInstance().reviewExists(this.id.getText())) {
+				setPageComplete(true);
+				lValid.setText("");
+			} else {
+				setPageComplete(false);
+				lValid.setText("*) "+"ReviewId already in use");
+			}
+		} else {
 			setPageComplete(false);
 			lValid.setText("*) "+validMessage);
 		}

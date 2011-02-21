@@ -49,9 +49,9 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 							
 							// Test if active review may have vanished
 							String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-							if (!activeReview.isEmpty())
+							if (activeReview.equals(reviewId))
 							{
-								if (!ReviewAccess.getInstance().isReviewLoaded(activeReview))
+								if (!ReviewAccess.getInstance().isReviewLoaded(reviewId))
 								{
 									// Active review has vanished --> deactivate it
 									PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);

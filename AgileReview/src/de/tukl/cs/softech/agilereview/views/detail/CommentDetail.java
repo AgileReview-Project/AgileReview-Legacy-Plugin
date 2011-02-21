@@ -168,7 +168,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#saveChanges()
 	 */
 	protected boolean saveChanges() {
-		if(attributesChanged() || editedObject.getLastModified()==null) {
+		if(attributesChanged()) {
 			editedObject.setLastModified(Calendar.getInstance());
 			return true;
 		} else {
@@ -188,7 +188,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 
 			// Proof if the comment is loaded for the first time
 			recipientText.setText(comment.getRecipient());
-			if (comment.getLastModified() == null) {
+			if (comment.getLastModified().equals(comment.getCreationDate())) {
 				if (PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED)) {
 			    	recipientText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT));
 				}

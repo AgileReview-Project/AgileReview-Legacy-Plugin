@@ -35,7 +35,7 @@ public class RefreshHandler extends AbstractHandler {
 		
 		// Test if active review may have vanished
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-		if (!activeReview.isEmpty())
+		if (!ReviewAccess.getInstance().reviewExists(activeReview))
 		{
 			if (!ReviewAccess.getInstance().isReviewLoaded(activeReview))
 			{

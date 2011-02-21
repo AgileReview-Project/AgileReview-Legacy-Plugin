@@ -217,8 +217,8 @@ public class DetailView extends ViewPart {
 			} else if(e instanceof Comment) {
 				if(!(this.actParent instanceof CommentDetail)) {
 					this.changeParent(DetailView.COMMENT_DETAIL);
-					((CommentDetail)this.actParent).fillContents((Comment)e);
 				}
+				((CommentDetail)this.actParent).fillContents((Comment)e);
 			}
 		}
 	}

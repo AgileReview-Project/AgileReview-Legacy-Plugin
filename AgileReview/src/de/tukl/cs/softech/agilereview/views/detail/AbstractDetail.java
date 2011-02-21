@@ -60,7 +60,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @return current content representation
 	 */
 	protected E getContent() {
-		return backupObject;
+		return this.editedObject;
 	}
 	
 	/**

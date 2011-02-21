@@ -50,23 +50,25 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 	@Override
 	public boolean performFinish() 
 	{
-		boolean result = true;
+		boolean result = false;
 		try 
 		{
 			Review newRev = ReviewAccess.getInstance().createNewReview(this.page1.getReviewID());
-			newRev.setReferenceId(this.page1.getReviewReference());
-			newRev.setDescription(this.page1.getReviewDescription());
-			PersonInCharge piC = PersonInCharge.Factory.newInstance();
-			piC.setName(this.page1.getReviewResponsibility());
-			newRev.setPersonInCharge(piC);
-			
-			if (ViewControl.isOpen(ReviewExplorer.class)){
-				ReviewExplorer.getInstance().addReview(newRev);
+			if (newRev!=null) {
+				newRev.setReferenceId(this.page1.getReviewReference());
+				newRev.setDescription(this.page1.getReviewDescription());
+				PersonInCharge piC = PersonInCharge.Factory.newInstance();
+				piC.setName(this.page1.getReviewResponsibility());
+				newRev.setPersonInCharge(piC);
+				
+				if (ViewControl.isOpen(ReviewExplorer.class)){
+					ReviewExplorer.getInstance().addReview(newRev);
+				}
+				result = true;
 			}
 		} catch (IOException e) 
 		{
 			PluginLogger.logError(this.getClass().toString(), "performFinish", "Exception thrown while created a new Review", e);
-			result = false;
 		}
 		
 		return result;

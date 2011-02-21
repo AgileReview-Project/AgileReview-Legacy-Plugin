@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
@@ -26,8 +27,12 @@ public class DeleteHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if(ViewControl.isOpen(DetailView.class)) {
-			Object o = DetailView.getInstance().getContent();			
+			Object o = DetailView.getInstance().getContent();	
 			if(o instanceof Review) {
+				if (!MessageDialog.openConfirm(null, "Delete", "Are you sure you want to delete this review?"))
+				{
+					return null;
+				}
 				Review r = (Review)o;
 				// Delete the selected review from ReviewExplorer
 				if(ViewControl.isOpen(ReviewExplorer.class)) {
@@ -42,6 +47,10 @@ public class DeleteHandler extends AbstractHandler {
 				// Remove this review from the list of open reviews (regardless if it was open or not)
 				PropertiesManager.getInstance().removeFromOpenReviews(r.getId());
 			} else if(o instanceof Comment) {
+				if (!MessageDialog.openConfirm(null, "Delete", "Are you sure you want to delete this comment?"))
+				{
+					return null;
+				}
 				Comment c = (Comment)o;
 				if(ViewControl.isOpen(CommentTableView.class)) {
 					CommentTableView.getInstance().deleteComment(c);

@@ -430,7 +430,7 @@
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-         description="Delete Resource in DetailView"
+         description="Delete Resource"
          id="de.tukl.cs.softech.agilereview.views.detail.delete"
          name="de.tukl.cs.softech.agilereview.views.detail.delete">
    </command>
@@ -505,7 +505,7 @@
       </command>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose"
-            icon="IMG_OBJ_PROJECT_CLOSED"
+            icon="icons/review/closed_project.gif"
             label="Open/Close selected reviews"
             style="push"
             tooltip="Open/Close reviews">
@@ -516,7 +516,7 @@
       </separator>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer"
-            icon="IMG_ELCL_SYNCED"
+            icon="icons/synced.gif"
             label="Link Review Explorer with Comments Summary"
             style="toggle">
       </command>
@@ -558,7 +558,7 @@
       </command>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose"
-            icon="IMG_OBJ_PROJECT_CLOSED"
+            icon="icons/review/closed_project.gif"
             label="Open/Close selected reviews"
             style="push"
             tooltip="Open/Close reviews">
@@ -574,7 +574,8 @@
             style="push">
       </command>
       <command
-            commandId="org.eclipse.ui.edit.delete"
+            commandId="de.tukl.cs.softech.agilereview.views.detail.delete"
+            icon="icons/comment/comment_del_15x15.png"
             label="Delete comments"
             style="push">
       </command>
@@ -600,14 +601,14 @@
    <key
          commandId="de.tukl.cs.softech.agilereview.views.commenttable.filter"
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
-         schemeId="de.tukl.cs.softech.agilereview.keyscheme"
-         sequence="M1+M2+F">
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+?">
    </key>
    <key
          commandId="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment"
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
-         schemeId="de.tukl.cs.softech.agilereview.keyscheme"
-         sequence="M1+M2+M">
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2++">
    </key>
 </extension>
 <extension

@@ -69,20 +69,6 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 					IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
 					contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
 					PluginLogger.log(ViewControl.class.toString(), "Constructor", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" activated");
-					// TODO: Should not be done this way
-//					IBindingService bindingService = (IBindingService)PlatformUI.getWorkbench().getService(IBindingService.class);
-//					CommandManager commandManager = new CommandManager();
-//					ContextManager contextManager = new ContextManager();
-//					BindingManager bindingManager = new BindingManager(contextManager, commandManager);
-//					Scheme scheme = bindingService.getScheme("de.tukl.cs.softech.agilereview.keyscheme");
-//					if (scheme.isDefined()) {
-//						try {
-//							bindingManager.setActiveScheme(scheme);
-//						} catch (NotDefinedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//					}
 				}
 			}
 		});

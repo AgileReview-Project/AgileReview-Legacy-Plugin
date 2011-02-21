@@ -511,8 +511,9 @@ public class ReviewAccess {
 		// Fill attributes
 		result.setAuthor(author);
 		result.setReviewID(reviewId);
-		result.setCreationDate(Calendar.getInstance());
-		// last-modified will be set when saved
+		Calendar currCal = Calendar.getInstance();
+		result.setCreationDate(currCal);
+		result.setLastModified(currCal);
 		result.setPriority(0);
 		result.setRecipient("");
 		result.setStatus(0);
@@ -623,6 +624,16 @@ public class ReviewAccess {
 		boolean contains = this.rModel.containsReview(reviewId);
 		boolean loaded = !this.rModel.getComments(reviewId).isEmpty();
 		return contains && loaded; 
+	}
+	
+	/**
+	 * Checks whether the given reviewId already exists
+	 * @param reviewId
+	 * @return true, if reviewId already exists, false otherwise
+	 */
+	public boolean reviewExists(String reviewId)
+	{
+		return this.rModel.containsReview(reviewId);
 	}
 	
 	/**
