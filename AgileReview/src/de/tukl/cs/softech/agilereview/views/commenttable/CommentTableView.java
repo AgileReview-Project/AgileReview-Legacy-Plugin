@@ -64,6 +64,7 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
@@ -793,6 +794,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			this.parserMap.get(getActiveEditor()).revealCommentLocation(commentTag);
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
+		}
+		if (ViewControl.isOpen(DetailView.class)) {
+			DetailView.getInstance().setFocus();
 		}
 	}
 	

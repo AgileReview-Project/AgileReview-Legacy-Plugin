@@ -152,9 +152,9 @@ public class CleanupHandler extends AbstractHandler {
 		
 			// Inform user
 			if (success) {
-				MessageDialog.open(MessageDialog.INFORMATION, HandlerUtil.getActiveShell(event), "AgileReview Cleanup", "The project " + ((IProject)selProject).getName() + " was successfully cleaned." , SWT.OK);
+				MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "AgileReview Cleanup", "The project " + ((IProject)selProject).getName() + " was successfully cleaned.");
 			} else {
-				MessageDialog.open(MessageDialog.WARNING, HandlerUtil.getActiveShell(event), "AgileReview Cleanup", "The project " + ((IProject)selProject).getName() + " could not be cleaned." , SWT.OK);
+				MessageDialog.openWarning(HandlerUtil.getActiveShell(event), "AgileReview Cleanup", "The project " + ((IProject)selProject).getName() + " could not be cleaned.");
 			}
 			
 		}
