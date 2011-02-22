@@ -389,7 +389,7 @@
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.dataaccess.handler.CleanupHandler"
-         commandId="AgileReview.Cleanup">
+         commandId="de.tukl.cs.softech.agilereview.cleanup">
       <activeWhen>
          <with
                variable="selection">
@@ -403,26 +403,38 @@
          </with>
       </activeWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.ShowCommentHandler"
+         commandId="de.tukl.cs.softech.agilereview.showComment">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="org.eclipse.ui.IEditorPart">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-         description="Add new Reply in DetailView"
+         description="Add new Reply to a Comment in DetailView"
          id="de.tukl.cs.softech.agilereview.views.detail.newReply"
-         name="de.tukl.cs.softech.agilereview.views.detail.newReply">
+         name="Add New Reply">
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
          description="SaveCommand for AgileReview Contents"
          id="de.tukl.cs.softech.agilereview.save"
-         name="de.tukl.cs.softech.agilereview.save">
+         name="SaveCommand for AgileReview Contents">
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
          description="RevertCommand in DetailView"
          id="de.tukl.cs.softech.agilereview.views.detail.revert"
-         name="de.tukl.cs.softech.agilereview.views.detail.revert">
+         name="Revert comment changes">
    </command>
    <category
          description="Commands for AgileReview Plugin"
@@ -432,34 +444,34 @@
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
          defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CreateNewReviewHandler"
-         description="Create new review"
+         description="Create new review in ReviewExplorer"
          id="de.tukl.cs.softech.agilereview.views.reviewexplorer.createNewReview"
-         name="de.tukl.cs.softech.agilereview.views.reviewexplorer.createNewReview">
+         name="Create New Review">
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
          description="Activate review based on selection in ReviewExplorer"
          id="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate"
-         name="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate">
+         name="Activate Selected Review">
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
          description="Open/Close reviews based on selection in ReviewExplorer"
          id="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose"
-         name="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose">
+         name="Open/Close Selected Reviewh.agilereview.views.reviewexplorer.openClose">
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
          description="Add new comment in CommentTableView"
          id="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment"
-         name="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment">
+         name="Add New Comment">
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
          defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.LinkExplorerToggleHandler"
          description="Link ReviewExplorer with CommentTableView"
          id="de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer"
-         name="de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer">
+         name="Link ReviewExplorer with CommentTableView">
       <state
             class="org.eclipse.ui.handlers.RegistryToggleState:false"
             id="org.eclipse.ui.commands.toggleState">
@@ -467,13 +479,14 @@
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-         description="Delete Resource in DetailView"
+         description="Delete Content in DetailView"
          id="de.tukl.cs.softech.agilereview.views.detail.delete"
-         name="de.tukl.cs.softech.agilereview.views.detail.delete">
+         name="Delete Content in DetailView">
    </command>
       <command
-         id="AgileReview.Cleanup"
-         name="Cleanup">
+            description="Clean a project from all AgileReview comment"
+            id="de.tukl.cs.softech.agilereview.cleanup"
+            name="Cleanup project">
    </command>
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
@@ -485,6 +498,12 @@
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
             id="de.tukl.cs.softech.agilereview.views.commenttable.delete"
             name="Delete comments in CommentTableView">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Show in Editor selected comment in Detail View"
+            id="de.tukl.cs.softech.agilereview.showComment"
+            name="Show comment in DetailView">
       </command>
 </extension>
 <extension
@@ -647,7 +666,7 @@
             visible="true">
       </separator>
       <command
-            commandId="AgileReview.Cleanup"
+            commandId="de.tukl.cs.softech.agilereview.cleanup"
             icon="icons/agile_icon.png"
             label="AgileReview Project CleanUp"
             style="push"
@@ -684,6 +703,12 @@
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M3+M2++">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.showComment"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+#">
    </key>
 </extension>
 <extension

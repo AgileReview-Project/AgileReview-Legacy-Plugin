@@ -140,7 +140,7 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 				lValid.setText("");
 			} else {
 				setPageComplete(false);
-				lValid.setText("*) "+"ReviewId already in use");
+				lValid.setText("* "+"ReviewId already in use");
 			}
 		} else {
 			setPageComplete(false);

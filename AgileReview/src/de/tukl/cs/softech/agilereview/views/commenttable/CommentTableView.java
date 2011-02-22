@@ -167,7 +167,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 		// set selection (to display comment in detail view)
 		// getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
-		viewer.setSelection(new StructuredSelection(comment), true);
+		this.selectComment(comment);
 		// TODO: Das hier vlt auslagern -> macht CTV dümmer, außerdem liegen z.B. Editor und Selection im Handler vor 
 		try {
 			IEditorPart editor;
@@ -876,5 +876,13 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	public void focusFilterField(){
 		this.filterText.setFocus();
+	}
+	
+	/**
+	 * Selects the given comment in the table
+	 * @param c comment to select
+	 */
+	public void selectComment(Comment c) {
+		viewer.setSelection(new StructuredSelection(c), true);
 	}
 }

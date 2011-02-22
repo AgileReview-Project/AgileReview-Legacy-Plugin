@@ -158,46 +158,6 @@ public class ReviewAccess {
 		return f;
 	}
 	
-//	/**
-//	 * Computes the path for a given comment
-//	 * @param comment comment for which the path should be returned
-//	 * @return path of the file, to which this comment belongs
-//	 */
-//	public static String computePath(Comment comment)
-//	{  
-//		XmlCursor c = comment.newCursor();
-//		c.toParent();
-//		String path = c.getAttributeText(new QName("name"));
-//		
-//		while(c.toParent() && !(c.getObject() instanceof Files))
-//		{
-//			path = c.getAttributeText(new QName("name"))+System.getProperty("file.separator")+path;
-//		}
-//		c.dispose();
-//		
-//		return path;
-//	}
-//	
-//	/**
-//	 * Computes the path for a given file
-//	 * @param file comment for which the path should be returned
-//	 * @return path of the file
-//	 */
-//	public static String computePath(agileReview.softech.tukl.de.FileDocument.File file)
-//	{  
-//		XmlCursor c = file.newCursor();
-//		c.toParent();
-//		String path = c.getAttributeText(new QName("name"));
-//		
-//		while(c.toParent() && !(c.getObject() instanceof Files))
-//		{
-//			path = c.getAttributeText(new QName("name"))+System.getProperty("file.separator")+path;
-//		}
-//		c.dispose();
-//		
-//		return path;
-//	}
-	
 	/**
 	 * Computes the path for a given comment, file or folder
 	 * @param item comment for which the path should be returned
@@ -612,6 +572,10 @@ public class ReviewAccess {
 	public ArrayList<Comment> getComments(String reviewId, String path)
 	{
 		return this.rModel.getComments(reviewId, path);
+	}
+	
+	public Comment getComment(String reviewId, String author, String commentId) {
+		return this.rModel.getComment(reviewId, author, commentId);
 	}
 	
 	
