@@ -54,13 +54,13 @@ public class CleanupHandler extends AbstractHandler {
 			boolean deleteComments = true;
 			MessageBox messageDialog = new MessageBox(HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 			messageDialog.setText("AgileReview Cleanup");
-			messageDialog.setMessage("Convert comments to global comments? Otherwise they will be deleted!");
+			messageDialog.setMessage("Delete comments? Otherwise they will be converted to global comments!");
 			int result = messageDialog.open();
 
 			if (result==SWT.CANCEL) {
 				// cancel selected -> quit method
 				return null;
-			} else if (result==SWT.YES) {
+			} else if (result==SWT.NO) {
 				deleteComments = false;
 			}
 			
@@ -101,10 +101,10 @@ public class CleanupHandler extends AbstractHandler {
 			for (String path : paths) {
 				if (!success) {
 					IPath actPath = new Path(path);
-					removeTagsFromFile(actPath);
+					TagCleaner.removeAllTags(actPath);
 				} else {
 					IPath actPath = new Path(path);
-					success = removeTagsFromFile(actPath);
+					success = TagCleaner.removeAllTags(actPath);
 				}				
 			}
 			
@@ -113,6 +113,7 @@ public class CleanupHandler extends AbstractHandler {
 				try {
 					PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
 					ReviewAccess.getInstance().deleteComments(comments);
+					ReviewAccess.getInstance().save();
 					if (ViewControl.isOpen(CommentTableView.class)) {
 						CommentTableView.getInstance().resetComments();	
 					}
@@ -143,15 +144,6 @@ public class CleanupHandler extends AbstractHandler {
 		}
 		
 		return null;
-	}
-	
-	/**
-	 * Removes the comment tags from the file given by the path
-	 * @param path the path relative to the workspaceroot
-	 * @return true if tags were removed successfully, else false
-	 */
-	private boolean removeTagsFromFile(IPath path) {
-		return TagCleaner.removeAllTags(path);
 	}
 
 }

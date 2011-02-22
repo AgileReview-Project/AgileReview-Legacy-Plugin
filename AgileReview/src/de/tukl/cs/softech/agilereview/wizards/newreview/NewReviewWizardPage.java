@@ -62,6 +62,7 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 
 		id = new Text(container, SWT.BORDER | SWT.SINGLE);
 		id.setText("");
+		id.setToolTipText("Review-Name must be set.");
 //		id.addKeyListener(this);
 		id.addModifyListener(this);
 //		id.addVerifyListener(this);
