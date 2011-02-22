@@ -108,6 +108,10 @@ public class CleanupHandler extends AbstractHandler {
 				}				
 			}
 			
+			if (ViewControl.isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().reparseAllEditors();
+			}
+			
 			// delete comments based on users decision
 			if (deleteComments) {
 				try {
