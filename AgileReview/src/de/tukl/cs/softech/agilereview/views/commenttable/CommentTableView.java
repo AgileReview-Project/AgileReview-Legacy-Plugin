@@ -60,6 +60,7 @@ import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.annotations.AnnotationParser;
 import de.tukl.cs.softech.agilereview.annotations.IAnnotationParser;
 import de.tukl.cs.softech.agilereview.annotations.ParserFactory;
+import de.tukl.cs.softech.agilereview.annotations.TagCleaner;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -197,14 +198,15 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		// remove annotation and tags
 		try {
 			PluginLogger.log(this.getClass().toString(), "deleteComment", "Starting to remove tags for currently deleted comment");
-			openEditor(comment);
-			parserMap.get(getActiveEditor()).removeCommentTags(comment);
+			if(openEditorContains(comment)) {
+				parserMap.get(getActiveEditor()).removeCommentTags(comment);
+			} else {
+				TagCleaner.removeTag(new Path(ReviewAccess.computePath(comment)), generateCommentKey(comment), false);
+			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "deleteComment", "BadLocationException when trying to delete comment", e);
-			//e.printStackTrace();
 		} catch (CoreException e) {
 			PluginLogger.logError(this.getClass().toString(), "deleteComment", "CoreException when trying to delete comment", e);
-			//e.printStackTrace();
 		}
 	}
 
@@ -585,6 +587,26 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	}
 	
 	/**
+	 * Proves whether the current open editor contains the tags for the given comment
+	 * @param comment the comment
+	 * @return true, if the current open editor contains the given comment<br>
+	 * false, otherwise
+	 */
+	private boolean openEditorContains(Comment comment) {
+		boolean result = false;
+		IPath path = new Path(ReviewAccess.computePath(comment));
+		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		if(getActiveEditor() != null) {
+			IFile editorFile = (IFile) getActiveEditor().getEditorInput().getAdapter(IFile.class);
+			PluginLogger.log(this.getClass().toString(), "openEditorContains", "File for comment: "+file.getFullPath()+" | Current Editor File: "+editorFile.getFullPath());
+			if(file.getFullPath().equals(editorFile.getFullPath())) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Opens an editor for a given comment
 	 * @param comment the comment
 	 */
@@ -598,6 +620,17 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		} catch (PartInitException e) {
 			PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
 		}
+	}
+	
+	/**
+	 * Generates the comment key for the given comment in the following scheme: reviewID|author|commendID
+	 * @param comment which comment key should be generated
+	 * @return comment key
+	 */
+	private String generateCommentKey(Comment comment) {
+		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
+		return commentTag;
 	}
 	
 	//###############################################################################
@@ -787,11 +820,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
 		openEditor(comment);
 		//jump to comment in opened editor
-		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 		try {
 			PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
-			this.parserMap.get(getActiveEditor()).revealCommentLocation(commentTag);
+			this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
 		}
@@ -814,6 +845,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		filterComments();
 		viewer.refresh();
 	}
+	
 	/**
 	 * Removes the selection filter from the viewer
 	 */
