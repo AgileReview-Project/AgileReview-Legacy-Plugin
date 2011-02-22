@@ -16,11 +16,11 @@
     <topic href="help/guide/concepts/storage.htm" label="Storage concept">
     </topic>
     <topic label="Views">
-       <topic label="ReviewExplorer">
+       <topic href="help/guide/concepts/views/reviewexplorer.htm" label="ReviewExplorer">
        </topic>
-       <topic label="CommentDetail view">
+       <topic href="help/guide/concepts/views/detailview.htm" label="CommentDetail view">
        </topic>
-       <topic label="CommentTable view">
+       <topic href="help/guide/concepts/views/summaryview.htm" label="CommentTable view">
        </topic>
     </topic>
     <topic href="help/guide/concepts/perspective.htm" label="Agilereview perspective">
