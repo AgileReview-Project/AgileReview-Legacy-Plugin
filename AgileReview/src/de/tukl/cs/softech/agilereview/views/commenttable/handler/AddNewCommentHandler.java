@@ -18,6 +18,7 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
@@ -27,6 +28,11 @@ public class AddNewCommentHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		if (ViewControl.isOpen(CommentTableView.class) || ViewControl.isOpen(DetailView.class) || ViewControl.isOpen(ReviewExplorer.class)) {
+			if (ViewControl.getInstance().shouldSwitchPerspective()) {
+				ViewControl.getInstance().switchPerspective();
+			}
+		}
 		PluginLogger.log(this.getClass().toString(), "execute", "Command \"Add new Comment\" triggered");			
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		if (!activeReview.isEmpty()) {

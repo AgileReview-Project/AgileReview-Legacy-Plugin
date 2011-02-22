@@ -2,6 +2,10 @@ package de.tukl.cs.softech.agilereview.views;
 
 import java.util.HashSet;
 
+import javax.swing.UIManager;
+
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Display;
@@ -13,13 +17,17 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.ViewPart;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.detail.CommentDetail;
 import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 
 /**
@@ -123,6 +131,41 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 		return perspectiveIsOpen;
 	}
 	
+	/**
+	 * Indicates whether the perspective should be switched (user preferences or actual user decision)
+	 * @return true if perspective should be switched to AgileReview perspective, false if not
+	 */
+	public boolean shouldSwitchPerspective() {
+		boolean answer = false;
+		while (PlatformUI.getWorkbench()==null) {}
+		while (PlatformUI.getWorkbench().getDisplay()==null) {}
+		while (PlatformUI.getWorkbench().getDisplay().getActiveShell()==null) {}
+		if (!isPerspectiveOpen()) {
+			String switchPerspective = PropertiesManager.getPreferences().getString("autoOpenPerspective"); 
+			if (MessageDialogWithToggle.ALWAYS.equals(switchPerspective)) {
+				return true;
+			} else if (MessageDialogWithToggle.NEVER.equals(switchPerspective)) {
+				return false;
+			}
+			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(PlatformUI.getWorkbench().getDisplay().getActiveShell(), "AgileReview", "This command belongs to the AgileReview Perspective. Do you want to switch to this perspective to fully enable the AgileReview Plugin?", null, true, PropertiesManager.getPreferences(), "autoOpenPerspective");
+			answer = (dialog.getReturnCode() == IDialogConstants.YES_ID);
+		}
+		return answer;
+	}
+	
+	/**
+	 * Switches the perspective to the AgileReview perspective
+	 */
+	public void switchPerspective() {
+		while (PlatformUI.getWorkbench()==null) {}
+		while (PlatformUI.getWorkbench().getActiveWorkbenchWindow()==null) {}
+		try {
+			PlatformUI.getWorkbench().showPerspective("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective", PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+		} catch (WorkbenchException e) {
+			PluginLogger.logError(this.getClass().toString(), "partOpened", "WorkbenchException while opening perspective", e);
+		}
+	}
+	
 	//****************************************
 	//****** ISelectionChangedListener *******
 	//****************************************
@@ -220,7 +263,6 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 */
 	@Override
 	public void partOpened(IWorkbenchPartReference partRef) {
-		
 	}
 
 	/**
