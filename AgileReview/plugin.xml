@@ -89,7 +89,9 @@
        </type>
     </extension>
     <extension point="org.eclipse.help.contexts">
-    <contexts file="help/contexts.xml">
+    <contexts
+          file="help/contexts.xml"
+          plugin="de.tukl.cs.softech.agilereview">
     </contexts>
 </extension>
 <extension
@@ -676,5 +678,5 @@
          id="de.tukl.cs.softech.agilereview.nature.image"
          natureId="de.tukl.cs.softech.agilereview.nature">
    </image>
-</extension>n
+</extension>
 </plugin>
