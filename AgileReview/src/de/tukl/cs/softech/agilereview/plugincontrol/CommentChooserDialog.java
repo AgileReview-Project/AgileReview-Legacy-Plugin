@@ -2,8 +2,6 @@ package de.tukl.cs.softech.agilereview.plugincontrol;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -11,13 +9,14 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * The ReplyDialog is a small Wizard to insert new Replys to a document
  */
-public class CommentChooserDialog extends Composite implements Listener, KeyListener {
+public class CommentChooserDialog extends Composite implements Listener {
 	
 	/**
 	 * TextBox to insert the reply text
@@ -47,7 +46,7 @@ public class CommentChooserDialog extends Composite implements Listener, KeyList
 	 * @param style
 	 * @param args Comment tags from which to choose
 	 */
-	public CommentChooserDialog(Composite parent, int style, String[] args) {
+	public CommentChooserDialog(Shell parent, int style, String[] args) {
 		super(parent, style);
 		this.argsArr = args;
 		initUI();
@@ -59,8 +58,7 @@ public class CommentChooserDialog extends Composite implements Listener, KeyList
 	private void initUI() {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
-		this.setLayout(gridLayout);
-		this.addKeyListener(this);
+		this.setLayout(gridLayout);		
 		
 		replyText = new Combo(this, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER | SWT.READ_ONLY);
 		replyText.setItems(this.argsArr);
@@ -78,6 +76,7 @@ public class CommentChooserDialog extends Composite implements Listener, KeyList
 	    okButton = new Button(this, SWT.PUSH);
 	    okButton.setText("Ok");
 	    okButton.addListener(SWT.Selection, this);
+	    this.getShell().setDefaultButton(okButton);
 	    
 	    Button cancelButton = new Button(this, SWT.PUSH);
 	    cancelButton.setText("Cancel");
@@ -120,14 +119,5 @@ public class CommentChooserDialog extends Composite implements Listener, KeyList
         	getParent().dispose();
         }        
 	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {/* Do nothing */}
 }
 
