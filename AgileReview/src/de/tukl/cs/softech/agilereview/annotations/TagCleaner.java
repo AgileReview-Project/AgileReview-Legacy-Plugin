@@ -16,7 +16,7 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
- * Removes comment tags for a file given by a path
+ * Remove one or more comment tags
  */
 public class TagCleaner {
 
@@ -35,24 +35,34 @@ public class TagCleaner {
 	 * @return true if tags were removed successfully, else false
 	 */
 	public static boolean removeAllTags(IPath path) {
-		return removeTag(path, rawTagRegex);	
+		return removeTag(path, rawTagRegex, true);	
 	}
 	
-	public static boolean removeTag(IPath path, String identifier) {
-		
+	/**
+	 * @param path the path of the file which will be modified
+	 * @param identifier the identifier of the comment to be removed
+	 * @param regex true if the identifier already a regex
+	 * @return whether tags were removed successful
+	 */
+	public static boolean removeTag(IPath path, String identifier, boolean regex) {
 		boolean result = true;
 		
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		try {
+			// identifier already quoted?
+			if (!regex) {
+				identifier = Pattern.quote(identifier);
+			}
+			String identifierRegex = "\\s*(\\??)\\s*"+Pattern.quote(keySeparator)+"\\s*"+identifier+"\\s*"+Pattern.quote(keySeparator)+"\\s*(\\??)\\s*";
+			
+			// get input from file
 			InputStream is = file.getContents();
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));			
 			
-			String line = br.readLine();
-			String identifierRegex = "\\s*(\\??)\\s*"+Pattern.quote(keySeparator)+"\\s*"+Pattern.quote(identifier)+"\\s*"+Pattern.quote(keySeparator)+"\\s*(\\??)\\s*";
-			
+			// read file line by line, replace tags
 			String input = "";						
-			while (line != null) {
-								
+			String line = br.readLine();
+			while (line != null) {								
 				if (path.getFileExtension().equals("java")) {
 					String javaregex = "/\\*"+identifierRegex+"\\*/";
 					input += line.replaceAll(javaregex, "");	
@@ -65,6 +75,7 @@ public class TagCleaner {
 				input += line!=null ? System.getProperty("line.separator") : "";
 			}
 
+			// write modified content to file
 			byte[] bytes = input.getBytes();
 			InputStream source = new ByteArrayInputStream(bytes);
 			file.setContents(source, false, true, null);
