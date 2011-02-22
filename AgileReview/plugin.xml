@@ -203,15 +203,6 @@
    </initializer>
 </extension>   
 <extension
-      point="org.eclipse.core.variables.dynamicVariables">
-   <variable
-         description="VariableResolver for DetailView"
-         name="REVERTABLE"
-         resolver="de.tukl.cs.softech.agilereview.views.detail.handlers.VariableResolver"
-         supportsArgument="false">
-   </variable>
-</extension>
-<extension
       point="org.eclipse.ui.handlers">
    <handler
          class="de.tukl.cs.softech.agilereview.plugincontrol.RefreshHandler"

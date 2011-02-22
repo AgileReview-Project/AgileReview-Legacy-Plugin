@@ -97,6 +97,23 @@ public class AgileAnnotationController {
 	}
 	
 	/**
+	 * Returns all comments which are overlapping with the given {@link Position}
+	 * @param p position
+	 * @return all comments which are overlapping with the given {@link Position}
+	 */
+	protected String[] getCommentsByPosition(Position p) {
+		HashSet<String> commentKeys = new HashSet<String>();
+		Position tmp;
+		for(String key : annotationMap.keySet()) {
+			tmp = ((IAnnotationModel) this.annotationModel).getPosition(annotationMap.get(key));
+			if(tmp.overlapsWith(p.getOffset(), p.getLength())) {
+				commentKeys.add(key);
+			}
+		}
+		return commentKeys.toArray(new String[0]);
+	}
+	
+	/**
 	 * Creates a new annotation for a given comment key
 	 * @param commentKey for which an annotation will be created
 	 * @return created annotation

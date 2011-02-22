@@ -25,6 +25,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.tools.NoDocumentFoundException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * The AnnotationParser analyzes the document of the given editor and provides a mapping
@@ -238,7 +239,9 @@ public class AnnotationParser implements IAnnotationParser {
 				display.put(s, this.idPositionMap.get(s));
 			}
 		}
-		this.annotationModel.displayAnnotations(display);
+		if(ViewControl.isPerspectiveOpen()) {
+			this.annotationModel.displayAnnotations(display);
+		}
 	}
 	
 	/*
@@ -312,7 +315,9 @@ public class AnnotationParser implements IAnnotationParser {
 				//		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
 			}
 			parseInput();
-			this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
+			if(ViewControl.isPerspectiveOpen()) {
+				this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
+			}
 		}
 		//return result;
 	}
