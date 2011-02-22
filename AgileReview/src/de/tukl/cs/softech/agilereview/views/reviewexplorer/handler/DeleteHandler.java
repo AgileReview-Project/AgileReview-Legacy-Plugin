@@ -34,7 +34,7 @@ public class DeleteHandler extends AbstractHandler {
 		ISelection sel1 = HandlerUtil.getCurrentSelection(event);
 		if (sel1 != null){
 			// Check for not empty and if user really wants to deleted the selected reviews
-			if (!sel1.isEmpty() && !MessageDialog.openConfirm(null, "Delete", "Are you sure you want to delete all comments of this selection?"))
+			if (!sel1.isEmpty() && !MessageDialog.openConfirm(null, "Review Explorer - Delete", "Are you sure you want to delete all comments of this selection?"))
 			{
 				return null;
 			}		

@@ -262,6 +262,14 @@
    <handler
          class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.DeleteHandler"
          commandId="org.eclipse.ui.edit.delete">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+            </instanceof>
+         </with>
+      </activeWhen>
       <enabledWhen>
          <with
                variable="selection">
@@ -274,14 +282,6 @@
             </iterate>
          </with>
       </enabledWhen>
-      <activeWhen>
-         <with
-               variable="activePart">
-            <instanceof
-                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
-            </instanceof>
-         </with>
-      </activeWhen>
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.OpenCloseReviewHandler"
@@ -323,14 +323,14 @@
    <handler
          class="de.tukl.cs.softech.agilereview.views.detail.handlers.NewReplyHandler"
          commandId="de.tukl.cs.softech.agilereview.views.detail.newReply">
-      <enabledWhen>
+      <activeWhen>
          <with
                variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
             <equals
                   value="true">
             </equals>
          </with>
-      </enabledWhen>
+      </activeWhen>
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.dataaccess.SaveHandler"
@@ -339,6 +339,30 @@
    <handler
          class="de.tukl.cs.softech.agilereview.views.commenttable.handler.DeleteCommentHandler"
          commandId="de.tukl.cs.softech.agilereview.views.commenttable.delete">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+            </instanceof>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="agileReview.softech.tukl.de.CommentDocument$Comment">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.commenttable.handler.DeleteCommentHandler"
+         commandId="org.eclipse.ui.edit.delete">
       <activeWhen>
          <with
                variable="activePart">
@@ -480,7 +504,7 @@
       <command
             commandId="de.tukl.cs.softech.agilereview.views.detail.newReply"
             icon="icons/comment/comment_newReply_15x15.png"
-            label="new Reply"
+            label="New Reply"
             style="push">
          <visibleWhen
                checkEnabled="false">
@@ -501,12 +525,30 @@
             icon="icons/undo_edit.gif"
             label="revert"
             style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
       </command>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.detail.delete"
             icon="icons/delete_obj.gif"
-            label="delete"
+            label="Delete shown resource"
             style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
       </command>
    </menuContribution>
    <menuContribution
@@ -628,11 +670,6 @@
 </extension>
 <extension
       point="org.eclipse.ui.bindings">
-   <scheme
-         id="de.tukl.cs.softech.agilereview.keyscheme"
-         name="AgileReview in use"
-         parentId="org.eclipse.ui.defaultAcceleratorConfiguration">
-   </scheme>
    <key
          commandId="de.tukl.cs.softech.agilereview.views.commenttable.filter"
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
@@ -646,10 +683,16 @@
          sequence="M1+M2++">
    </key>
    <key
-         commandId="de.tukl.cs.softech.agilereview.views.commenttable.delete"
+         commandId="de.tukl.cs.softech.agilereview.views.detail.delete"
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-         sequence="DEL">
+         sequence="M3+M2+DEL">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.detail.newReply"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M3+M2++">
    </key>
 </extension>
 <extension
@@ -681,6 +724,7 @@
 </extension>
 <extension
       id="de.tukl.cs.softech.agilereview.nature"
+      name="AgileReview Source Folder"
       point="org.eclipse.core.resources.natures">
    <runtime>
       <run

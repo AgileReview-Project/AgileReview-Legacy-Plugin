@@ -120,10 +120,13 @@ public class DetailView extends ViewPart {
 	
 	/**
 	 * Add Reply if and only if the comment detail part is opened
+	 * @param author author of the reply
+	 * @param text text of the reply
 	 */
-	public void addReply() {
+	public void addReply(String author, String text) {
 		if(currentDisplay == COMMENT_DETAIL) {
-			((CommentDetail) actParent).addReply();
+			((CommentDetail) actParent).saveChanges();
+			((CommentDetail) actParent).addReply(author, text);
 		}
 	}
 

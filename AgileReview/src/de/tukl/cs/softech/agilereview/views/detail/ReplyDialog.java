@@ -44,7 +44,7 @@ public class ReplyDialog extends Composite implements Listener {
 	 * @param parent
 	 * @param style
 	 */
-	protected ReplyDialog(Composite parent, int style) {
+	public ReplyDialog(Composite parent, int style) {
 		super(parent, style);
 		initUI();
 	}	
@@ -83,7 +83,7 @@ public class ReplyDialog extends Composite implements Listener {
 	 * Returns whether the Save-Button was pressed or not
 	 * @return true for save button, false for cancel button
 	 */
-	protected boolean getSaved() {
+	public boolean getSaved() {
 		return boolSaved;
 	}
 	
@@ -91,7 +91,7 @@ public class ReplyDialog extends Composite implements Listener {
 	 * Returns the author of the reply
 	 * @return reply author
 	 */
-	protected String getReplyAuthor() {
+	public String getReplyAuthor() {
 		return strReplyAuthor;
 	}
 	
@@ -99,7 +99,7 @@ public class ReplyDialog extends Composite implements Listener {
 	 * Return the reply's text
 	 * @return reply text
 	 */
-	protected String getReplyText(){
+	public String getReplyText(){
 		return strReplyText;
 	}
 	

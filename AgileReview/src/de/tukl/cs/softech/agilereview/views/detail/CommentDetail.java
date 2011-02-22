@@ -14,10 +14,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -232,30 +230,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	}
 	
 	/**
-	 * Starts the wizard for adding a reply and adds it to the view
-	 */
-	public void addReply() {
-		Shell shell = new Shell(this.getShell());
-		ReplyDialog dialog = new ReplyDialog(shell, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM | SWT.SHELL_TRIM);
-		dialog.setSize(250, 150);
-	    shell.pack();
-	    shell.open();
-		while (!shell.isDisposed()) {
-			if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
-	    }
-		
-		if(dialog.getSaved()) {
-			saveChanges();
-			addReply(dialog.getReplyAuthor(), dialog.getReplyText());
-		}
-	}
-	
-	/**
 	 * adds a reply to the reply list shown in the view
 	 * @param author of the reply
 	 * @param text of the reply
 	 */
-	private void addReply(String author, String text) {
+	public void addReply(String author, String text) {
 		
 		String replyText = this.replys.getText();
 		DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");

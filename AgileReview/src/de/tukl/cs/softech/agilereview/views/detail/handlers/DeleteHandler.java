@@ -29,7 +29,7 @@ public class DeleteHandler extends AbstractHandler {
 		if(ViewControl.isOpen(DetailView.class)) {
 			Object o = DetailView.getInstance().getContent();	
 			if(o instanceof Review) {
-				if (!MessageDialog.openConfirm(null, "Delete", "Are you sure you want to delete this review?"))
+				if (!MessageDialog.openConfirm(null, "Review Details - Delete", "Are you sure you want to delete this review?"))
 				{
 					return null;
 				}
@@ -47,7 +47,7 @@ public class DeleteHandler extends AbstractHandler {
 				// Remove this review from the list of open reviews (regardless if it was open or not)
 				PropertiesManager.getInstance().removeFromOpenReviews(r.getId());
 			} else if(o instanceof Comment) {
-				if (!MessageDialog.openConfirm(null, "Delete", "Are you sure you want to delete this comment?"))
+				if (!MessageDialog.openConfirm(null, "Comment Details - Delete", "Are you sure you want to delete this comment?"))
 				{
 					return null;
 				}
