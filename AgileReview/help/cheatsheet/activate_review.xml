@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Activate Review">
+<intro>
+<description>This tutorial guides you through the activation of a review.</description>
+</intro>
+<item title="Review Explorer">
+<description>Go into the <b>Review Explorer</b>.
+</description>
+<command
+      required="false"
+      serialization="org.eclipse.ui.views.showView(org.eclipse.ui.views.showView.viewId=de.tukl.cs.softech.agilereview.view.reviewnavigator.view)"/>
+</item>
+<item
+      title="Activate Review">
+   <description>
+      Activate a review, with pressing the <b>NewReview-icon</b>.
+   </description>
+   <command
+         required="false"
+         serialization="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate"/>
+</item>
+</cheatsheet>

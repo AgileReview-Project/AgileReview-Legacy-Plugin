@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<cheatsheet title="Insert Review">
+<cheatsheet title="Open/Close Review">
 <intro>
-<description>This tutorial guides you through the creation of a review.</description>
+<description>This tutorial guides you through the open/close mechanism of the review(s).</description>
 </intro>
 <item title="Review Explorer">
 <description>Go into the <b>Review Explorer</b>.
