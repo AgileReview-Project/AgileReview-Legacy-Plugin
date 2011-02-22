@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Position;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 
@@ -40,5 +41,14 @@ public class NullParser implements IAnnotationParser {
 
 	@Override
 	public void reload() {}
+
+	/**
+	 * Returns always an empty String array
+	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#getCommentsByPosition(org.eclipse.jface.text.Position)
+	 */
+	@Override
+	public String[] getCommentsByPosition(Position p) {
+		return new String[]{};
+	}
 
 }

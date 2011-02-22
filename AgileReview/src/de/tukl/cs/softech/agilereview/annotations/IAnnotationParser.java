@@ -64,4 +64,11 @@ public interface IAnnotationParser {
 	 * Parses the document another time
 	 */
 	public abstract void reload();
+	
+	/**
+	 * Returns all comments which are overlapping with the given {@link Position}
+	 * @param p position
+	 * @return all comments which are overlapping with the given {@link Position}
+	 */
+	public String[] getCommentsByPosition(Position p);
 }

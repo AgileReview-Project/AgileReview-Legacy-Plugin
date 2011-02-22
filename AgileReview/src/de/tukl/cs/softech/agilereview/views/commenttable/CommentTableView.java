@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -688,6 +689,21 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			p.reload();
 			p.filter(filteredComments);
 		}
+	}
+	
+	/**
+	 * Returns all comments which are overlapping with the given {@link Position}
+	 * @param p position
+	 * @return all comments which are overlapping with the given {@link Position}
+	 */
+	public String[] getCommentsByPositionOfActiveEditor(Position p) {
+		if(getActiveEditor() != null) {
+			IAnnotationParser parser;
+			if((parser = this.parserMap.get(getActiveEditor())) != null) {
+				return parser.getCommentsByPosition(p);
+			}
+		}
+		return new String[]{};
 	}
 	
 	//###############################################################################

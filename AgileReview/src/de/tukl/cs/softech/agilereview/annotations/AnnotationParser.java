@@ -385,4 +385,13 @@ public class AnnotationParser implements IAnnotationParser {
 			throw new BadLocationException();
 		}
 	}
+	
+	/**
+	 * Returns all comments which are overlapping with the given {@link Position}
+	 * @param p position
+	 * @return all comments which are overlapping with the given {@link Position}
+	 */
+	public String[] getCommentsByPosition(Position p) {
+		return this.annotationModel.getCommentsByPosition(p);
+	}
 }
