@@ -1,14 +1,10 @@
 package de.tukl.cs.softech.agilereview.dataaccess.handler;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlException;
@@ -16,8 +12,9 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -26,6 +23,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
+import de.tukl.cs.softech.agilereview.annotations.TagCleaner;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -37,23 +35,6 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
  * 
  */
 public class CleanupHandler extends AbstractHandler {
-
-	/**
-	 * Key separator for tag creation
-	 */
-	private static String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-	/**
-	 * Core Regular Expression to find the core tag structure
-	 */
-	private static String rawTagRegex = "\\s*(\\??)"+Pattern.quote(keySeparator)+"\\s*([^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^\\?"+Pattern.quote(keySeparator)+"]*)\\s*"+Pattern.quote(keySeparator)+"(\\??)\\s*";
-	/**
-	 * Regular Expression to find each comment tag in java files
-	 */	
-	private static final String javaTagRegex = "/\\*\\s*"+rawTagRegex+"\\s*\\*/";
-	/**
-	 * Regular Expression to find each comment tag in XML files
-	 */
-	private static final String xmlTagRegex = "<!--\\s*"+rawTagRegex+"\\s*-->";
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -73,13 +54,13 @@ public class CleanupHandler extends AbstractHandler {
 			boolean deleteComments = true;
 			MessageBox messageDialog = new MessageBox(HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 			messageDialog.setText("AgileReview Cleanup");
-			messageDialog.setMessage("Delete comments when removing tags?");
+			messageDialog.setMessage("Convert comments to global comments? Otherwise they will be deleted!");
 			int result = messageDialog.open();
 
 			if (result==SWT.CANCEL) {
 				// cancel selected -> quit method
 				return null;
-			} else if (result==SWT.NO) {
+			} else if (result==SWT.YES) {
 				deleteComments = false;
 			}
 			
@@ -119,9 +100,11 @@ public class CleanupHandler extends AbstractHandler {
 			PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from "+paths.toString());
 			for (String path : paths) {
 				if (!success) {
-					removeTagsFromFile(path);
+					IPath actPath = new Path(path);
+					removeTagsFromFile(actPath);
 				} else {
-					success = removeTagsFromFile(path);
+					IPath actPath = new Path(path);
+					success = removeTagsFromFile(actPath);
 				}				
 			}
 			
@@ -162,58 +145,13 @@ public class CleanupHandler extends AbstractHandler {
 		return null;
 	}
 	
-	
 	/**
 	 * Removes the comment tags from the file given by the path
 	 * @param path the path relative to the workspaceroot
 	 * @return true if tags were removed successfully, else false
 	 */
-	private boolean removeTagsFromFile(String path) {
-
-		boolean success = true;
-		// get workspaceroot to make filepath absolute
-		String workspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-		if (!workspaceRoot.endsWith(System.getProperty("file.separator"))) {
-			workspaceRoot += System.getProperty("file.separator");
-		}
-		
-		File file = new File(workspaceRoot + path);
-		// supported files are *.java and *.xml -> if file is of type and exists proceed
-		if (file.exists()) {
-			if (path.endsWith("java") || path.endsWith("xml")) {
-				try {
-					// read file and remove tags
-					Scanner input = new Scanner(file);
-					String modifiedContent = "";
-					while (input.hasNext()) {
-						String actLine = input.nextLine();
-						if (path.endsWith("java")) {
-							modifiedContent += actLine.replaceAll(javaTagRegex, "");	
-						} else if (path.endsWith("xml")) {
-							modifiedContent += actLine.replaceAll(xmlTagRegex, "");
-						} 
-						modifiedContent += input.hasNext() ? System.getProperty("line.separator") : "";
-					}
-					input.close();
-
-					// save modified content to file
-					FileWriter output = new FileWriter(file);
-					output.write(modifiedContent);
-					output.close();
-
-
-				} catch (FileNotFoundException e) {
-					PluginLogger.logError(this.getClass().toString(), "execute", "FileNotFoundException while trying to remove tags.", e);
-					success = false;
-				} catch (IOException e) {
-					PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to remove tags.", e);
-					success = false;
-				}	
-			}
-		} else {
-			success = false;
-		}
-		return success;
+	private boolean removeTagsFromFile(IPath path) {
+		return TagCleaner.removeAllTags(path);
 	}
 
 }
