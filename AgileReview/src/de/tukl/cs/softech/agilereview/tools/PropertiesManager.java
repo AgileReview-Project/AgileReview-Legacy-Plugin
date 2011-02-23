@@ -156,7 +156,10 @@ public class PropertiesManager implements IInputValidator{
 		 * The default export location
 		 */
 		public static String EXPORT_PATH = "exportPath";
-		
+		/**
+		 * States whether the AgileReview Perspective should automatically be opened on certain events
+		 */
+		public static String AUTO_OPEN_PERSPECTIVE = "autoOpenPerspective";
 		
 	}
 	

@@ -57,7 +57,6 @@ public class AddNewCommentHandler extends AbstractHandler {
 					if(ViewControl.isOpen(ReviewExplorer.class)) {
 						ReviewExplorer.getInstance().refresh();
 					}
-					// TODO: Hier saven nötig? Gespeichert wird ja automatisch beim Focusverlust im DetailView
 					ReviewAccess.getInstance().save();
 				} else {
 					// no open editor

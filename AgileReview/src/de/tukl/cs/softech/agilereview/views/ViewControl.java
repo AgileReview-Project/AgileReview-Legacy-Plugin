@@ -137,7 +137,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 		while (PlatformUI.getWorkbench().getDisplay()==null) {}
 		while (PlatformUI.getWorkbench().getDisplay().getActiveShell()==null) {}
 		if (!isPerspectiveOpen()) {
-			String switchPerspective = PropertiesManager.getPreferences().getString("autoOpenPerspective"); 
+			String switchPerspective = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTO_OPEN_PERSPECTIVE); 
 			if (MessageDialogWithToggle.ALWAYS.equals(switchPerspective)) {
 				return true;
 			} else if (MessageDialogWithToggle.NEVER.equals(switchPerspective)) {
@@ -175,26 +175,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 			DetailView.getInstance().selectionChanged(event);
 		}
 	}
-	
-//	/** listens for selectionChanged events and forwards these to following methods:<br>
-//	 *  {@link CommentTableView#selectionChanged(IWorkbenchPart, ISelection)}<br>
-//	 *  {@link DetailView#selectionChanged(IWorkbenchPart, ISelection)}
-//	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
-//	 */
-//	@Override
-//	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-//		if(selection != null && part != null) {
-//			// TODO: the following logging line makes reading logs impossible 
-//			// PluginLogger.log(this.getClass().toString(), "selectionChanged", "fired with selection != null && part != null");
-//			if(isOpen(CommentTableView.class)) {
-//				CommentTableView.getInstance().selectionChanged(part, selection);
-//			}
-//			if(isOpen(DetailView.class)) {
-//				DetailView.getInstance().selectionChanged(part, selection);
-//			}
-//		}
-//	}
-	
+		
 	//****************************************
 	//********** IPartListener2 **************
 	//****************************************

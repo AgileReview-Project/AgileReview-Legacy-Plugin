@@ -232,11 +232,9 @@ public class ReviewAccess {
 		try {
 			fillDatabaseForOpenReviews();
 		} catch (XmlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(this.getClass().toString(), "constructor", "XmlException while filling database", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(this.getClass().toString(), "constructor", "IOException while filling database", e);
 		}
 	}
 
@@ -574,6 +572,13 @@ public class ReviewAccess {
 		return this.rModel.getComments(reviewId, path);
 	}
 	
+	/**
+	 * Returns the comment specified by the given tupel
+	 * @param reviewId
+	 * @param author
+	 * @param commentId
+	 * @return comment specified by given tupel
+	 */
 	public Comment getComment(String reviewId, String author, String commentId) {
 		return this.rModel.getComment(reviewId, author, commentId);
 	}
@@ -794,14 +799,6 @@ public class ReviewAccess {
 			{
 				// Just remove open, but not existent reviews
 				PropertiesManager.getInstance().removeFromOpenReviews(currReview);
-//				// A not existent review is marked as open
-//				// Ask the user, if he/she wants to delete it	
-//				if (MessageDialog.openQuestion(null, "Missing Review found", "Review \""+currReview+"\" cannot be found, but is marked as \"open\". Do you want to remove it from the list of open reviews?"))
-//				{
-//					// Yes
-//					PropertiesManager.getInstance().removeFromOpenReviews(currReview);
-//				}
-//				// Else do nothing
 			}	
 		}
 		if (!activeReviewFound){

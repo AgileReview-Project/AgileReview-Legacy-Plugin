@@ -25,15 +25,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				System.getProperty("user.name"));
 		
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER,
-				"AgileReviews"); //TODO need an absolute path
-		
+				"AgileReviews"); 		
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, true);
 		
 		//initial color value and transferation of the color to the other preference
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR,
 				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_ANNOTATION_COLOR));
 		
-		// TODO Think of good defaults
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, "");
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, "");
 		

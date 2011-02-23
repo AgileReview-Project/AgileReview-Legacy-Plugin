@@ -486,6 +486,30 @@
          </with>
       </activeWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ExportHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.export">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+            </instanceof>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -576,6 +600,12 @@
             id="de.tukl.cs.softech.agilereview.showComment"
             name="Show comment in DetailView">
       </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Export selected reviews in Review Explorer"
+            id="de.tukl.cs.softech.agilereview.views.reviewexplorer.export"
+            name="Export reviews">
+      </command>
 </extension>
 <extension
       point="org.eclipse.ui.menus">
@@ -643,6 +673,15 @@
             tooltip="Create a new review">
       </command>
       <separator
+            name="AgileReview.separator2"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.eclipse.ui.file.refresh"
+            label="Refresh all reviews"
+            style="push">
+      </command>
+      <separator
             name="AgileReview.separator1"
             visible="true">
       </separator>
@@ -662,6 +701,16 @@
       </command>
       <separator
             name="AgileReview.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.export"
+            icon="icons/export_wiz.gif"
+            label="Export selected review"
+            style="push">
+      </command>
+      <separator
+            name="AgileReview.separator3"
             visible="true">
       </separator>
       <command
@@ -696,7 +745,7 @@
       </separator>
       <command
             commandId="org.eclipse.ui.edit.delete"
-            label="Delete from review"
+            label="Delete"
             style="push">
       </command>
       <command
@@ -712,6 +761,16 @@
             label="Open/Close selected reviews"
             style="push"
             tooltip="Open/Close reviews">
+      </command>
+      <separator
+            name="AgileReview.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.export"
+            icon="icons/export_wiz.gif"
+            label="Export selected review"
+            style="push">
       </command>
    </menuContribution>
    <menuContribution
