@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchWizard;
 
 import agileReview.softech.tukl.de.PersonInChargeDocument.PersonInCharge;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
@@ -17,7 +17,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 /**
  * Provides a wizard for creating a new Review via the NewWizard
  */
-public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
+public class NewReviewWizard extends Wizard implements INewWizard {
 
 	/**
 	 * The first and sole page of the wizard 
@@ -79,6 +79,10 @@ public class NewReviewWizard extends Wizard implements IWorkbenchWizard {
 	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	@Override
-	public void init(IWorkbench workbench, IStructuredSelection selection) { /* Do nothing */ }
+	public void init(IWorkbench workbench, IStructuredSelection selection) { 
+		if (ViewControl.getInstance().shouldSwitchPerspective()) {
+			ViewControl.getInstance().switchPerspective();
+		}
+	}
 
 }

@@ -2,8 +2,6 @@ package de.tukl.cs.softech.agilereview.views;
 
 import java.util.HashSet;
 
-import javax.swing.UIManager;
-
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -25,9 +23,7 @@ import org.eclipse.ui.part.ViewPart;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.detail.CommentDetail;
 import de.tukl.cs.softech.agilereview.views.detail.DetailView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 
 /**
@@ -77,7 +73,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 				// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addSelectionListener(ViewControl.this);
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(ViewControl.this);
 				// If our perspective is loaded, activate its context
-				if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective().getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
+				if (contextActivation==null && PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective().getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
 					IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
 					contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
 					PluginLogger.log(ViewControl.class.toString(), "Constructor", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" activated");
@@ -147,7 +143,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 			} else if (MessageDialogWithToggle.NEVER.equals(switchPerspective)) {
 				return false;
 			}
-			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(PlatformUI.getWorkbench().getDisplay().getActiveShell(), "AgileReview", "This command belongs to the AgileReview Perspective. Do you want to switch to this perspective to fully enable the AgileReview Plugin?", null, true, PropertiesManager.getPreferences(), "autoOpenPerspective");
+			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(PlatformUI.getWorkbench().getDisplay().getActiveShell(), "AgileReview", "This command belongs to the AgileReview Perspective. Do you want to switch to this perspective to fully enable the AgileReview Plugin?", null, false, PropertiesManager.getPreferences(), "autoOpenPerspective");
 			answer = (dialog.getReturnCode() == IDialogConstants.YES_ID);
 		}
 		return answer;
@@ -315,14 +311,20 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
 		PluginLogger.log(this.getClass().toString(), "perspectiveActivated", perspective.getLabel());
 		if (perspective.getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
-			IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
-			contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
-			PluginLogger.log(ViewControl.class.toString(), "perspectiveActivated", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" activated");
+			if (contextActivation == null) {
+				IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
+				contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
+				PluginLogger.log(ViewControl.class.toString(), "perspectiveActivated", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" activated");
+				
+			}
 			perspectiveIsOpen = true;
 		} else {
-			IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
-			contextService.deactivateContext(contextActivation);
-			PluginLogger.log(ViewControl.class.toString(), "perspectiveActivated", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" deactivated");
+			if (contextActivation != null) {
+				IContextService contextService = (IContextService)PlatformUI.getWorkbench().getService(IContextService.class);
+				contextService.deactivateContext(contextActivation);
+				contextActivation = null;
+				PluginLogger.log(ViewControl.class.toString(), "perspectiveActivated", "Context \"de.tukl.cs.softech.agilereview.perspective.open\" deactivated");
+			}
 			perspectiveIsOpen = false;
 		}
 		

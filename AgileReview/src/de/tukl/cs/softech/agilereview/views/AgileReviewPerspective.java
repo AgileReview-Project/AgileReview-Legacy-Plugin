@@ -25,14 +25,28 @@ public class AgileReviewPerspective implements IPerspectiveFactory {
 	 */
 	public void createInitialLayout(IPageLayout factory) {
 		// Create layout
-		IFolderLayout topLeft =	factory.createFolder("left", IPageLayout.LEFT, 0.2f, factory.getEditorArea());
-		topLeft.addView("de.tukl.cs.softech.agilereview.view.reviewnavigator.view");
-		topLeft.addView("org.eclipse.jdt.ui.PackageExplorer");
+//		IFolderLayout topLeft =	factory.createFolder("left", IPageLayout.LEFT, 0.2f, factory.getEditorArea());
+//		topLeft.addView("de.tukl.cs.softech.agilereview.view.reviewnavigator.view");
+//		topLeft.addView("org.eclipse.jdt.ui.PackageExplorer");
+//		
+//		factory.addView("de.tukl.cs.softech.agilereview.view.commenttableview.view",
+//				IPageLayout.BOTTOM,	0.7f, factory.getEditorArea());
+//		
+//		factory.addView("de.tukl.cs.softech.agilereview.view.commentdetailview.view",
+//				IPageLayout.RIGHT, 0.75f,	factory.getEditorArea());
 		
-		factory.addView("de.tukl.cs.softech.agilereview.view.commenttableview.view",
-				IPageLayout.BOTTOM,	0.7f, factory.getEditorArea());
+		// Contributing to Alt+Shift+N
+//		factory.addNewWizardShortcut("de.tukl.cs.softech.agilereview.newReviewWizard");
+//	
+//		// Contributing to Window->Show View (will be alphabetically)
+//		factory.addShowViewShortcut("org.eclipse.jdt.ui.PackageExplorer");
+//		factory.addShowViewShortcut("org.eclipse.ui.views.ContentOutline");
+//		factory.addShowViewShortcut("org.eclipse.ui.navigator.ProjectExplorer");
+//		factory.addShowViewShortcut("org.eclipse.ui.views.ProblemView");
 		
-		factory.addView("de.tukl.cs.softech.agilereview.view.commentdetailview.view",
-				IPageLayout.RIGHT, 0.75f,	factory.getEditorArea());
+		// Contributing to Window->Open Perspective (will be alphabetically)
+//		factory.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaPerspective");
+//		factory.addPerspectiveShortcut("org.eclipse.ui.resourcePerspective");
+		
 	}
 }
