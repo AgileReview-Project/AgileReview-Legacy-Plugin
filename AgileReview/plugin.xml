@@ -10,6 +10,78 @@
          name="%perspective.name">
    </perspective>
 </extension>
+<extension
+      point="org.eclipse.ui.perspectiveExtensions">
+   <perspectiveExtension
+         targetID="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+      <perspectiveShortcut
+            id="org.eclipse.jdt.ui.JavaPerspective">
+      </perspectiveShortcut>
+      <perspectiveShortcut
+            id="org.eclipse.ui.resourcePerspective">
+      </perspectiveShortcut>
+      <viewShortcut
+            id="org.eclipse.ui.navigator.ProjectExplorer">
+      </viewShortcut>
+      <viewShortcut
+            id="org.eclipse.ui.views.ContentOutline">
+      </viewShortcut>
+      <viewShortcut
+            id="org.eclipse.jdt.ui.PackageExplorer">
+      </viewShortcut>
+      <viewShortcut
+            id="org.eclipse.ui.views.ProblemView">
+      </viewShortcut>
+      <view
+            id="de.tukl.cs.softech.agilereview.view.reviewnavigator.view"
+            minimized="false"
+            ratio="0.2f"
+            relationship="left"
+            relative="org.eclipse.ui.editorss">
+      </view>
+      <view
+            id="org.eclipse.jdt.ui.PackageExplorer"
+            minimized="false"
+            relationship="stack"
+            relative="de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
+      </view>
+      <view
+            id="de.tukl.cs.softech.agilereview.view.commenttableview.view"
+            minimized="false"
+            ratio="0.7f"
+            relationship="bottom"
+            relative="org.eclipse.ui.editorss">
+      </view>
+      <view
+            id="de.tukl.cs.softech.agilereview.view.commentdetailview.view"
+            minimized="false"
+            ratio="0.75f"
+            relationship="right"
+            relative="org.eclipse.ui.editorss">
+      </view>
+   </perspectiveExtension>
+   <perspectiveExtension
+         targetID="org.eclipse.jdt.ui.JavaPerspective">
+      <perspectiveShortcut
+            id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+      </perspectiveShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+   </perspectiveExtension>
+   <perspectiveExtension
+         targetID="org.eclipse.ui.resourcePerspective">
+      <perspectiveShortcut
+            id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+      </perspectiveShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+   </perspectiveExtension>
+</extension>
    <extension
          point="org.eclipse.ui.views">
       <view
@@ -757,77 +829,5 @@
          id="de.tukl.cs.softech.agilereview.nature.image"
          natureId="de.tukl.cs.softech.agilereview.nature">
    </image>
-</extension>
-<extension
-      point="org.eclipse.ui.perspectiveExtensions">
-   <perspectiveExtension
-         targetID="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
-      <newWizardShortcut
-            id="de.tukl.cs.softech.agilereview.newReviewWizard">
-      </newWizardShortcut>
-      <perspectiveShortcut
-            id="org.eclipse.jdt.ui.JavaPerspective">
-      </perspectiveShortcut>
-      <perspectiveShortcut
-            id="org.eclipse.ui.resourcePerspective">
-      </perspectiveShortcut>
-      <viewShortcut
-            id="org.eclipse.ui.navigator.ProjectExplorer">
-      </viewShortcut>
-      <viewShortcut
-            id="org.eclipse.ui.views.ContentOutline">
-      </viewShortcut>
-      <viewShortcut
-            id="org.eclipse.jdt.ui.PackageExplorer">
-      </viewShortcut>
-      <viewShortcut
-            id="org.eclipse.ui.views.ProblemView">
-      </viewShortcut>
-      <view
-            id="de.tukl.cs.softech.agilereview.view.reviewnavigator.view"
-            minimized="false"
-            ratio="0.2f"
-            relationship="left"
-            relative="org.eclipse.ui.editorss">
-      </view>
-      <view
-            id="org.eclipse.ui.navigator.ProjectExplorer"
-            minimized="false"
-            relationship="stack"
-            relative="de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
-      </view>
-      <view
-            id="de.tukl.cs.softech.agilereview.view.commenttableview.view"
-            minimized="false"
-            ratio="0.7f"
-            relationship="bottom"
-            relative="org.eclipse.ui.editorss">
-      </view>
-      <view
-            id="de.tukl.cs.softech.agilereview.view.commentdetailview.view"
-            minimized="false"
-            ratio="0.75f"
-            relationship="right"
-            relative="org.eclipse.ui.editorss">
-      </view>
-   </perspectiveExtension>
-   <perspectiveExtension
-         targetID="org.eclipse.jdt.ui.JavaPerspective">
-      <perspectiveShortcut
-            id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
-      </perspectiveShortcut>
-      <newWizardShortcut
-            id="de.tukl.cs.softech.agilereview.newReviewWizard">
-      </newWizardShortcut>
-   </perspectiveExtension>
-   <perspectiveExtension
-         targetID="org.eclipse.ui.resourcePerspective">
-      <perspectiveShortcut
-            id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
-      </perspectiveShortcut>
-      <newWizardShortcut
-            id="de.tukl.cs.softech.agilereview.newReviewWizard">
-      </newWizardShortcut>
-   </perspectiveExtension>
 </extension>
 </plugin>

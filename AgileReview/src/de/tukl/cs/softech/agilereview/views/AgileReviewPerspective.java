@@ -1,6 +1,5 @@
 package de.tukl.cs.softech.agilereview.views;
 
-import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
