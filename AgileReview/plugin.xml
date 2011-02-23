@@ -498,16 +498,24 @@
          </with>
       </activeWhen>
       <enabledWhen>
-         <with
-               variable="selection">
-            <iterate
-                  ifEmpty="false"
-                  operator="and">
-               <instanceof
-                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
-               </instanceof>
-            </iterate>
-         </with>
+	      <and>
+	         <with
+	               variable="selection">
+	            <iterate
+	                  ifEmpty="false"
+	                  operator="and">
+	               <instanceof
+	                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
+	               </instanceof>
+	            </iterate>
+	         </with>
+          <with
+                variable="de.tukl.cs.softech.agilereview.views.export.variables.containsClosedReview">
+             <equals
+                   value="false">
+             </equals>
+          </with>
+	      </and>
       </enabledWhen>
    </handler>
 </extension>
@@ -853,7 +861,7 @@
 <extension
       point="org.eclipse.ui.services">
    <sourceProvider
-         provider="de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider">
+         provider="de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider">
       <variable
             name="de.tukl.cs.softech.agilereview.views.detail.variables.revertable"
             priorityLevel="workbench">
@@ -864,6 +872,10 @@
       </variable>
       <variable
             name="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable"
+            priorityLevel="workbench">
+      </variable>
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.export.variables.containsClosedReview"
             priorityLevel="workbench">
       </variable>
    </sourceProvider>

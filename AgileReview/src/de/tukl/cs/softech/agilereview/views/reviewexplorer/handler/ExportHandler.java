@@ -10,8 +10,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import agileReview.softech.tukl.de.ReviewDocument.Review;
-
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 import de.tukl.cs.softech.agilereview.wizards.export.ExportReviewDataWizard;

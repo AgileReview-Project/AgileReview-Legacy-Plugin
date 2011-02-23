@@ -10,10 +10,10 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
@@ -82,24 +82,24 @@ public class DetailView extends ViewPart {
 			this.actParent = new Composite(this.parentParent, this.parentStyle);
 			this.setPartName("Detail View");
 			this.currentDisplay = EMPTY;
-			sp1.setReplyPossible(false);
-			sp2.setContentAvailable(false);
+			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
+			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, false);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
 			this.actParent = new CommentDetail(this.parentParent, this.parentStyle);
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
-			sp1.setReplyPossible(true);
-			sp2.setContentAvailable(true);
+			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, true);
+			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
 			this.actParent = new ReviewDetail(this.parentParent, this.parentStyle);
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
-			sp1.setReplyPossible(false);
-			sp2.setContentAvailable(true);
+			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
+			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to REVIEW_DETAIL");
 			break;
 		}

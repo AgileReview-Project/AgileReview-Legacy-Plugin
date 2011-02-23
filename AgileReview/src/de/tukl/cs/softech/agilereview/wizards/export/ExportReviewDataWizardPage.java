@@ -2,12 +2,12 @@ package de.tukl.cs.softech.agilereview.wizards.export;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -75,7 +75,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	/**
 	 * all reviews that are selected in the wizard
 	 */
-	private HashSet<String> selectedReviews = new HashSet<String>();
+	private HashSet<String> selectedReviewIDs = new HashSet<String>();
 
 	/**
 	 * Creates a new page
@@ -153,8 +153,8 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		
 		cbtreeviewer = new CheckboxTreeViewer(container);
 		cbtreeviewer.setContentProvider(new ExportTreeViewContentProvider());
-		cbtreeviewer.setLabelProvider(new LabelProvider());
-		ArrayList<Review> allReviews = ReviewAccess.getInstance().getAllReviews();
+		cbtreeviewer.setLabelProvider(new ExportTreeViewLabelProvider());
+		Collection<Review> allReviews = reviews.values();
 		ArrayList<Review> openReviews = new ArrayList<Review>();
 		for (Review r : allReviews) {
 			if (ReviewAccess.getInstance().isReviewLoaded(r.getId())) {
@@ -167,6 +167,11 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		tvGridData.horizontalSpan = 2;
 		cbtreeviewer.getTree().setLayoutData(tvGridData);
 		cbtreeviewer.getTree().addSelectionListener(this);
+		
+		//select initial reviews
+		for(String id : selectedReviewIDs) {
+			cbtreeviewer.setChecked(reviews.get(id), true);
+		}
 
 		GridData resGridData = new GridData(GridData.FILL_HORIZONTAL);
 		resGridData.horizontalSpan = 1;
@@ -243,18 +248,18 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 				String selectedReviewID = selectedTI.getText();
 				if (selectedTI.getChecked()) {
 					// review not in list and checked, add it
-					if (!selectedReviews.contains(selectedReviewID)) {
-						selectedReviews.add(selectedReviewID);
+					if (!selectedReviewIDs.contains(selectedReviewID)) {
+						selectedReviewIDs.add(selectedReviewID);
 					}
-				} else if (selectedReviews.contains(selectedReviewID)) {
+				} else if (selectedReviewIDs.contains(selectedReviewID)) {
 					// review is in list, but not checked, remove it
-					selectedReviews.remove(selectedReviewID);
+					selectedReviewIDs.remove(selectedReviewID);
 				}
 				// adapt labels for responsibility and description
 				responsibility.setText("Responsibility: "+reviews.get(selectedReviewID).getPersonInCharge().getName());
 				description.setText("Description:\n"+reviews.get(selectedReviewID).getDescription());
 				
-				reviewsSelected = selectedReviews.size()>0;
+				reviewsSelected = selectedReviewIDs.size()>0;
 				
 			}
 	
@@ -310,7 +315,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 * @return the ids of the reviews currently selected in the checkboxtreeviewer
 	 */
 	public HashSet<String> getSelectedReviewIDs() {
-		return selectedReviews;
+		return selectedReviewIDs;
 	}
 	
 	/**
@@ -318,7 +323,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 */
 	public ArrayList<Review> getSelectedReviews() {
 		ArrayList<Review> result = new ArrayList<Review>();
-		for (String id : selectedReviews) {
+		for (String id : selectedReviewIDs) {
 			result.add(reviews.get(id));
 		}
 		return result;
@@ -328,10 +333,8 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 * Sets the reviews to be selected
 	 * @param selectedReviews
 	 */
-	public void setSelectedReviews(Set<Review> selectedReviews) {
-		cbtreeviewer.setCheckedElements(selectedReviews.toArray());
-		for(Review r : selectedReviews) {
-			this.selectedReviews.add(r.getId());
-		}
+	public void setSelectedReviews(Set<String> selectedReviews) {
+		this.selectedReviewIDs.clear();
+		this.selectedReviewIDs.addAll(selectedReviews);
 	}
 }

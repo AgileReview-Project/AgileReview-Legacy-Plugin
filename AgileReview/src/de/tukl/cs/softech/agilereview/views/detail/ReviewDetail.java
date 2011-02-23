@@ -13,8 +13,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
+import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -221,6 +221,6 @@ public class ReviewDetail extends AbstractDetail<Review> {
 		//set revertable to false because it was set from the ModificationListener while inserting inital content
 		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-		sp.setRevertable(false);
+		sp.setVariable(SourceProvider.REVERTABLE, false);
 	}
 }

@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import agileReview.softech.tukl.de.ReviewDocument.Review;
-
 /**
  * Content provider for the export tree viewer used in the export wizard
  */
@@ -40,15 +38,13 @@ public class ExportTreeViewContentProvider implements ITreeContentProvider {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 	 */
-	@SuppressWarnings("unchecked") /* elements can only be reviews, no check needed */
 	@Override
-	public Object[] getElements(Object inputElement) {		
-		ArrayList<Review> reviews = (ArrayList<Review>) inputElement;
-		ArrayList<String> reviewIDs = new ArrayList<String>(); 
-		for (Review review : reviews) {
-			reviewIDs.add(review.getId());
+	public Object[] getElements(Object inputElement) {
+		Object[] result = new Object[0];
+		if(inputElement instanceof ArrayList<?>) {
+			result = ((ArrayList<?>) inputElement).toArray();
 		}
-		return reviewIDs.toArray();
+		return result;
 	}
 
 	/* not used

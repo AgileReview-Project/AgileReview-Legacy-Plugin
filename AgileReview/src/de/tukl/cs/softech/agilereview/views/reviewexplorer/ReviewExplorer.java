@@ -1,5 +1,7 @@
 package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
+import java.util.Iterator;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
@@ -9,6 +11,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -17,10 +20,12 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
@@ -216,6 +221,30 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 					}
 				}
 			}
+		}
+	}
+	
+	/**
+	 * Will be called by the {@link ViewControl} when the selection was changed and changes
+	 * @param event
+	 * @see de.tukl.cs.softech.agilereview.views.ViewControl#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+	 */
+	public void selectionChanged(SelectionChangedEvent event) {
+		if(event.getSelection() instanceof IStructuredSelection) {
+			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+			Iterator<?> it = sel.iterator();
+			boolean containsClosedReview = false;
+			while(it.hasNext() && !containsClosedReview) {
+				Object o = it.next();
+				if(o instanceof MultipleReviewWrapper) {
+					if(!RA.isReviewLoaded(((MultipleReviewWrapper)o).getReviewId())) {
+						containsClosedReview = true;
+					}
+				}
+			}
+			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
+			sp.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
 		}
 	}
 

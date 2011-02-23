@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.detail.handlers;
+package de.tukl.cs.softech.agilereview.plugincontrol;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,10 @@ public class SourceProvider extends AbstractSourceProvider {
 	 */
 	public static final String CONTENT_AVAILABLE = "de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable";
 	/**
+	 * Variable for the state "contains closed review"
+	 */
+	public static final String CONTAINS_CLOSED_REVIEW = "de.tukl.cs.softech.agilereview.views.export.variables.containsClosedReview";
+	/**
 	 * Map of variable value mappings
 	 */
 	private HashMap<String, Boolean> map = new HashMap<String, Boolean>();
@@ -34,6 +38,7 @@ public class SourceProvider extends AbstractSourceProvider {
 		map.put(REVERTABLE, false);
 		map.put(REPLY_POSSIBLE, false);
 		map.put(CONTENT_AVAILABLE, false);
+		map.put(CONTAINS_CLOSED_REVIEW, false);
 	}
 
 	@Override
@@ -52,34 +57,13 @@ public class SourceProvider extends AbstractSourceProvider {
 	}
 	
 	/**
-	 * Sets the current variable for the state "revertable" of the view
+	 * Sets the given variable (use one of the static fields of this class)
+	 * @param variable to be set
 	 * @param b new value
 	 */
-	public void setRevertable(boolean b) {
-		if(map.get(REVERTABLE) != b) {
-			map.put(REVERTABLE, b);
-			this.fireSourceChanged(0, map);
-		}
-	}
-	
-	/**
-	 * Sets the current variable for the state "reply possible" of the view
-	 * @param b new value
-	 */
-	public void setReplyPossible(boolean b) {
-		if(map.get(REPLY_POSSIBLE) != b) {
-			map.put(REPLY_POSSIBLE, b);
-			this.fireSourceChanged(0, map);
-		}
-	}
-	
-	/**
-	 * Sets the current variable for the state "content available" of the view
-	 * @param b new value
-	 */
-	public void setContentAvailable(boolean b) {
-		if(map.get(CONTENT_AVAILABLE) != b) {
-			map.put(CONTENT_AVAILABLE, b);
+	public void setVariable(String variable, boolean b) {
+		if(map.get(variable) != b) {
+			map.put(variable, b);
 			this.fireSourceChanged(0, map);
 		}
 	}

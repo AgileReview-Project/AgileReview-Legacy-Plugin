@@ -12,8 +12,8 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import de.tukl.cs.softech.agilereview.dataaccess.SaveHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
-import de.tukl.cs.softech.agilereview.views.detail.handlers.SourceProvider;
 
 /**
  * Abstract class of a Comment or Review representation, which automatically provides IPartListener
@@ -92,7 +92,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 			//get SourceProvider for configuration
 			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-			sp.setRevertable(false);
+			sp.setVariable(SourceProvider.REVERTABLE, false);
 		}
 	}
 	
@@ -108,7 +108,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 		//get SourceProvider for configuration
 		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-		sp.setRevertable(false);
+		sp.setVariable(SourceProvider.REVERTABLE, false);
 	}
 	
 	/*
@@ -135,7 +135,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 		if(saveChanges()) {
 			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-			sp.setRevertable(true);
+			sp.setVariable(SourceProvider.REVERTABLE, true);
 		}
 	}
 	
@@ -143,6 +143,6 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	public void modifyText(ModifyEvent e) {
 		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-		sp.setRevertable(true);
+		sp.setVariable(SourceProvider.REVERTABLE, true);
 	}
 }

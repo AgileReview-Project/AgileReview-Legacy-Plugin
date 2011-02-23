@@ -11,8 +11,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
-import agileReview.softech.tukl.de.ReviewDocument.Review;
-
 import de.tukl.cs.softech.agilereview.export.XSLExport;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
@@ -38,7 +36,7 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 	 * 
 	 * @param selectedReviews
 	 */
-	public ExportReviewDataWizard(Set<Review> selectedReviews) {
+	public ExportReviewDataWizard(Set<String> selectedReviews) {
 		super();
 		setNeedsProgressMonitor(true);
 		page1.setSelectedReviews(selectedReviews);

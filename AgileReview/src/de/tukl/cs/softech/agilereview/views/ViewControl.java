@@ -24,6 +24,7 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 
 /**
@@ -173,6 +174,9 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 		}
 		if(isOpen(DetailView.class)) {
 			DetailView.getInstance().selectionChanged(event);
+		}
+		if(isOpen(ReviewExplorer.class)) {
+			ReviewExplorer.getInstance().selectionChanged(event);
 		}
 	}
 		
