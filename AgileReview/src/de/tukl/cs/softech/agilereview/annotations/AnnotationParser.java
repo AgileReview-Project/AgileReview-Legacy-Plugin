@@ -239,9 +239,8 @@ public class AnnotationParser implements IAnnotationParser {
 				display.put(s, this.idPositionMap.get(s));
 			}
 		}
-		if(ViewControl.isPerspectiveOpen()) {
-			this.annotationModel.displayAnnotations(display);
-		}
+		//Do not prove for open perspective, because annotations will be cleaned by empty comment array
+		this.annotationModel.displayAnnotations(display);
 	}
 	
 	/*
