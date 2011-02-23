@@ -1,6 +1,7 @@
 package de.tukl.cs.softech.agilereview.wizards.export;
 
 import java.io.IOException;
+import java.util.Set;
 
 import net.sf.jxls.exception.ParsePropertyException;
 
@@ -9,6 +10,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
+
+import agileReview.softech.tukl.de.ReviewDocument.Review;
 
 import de.tukl.cs.softech.agilereview.export.XSLExport;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
@@ -21,7 +24,7 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 	/**
 	 * The first and sole page of the wizard 
 	 */
-	ExportReviewDataWizardPage page1;
+	private ExportReviewDataWizardPage page1 = new ExportReviewDataWizardPage();
 	
 	/**
 	 * creates a new wizard
@@ -32,15 +35,23 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 	}
 	
 	/**
+	 * 
+	 * @param selectedReviews
+	 */
+	public ExportReviewDataWizard(Set<Review> selectedReviews) {
+		super();
+		setNeedsProgressMonitor(true);
+		page1.setSelectedReviews(selectedReviews);
+	}
+	
+	/**
 	 * adds all needed pages to the wizard
 	 * @see org.eclipse.jface.wizard.Wizard#addPages()
 	 */
 	@Override
 	public void addPages() {
-		page1 = new ExportReviewDataWizardPage();
 		addPage(page1);
 	}
-
 
 	/**
 	 * Execute the actual wizard command after all information was collected
