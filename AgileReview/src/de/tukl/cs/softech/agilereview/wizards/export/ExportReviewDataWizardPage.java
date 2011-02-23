@@ -165,7 +165,14 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		CheckboxTreeViewer cbtreeviewer = new CheckboxTreeViewer(container);
 		cbtreeviewer.setContentProvider(new ExportTreeViewContentProvider());
 		cbtreeviewer.setLabelProvider(new LabelProvider());
-		cbtreeviewer.setInput(ReviewAccess.getInstance().getAllReviews());
+		ArrayList<Review> allReviews = ReviewAccess.getInstance().getAllReviews();
+		ArrayList<Review> openReviews = new ArrayList<Review>();
+		for (Review r : allReviews) {
+			if (ReviewAccess.getInstance().isReviewLoaded(r.getId())) {
+				openReviews.add(r);
+			}
+		}
+		cbtreeviewer.setInput(openReviews);
 		GridData tvGridData = new GridData(GridData.FILL_BOTH);
 		tvGridData.verticalSpan = 2;
 		tvGridData.horizontalSpan = 2;
