@@ -91,7 +91,7 @@ public class XSLExport {
         	outputPath += System.getProperty("file.separator");
         }
         
-		transformer.transformXLS(templatePath, beans, outputPath+"agilereview_export_"+df.format(Calendar.getInstance().getTime())+"."+filetype);
+		transformer.transformXLS(templatePath, beans, outputPath+"agilereview_export_"+df.format(Calendar.getInstance().getTime())+filetype);
 	}
 	
 	/**
