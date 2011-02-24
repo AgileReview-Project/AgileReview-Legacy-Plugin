@@ -14,6 +14,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
 
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleFileWrapper;
 
 /**
@@ -75,13 +76,17 @@ class REOpenAction extends Action {
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
 	public void run() { 
-		try {
-			if(isEnabled()) {
-				IFile propertiesFile = convertToIFile(data);
-				IDE.openEditor(page, propertiesFile); 
-			} 
-		} catch (PartInitException e) { 
-			MessageDialog.openError(Display.getDefault().getActiveShell(), "Error Opening Property", "Could not open property!");
+		if(isEnabled()) {
+			IFile file = convertToIFile(data);
+			try {
+				IDE.openEditor(page, file); 
+			} catch (PartInitException e) {
+				PluginLogger.logError(this.getClass().toString(), "run", "An Error occured while initializing the Editor!", e);
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error Opening File", "An Error occured while initializing the Editor!");
+			} catch (Exception e) {
+				PluginLogger.logError(this.getClass().toString(), "run", "Could not open file!", e);
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error Opening File", "Could not open file!\nProve whether this file exists in your workspace and its project was imported in eclipse!");
+			}
 		}
 	}
 }
