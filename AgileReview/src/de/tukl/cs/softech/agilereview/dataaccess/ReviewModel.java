@@ -12,17 +12,18 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 
 /**
- * Model which holds all comments and provides some query functions
+ * Model which holds all comments and provides some query functions.
  */
 class ReviewModel {
 
 	/**
-	 * Database object which stores the comments in the following way: ReviewID.author -> CommentID (without leading "c" for correct ordering) (sorted) -> Comment
+	 * Database object which stores the comments in the following way: ReviewID.author -> CommentID (without leading "c" for correct ordering) (sorted) -> Comment \n
+	 * Contains only loaded reviews. For not loaded reviews no mapping should be available
 	 */
 	private HashMap<String, HashMap<String, TreeMap<Integer,Comment>>> commentDB = new HashMap<String,HashMap<String, TreeMap<Integer, Comment>>>(); 
 	
 	/**
-	 * Review model. Contains all reviews (ReviewId -> Review)
+	 * Review model. Contains all reviews (ReviewId -> Review), even unloaded
 	 */
 	private HashMap<String, Review> rModel = new HashMap<String, Review>();
 	
@@ -112,6 +113,14 @@ class ReviewModel {
 	}
 	
 	/**
+	 * Creates the model entry for this reviewId (should only be used for reviews without comments)
+	 * @param reviewId
+	 */
+	protected void createModelEntry(String reviewId) {
+		this.commentDB.put(reviewId, new HashMap<String, TreeMap<Integer,Comment>>());
+	}
+	
+	/**
 	 * Adds a review to this model
 	 * @param r
 	 * @return <i>false</i> if a review with this name does already exist (review will not be added then). <i>true</i> otherwise.
@@ -130,16 +139,16 @@ class ReviewModel {
 	/**
 	 * Removes the given review from the model
 	 * @param reviewId
+	 * @param completely if true, the review will be removed completely, if false, it will only be deleted from 
 	 */
-	protected void removeReview(String reviewId)
-	{
-		// Remove the review itself
-		this.rModel.remove(reviewId);
+	protected void removeReview(String reviewId, boolean completely)
+	{	
+		// Remove the review from the commentDB
+		this.commentDB.remove(reviewId);
 		
-		// Remove the comment associated with this review
-		for (Comment c : this.getComments(reviewId))
-		{
-			this.removeComment(reviewId, c.getAuthor(), c.getId());
+		if (completely) {
+			// Remove the review itself
+			this.rModel.remove(reviewId);
 		}
 	}
 	
@@ -219,7 +228,7 @@ class ReviewModel {
 	 */
 	protected ArrayList<Comment> getComments(String reviewId)
 	{	
-		ArrayList<Comment> result = new ArrayList<Comment>();
+		ArrayList<Comment> result =  new ArrayList<Comment>();
 		
 		HashMap<String, TreeMap<Integer,Comment>> authorMap = commentDB.get(reviewId);
 		if (authorMap!=null)
@@ -250,15 +259,23 @@ class ReviewModel {
 	/**
 	 * Checks whether the given reviewId is stored in the model
 	 * @param reviewId
-	 * @return <i>true</i> if the model contains such a reviewId, <i>false</i> otherwise.
+	 * @param checkLoaded if <i>true</i>, it is also checked, if the review is loaded
+	 * @return <i>true</i> if the model contains such a reviewId, 
+	 * <i>false</i> otherwise.
 	 */
-	protected boolean containsReview(String reviewId)
+	protected boolean containsReview(String reviewId, boolean checkLoaded)
 	{
-		return this.rModel.containsKey(reviewId);
+		boolean result = this.rModel.containsKey(reviewId);
+		if (checkLoaded) {
+			result = result && this.commentDB.containsKey(reviewId);
+		}
+		
+		return result;
 	}
+
 	
 	/**
-	 * Returns all reviews being stored in the model
+	 * Returns all reviews being stored in the model (this includes the not loaded reviews)
 	 * @return All Reviews stored in this model
 	 */
 	protected ArrayList<Review> getAllReviews()

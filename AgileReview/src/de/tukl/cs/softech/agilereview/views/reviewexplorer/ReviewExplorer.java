@@ -237,7 +237,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 			while(it.hasNext() && !containsClosedReview) {
 				Object o = it.next();
 				if(o instanceof MultipleReviewWrapper) {
-					if(!RA.isReviewLoaded(((MultipleReviewWrapper)o).getReviewId())) {
+					if(!((MultipleReviewWrapper)o).isOpen()) {
 						containsClosedReview = true;
 					}
 				}

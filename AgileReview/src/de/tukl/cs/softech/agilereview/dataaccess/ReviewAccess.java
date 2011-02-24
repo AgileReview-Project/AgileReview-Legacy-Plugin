@@ -595,9 +595,7 @@ public class ReviewAccess {
 	 */
 	public boolean isReviewLoaded(String reviewId)
 	{
-		boolean contains = this.rModel.containsReview(reviewId);
-		boolean loaded = !this.rModel.getComments(reviewId).isEmpty();
-		return contains && loaded; 
+		return this.rModel.containsReview(reviewId, true); 
 	}
 	
 	/**
@@ -607,7 +605,7 @@ public class ReviewAccess {
 	 */
 	public boolean reviewExists(String reviewId)
 	{
-		return this.rModel.containsReview(reviewId);
+		return this.rModel.containsReview(reviewId, false);
 	}
 	
 	/**
@@ -671,6 +669,7 @@ public class ReviewAccess {
 		{
 			return null;
 		}
+		this.rModel.createModelEntry(reviewId);
 		
 		// Create the folder for this review
 		File commentFolder = ReviewAccess.createReviewFolder(reviewId);
@@ -699,7 +698,7 @@ public class ReviewAccess {
 		File delFile = ReviewAccess.createReviewFile(reviewId);
 		
 		// Delete review from Model
-		this.rModel.removeReview(reviewId);
+		this.rModel.removeReview(reviewId, true);
 		this.rFileModel.removeXmlDocument(delFile);
 	}
 	
@@ -725,6 +724,8 @@ public class ReviewAccess {
 		};
 		File[] allFiles = currFolder.listFiles(fileFilter);
 		
+		this.rModel.createModelEntry(reviewId);
+				
 		// Iterate all files in the current folder
 		for (File currFile : allFiles)
 		{
@@ -744,10 +745,7 @@ public class ReviewAccess {
 	{
 		PluginLogger.log(this.getClass().toString(), "unloadReviewComments", "Unload comments of review: "+reviewId);
 		// Remove the given review from the models
-		for (Comment c: this.rModel.getComments(reviewId))
-		{
-			this.rModel.removeComment(c.getReviewID(), c.getAuthor(), c.getId());
-		}
+		this.rModel.removeReview(reviewId, false);
 		// TODO: Erstmal nicht aus dem anderen Model rauslöschen. Dazu muss es cleverer werden
 	}
 	
@@ -788,8 +786,7 @@ public class ReviewAccess {
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		for (String currReview: PropertiesManager.getInstance().getOpenReviews())
 		{
-			
-			if (rModel.containsReview(currReview))
+			if (rModel.containsReview(currReview, false))
 			{
 				this.loadReviewComments(currReview);
 				// Test for active review
