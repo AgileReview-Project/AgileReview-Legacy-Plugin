@@ -3,19 +3,22 @@ package de.tukl.cs.softech.agilereview.views.detail;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * The ReplyDialog is a small Wizard to insert new Replys to a document
  */
-public class ReplyDialog extends Composite implements Listener {
+public class ReplyDialog extends Composite implements Listener, KeyListener {
 	
 	/**
 	 * TextBox to insert the reply text
@@ -38,13 +41,17 @@ public class ReplyDialog extends Composite implements Listener {
 	 * inserted reply text
 	 */
 	private String strReplyText = "";
+	/**
+	 * The last key which was pressed
+	 */
+	private int lastKeyCode = 0;
 	
 	/**
 	 * Creates a new dialog for entering replies
 	 * @param parent
 	 * @param style
 	 */
-	public ReplyDialog(Composite parent, int style) {
+	public ReplyDialog(Shell parent, int style) {
 		super(parent, style);
 		initUI();
 	}	
@@ -77,6 +84,7 @@ public class ReplyDialog extends Composite implements Listener {
 	    Button cancelButton = new Button(this, SWT.PUSH);
 	    cancelButton.setText("Cancel");
 	    cancelButton.addListener(SWT.Selection, this);
+	    replyText.addKeyListener(this);
 	}
 	
 	/**
@@ -110,18 +118,45 @@ public class ReplyDialog extends Composite implements Listener {
 	@Override
 	public void handleEvent(Event event) {
 		if (event.widget == okButton) {
-			strReplyText = replyText.getText().trim();
-			if(strReplyText.equals("")) {
-				MessageDialog.openInformation(this.getShell(), "Information", 
-		        		PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_EMPTY_REPLY_MESSAGE));
-			} else {
-				boolSaved = true;
-				getParent().dispose();
-			}
+			doOk();
         } else {
-        	boolSaved = false;
-        	getParent().dispose();
+        	doCancel();
         }        
 	}
+	
+	/**
+	 * What should be done, when pressing ok button
+	 */
+	private void doOk() {
+		strReplyText = replyText.getText().trim();
+		if(strReplyText.equals("")) {
+			MessageDialog.openInformation(this.getShell(), "Information", 
+	        		PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_EMPTY_REPLY_MESSAGE));
+		} else {
+			boolSaved = true;
+			getParent().dispose();
+		}
+	}
+	
+	/**
+	 * What should be done, when pressing cancel button
+	 */
+	private void doCancel(){
+		boolSaved = false;
+    	getParent().dispose();
+	}
+	
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// This should be Ctrl+Enter
+		if (e.keyCode==13 && lastKeyCode==262144){
+			doOk();
+		}
+		lastKeyCode = e.keyCode;
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) { /* do nothing */}
 }
 

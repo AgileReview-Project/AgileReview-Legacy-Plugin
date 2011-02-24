@@ -15,7 +15,6 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
@@ -31,7 +30,7 @@ public class DeleteCommentHandler extends AbstractHandler {
 			// Check for not empty and if user really wants to deleted the selected reviews	
 			if (sel instanceof IStructuredSelection) {
 				IStructuredSelection structSel = (IStructuredSelection)sel;
-				if (!MessageDialog.openConfirm(null, "Comments Summary - Delete", "Are you sure you want to delete the selected comments?"))
+				if (!MessageDialog.openConfirm(null, "Comments Summary - Delete", "Are you sure you want to delete the comments currently selected in the Comment Summary?"))
 				{
 					return null;
 				}
@@ -46,10 +45,6 @@ public class DeleteCommentHandler extends AbstractHandler {
 							ReviewAccess.getInstance().deleteComment(c);
 						} catch (IOException e) {
 							PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+c, e);
-						}
-						// Clean the DetailView
-						if(ViewControl.isOpen(DetailView.class)) {
-							DetailView.getInstance().changeParent(DetailView.EMPTY);
 						}
 						// Refresh the Review Explorer
 						if(ViewControl.isOpen(ReviewExplorer.class)) {

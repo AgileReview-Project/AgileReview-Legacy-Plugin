@@ -526,6 +526,18 @@
 	      </and>
       </enabledWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.DeleteCommentHandler"
+         commandId="de.tukl.cs.softech.agilereview.editor.delete">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="org.eclipse.ui.IEditorPart">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -621,6 +633,11 @@
             description="Export selected reviews in Review Explorer"
             id="de.tukl.cs.softech.agilereview.views.reviewexplorer.export"
             name="Export reviews">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            id="de.tukl.cs.softech.agilereview.editor.delete"
+            name="Delete comment in Editor">
       </command>
 </extension>
 <extension
@@ -855,6 +872,12 @@
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M1+M2+#">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.editor.delete"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+-">
    </key>
 </extension>
 <extension

@@ -47,11 +47,14 @@ public class DeleteHandler extends AbstractHandler {
 				// Remove this review from the list of open reviews (regardless if it was open or not)
 				PropertiesManager.getInstance().removeFromOpenReviews(r.getId());
 			} else if(o instanceof Comment) {
-				if (!MessageDialog.openConfirm(null, "Comment Details - Delete", "Are you sure you want to delete this comment?"))
+				Comment c = (Comment)o;
+				String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+				String commentTag = c.getReviewID()+keySeparator+c.getAuthor()+keySeparator+c.getId();
+				
+				if (!MessageDialog.openConfirm(null, "Comment Details - Delete", "Are you sure you want to delete comment \""+commentTag+"\"?"))
 				{
 					return null;
 				}
-				Comment c = (Comment)o;
 				if(ViewControl.isOpen(CommentTableView.class)) {
 					CommentTableView.getInstance().deleteComment(c);
 				}
@@ -60,8 +63,6 @@ public class DeleteHandler extends AbstractHandler {
 				} catch (IOException e) {
 					PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+c, e);
 				}
-				// Clean the DetailView
-				DetailView.getInstance().changeParent(DetailView.EMPTY);
 				// Refresh the Review Explorer
 				if(ViewControl.isOpen(ReviewExplorer.class)) {
 					ReviewExplorer.getInstance().refresh();
