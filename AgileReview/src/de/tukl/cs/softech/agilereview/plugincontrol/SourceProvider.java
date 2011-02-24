@@ -27,6 +27,10 @@ public class SourceProvider extends AbstractSourceProvider {
 	 */
 	public static final String CONTAINS_CLOSED_REVIEW = "de.tukl.cs.softech.agilereview.views.export.variables.containsClosedReview";
 	/**
+	 * Variable for the state "is review active"
+	 */
+	public static final String IS_ACTIVE_REVIEW = "de.tukl.cs.softech.agilereview.views.reviewexplorer.variables.isActiveReview";
+	/**
 	 * Map of variable value mappings
 	 */
 	private HashMap<String, Boolean> map = new HashMap<String, Boolean>();
@@ -39,6 +43,7 @@ public class SourceProvider extends AbstractSourceProvider {
 		map.put(REPLY_POSSIBLE, false);
 		map.put(CONTENT_AVAILABLE, false);
 		map.put(CONTAINS_CLOSED_REVIEW, false);
+		map.put(IS_ACTIVE_REVIEW, false);
 	}
 
 	@Override

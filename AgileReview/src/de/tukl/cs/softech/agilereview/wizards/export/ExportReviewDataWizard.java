@@ -6,6 +6,7 @@ import java.util.Set;
 import net.sf.jxls.exception.ParsePropertyException;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
@@ -62,10 +63,13 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 			XSLExport.exportReviews(page1.getSelectedReviews(), page1.getTemplatePath(), page1.getExportPath());
 		} catch (ParsePropertyException e) {
 			PluginLogger.logError(this.getClass().toString(),"performFinish", "ParsePropertyException", e);
+			MessageDialog.openError(this.getShell(), "Error while exporting Reviews", "The formulas in the selected template file cannot be evaluated correctly");
 		} catch (InvalidFormatException e) {
-			PluginLogger.logError(this.getClass().toString(),"performFinish", "InvalidFormatExceptionException", e);
+			PluginLogger.logError(this.getClass().toString(),"performFinish", "InvalidFormatException", e);
+			MessageDialog.openError(this.getShell(), "Error while exporting Reviews", "An error occured while exporting the selected Reviews!");
 		} catch (IOException e) {
 			PluginLogger.logError(this.getClass().toString(),"performFinish", "IOException", e);
+			MessageDialog.openError(this.getShell(), "Error while exporting Reviews", "One of the selected files could not be read or written!");
 		}
 		return true;
 	}

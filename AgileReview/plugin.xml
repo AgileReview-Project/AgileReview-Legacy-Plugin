@@ -365,21 +365,29 @@
          class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ActivateReviewHandler"
          commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate">
       <enabledWhen>
-         <with
-               variable="selection">
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <instanceof
-                        value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
-                  </instanceof>
-               </iterate>
-            </and>
-         </with>
+		  <and>
+		     <with
+		           variable="selection">
+		        <and>
+		           <count
+		                 value="1">
+		           </count>
+		           <iterate
+		                 ifEmpty="false"
+		                 operator="and">
+		              <instanceof
+		                    value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
+		              </instanceof>
+		           </iterate>
+		        </and>
+		     </with>
+       <with
+             variable="de.tukl.cs.softech.agilereview.views.reviewexplorer.variables.isActiveReview">
+          <equals
+                value="false">
+          </equals>
+       </with>
+		  </and>
       </enabledWhen>
    </handler>
    <handler
@@ -876,6 +884,10 @@
       </variable>
       <variable
             name="de.tukl.cs.softech.agilereview.views.export.variables.containsClosedReview"
+            priorityLevel="workbench">
+      </variable>
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.reviewexplorer.variables.isActiveReview"
             priorityLevel="workbench">
       </variable>
    </sourceProvider>

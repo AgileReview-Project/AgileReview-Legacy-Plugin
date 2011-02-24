@@ -12,7 +12,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.services.ISourceProviderService;
 
+import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
@@ -66,7 +68,9 @@ public class ActivateReviewHandler extends AbstractHandler {
 						if(ViewControl.isOpen(ReviewExplorer.class)) {
 							ReviewExplorer.getInstance().refresh();
 						}
-						
+						ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+						SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.IS_ACTIVE_REVIEW);
+						sp.setVariable(SourceProvider.IS_ACTIVE_REVIEW, true);
 					}
 				}
 			}

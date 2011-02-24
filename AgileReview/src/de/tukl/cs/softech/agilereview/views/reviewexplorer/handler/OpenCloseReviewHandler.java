@@ -73,17 +73,17 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 							}
 							PropertiesManager.getInstance().addToOpenReviews(reviewId);
 						}	
-						if(ViewControl.isOpen(ReviewExplorer.class)) {
-							ReviewExplorer.getInstance().refresh();
-						}
-						if(ViewControl.isOpen(CommentTableView.class)) {
-							CommentTableView.getInstance().resetComments();
-						}
 					}
+				}
+				if(ViewControl.isOpen(ReviewExplorer.class)) {
+					ReviewExplorer.getInstance().refresh();
+					ReviewExplorer.getInstance().validateExplorerSelection();
+				}
+				if(ViewControl.isOpen(CommentTableView.class)) {
+					CommentTableView.getInstance().resetComments();
 				}
 			}
 		}
 		return null;
 	}
-
 }

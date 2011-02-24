@@ -31,6 +31,10 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class CommentDetail extends AbstractDetail<Comment> {
 	
 	/**
+	 * Label to show the comment tag of the shown Comment
+	 */
+	private Label tagInstance;
+	/**
 	 * Label to show the author of the shown Comment
 	 */
 	private Label authorInstance;
@@ -74,11 +78,20 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		gridLayout.numColumns = numColumns;
 		this.setLayout(gridLayout);
 
+		Label tagID = new Label(this, SWT.NONE);
+		tagID.setText("Tag-ID: ");
+		
+		tagInstance = new Label(this, SWT.NONE);
+		GridData gridData = new GridData();
+	    gridData.horizontalAlignment = GridData.FILL;
+	    gridData.horizontalSpan = numColumns-1;
+	    tagInstance.setLayoutData(gridData);
+		
 	    Label author = new Label(this, SWT.PUSH);
 	    author.setText("Author: ");
 	    
 	    authorInstance = new Label(this, SWT.PUSH);
-	    GridData gridData = new GridData();
+	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    authorInstance.setLayoutData(gridData);
@@ -187,6 +200,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		if(comment != null) {
 			this.backupObject = (Comment)comment.copy();
 			this.editedObject = comment;
+			tagInstance.setText(generateCommentKey(comment));
 			authorInstance.setText(comment.getAuthor());
 
 			// Proof if the comment is loaded for the first time
@@ -311,4 +325,14 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		}
 	}
 
+	/**
+	 * Generates the comment key for the given comment in the following scheme: reviewID|author|commendID
+	 * @param comment which comment key should be generated
+	 * @return comment key
+	 */
+	private String generateCommentKey(Comment comment) {
+		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
+		return commentTag;
+	}
 }

@@ -78,14 +78,15 @@ class REOpenAction extends Action {
 	public void run() { 
 		if(isEnabled()) {
 			IFile file = convertToIFile(data);
-			try {
-				IDE.openEditor(page, file); 
-			} catch (PartInitException e) {
-				PluginLogger.logError(this.getClass().toString(), "run", "An Error occured while initializing the Editor!", e);
-				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error Opening File", "An Error occured while initializing the Editor!");
-			} catch (Exception e) {
-				PluginLogger.logError(this.getClass().toString(), "run", "Could not open file!", e);
-				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error Opening File", "Could not open file!\nProve whether this file exists in your workspace and its project was imported in eclipse!");
+			if(file.exists()) {
+				try {
+					IDE.openEditor(page, file); 
+				} catch (PartInitException e) {
+					PluginLogger.logError(this.getClass().toString(), "run", "An error occured while initializing the Editor!", e);
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "error while opening file", "An error occured while initializing the editor!");
+				}
+			} else {
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening file", "Could not open file!\nProve whether this file exists in your workspace and its project was imported in eclipse!");
 			}
 		}
 	}

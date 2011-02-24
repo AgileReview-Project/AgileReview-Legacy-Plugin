@@ -225,6 +225,13 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	}
 	
 	/**
+	 * Validates the ReviewExplorer selection in order to update the CONTAINS_CLOSED_REVIEW variable of the {@link SourceProvider}
+	 */
+	public void validateExplorerSelection() {
+		selectionChanged(new SelectionChangedEvent(this.treeViewer, this.treeViewer.getSelection()));
+	}
+	
+	/**
 	 * Will be called by the {@link ViewControl} when the selection was changed and changes
 	 * @param event
 	 * @see de.tukl.cs.softech.agilereview.views.ViewControl#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
@@ -233,18 +240,26 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		if(event.getSelection() instanceof IStructuredSelection) {
 			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 			Iterator<?> it = sel.iterator();
-			boolean containsClosedReview = false;
+			boolean containsClosedReview = false, firstReviewIsActive = false, firstIteration = true;
 			while(it.hasNext() && !containsClosedReview) {
 				Object o = it.next();
 				if(o instanceof MultipleReviewWrapper) {
 					if(!((MultipleReviewWrapper)o).isOpen()) {
 						containsClosedReview = true;
 					}
+					if(firstIteration) {
+						if(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(((MultipleReviewWrapper)o).getReviewId())) {
+							firstReviewIsActive = true;
+						}
+					}
 				}
+				firstIteration = false;
 			}
 			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
-			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-			sp.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
+			SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTAINS_CLOSED_REVIEW);
+			sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
+			SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.IS_ACTIVE_REVIEW);
+			sp2.setVariable(SourceProvider.IS_ACTIVE_REVIEW, firstReviewIsActive);
 		}
 	}
 
