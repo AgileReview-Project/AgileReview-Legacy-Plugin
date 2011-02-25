@@ -61,7 +61,7 @@ public class AnnotationParser implements IAnnotationParser {
 	/**
 	 * The currently displayed comments
 	 */
-	protected HashMap<String, Position> displayedComments = new HashMap<String, Position>();
+	protected TreeSet<String> displayedComments = new TreeSet<String>();
 	/**
 	 * Document which provides the contents for this instance
 	 */
@@ -224,13 +224,16 @@ public class AnnotationParser implements IAnnotationParser {
 		} catch (CoreException e) {
 			PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "+editor.getTitle(), e);
 		}
+		
+		//update annotations in order to recognize moved tags
+		TreeMap<String, Position> annotationsToUpdate = new TreeMap<String, Position>();
+		for(String key : displayedComments) {
+			if(idPositionMap.get(key) != null) {
+				annotationsToUpdate.put(key, idPositionMap.get(key));
+			}
+		}
+		annotationModel.updateAnnotations(annotationsToUpdate);
 	}
-	
-//	private void checkForPositionUpdates() {
-//		for(String key : idTagPositions.keySet()) {
-//			
-//		}
-//	}
 	
 	/*
 	 * (non-Javadoc)
@@ -246,14 +249,18 @@ public class AnnotationParser implements IAnnotationParser {
 			i++;
 		}
 
-		displayedComments.clear();
+		HashMap<String, Position> toDisplay = new HashMap<String, Position>();
 		for(String s : commentKeys) {
 			if(this.idPositionMap.get(s) != null) {
-				displayedComments.put(s, this.idPositionMap.get(s));
+				toDisplay.put(s, this.idPositionMap.get(s));
 			}
 		}
+		
+		displayedComments.clear();
+		displayedComments.addAll(toDisplay.keySet());
+		
 		//Do not prove for open perspective, because annotations will be cleaned by empty comment array
-		this.annotationModel.displayAnnotations(displayedComments);
+		this.annotationModel.displayAnnotations(toDisplay);
 	}
 	
 	/*
@@ -327,7 +334,6 @@ public class AnnotationParser implements IAnnotationParser {
 				//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
 			}
 			parseInput();
-			// && displayedComments.keySet().contains(commentKey)
 			if(ViewControl.isPerspectiveOpen() && display) {
 				this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
 			}

@@ -70,6 +70,19 @@ public class AgileAnnotationController {
 	}
 	
 	/**
+	 * Updates the given comment annotations in the provided editor to the given positions
+	 * @param keyPositionMap a map of updated positions and the comment keys correlated to the positions
+	 */
+	protected void updateAnnotations(Map<String, Position> keyPositionMap) {
+		PluginLogger.log(this.getClass().toString(), "displayAnnotations", "display: "+keyPositionMap.keySet().toString());
+		for(String key : keyPositionMap.keySet()) {
+			if(annotationMap.get(key) != null) {
+				annotationModel.modifyAnnotationPosition(annotationMap.get(key), keyPositionMap.get(key));
+			}
+		}
+	}
+	
+	/**
 	 * Adds a new annotation at a given position p.
 	 * @param commentKey The tag key of the comment for which this annotation holds
 	 * @param p The position to add the annotation on.
