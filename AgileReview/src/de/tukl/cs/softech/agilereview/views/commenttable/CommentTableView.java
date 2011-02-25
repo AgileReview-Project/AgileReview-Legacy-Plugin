@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -83,10 +84,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * The comments to be displayed (model of TableViewer viewer) 
 	 */
 	private ArrayList<Comment> comments;
-	/**
-	 * The comments filtered by the viewers text field (and the explorers selection) 
-	 */
-	private ArrayList<Comment> filteredComments;
 	/**
 	 * The view that displays the comments
 	 */
@@ -160,9 +157,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		// add comment to (un)filtered model
 		PluginLogger.log(this.getClass().toString(), "addComment", "Adding comment to table content");
 		this.comments.add(comment);
-		if (!this.comments.equals(this.filteredComments)) { 
-			this.filteredComments.add(comment);
-		}
+		
 		viewer.setInput(this.comments);
 		
 		// set selection (to display comment in detail view)
@@ -173,7 +168,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			IEditorPart editor;
 			if((editor = getActiveEditor()) != null) {
 				PluginLogger.log(this.getClass().toString(), "addComment", "Add tags for currently added comment");
-				parserMap.get(editor).addTagsInDocument(comment);
+				parserMap.get(editor).addTagsInDocument(comment, getFilteredComments().contains(comment));
 			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "addComment", "BadLocationException when trying to add tags", e);
@@ -190,10 +185,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 
 		PluginLogger.log(this.getClass().toString(), "deleteComment", "Deleting a comment from table content");
 		// add comment to (un)filtered model
-		this.comments.remove(comment);
-		if (this.filteredComments.contains(comment)) {
-			this.filteredComments.remove(comment);	
-		}		
+		this.comments.remove(comment);		
 		viewer.setInput(this.comments);
 		
 		// remove annotation and tags
@@ -240,19 +232,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		{
 			filteredCommentObjects = filter.filter(viewer, this, filteredCommentObjects);
 		}
-		
-		//fill filteredComments and filter annotations
-		this.filteredComments = new ArrayList<Comment>();
-		
-		
-		for (Object o : filteredCommentObjects) {
-			filteredComments.add((Comment) o);
-		}
 
 		IEditorPart editor;
 		if((editor = this.getActiveEditor()) != null) {
 			if(this.parserMap.get(editor) != null) {
-				this.parserMap.get(editor).filter(filteredComments);
+				this.parserMap.get(editor).filter(getFilteredComments());
 			}
 		}
 	}
@@ -270,7 +254,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		instance = this;
 		// get comments from CommentController
 		this.comments = ReviewAccess.getInstance().getAllComments();
-		this.filteredComments = this.comments;
 
 		
 		// set layout of parent
@@ -297,7 +280,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		// get editor that is active when opening eclipse
 		if (getActiveEditor() instanceof IEditorPart) {
 			this.parserMap.put((IEditorPart) getActiveEditor(), ParserFactory.createParser((IEditorPart) getActiveEditor()));
-			this.parserMap.get((IEditorPart) getActiveEditor()).filter(filteredComments);
+			this.parserMap.get((IEditorPart) getActiveEditor()).filter(getFilteredComments());
 		}
 		
 	}
@@ -634,6 +617,20 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		return commentTag;
 	}
 	
+	/**
+	 * Returns all currently shown comments of the table
+	 * @return comments of all currently displayed comments
+	 */
+	private HashSet<Comment> getFilteredComments() {
+		HashSet<Comment> comments = new HashSet<Comment>();
+		for(TableItem i : viewer.getTable().getItems()) {
+			if(i.getData() instanceof Comment) {
+				comments.add((Comment)i.getData());
+			}
+		}
+		return comments;
+	}
+	
 	//###############################################################################
 	//######### functions which provide functionality for AnnotationParser ##########
 	//###############################################################################
@@ -663,7 +660,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if((editor = this.getActiveEditor()) != null) {
 			if(editor instanceof IEditorPart) {
 				this.parserMap.put((IEditorPart) editor, ParserFactory.createParser((IEditorPart) editor));
-				this.parserMap.get((IEditorPart) editor).filter(filteredComments);
+				this.parserMap.get((IEditorPart) editor).filter(getFilteredComments());
 			}
 		}
 	}
@@ -676,7 +673,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		if((editor = this.getActiveEditor()) != null) {
 			if(editor instanceof IEditorPart) {
 				this.parserMap.get(editor).reload();
-				this.parserMap.get(editor).filter(filteredComments);
+				this.parserMap.get(editor).filter(getFilteredComments());
 			}
 		}
 	}
@@ -687,7 +684,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void reparseAllEditors() {
 		for(IAnnotationParser p : this.parserMap.values()) {
 			p.reload();
-			p.filter(filteredComments);
+			p.filter(getFilteredComments());
 		}
 	}
 	
@@ -792,8 +789,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			IEditorPart editor = (IEditorPart) partRef.getPart(false);
 			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
 				this.parserMap.put(editor, ParserFactory.createParser(editor));
-				this.parserMap.get(editor).filter(filteredComments);
 			}
+			this.parserMap.get(editor).filter(getFilteredComments());
 		}
 	}
 	
@@ -820,7 +817,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 				PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Adding annotations since AgileReview perspective has been activated");
 				if (getActiveEditor() instanceof IEditorPart) {
 						this.parserMap.put((IEditorPart) getActiveEditor(), ParserFactory.createParser((IEditorPart) getActiveEditor()));
-						this.parserMap.get((IEditorPart) getActiveEditor()).filter(filteredComments);
+						this.parserMap.get((IEditorPart) getActiveEditor()).filter(getFilteredComments());
 				}
 				this.perspectiveNotActive = false;
 			}

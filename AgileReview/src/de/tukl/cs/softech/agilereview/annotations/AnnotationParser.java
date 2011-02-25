@@ -59,6 +59,10 @@ public class AnnotationParser implements IAnnotationParser {
 	 */
 	protected TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
 	/**
+	 * The currently displayed comments
+	 */
+	protected HashMap<String, Position> displayedComments = new HashMap<String, Position>();
+	/**
 	 * Document which provides the contents for this instance
 	 */
 	protected IDocument document;
@@ -222,25 +226,34 @@ public class AnnotationParser implements IAnnotationParser {
 		}
 	}
 	
+//	private void checkForPositionUpdates() {
+//		for(String key : idTagPositions.keySet()) {
+//			
+//		}
+//	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#filter(java.util.ArrayList)
 	 */
-	public void filter(ArrayList<Comment> comments) {
+	public void filter(HashSet<Comment> comments) {
 		PluginLogger.log(this.getClass().toString(), "filter", "triggered");
 		String[] commentKeys = new String[comments.size()];
-		for(int i = 0; i < comments.size(); i++) {
-			commentKeys[i] = comments.get(i).getReviewID()+keySeparator+comments.get(i).getAuthor()+keySeparator+comments.get(i).getId();
+		
+		int i = 0;
+		for(Comment c : comments) {
+			commentKeys[i] = c.getReviewID()+keySeparator+c.getAuthor()+keySeparator+c.getId();
+			i++;
 		}
 
-		HashMap<String, Position> display = new HashMap<String, Position>();
+		displayedComments.clear();
 		for(String s : commentKeys) {
 			if(this.idPositionMap.get(s) != null) {
-				display.put(s, this.idPositionMap.get(s));
+				displayedComments.put(s, this.idPositionMap.get(s));
 			}
 		}
 		//Do not prove for open perspective, because annotations will be cleaned by empty comment array
-		this.annotationModel.displayAnnotations(display);
+		this.annotationModel.displayAnnotations(displayedComments);
 	}
 	
 	/*
@@ -248,15 +261,15 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#clearAnnotations()
 	 */
 	public void clearAnnotations() {
-		filter(new ArrayList<Comment>());
+		filter(new HashSet<Comment>());
 	}
 	
 	/*
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#addTagsInDocument(agileReview.softech.tukl.de.CommentDocument.Comment)
 	 */
-	public void addTagsInDocument(Comment comment) throws BadLocationException, CoreException {
-		//Position result = null;
+	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {
+		//VARIANT(return Position):Position result = null;
 
 		ISelection selection= editor.getSelectionProvider().getSelection();
 		if (selection instanceof ITextSelection) {
@@ -282,7 +295,7 @@ public class AnnotationParser implements IAnnotationParser {
 					document.replace(insertOffset, 0, "<!--?"+commentTag+"?-->");
 				}
 				
-				//result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
+				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
 			} else {
 				// Calculate insert position for start line
 				String lineDelimiter = document.getLineDelimiter(selStartLine);
@@ -310,15 +323,16 @@ public class AnnotationParser implements IAnnotationParser {
 					document.replace(insertStartOffset, 0, "<!--?"+commentTag+"-->");
 				}
 				
-				//result = new Position(document.getLineOffset(selStartLine), 
-				//		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
+				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
+				//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
 			}
 			parseInput();
-			if(ViewControl.isPerspectiveOpen()) {
+			// && displayedComments.keySet().contains(commentKey)
+			if(ViewControl.isPerspectiveOpen() && display) {
 				this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
 			}
 		}
-		//return result;
+		//VARIANT(return Position):return result;
 	}
 	
 	/*

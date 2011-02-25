@@ -1,6 +1,6 @@
 package de.tukl.cs.softech.agilereview.annotations;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -19,16 +19,17 @@ public interface IAnnotationParser {
 	 * Filter annotations and display only the given comments
 	 * @param comments which should be displayed
 	 */
-	public abstract void filter(ArrayList<Comment> comments);
+	public abstract void filter(HashSet<Comment> comments);
 	
 	/**
 	 * Adds the Comment tags for the given comment in the currently opened file at the currently selected place
 	 * @param comment Comment for which the tags should be inserted
+	 * @param display if true, the new comment will instantly displayed<br>false, otherwise
 //	 * @return Position of the added {@link Comment} or null if the selection is no instance of {@link ITextSelection}
 	 * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
 	 * @throws CoreException 
 	 */
-	public abstract void addTagsInDocument(Comment comment) throws BadLocationException, CoreException;
+	public abstract void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException;
 	
 	/**
 	 * Removes the tags for one comment. Attention: if you want to delete more then one {@link Comment} in a row
