@@ -336,5 +336,6 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	public void setSelectedReviews(Set<String> selectedReviews) {
 		this.selectedReviewIDs.clear();
 		this.selectedReviewIDs.addAll(selectedReviews);
+		reviewsSelected = true;
 	}
 }
