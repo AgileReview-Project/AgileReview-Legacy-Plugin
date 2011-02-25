@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.views.detail.handlers;
 
 import java.io.IOException;
 
+import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -34,6 +35,17 @@ public class DeleteHandler extends AbstractHandler {
 					return null;
 				}
 				Review r = (Review)o;
+				// If necessary load review before deleting stuff (so comments and tags will be deleted)
+				if (!ReviewAccess.getInstance().isReviewLoaded(r.getId())){
+					try {
+						ReviewAccess.getInstance().loadReviewComments(r.getId());
+					} catch (XmlException e) {
+						PluginLogger.logError(this.getClass().toString(), "execute", "XmlException while loading comment of closed review "+r.getId(), e);
+					} catch (IOException e) {
+						PluginLogger.logError(this.getClass().toString(), "execute", "IOEXception while loading comment of closed review "+r.getId(), e);
+					}
+				}
+				
 				// Delete the selected review from ReviewExplorer
 				if(ViewControl.isOpen(ReviewExplorer.class)) {
 					ReviewExplorer.getInstance().deleteReview(new MultipleReviewWrapper(r, r.getId()));

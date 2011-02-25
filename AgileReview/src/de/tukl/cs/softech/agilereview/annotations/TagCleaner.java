@@ -48,43 +48,47 @@ public class TagCleaner {
 		boolean result = true;
 		
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-		try {
-			// identifier already quoted?
-			if (!regex) {
-				identifier = Pattern.quote(identifier);
-			}
-			String identifierRegex = "\\s*(\\??)\\s*"+Pattern.quote(keySeparator)+"\\s*"+identifier+"\\s*"+Pattern.quote(keySeparator)+"\\s*(\\??)\\s*";
-			
-			// get input from file
-			InputStream is = file.getContents();
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));			
-			
-			// read file line by line, replace tags
-			String input = "";						
-			String line = br.readLine();
-			while (line != null) {								
-				if (path.getFileExtension().equals("java")) {
-					String javaregex = "/\\*"+identifierRegex+"\\*/";
-					input += line.replaceAll(javaregex, "");	
-				} else if (path.getFileExtension().equals("xml")) {
-					String xmlregex = "<!--"+identifierRegex+"-->";
-					input += line.replaceAll(xmlregex, "");
+		if (file.exists()) {
+			try {
+				// identifier already quoted?
+				if (!regex) {
+					identifier = Pattern.quote(identifier);
 				}
-				line = br.readLine();
-				// append new line chars if not last line
-				input += line!=null ? System.getProperty("line.separator") : "";
+				String identifierRegex = "\\s*(\\??)\\s*"+Pattern.quote(keySeparator)+"\\s*"+identifier+"\\s*"+Pattern.quote(keySeparator)+"\\s*(\\??)\\s*";
+				
+				// get input from file
+				InputStream is = file.getContents();
+				BufferedReader br = new BufferedReader(new InputStreamReader(is));			
+				
+				// read file line by line, replace tags
+				String input = "";						
+				String line = br.readLine();
+				while (line != null) {								
+					if (path.getFileExtension().equals("java")) {
+						String javaregex = "/\\*"+identifierRegex+"\\*/";
+						input += line.replaceAll(javaregex, "");	
+					} else if (path.getFileExtension().equals("xml")) {
+						String xmlregex = "<!--"+identifierRegex+"-->";
+						input += line.replaceAll(xmlregex, "");
+					}
+					line = br.readLine();
+					// append new line chars if not last line
+					input += line!=null ? System.getProperty("line.separator") : "";
+				}
+	
+				// write modified content to file
+				byte[] bytes = input.getBytes();
+				InputStream source = new ByteArrayInputStream(bytes);
+				file.setContents(source, false, true, null);
+			
+			} catch (CoreException e) {
+				PluginLogger.logError(TagCleaner.class.toString(), "execute", "CoreException while trying to remove tags.", e);
+				result = false;
+			} catch (IOException e) {
+				PluginLogger.logError(TagCleaner.class.toString(), "execute", "IOException while trying to remove tags.", e);
+				result = false;
 			}
-
-			// write modified content to file
-			byte[] bytes = input.getBytes();
-			InputStream source = new ByteArrayInputStream(bytes);
-			file.setContents(source, false, true, null);
-		
-		} catch (CoreException e) {
-			PluginLogger.logError(TagCleaner.class.toString(), "execute", "CoreException while trying to remove tags.", e);
-			result = false;
-		} catch (IOException e) {
-			PluginLogger.logError(TagCleaner.class.toString(), "execute", "IOException while trying to remove tags.", e);
+		} else {
 			result = false;
 		}
 		
