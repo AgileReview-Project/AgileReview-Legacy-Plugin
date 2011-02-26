@@ -371,8 +371,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	    filterText.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent ke) {
 				commentFilter.setSearchText(filterText.getText());
+				viewer.refresh();
 				filterComments();
-				viewer.refresh();		
 			}
 
 		});

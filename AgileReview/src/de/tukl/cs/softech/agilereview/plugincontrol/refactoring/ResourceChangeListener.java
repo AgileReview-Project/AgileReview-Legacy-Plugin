@@ -38,7 +38,6 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 		oldPath = "";
 		newPath = "";
 		refactoringDone = false;
-		System.out.println("refactoring: false");
 		if((event.getType() & IResourceChangeEvent.POST_CHANGE) != 0) {
 			try {
 				event.getDelta().accept(this);
