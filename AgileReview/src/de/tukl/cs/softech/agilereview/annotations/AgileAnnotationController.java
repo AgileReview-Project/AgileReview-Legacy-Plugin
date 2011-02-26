@@ -74,7 +74,7 @@ public class AgileAnnotationController {
 	 * @param keyPositionMap a map of updated positions and the comment keys correlated to the positions
 	 */
 	protected void updateAnnotations(Map<String, Position> keyPositionMap) {
-		PluginLogger.log(this.getClass().toString(), "displayAnnotations", "display: "+keyPositionMap.keySet().toString());
+		PluginLogger.log(this.getClass().toString(), "updateAnnotations", "update: "+keyPositionMap.keySet().toString());
 		for(String key : keyPositionMap.keySet()) {
 			if(annotationMap.get(key) != null) {
 				annotationModel.modifyAnnotationPosition(annotationMap.get(key), keyPositionMap.get(key));

@@ -34,12 +34,17 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 	 * Shows the status of refactoring of every event 
 	 */
 	private boolean refactoringDone = false;
+	private boolean firstMovedTo = false;
+	private boolean firstMovedFrom = false;
 
 	@Override
 	public void resourceChanged(final IResourceChangeEvent event) {
 		oldPath = "";
 		newPath = "";
 		refactoringDone = false;
+		firstMovedTo = false;
+		firstMovedFrom = false;
+		System.out.println("refactoring: false");
 		if((event.getType() & IResourceChangeEvent.POST_CHANGE) != 0) {
 			try {
 				event.getDelta().accept(this);
@@ -54,14 +59,16 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 		
 		switch(delta.getKind()) {
 		case IResourceDelta.ADDED:
-			if((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0) {
+			if((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0 && !firstMovedFrom) {
 				oldPath = delta.getMovedFromPath().toOSString();
+				firstMovedFrom = true;
 				System.out.println("oldPath="+delta.getMovedFromPath().toOSString());
 			}
 			break;
 		case IResourceDelta.REMOVED:
-			if((delta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
+			if((delta.getFlags() & IResourceDelta.MOVED_TO) != 0 && !firstMovedTo) {
 				newPath = delta.getMovedToPath().toOSString();
+				firstMovedTo = true;
 				System.out.println("newPath="+delta.getMovedToPath().toOSString());
 			}
 			break;
@@ -82,8 +89,7 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 						}
 					}
 				});
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				PluginLogger.logError(this.getClass().toString(), "visit", "IOException occured during refactoring Path in ReviewAccess", e);
 			} catch (XmlException e) {
 				PluginLogger.logError(this.getClass().toString(), "visit", "XmlException occured during refactoring Path in ReviewAccess", e);
@@ -91,6 +97,7 @@ public class ResourceChangeListener implements IResourceChangeListener, IResourc
 				PluginLogger.logError(this.getClass().toString(), "visit", "SWTException occured during asynchronous execution in the UI-Thread", e);
 			}
 			refactoringDone = true;
+			System.out.println("refactoring: true");
 		}
 		
 		return true;
