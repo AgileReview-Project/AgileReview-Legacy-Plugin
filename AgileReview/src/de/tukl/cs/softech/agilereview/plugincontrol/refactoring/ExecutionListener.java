@@ -5,7 +5,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 
-import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -53,6 +52,7 @@ public class ExecutionListener implements IExecutionListener {
 				ReviewExplorer.getInstance().refresh();
 			}
 			if(ViewControl.isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().resetComments();
 				CommentTableView.getInstance().resetEditorReferences();
 			}
 		}
