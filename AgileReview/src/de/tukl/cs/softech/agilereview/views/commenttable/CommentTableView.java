@@ -880,6 +880,12 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param c comment to select
 	 */
 	public void selectComment(Comment c) {
-		viewer.setSelection(new StructuredSelection(c), true);
+		if(getFilteredComments().contains(c)) {
+			viewer.setSelection(new StructuredSelection(c), true);
+		} else {
+			if(ViewControl.isOpen(DetailView.class)) {
+				DetailView.getInstance().selectionChanged(new SelectionChangedEvent(viewer, new StructuredSelection(c)));
+			}
+		}
 	}
 }
