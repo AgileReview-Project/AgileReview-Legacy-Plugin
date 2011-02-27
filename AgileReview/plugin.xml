@@ -278,6 +278,14 @@
    <handler
          class="de.tukl.cs.softech.agilereview.plugincontrol.RefreshHandler"
          commandId="org.eclipse.ui.file.refresh">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+            </instanceof>
+         </with>
+      </activeWhen>
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.views.commenttable.handler.AddNewCommentHandler"
@@ -704,15 +712,6 @@
             label="Create new review"
             style="push"
             tooltip="Create a new review">
-      </command>
-      <separator
-            name="AgileReview.separator2"
-            visible="true">
-      </separator>
-      <command
-            commandId="org.eclipse.ui.file.refresh"
-            label="Refresh all reviews"
-            style="push">
       </command>
       <separator
             name="AgileReview.separator1"

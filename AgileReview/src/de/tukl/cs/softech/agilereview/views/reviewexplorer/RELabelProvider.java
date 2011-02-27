@@ -1,8 +1,13 @@
 package de.tukl.cs.softech.agilereview.views.reviewexplorer;
 
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE.SharedImages;
@@ -18,23 +23,37 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
 /**
  * The LabelProvider specifies how the nodes of the tree viewer should be displayed
  */
-class RELabelProvider implements ILabelProvider {
+class RELabelProvider extends ColumnLabelProvider {
 	
-	@Override
-	public void addListener(ILabelProviderListener listener) {/* not implemented */}
-
-	@Override
-	public void dispose() {/* not implemented */}
-
-	@Override
-	public boolean isLabelProperty(Object element, String property) {
-		/* not implemented */
-		return false;
+	/**
+	 * Standard grey color for displaying not exisitng resources
+	 */
+	private Color grey = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+	
+	/**
+	 * Empty Constructor
+	 */
+	public RELabelProvider(){
+		super();
 	}
-
-	@Override
-	public void removeListener(ILabelProviderListener listener) {/* not implemented */}
-
+	
+	/**
+	 * Checks whether the file represented by the given AbstractMultipleWrapper exists
+	 * @param o AbstractMultipleWrapper to check
+	 * @return <i>true</i> if the resource exits, false otherwise
+	 */
+	private boolean exists (Object o) {
+		boolean result = true;
+		if (o instanceof AbstractMultipleWrapper) {
+			IWorkspaceRoot wr = ResourcesPlugin.getWorkspace().getRoot();
+			if (!wr.exists(new Path(((AbstractMultipleWrapper) o).getPath()))) {
+				result = false;
+			}
+		}
+		return result;
+	}
+	
+	
 	@Override
 	public Image getImage(Object element) {
 		Image result = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(getText(element)).createImage();
@@ -79,4 +98,11 @@ class RELabelProvider implements ILabelProvider {
 		return result;
 	}
 
+	@Override
+	public Color getForeground(Object element) {
+		if (!this.exists(element)) {
+			return this.grey;
+		}
+		return null;
+	}
 }

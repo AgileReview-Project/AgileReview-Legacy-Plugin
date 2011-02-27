@@ -78,7 +78,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		PluginLogger.log(this.getClass().toString(), "createPartControl", "ReviewExplorer will be created.");
 		instance = this;
 		
-		// Create the treeview
+		// Create the treeview MULTI, H_SCROLL, V_SCROLL, and BORDER
 		treeViewer = new TreeViewer(parent);
 		treeViewer.setContentProvider(new REContentProvider());
 		treeViewer.setLabelProvider(new RELabelProvider());
@@ -129,6 +129,8 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 	public void refreshInput()
 	{
 		PluginLogger.log(this.getClass().toString(), "refreshInput", "Refreshing the ReviewExplorer viewer (with reloading the input)");
+		// Save previous selection
+		ISelection selection = this.treeViewer.getSelection();
 		// Save expansion state
 		this.treeViewer.getControl().setRedraw(false);
 		TreePath[] expandedElements = this.treeViewer.getExpandedTreePaths();
@@ -151,6 +153,9 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		}
 		this.treeViewer.getControl().setRedraw(true);
 		this.treeViewer.getControl().redraw();
+
+		//Reset selection
+		this.treeViewer.setSelection(selection, true);
 	}
 	
 	/**

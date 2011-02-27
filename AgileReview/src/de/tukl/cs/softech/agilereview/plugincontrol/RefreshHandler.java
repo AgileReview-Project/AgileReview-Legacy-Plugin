@@ -44,16 +44,15 @@ public class RefreshHandler extends AbstractHandler {
 			}
 		}
 		
-		if(ViewControl.isOpen(ReviewExplorer.class)) {
-			ReviewExplorer.getInstance().refreshInput();
-		}
 		if(ViewControl.isOpen(DetailView.class)) {
 			DetailView.getInstance().changeParent(DetailView.EMPTY);
+		}
+		if(ViewControl.isOpen(ReviewExplorer.class)) {
+			ReviewExplorer.getInstance().refreshInput();
 		}
 		if(ViewControl.isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().resetComments();
 		}
-
 
 		// Return must be null (see API)
 		return null;
