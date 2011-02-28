@@ -35,6 +35,7 @@ public class NewReplyHandler extends AbstractHandler {
 		if(dialog.getSaved()) {
 			if (ViewControl.isOpen(DetailView.class)) {
 				DetailView.getInstance().addReply(dialog.getReplyAuthor(), dialog.getReplyText());
+				DetailView.getInstance().setFocus();
 			}
 		}
 		return null;
