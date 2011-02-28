@@ -170,56 +170,29 @@
       id="agilereview"
       point="org.eclipse.ui.cheatsheets.cheatSheetContent">
    <category
-         id="AgileReview.category1"
-         name="AgileReview">
+         id="de.tukl.cs.softech.agilereview"
+         name="%category.name.0">
    </category>
    <cheatsheet
-         category="AgileReview.category1"
+         category="de.tukl.cs.softech.agilereview"
          composite="false"
-         contentFile="help/cheatsheet/insert_review.xml"
-         id="AgileReview.cheatsheet3"
-         name="review creation">
+         contentFile="help/cheatsheet/new_review.xml"
+         id="de.tukl.cs.softech.agilereview.new_review_cheatsheet"
+         name="New review">
    </cheatsheet>
    <cheatsheet
-         category="AgileReview.category1"
+         category="de.tukl.cs.softech.agilereview"
          composite="false"
-         contentFile="help/cheatsheet/change_review.xml"
-         id="AgileReview.cheatsheet5"
-         name="review changing">
+         contentFile="help/cheatsheet/add_comment.xml"
+         id="de.tukl.cs.softech.agilereview.add_comment_cheatsheet"
+         name="Add comment">
    </cheatsheet>
    <cheatsheet
-         category="AgileReview.category1"
-         composite="false"
-         contentFile="help/cheatsheet/activate_review.xml"
-         id="AgileReview.cheatsheet6"
-         name="review activation">
-   </cheatsheet>
-   <cheatsheet
-         category="AgileReview.category1"
-         composite="false"
-         id="AgileReview.cheatsheet7"
-         name="review open/close">
-   </cheatsheet>
-   <cheatsheet
-         category="AgileReview.category1"
-         composite="false"
-         contentFile="help/cheatsheet/delete_review.xml"
-         id="AgileReview.cheatsheet4"
-         name="review deletion">
-   </cheatsheet>
-   <cheatsheet
-         category="AgileReview.category1"
-         composite="false"
-         contentFile="help/cheatsheet/insert_comment.xml"
-         id="AgileReview.cheatsheet1"
-         name="comment creation">
-   </cheatsheet>
-   <cheatsheet
-         category="AgileReview.category1"
+         category="de.tukl.cs.softech.agilereview"
          composite="false"
          contentFile="help/cheatsheet/delete_comment.xml"
-         id="AgileReview.cheatsheet2"
-         name="comment deletion">
+         id="de.tukl.cs.softech.agilereview.delete_comment_cheatsheet"
+         name="Delete comment">
    </cheatsheet>
 </extension>
 <extension
