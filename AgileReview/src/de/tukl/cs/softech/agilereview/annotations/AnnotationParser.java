@@ -19,9 +19,12 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.NoDocumentFoundException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -41,6 +44,10 @@ public class AnnotationParser implements IAnnotationParser {
 	 * Core Regular Expression to find the core tag structure
 	 */
 	private static String rawTagRegex = "\\s*(\\??)"+Pattern.quote(keySeparator)+"\\s*([^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^\\?"+Pattern.quote(keySeparator)+"]*)\\s*"+Pattern.quote(keySeparator)+"(\\??)\\s*";
+	/**
+	 * Path of the file this parser represents
+	 */
+	private String path;
 	
 	/**
 	 * Regular Expression used by this instance
@@ -96,6 +103,12 @@ public class AnnotationParser implements IAnnotationParser {
 			}
 		} else {
 			throw new NoDocumentFoundException();
+		}
+		
+		// Set the path this Parser stand for
+		IEditorInput input = this.editor.getEditorInput();
+		if (input != null && input instanceof FileEditorInput) {
+			path = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
 		}
 		
 		this.annotationModel = new AgileAnnotationController(editor);
@@ -241,18 +254,13 @@ public class AnnotationParser implements IAnnotationParser {
 	 */
 	public void filter(HashSet<Comment> comments) {
 		PluginLogger.log(this.getClass().toString(), "filter", "triggered");
-		String[] commentKeys = new String[comments.size()];
-		
-		int i = 0;
-		for(Comment c : comments) {
-			commentKeys[i] = c.getReviewID()+keySeparator+c.getAuthor()+keySeparator+c.getId();
-			i++;
-		}
 
 		HashMap<String, Position> toDisplay = new HashMap<String, Position>();
-		for(String s : commentKeys) {
-			if(this.idPositionMap.get(s) != null) {
-				toDisplay.put(s, this.idPositionMap.get(s));
+		for(Comment c : comments) {
+			String commentKey = c.getReviewID()+keySeparator+c.getAuthor()+keySeparator+c.getId();
+			
+			if(path.equals(ReviewAccess.computePath(c)) && this.idPositionMap.get(commentKey) != null) {
+				toDisplay.put(commentKey, this.idPositionMap.get(commentKey));
 			}
 		}
 		
