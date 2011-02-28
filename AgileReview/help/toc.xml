@@ -9,11 +9,11 @@
  <topic href="help/guide/install.htm" label="Installation and update">
  </topic>
  <topic label="Concepts">
-    <topic label="Review concept">
+    <topic href="help/guide/concepts/review.htm" label="Review concept">
     </topic>
-    <topic label="Comment concept">
+    <topic href="help/guide/concepts/comment.htm" label="Comment concept">
     </topic>
-    <topic label="Storage concept">
+    <topic href="help/guide/concepts/storage.htm" label="Storage concept">
     </topic>
     <topic label="Views">
        <topic label="ReviewExplorer">
@@ -22,8 +22,8 @@
        </topic>
        <topic label="CommentTable view">
        </topic>
-    </topic>
-    <topic label="Agilereview perspective">
+       <topic label="AgileReview Perspective">
+       </topic>
     </topic>
  </topic>
  <topic href="help/guide/tips.htm" label="Tips and tricks">

@@ -25,6 +25,8 @@
     <command label="Activate Review" serialization="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate"/>
     <command label="Open/Close Review" serialization="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose"/>
     <command label="Delete Review" serialization="de.tukl.cs.softech.agilereview.views.detail.delete"/>
-    <command label="Link Explorer" serialization="de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer"/>
+    <command label="Link Explorer" serialization="de.tukl.cs.so
+ <context id="Help_Context">
+ </context>ftech.agilereview.views.reviewexplorer.linkexplorer"/>
  </context>
 </contexts> 
