@@ -3,8 +3,6 @@ package de.tukl.cs.softech.agilereview.views.detail;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -18,7 +16,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * The ReplyDialog is a small Wizard to insert new Replys to a document
  */
-public class ReplyDialog extends Composite implements Listener, KeyListener {
+public class ReplyDialog extends Composite implements Listener {
 	
 	/**
 	 * TextBox to insert the reply text
@@ -41,10 +39,7 @@ public class ReplyDialog extends Composite implements Listener, KeyListener {
 	 * inserted reply text
 	 */
 	private String strReplyText = "";
-	/**
-	 * The last key which was pressed
-	 */
-	private int lastKeyCode = 0;
+	
 	
 	/**
 	 * Creates a new dialog for entering replies
@@ -80,11 +75,12 @@ public class ReplyDialog extends Composite implements Listener, KeyListener {
 	    okButton = new Button(this, SWT.PUSH);
 	    okButton.setText("Save");
 	    okButton.addListener(SWT.Selection, this);
+	    okButton.setToolTipText("Save (Ctrl+Enter)");
+	    this.getShell().setDefaultButton(okButton);
 	    
 	    Button cancelButton = new Button(this, SWT.PUSH);
 	    cancelButton.setText("Cancel");
 	    cancelButton.addListener(SWT.Selection, this);
-	    replyText.addKeyListener(this);
 	}
 	
 	/**
@@ -145,18 +141,5 @@ public class ReplyDialog extends Composite implements Listener, KeyListener {
 		boolSaved = false;
     	getParent().dispose();
 	}
-	
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		// This should be Ctrl+Enter
-		if (e.keyCode==13 && lastKeyCode==262144){
-			doOk();
-		}
-		lastKeyCode = e.keyCode;
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) { /* do nothing */}
 }
 
