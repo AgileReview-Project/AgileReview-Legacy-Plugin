@@ -1,0 +1,911 @@
+<?eclipse version="3.2"?>
+<plugin>
+<extension
+      point="org.eclipse.ui.perspectives">
+   <perspective
+         class="de.tukl.cs.softech.agilereview.views.AgileReviewPerspective"
+         fixed="false"
+         icon="%agileReview.icon"
+         id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
+         name="%perspective.name">
+   </perspective>
+</extension>
+<extension
+      point="org.eclipse.ui.perspectiveExtensions">
+   <perspectiveExtension
+         targetID="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+      <perspectiveShortcut
+            id="org.eclipse.jdt.ui.JavaPerspective">
+      </perspectiveShortcut>
+      <perspectiveShortcut
+            id="org.eclipse.ui.resourcePerspective">
+      </perspectiveShortcut>
+      <viewShortcut
+            id="org.eclipse.ui.navigator.ProjectExplorer">
+      </viewShortcut>
+      <viewShortcut
+            id="org.eclipse.ui.views.ContentOutline">
+      </viewShortcut>
+      <viewShortcut
+            id="org.eclipse.jdt.ui.PackageExplorer">
+      </viewShortcut>
+      <viewShortcut
+            id="org.eclipse.ui.views.ProblemView">
+      </viewShortcut>
+      <view
+            id="de.tukl.cs.softech.agilereview.view.reviewnavigator.view"
+            minimized="false"
+            ratio="0.2f"
+            relationship="left"
+            relative="org.eclipse.ui.editorss">
+      </view>
+      <view
+            id="org.eclipse.jdt.ui.PackageExplorer"
+            minimized="false"
+            relationship="stack"
+            relative="de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
+      </view>
+      <view
+            id="de.tukl.cs.softech.agilereview.view.commenttableview.view"
+            minimized="false"
+            ratio="0.7f"
+            relationship="bottom"
+            relative="org.eclipse.ui.editorss">
+      </view>
+      <view
+            id="de.tukl.cs.softech.agilereview.view.commentdetailview.view"
+            minimized="false"
+            ratio="0.75f"
+            relationship="right"
+            relative="org.eclipse.ui.editorss">
+      </view>
+   </perspectiveExtension>
+   <perspectiveExtension
+         targetID="org.eclipse.jdt.ui.JavaPerspective">
+      <perspectiveShortcut
+            id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+      </perspectiveShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+   </perspectiveExtension>
+   <perspectiveExtension
+         targetID="org.eclipse.ui.resourcePerspective">
+      <perspectiveShortcut
+            id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+      </perspectiveShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+   </perspectiveExtension>
+</extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="de.tukl.cs.softech.agilereview.category"
+            class="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView"
+            icon="%agileReview.icon"
+            id="de.tukl.cs.softech.agilereview.view.commenttableview.view"
+            name="%view.name"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="de.tukl.cs.softech.agilereview.category"
+            class="de.tukl.cs.softech.agilereview.views.detail.DetailView"
+            icon="%agileReview.icon"
+            id="de.tukl.cs.softech.agilereview.view.commentdetailview.view"
+            name="%view.name.0"
+            restorable="true">
+      </view>
+      <category
+            id="de.tukl.cs.softech.agilereview.category"
+            name="%category.name"
+            parentCategory="de.tukl.cs.softech.agilereview.category">
+      </category>
+      <view
+            allowMultiple="false"
+            category="de.tukl.cs.softech.agilereview.category"
+            class="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer"
+            icon="%agileReview.icon"
+            id="de.tukl.cs.softech.agilereview.view.reviewnavigator.view"
+            name="%view.name.1"
+            restorable="true">
+      </view>
+   </extension>
+    <extension point="org.eclipse.help.toc">
+        <toc file="help/toc.xml" primary="true"/>
+    </extension>
+    <extension
+          id="AgileReview.CommentSpecification"
+          point="org.eclipse.ui.editors.markerAnnotationSpecification">
+       <specification
+             annotationType="AgileReview.comment.annotation"
+             colorPreferenceKey="Comment_Annotation"
+             colorPreferenceValue="%annotations.default.color"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical"
+             verticalRulerPreferenceValue="true">
+       </specification>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.AnnotationType"
+          point="org.eclipse.ui.editors.annotationTypes">
+       <type
+             markerType="AgileReview.ResourceMarker"
+             name="AgileReview.comment.annotation">
+       </type>
+    </extension>
+    <extension point="org.eclipse.help.contexts">
+    <contexts
+          file="help/contexts.xml"
+          plugin="de.tukl.cs.softech.agilereview">
+    </contexts>
+</extension>
+<extension
+      id="agilereview"
+      point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+   <category
+         id="de.tukl.cs.softech.agilereview"
+         name="%category.name.0">
+   </category>
+   <cheatsheet
+         category="de.tukl.cs.softech.agilereview"
+         composite="false"
+         contentFile="help/cheatsheet/new_review.xml"
+         id="de.tukl.cs.softech.agilereview.new_review_cheatsheet"
+         name="New review">
+   </cheatsheet>
+   <cheatsheet
+         category="de.tukl.cs.softech.agilereview"
+         composite="false"
+         contentFile="help/cheatsheet/add_comment.xml"
+         id="de.tukl.cs.softech.agilereview.add_comment_cheatsheet"
+         name="Add comment">
+   </cheatsheet>
+   <cheatsheet
+         category="de.tukl.cs.softech.agilereview"
+         composite="false"
+         contentFile="help/cheatsheet/delete_comment.xml"
+         id="de.tukl.cs.softech.agilereview.delete_comment_cheatsheet"
+         name="Delete comment">
+   </cheatsheet>
+</extension>
+<extension
+      point="org.eclipse.ui.startup">
+   <startup
+         class="de.tukl.cs.softech.agilereview.plugincontrol.Startup">
+   </startup>
+</extension>
+<extension
+      point="org.eclipse.ui.newWizards">
+   <category
+         id="AgileReview.AgileReviewCategory"
+         name="%category.name.0">
+   </category>
+   <wizard
+         canFinishEarly="false"
+         category="AgileReview.AgileReviewCategory"
+         class="de.tukl.cs.softech.agilereview.wizards.newreview.NewReviewWizard"
+         descriptionImage="icons/agile_icon.png"
+         hasPages="true"
+         icon="icons/review/review_add_15x15.png"
+         id="de.tukl.cs.softech.agilereview.newReviewWizard"
+         name="%wizard.name">
+   </wizard>
+</extension>
+<extension
+      point="org.eclipse.ui.exportWizards">
+   <category
+         id="AgileReview.AgileReviewCategory"
+         name="%category.name.0">
+   </category>
+   <wizard
+         category="AgileReview.AgileReviewCategory"
+         class="de.tukl.cs.softech.agilereview.wizards.export.ExportReviewDataWizard"
+         icon="icons/agile_icon.png"
+         id="AgileReview.exportReviewDataWizard"
+         name="%wizard.name">
+   </wizard>
+</extension>
+<extension
+      point="org.eclipse.ui.preferencePages">
+   <page
+         class="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         id="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         name="AgileReview">
+   </page>
+</extension>
+<extension
+      point="org.eclipse.core.runtime.preferences">
+   <initializer
+         class="de.tukl.cs.softech.agilereview.preferences.PreferenceInitializer">
+   </initializer>
+</extension>   
+<extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.RefreshHandler"
+         commandId="org.eclipse.ui.file.refresh">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.commenttable.handler.AddNewCommentHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <or>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.ui.IEditorPart">
+               </instanceof>
+            </or>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <with
+               variable="activePart">
+            <or>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.ui.IEditorPart">
+               </instanceof>
+            </or>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.RevertHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.detail.revert">
+      <enabledWhen>
+         <with
+               variable="de.tukl.cs.softech.agilereview.views.detail.variables.revertable">
+            <equals
+                  value="true">
+            </equals>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.DeleteHandler"
+         commandId="org.eclipse.ui.edit.delete">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+            </instanceof>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.OpenCloseReviewHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose">
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ActivateReviewHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate">
+      <enabledWhen>
+		  <and>
+		     <with
+		           variable="selection">
+		        <and>
+		           <count
+		                 value="1">
+		           </count>
+		           <iterate
+		                 ifEmpty="false"
+		                 operator="and">
+		              <instanceof
+		                    value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
+		              </instanceof>
+		           </iterate>
+		        </and>
+		     </with>
+       <with
+             variable="de.tukl.cs.softech.agilereview.views.reviewexplorer.variables.isActiveReview">
+          <equals
+                value="false">
+          </equals>
+       </with>
+		  </and>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.NewReplyHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.detail.newReply">
+      <activeWhen>
+         <with
+               variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+            <equals
+                  value="true">
+            </equals>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.dataaccess.SaveHandler"
+         commandId="de.tukl.cs.softech.agilereview.save">
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.commenttable.handler.DeleteCommentHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.commenttable.delete">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+            </instanceof>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="agileReview.softech.tukl.de.CommentDocument$Comment">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.commenttable.handler.DeleteCommentHandler"
+         commandId="org.eclipse.ui.edit.delete">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+            </instanceof>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="agileReview.softech.tukl.de.CommentDocument$Comment">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.DeleteHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.detail.delete">
+      <activeWhen>
+         <with
+               variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
+            <equals
+                  value="true">
+            </equals>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.dataaccess.handler.CleanupHandler"
+         commandId="de.tukl.cs.softech.agilereview.cleanup">
+      <activeWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="org.eclipse.jdt.core.IJavaProject">
+               </instanceof>
+            </iterate>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.ShowCommentHandler"
+         commandId="de.tukl.cs.softech.agilereview.showComment">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="org.eclipse.ui.IEditorPart">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ExportHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.export">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+            </instanceof>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+	      <and>
+	         <with
+	               variable="selection">
+	            <iterate
+	                  ifEmpty="false"
+	                  operator="and">
+	               <instanceof
+	                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
+	               </instanceof>
+	            </iterate>
+	         </with>
+          <with
+                variable="de.tukl.cs.softech.agilereview.views.export.variables.containsClosedReview">
+             <equals
+                   value="false">
+             </equals>
+          </with>
+	      </and>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.DeleteCommentHandler"
+         commandId="de.tukl.cs.softech.agilereview.editor.delete">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="org.eclipse.ui.IEditorPart">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
+</extension>
+<extension
+      point="org.eclipse.ui.commands">
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         description="Add new Reply to a Comment in DetailView"
+         id="de.tukl.cs.softech.agilereview.views.detail.newReply"
+         name="Add New Reply">
+   </command>
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         description="SaveCommand for AgileReview Contents"
+         id="de.tukl.cs.softech.agilereview.save"
+         name="SaveCommand for AgileReview Contents">
+   </command>
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         description="RevertCommand in DetailView"
+         id="de.tukl.cs.softech.agilereview.views.detail.revert"
+         name="Revert comment changes">
+   </command>
+   <category
+         description="Commands for AgileReview Plugin"
+         id="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         name="AgileReview">
+   </category>
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CreateNewReviewHandler"
+         description="Create new review in ReviewExplorer"
+         id="de.tukl.cs.softech.agilereview.views.reviewexplorer.createNewReview"
+         name="Create New Review">
+   </command>
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         description="Activate review based on selection in ReviewExplorer"
+         id="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate"
+         name="Activate Selected Review">
+   </command>
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         description="Open/Close reviews based on selection in ReviewExplorer"
+         id="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose"
+         name="Open/Close Selected Reviewh.agilereview.views.reviewexplorer.openClose">
+   </command>
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         description="Add new comment in CommentTableView"
+         id="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment"
+         name="Add New Comment">
+   </command>
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.LinkExplorerToggleHandler"
+         description="Link ReviewExplorer with CommentTableView"
+         id="de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer"
+         name="Link ReviewExplorer with CommentTableView">
+      <state
+            class="org.eclipse.ui.handlers.RegistryToggleState:false"
+            id="org.eclipse.ui.commands.toggleState">
+      </state>
+   </command>
+   <command
+         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+         description="Delete Content in DetailView"
+         id="de.tukl.cs.softech.agilereview.views.detail.delete"
+         name="Delete Content in DetailView">
+   </command>
+      <command
+            description="Clean a project from all AgileReview comment"
+            id="de.tukl.cs.softech.agilereview.cleanup"
+            name="Cleanup project">
+   </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            defaultHandler="de.tukl.cs.softech.agilereview.views.commenttable.handler.FilterCommentsHandler"
+            id="de.tukl.cs.softech.agilereview.views.commenttable.filter"
+            name="Filter comments">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            id="de.tukl.cs.softech.agilereview.views.commenttable.delete"
+            name="Delete comments in CommentTableView">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Show in Editor selected comment in Detail View"
+            id="de.tukl.cs.softech.agilereview.showComment"
+            name="Show comment in DetailView">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Export selected reviews in Review Explorer"
+            id="de.tukl.cs.softech.agilereview.views.reviewexplorer.export"
+            name="Export reviews">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            id="de.tukl.cs.softech.agilereview.editor.delete"
+            name="Delete comment in Editor">
+      </command>
+</extension>
+<extension
+      point="org.eclipse.ui.menus">
+   <menuContribution
+         allPopups="false"
+         locationURI="toolbar:de.tukl.cs.softech.agilereview.view.commentdetailview.view">
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.detail.newReply"
+            icon="icons/comment/comment_newReply_15x15.png"
+            label="New Reply"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
+      </command>
+      <separator
+            name="AgileReview.detailview.separator1"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.detail.revert"
+            icon="icons/undo_edit.gif"
+            label="revert"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.detail.delete"
+            icon="icons/delete_obj.gif"
+            label="Delete shown resource"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
+      </command>
+   </menuContribution>
+   <menuContribution
+         allPopups="false"
+         locationURI="toolbar:de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.createNewReview"
+            icon="icons/review/review_add_15x15.png"
+            label="Create new review"
+            style="push"
+            tooltip="Create a new review">
+      </command>
+      <separator
+            name="AgileReview.separator1"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate"
+            icon="icons/review/review_ok_15x15.png"
+            label="Activate selected review"
+            style="push"
+            tooltip="Activate selected review">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose"
+            icon="icons/review/closed_project.gif"
+            label="Open/Close selected reviews"
+            style="push"
+            tooltip="Open/Close reviews">
+      </command>
+      <separator
+            name="AgileReview.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.export"
+            icon="icons/export_wiz.gif"
+            label="Export selected review"
+            style="push">
+      </command>
+      <separator
+            name="AgileReview.separator3"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer"
+            icon="icons/synced.gif"
+            label="Link Review Explorer with Comments Summary"
+            style="toggle">
+      </command>
+   </menuContribution>
+   <menuContribution
+         allPopups="true"
+         locationURI="popup:de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.createNewReview"
+            icon="icons/review/review_add_15x15.png"
+            label="Create new review"
+            style="push"
+            tooltip="Create a new review">
+      </command>
+      <separator
+            name="AgileReview.separator2"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.eclipse.ui.file.refresh"
+            label="Refresh all reviews"
+            style="push">
+      </command>
+      <separator
+            name="AgileReview.separator3"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.eclipse.ui.edit.delete"
+            label="Delete"
+            style="push">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.activate"
+            icon="icons/review/review_ok_15x15.png"
+            label="Activate selected review"
+            style="push"
+            tooltip="Activate selected review">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose"
+            icon="icons/review/closed_project.gif"
+            label="Open/Close selected reviews"
+            style="push"
+            tooltip="Open/Close reviews">
+      </command>
+      <separator
+            name="AgileReview.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.export"
+            icon="icons/export_wiz.gif"
+            label="Export selected review"
+            style="push">
+      </command>
+   </menuContribution>
+   <menuContribution
+         allPopups="false"
+         locationURI="toolbar:de.tukl.cs.softech.agilereview.view.commenttableview.view">
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment"
+            icon="icons/comment/comment_add_15x15.png"
+            label="Add new comment"
+            style="push">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.commenttable.delete"
+            icon="icons/comment/comment_del_15x15.png"
+            label="Delete comments"
+            style="push">
+      </command>
+   </menuContribution>
+   <menuContribution
+         locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+      <separator
+            name="AgileReview.PackageExplorer.separator1"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.cleanup"
+            icon="icons/agile_icon.png"
+            label="AgileReview Project CleanUp"
+            style="push"
+            tooltip="Remove AgileReview comments tags from all files of this project">
+      </command>
+      <separator
+            name="AgileReview.PackageExplorer.separator2"
+            visible="true">
+      </separator>
+   </menuContribution>
+</extension>
+<extension
+      point="org.eclipse.ui.bindings">
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.commenttable.filter"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+?">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.commenttable.addnewcomment"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2++">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.detail.delete"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M3+M2+DEL">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.detail.newReply"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M3+M2++">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.showComment"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+#">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.editor.delete"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+-">
+   </key>
+</extension>
+<extension
+      point="org.eclipse.ui.contexts">
+   <context
+         description="AgileReview Extension is in use"
+         id="de.tukl.cs.softech.agilereview.perspective.open"
+         name="AgileReview in use"
+         parentId="org.eclipse.ui.textEditorScope">
+   </context>
+</extension>
+<extension
+      point="org.eclipse.ui.services">
+   <sourceProvider
+         provider="de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider">
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.detail.variables.revertable"
+            priorityLevel="workbench">
+      </variable>
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible"
+            priorityLevel="workbench">
+      </variable>
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable"
+            priorityLevel="workbench">
+      </variable>
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.export.variables.containsClosedReview"
+            priorityLevel="workbench">
+      </variable>
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.reviewexplorer.variables.isActiveReview"
+            priorityLevel="workbench">
+      </variable>
+   </sourceProvider>
+</extension>
+<extension
+      id="de.tukl.cs.softech.agilereview.nature"
+      name="AgileReview Source Folder"
+      point="org.eclipse.core.resources.natures">
+   <runtime>
+      <run
+            class="de.tukl.cs.softech.agilereview.plugincontrol.AgileReviewNature">
+      </run>
+   </runtime>
+   <one-of-nature
+         id="de.tukl.cs.softech.agilereview.naturegroup">
+   </one-of-nature>
+</extension>
+<extension
+      point="org.eclipse.ui.ide.projectNatureImages">
+   <image
+         icon="icons/agile_icon.png"
+         id="de.tukl.cs.softech.agilereview.nature.image"
+         natureId="de.tukl.cs.softech.agilereview.nature">
+   </image>
+</extension>
+</plugin>
