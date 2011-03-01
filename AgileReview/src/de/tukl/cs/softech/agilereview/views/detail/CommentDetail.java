@@ -81,7 +81,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		Label tagID = new Label(this, SWT.NONE);
 		tagID.setText("Tag-ID: ");
 		
-		tagInstance = new Label(this, SWT.NONE);
+		tagInstance = new Label(this, SWT.WRAP);
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
@@ -90,7 +90,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    Label author = new Label(this, SWT.PUSH);
 	    author.setText("Author: ");
 	    
-	    authorInstance = new Label(this, SWT.PUSH);
+	    authorInstance = new Label(this, SWT.WRAP);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
@@ -201,7 +201,9 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			this.backupObject = (Comment)comment.copy();
 			this.editedObject = comment;
 			tagInstance.setText(generateCommentKey(comment));
+			tagInstance.setToolTipText(generateCommentKey(comment));
 			authorInstance.setText(comment.getAuthor());
+			authorInstance.setToolTipText(comment.getAuthor());
 
 			// Proof if the comment is loaded for the first time
 			recipientText.setText(comment.getRecipient());

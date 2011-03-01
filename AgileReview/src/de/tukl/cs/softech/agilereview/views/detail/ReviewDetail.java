@@ -66,7 +66,7 @@ public class ReviewDetail extends AbstractDetail<Review> {
 		Label review = new Label(this, SWT.PUSH);
 		review.setText("Review: ");
 	    
-	    reviewInstance = new Label(this, SWT.PUSH);
+	    reviewInstance = new Label(this, SWT.WRAP);
 	    GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
@@ -208,8 +208,11 @@ public class ReviewDetail extends AbstractDetail<Review> {
 			this.backupObject = (Review)review.copy();
 			this.editedObject = review;
 			this.reference.setText(review.getReferenceId());
+			this.reference.setText(review.getReferenceId());
 			this.authorInstance.setText(review.getPersonInCharge().getName());
+			this.authorInstance.setToolTipText(review.getPersonInCharge().getName());
 			this.reviewInstance.setText(review.getId());
+			this.reviewInstance.setToolTipText(review.getId());
 			
 			if(review.getDescription() != null) {
 				this.txt.setText(review.getDescription());
