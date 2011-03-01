@@ -12,7 +12,7 @@
    <item
          title="Delete Comment">
       <description>
-         <b>Press</b> the <b>&quot;Delete comment(s)&quot;</b> button in the &quot;Comments Summary&quot; view. Alternatively use the shortkey &quot;CTRL+Shift+-&quot;.
+         <b>Press</b> the <b>&quot;Delete comment(s)&quot;</b> button in the &quot;Comments Summary&quot; view. Alternatively go the highlighted range of a comment in the editor and use the shortkey &quot;CTRL+Shift+-&quot;.
       </description>
    </item>
 </cheatsheet>

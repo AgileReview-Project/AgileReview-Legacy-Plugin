@@ -18,8 +18,7 @@
 <p style="text-align: justify;">Reviewing code is done in two steps:</p>
 
 <ul style="text-align: justify;">
-    <li><strong>creating a review:</strong>
-A review contains a section of code (e.g. some functionality spread over several classes, a component represented by a Java package). The code is represented by it's files. The files are automatically assigned to a review when comments are added. When creating a review, initially basic information like a reference (e.g. a link to a Bugzilla ticket), the responsibility (who is in charge for this review) and a description can be provided. As the review is created it is automatically set "active". The "active" state means that newly created comments are assigned to this review. Also files that did not contain a comment are assigned to this review on demand when they are being commented.</li>
+    <li><strong>creating a review:</strong> comments are grouped in reviews, so for commenting code, a review has to be created first (see also: definition of <a href="./concepts/review.htm">review</a>).</li>
     <li><strong>commenting code:</strong>
 The AgileReview plugin allows to add/modify/delete code based comments. This means that a comment can be added to a selected range of code. After that the corresponding lines will be highlighted and e.g. comment text, recipient, or the priority can be set. By selecting an already existing comment it's details are shown and can be modified or the selected comment(s) can be deleted.</li>
 </ul>
@@ -55,7 +54,7 @@ The AgileReview plugin allows to add/modify/delete code based comments. This mea
 </ol>
 </li>
 </ol>
-<p style="text-align: justify;">Now the Review is created and shown in the ReviewExploere as  the active review. Detailed data can be seen and modified in the Detail View.</p>
+<p style="text-align: justify;">Now the Review is created and shown in the ReviewExplorer as  the active review. Detailed data can be seen and modified in the Detail View.</p>
 
 <h3 style="text-align: justify;">Change Review Information</h3>
 <ol style="text-align: justify;">
@@ -75,7 +74,7 @@ The AgileReview plugin allows to add/modify/delete code based comments. This mea
 <h3 style="text-align: justify;">Create new Comment</h3>
 <ol style="text-align: justify;">
     <li>If no review is set to "active", activate a review in the ReviewExplorer</li>
-    <li>Select the code line(s)/section where the comment should be placed. If no selection is made, the comment will be a "global" comment that is not related to a piece of code, but only to the actually opened file.</li>
+    <li>Select the code line(s)/section where the comment should be placed. If the filetype is not of type "xml" or "java", the comment will be a <a href="./concepts/comment.htm#global">"global" comment</a> that is not related to a piece of code, but only to the actually opened file.</li>
     <li>Add a comment
 <ol>
     <li>Option 1: Click "Add new comment" in the top right corner of the comments summary view</li>
@@ -91,7 +90,7 @@ The AgileReview plugin allows to add/modify/delete code based comments. This mea
     <li>Select the comment you want to change via
 <ol>
     <li>Option 1: selecting it in the comments summary view</li>
-    <li>Option 2: pressing CTRL+Shift+"#" in the editor that contains the comment</li>
+    <li>Option 2: pressing CTRL+Shift+"#" in the editor that contains the comment while the cursor is in the highlighted range of the comment.</li>
 </ol>
 </li>
     <li>The comment's details will be shown in the detail view. Data can be changed in this view</li>

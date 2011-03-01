@@ -23,7 +23,7 @@
          serialization="org.eclipse.ui.navigate.openResource"/>
 </item>
 <item title="Add comment" skip="false">
-<description>Select a range of source code. If no selection is made, the comment will be treated as a &quot;global&quot; comment. Adding a comment can be accomplished in two ways. <b>Press</b> the <b>&quot;Add new comment&quot;</b> button in the &quot;Comments Summary&quot; view or use the following shortkey &quot;CTRL+Shift++&quot;.
+<description>Select a range of source code. Adding a comment can be accomplished in two ways. <b>Press</b> the <b>&quot;Add new comment&quot;</b> button in the &quot;Comments Summary&quot; view or use the following shortkey &quot;CTRL+Shift++&quot;.
 </description>
 </item>
 <item
