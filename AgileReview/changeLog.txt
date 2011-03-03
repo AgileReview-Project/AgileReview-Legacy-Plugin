@@ -1,0 +1,2 @@
+Fixed Bugs:
+Nullpointer while perspective change - ID: 3198324
