@@ -790,7 +790,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
 				this.parserMap.put(editor, ParserFactory.createParser(editor));
 			}
-			this.parserMap.get(editor).filter(getFilteredComments());
+			if(parserMap.containsKey(editor)) {
+				parserMap.get(editor).filter(getFilteredComments());
+			}
 		}
 	}
 	
