@@ -102,28 +102,28 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 	/**
 	 * @return the review ID entered
 	 */
-	public String getReviewID() {
+	protected String getReviewID() {
 		return this.id.getText().trim();
 	}
 	
 	/**
 	 * @return the review reference entered
 	 */
-	public String getReviewReference() {
+	protected String getReviewReference() {
 		return this.reference.getText().trim();
 	}
 	
 	/**
 	 * @return the responsible person entered
 	 */
-	public String getReviewResponsibility() {
+	protected String getReviewResponsibility() {
 		return this.responsibility.getText().trim();
 	}
 	
 	/**
 	 * @return the review description entered
 	 */
-	public String getReviewDescription() {
+	protected String getReviewDescription() {
 		return this.description.getText().trim();
 	}
 

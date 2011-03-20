@@ -1,0 +1,19 @@
+Visibility Changes:
+	ExportReviewDataWizardPage:
+		methods:
+			getExportPath		public -> protected
+			getTemplatePath		public -> protected
+	NewReviewWizard:
+		attributes:
+			page1				none -> private
+	NewReviewWizardPage
+		methods:
+			getReviewID			public -> protected
+			getReviewReference	public -> protected
+			getReviewResponsibility	public -> protected
+			getReviewDescription public -> protected
+
+Deletions:
+	ExportReviewDataWizardPage:
+		methods:
+			getSelectedReviewIDs
