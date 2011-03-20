@@ -24,6 +24,10 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class AgileAnnotationController {
 
 	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
 	 * The texteditor's annotation model
 	 */
 	private IAnnotationModelExtension annotationModel;
@@ -132,7 +136,7 @@ public class AgileAnnotationController {
 	 * @return created annotation
 	 */
 	private Annotation createNewAnnotation(String commentKey) {
-		String[] commentData = commentKey.split(Pattern.quote(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
+		String[] commentData = commentKey.split(Pattern.quote(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
 		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);
 		this.annotationMap.put(commentKey, annotation);
 		return annotation;

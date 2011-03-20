@@ -31,6 +31,10 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
  */
 public class XSLExport {
 
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
 	
 	/**
 	 * This function provides the functionality for exporting the given Reviews to the outputPath by using the xls/xlsx template
@@ -44,7 +48,6 @@ public class XSLExport {
 	 */
 	public static void exportReviews(List<Review> reviews, String templatePath, String outputPath) throws ParsePropertyException, InvalidFormatException, IOException {
 		
-		ReviewAccess ra = ReviewAccess.getInstance();
 		Map<String, Object> beans = new HashMap<String, Object>();
 		
 		//collect all comments

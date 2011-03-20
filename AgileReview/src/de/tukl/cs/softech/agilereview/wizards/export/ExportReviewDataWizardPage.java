@@ -37,6 +37,10 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class ExportReviewDataWizardPage extends WizardPage implements SelectionListener, ModifyListener {
 
 	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
+	/**
 	 * indicates whether a path for exporting are valid or not
 	 */
 	private boolean pathsValid = false;
@@ -93,7 +97,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	public void createControl(Composite parent) {
 		
 		//get reviews from ReviewAccess
-		for (Review review : ReviewAccess.getInstance().getAllReviews()) {
+		for (Review review : ra.getAllReviews()) {
 			reviews.put(review.getId(), review);
 		}
 		
@@ -157,7 +161,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		Collection<Review> allReviews = reviews.values();
 		ArrayList<Review> openReviews = new ArrayList<Review>();
 		for (Review r : allReviews) {
-			if (ReviewAccess.getInstance().isReviewLoaded(r.getId())) {
+			if (ra.isReviewLoaded(r.getId())) {
 				openReviews.add(r);
 			}
 		}

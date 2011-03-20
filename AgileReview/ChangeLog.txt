@@ -1,4 +1,4 @@
-Visibility Changes:
+*Visibility Changes:
 	ExportReviewDataWizardPage:
 		methods:
 			getExportPath		public -> protected
@@ -13,7 +13,15 @@ Visibility Changes:
 			getReviewResponsibility	public -> protected
 			getReviewDescription public -> protected
 
-Deletions:
+*Deletions:
 	ExportReviewDataWizardPage:
 		methods:
 			getSelectedReviewIDs
+			
+*Code optimizations:
+	-> extract uses of classes implementing singleton-pattern as class attributes for better
+		visibility according to documentation. This was done in:
+			Class						(Variables)
+			XSLExport					(ReviewAccess)
+			ExportReviewDataWizardPage	(ReviewAccess)
+			AgileAnnotationController	(PropertiesManager)
