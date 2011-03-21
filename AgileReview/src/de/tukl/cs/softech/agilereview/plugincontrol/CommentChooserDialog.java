@@ -41,6 +41,11 @@ public class CommentChooserDialog extends Composite implements Listener {
 	private String[] argsArr;
 	
 	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	
+	/**
 	 * Creates a new dialog for entering replies
 	 * @param parent
 	 * @param style
@@ -109,7 +114,7 @@ public class CommentChooserDialog extends Composite implements Listener {
 			strReplyText = replyText.getText().trim();
 			if(strReplyText.equals("")) {
 				MessageDialog.openInformation(this.getShell(), "Information", 
-		        		PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_EMPTY_REPLY_MESSAGE));
+						pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_EMPTY_REPLY_MESSAGE));
 			} else {
 				boolSaved = true;
 				getParent().dispose();

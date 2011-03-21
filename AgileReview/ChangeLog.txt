@@ -12,6 +12,16 @@
 			getReviewReference	public -> protected
 			getReviewResponsibility	public -> protected
 			getReviewDescription public -> protected
+	AnnotationParser
+		attributes:
+			tagRegex			protected -> private
+			tagPattern			protected -> private
+			idPositionMap		protected -> private
+			idTagPositions		protected -> private
+			displayedComments	protected -> private
+			document			protected -> private
+			editor				protected -> private
+			annotationModel		protected -> private
 
 *Deletions:
 	ExportReviewDataWizardPage:
@@ -25,3 +35,9 @@
 			XSLExport					(ReviewAccess)
 			ExportReviewDataWizardPage	(ReviewAccess)
 			AgileAnnotationController	(PropertiesManager)
+			AnnotationParser			(PropertiesManager)
+			TagCleaner					(PropertiesManager)
+			RefreshHandler				(ReviewAccess)
+			ShowCommentHandler			(ReviewAccess)
+			CommentChooserDialog		(PropertiesManager)
+			DeleteCommentHandler		(ReviewAccess, PropertiesManager)

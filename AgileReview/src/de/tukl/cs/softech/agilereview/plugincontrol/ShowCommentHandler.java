@@ -26,6 +26,11 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  * Handler for showing the comment, which is currently selected in the editor, in the DetailView
  */
 public class ShowCommentHandler extends AbstractHandler {
+	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -75,7 +80,7 @@ public class ShowCommentHandler extends AbstractHandler {
 					commentId = tagPart[2];
 					
 					// Get the right comment
-					Comment c = ReviewAccess.getInstance().getComment(reviewId, author, commentId);
+					Comment c = ra.getComment(reviewId, author, commentId);
 					
 					// select it
 					if (ViewControl.isOpen(CommentTableView.class)) {

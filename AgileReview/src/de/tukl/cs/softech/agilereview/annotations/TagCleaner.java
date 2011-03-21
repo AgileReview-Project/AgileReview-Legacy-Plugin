@@ -21,9 +21,13 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class TagCleaner {
 
 	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
 	 * Key separator for tag creation
 	 */
-	private static String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+	private static String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 	/**
 	 * Core Regular Expression to find the core tag structure
 	 */

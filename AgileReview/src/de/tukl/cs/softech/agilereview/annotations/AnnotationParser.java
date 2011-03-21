@@ -37,9 +37,13 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
 public class AnnotationParser implements IAnnotationParser {
 	
 	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
 	 * Key separator for tag creation
 	 */
-	private static String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+	private static String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 	/**
 	 * Core Regular Expression to find the core tag structure
 	 */
@@ -52,35 +56,35 @@ public class AnnotationParser implements IAnnotationParser {
 	/**
 	 * Regular Expression used by this instance
 	 */
-	protected String tagRegex;
+	private String tagRegex;
 	/**
 	 * Pattern used by this instance
 	 */
-	protected Pattern tagPattern;
+	private Pattern tagPattern;
 	/**
 	 * This map lists every comment tag found in the document with its {@link Position}
 	 */
-	protected TreeMap<String, Position> idPositionMap = new TreeMap<String, Position>();
+	private TreeMap<String, Position> idPositionMap = new TreeMap<String, Position>();
 	/**
 	 * Position map of all tags
 	 */
-	protected TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
+	private TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
 	/**
 	 * The currently displayed comments
 	 */
-	protected TreeSet<String> displayedComments = new TreeSet<String>();
+	private TreeSet<String> displayedComments = new TreeSet<String>();
 	/**
 	 * Document which provides the contents for this instance
 	 */
-	protected IDocument document;
+	private IDocument document;
 	/**
 	 * The document of this parser
 	 */
-	protected ITextEditor editor;
+	private ITextEditor editor;
 	/**
 	 * Annotation model for this parser
 	 */
-	protected AgileAnnotationController annotationModel;
+	private AgileAnnotationController annotationModel;
 
 	/**
 	 * Creates a new instance of AnnotationParser with the given input
@@ -362,7 +366,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentsTags(java.util.Set)
 	 */
 	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {		
-		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String separator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		TreeSet<Position> tagPositions = new TreeSet<Position>();
 		String key;
 		HashSet<String> keyList = new HashSet<String>();

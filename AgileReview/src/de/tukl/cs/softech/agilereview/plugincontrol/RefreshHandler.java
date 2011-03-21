@@ -19,6 +19,11 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
  * Handler for the "refresh" (F5) command for our review
  */
 public class RefreshHandler extends AbstractHandler {
+	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException 
@@ -26,7 +31,7 @@ public class RefreshHandler extends AbstractHandler {
 		PluginLogger.log(this.getClass().toString(), "execute", "Refresh triggered");
 		// Refill the database
 		try {
-			ReviewAccess.getInstance().fillDatabaseForOpenReviews();
+			ra.fillDatabaseForOpenReviews();
 		} catch (XmlException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "XMLException is thrown", e);
 		} catch (IOException e) {
@@ -35,9 +40,9 @@ public class RefreshHandler extends AbstractHandler {
 		
 		// Test if active review may have vanished
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-		if (!ReviewAccess.getInstance().reviewExists(activeReview))
+		if (!ra.reviewExists(activeReview))
 		{
-			if (!ReviewAccess.getInstance().isReviewLoaded(activeReview))
+			if (!ra.isReviewLoaded(activeReview))
 			{
 				// Active review has vanished --> deactivate it
 				PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
