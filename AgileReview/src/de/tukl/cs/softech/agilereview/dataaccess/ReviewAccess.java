@@ -48,6 +48,11 @@ public class ReviewAccess {
 	private static ReviewAccess RA = new ReviewAccess();
 	
 	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	
+	/**
 	 * Reference to the folder where the review and comments xml files are located
 	 */
 	private static File REVIEW_REPO_FOLDER;
@@ -784,7 +789,7 @@ public class ReviewAccess {
 		// Load all comments from open reviews
 		boolean activeReviewFound = false;
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-		for (String currReview: PropertiesManager.getInstance().getOpenReviews())
+		for (String currReview: pm.getOpenReviews())
 		{
 			if (rModel.containsReview(currReview, false))
 			{
@@ -795,7 +800,7 @@ public class ReviewAccess {
 			else
 			{
 				// Just remove open, but not existent reviews
-				PropertiesManager.getInstance().removeFromOpenReviews(currReview);
+				pm.removeFromOpenReviews(currReview);
 			}	
 		}
 		if (!activeReviewFound){

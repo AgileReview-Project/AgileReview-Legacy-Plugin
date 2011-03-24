@@ -41,3 +41,6 @@
 			ShowCommentHandler			(ReviewAccess)
 			CommentChooserDialog		(PropertiesManager)
 			DeleteCommentHandler		(ReviewAccess, PropertiesManager)
+			ReviewAccess				(PropertiesManager)
+			CleanupHandler				(ReviewAccess)
+			CommentTableView			(ReviewAccess, PropertiesManager)

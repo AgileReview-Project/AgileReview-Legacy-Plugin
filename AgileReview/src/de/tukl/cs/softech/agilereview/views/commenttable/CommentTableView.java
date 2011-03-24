@@ -81,6 +81,14 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	private static CommentTableView instance;
 	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
 	 * The comments to be displayed (model of TableViewer viewer) 
 	 */
 	private ArrayList<Comment> comments;
@@ -216,7 +224,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	public void resetComments() {
 		PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
-		this.comments = ReviewAccess.getInstance().getAllComments();
+		this.comments = ra.getAllComments();
 		this.viewer.setInput(this.comments);
 		filterComments();
 		this.refreshTable();
@@ -253,7 +261,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		PluginLogger.log(this.getClass().toString(), "createPartControl", "CommentTableView will be created");
 		instance = this;
 		// get comments from CommentController
-		this.comments = ReviewAccess.getInstance().getAllComments();
+		this.comments = ra.getAllComments();
 
 		
 		// set layout of parent
@@ -456,7 +464,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			@Override
 			public String getText(Object element) {
 				Comment c = (Comment) element;
-				String status = PropertiesManager.getInstance().getCommentStatusByID(c.getStatus());			
+				String status = pm.getCommentStatusByID(c.getStatus());			
 				return status;
 			}
 		});
@@ -467,7 +475,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			@Override
 			public String getText(Object element) {
 				Comment c = (Comment) element;
-				String prio = PropertiesManager.getInstance().getCommentPriorityByID(c.getPriority());
+				String prio = pm.getCommentPriorityByID(c.getPriority());
 				return prio;
 			}
 		});
@@ -612,7 +620,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @return comment key
 	 */
 	private String generateCommentKey(Comment comment) {
-		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 		return commentTag;
 	}

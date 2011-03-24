@@ -36,6 +36,11 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
  */
 public class CleanupHandler extends AbstractHandler {
 	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
@@ -68,7 +73,7 @@ public class CleanupHandler extends AbstractHandler {
 			IProject selProject = (IProject)((IAdaptable)firstElement).getAdapter(IProject.class);
 					
 			// get all reviews (not only open ones)
-			ArrayList<Review> reviews = ReviewAccess.getInstance().getAllReviews();
+			ArrayList<Review> reviews = ra.getAllReviews();
 			
 			// some helper variables
 			ArrayList<Comment> comments = new ArrayList<Comment>();
@@ -77,7 +82,7 @@ public class CleanupHandler extends AbstractHandler {
 			
 			// load all comments for all reviews
 			try {
-				ReviewAccess.getInstance().fillDatabaseCompletely();
+				ra.fillDatabaseCompletely();
 			} catch (XmlException e1) {
 				success = false;
 				PluginLogger.logError(this.getClass().toString(), "execute", "XMLException while trying to fill database.", e1);
@@ -88,7 +93,7 @@ public class CleanupHandler extends AbstractHandler {
 			
 			// save all comments for the given project
 			for (Review r : reviews) {
-				comments.addAll(ReviewAccess.getInstance().getComments(r.getId(), selProjectPath));
+				comments.addAll(ra.getComments(r.getId(), selProjectPath));
 			}
 			
 			// save the paths of all files that are being reviewed (ergo that comments exist for)
@@ -116,8 +121,8 @@ public class CleanupHandler extends AbstractHandler {
 			if (deleteComments) {
 				try {
 					PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
-					ReviewAccess.getInstance().deleteComments(comments);
-					ReviewAccess.getInstance().save();
+					ra.deleteComments(comments);
+					ra.save();
 					if (ViewControl.isOpen(CommentTableView.class)) {
 						CommentTableView.getInstance().resetComments();	
 					}
@@ -134,7 +139,7 @@ public class CleanupHandler extends AbstractHandler {
 			List<String> openReviews = Arrays.asList(PropertiesManager.getInstance().getOpenReviews());
 			for (Review r : reviews) {				
 				if (!openReviews.contains(r.getId())) {
-					ReviewAccess.getInstance().unloadReviewComments(r.getId());
+					ra.unloadReviewComments(r.getId());
 				}
 			}
 		
