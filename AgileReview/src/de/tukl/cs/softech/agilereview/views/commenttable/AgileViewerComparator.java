@@ -3,8 +3,6 @@
  */
 package de.tukl.cs.softech.agilereview.views.commenttable;
 
-
-
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 
 import org.eclipse.jface.viewers.Viewer;
@@ -12,10 +10,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 
-/**
- * @author reuter
- *
- */
 public class AgileViewerComparator extends ViewerComparator {
 
 	/**

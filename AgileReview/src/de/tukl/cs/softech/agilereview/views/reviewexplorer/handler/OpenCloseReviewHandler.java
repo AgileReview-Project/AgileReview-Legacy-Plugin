@@ -24,6 +24,15 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
  * Enabled when: arbitrary number of MultipleReviewWrappers are selected
  */
 public class OpenCloseReviewHandler extends AbstractHandler {
+	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -44,14 +53,14 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 							// Review is open --> close it
 							PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be closed");
 							selectedWrap.setOpen(false);
-							ReviewAccess.getInstance().unloadReviewComments(reviewId);
-							PropertiesManager.getInstance().removeFromOpenReviews(reviewId);
+							ra.unloadReviewComments(reviewId);
+							pm.removeFromOpenReviews(reviewId);
 							
 							// Test if active review may have vanished
 							String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 							if (activeReview.equals(reviewId))
 							{
-								if (!ReviewAccess.getInstance().isReviewLoaded(reviewId))
+								if (!ra.isReviewLoaded(reviewId))
 								{
 									// Active review has vanished --> deactivate it
 									PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
@@ -65,13 +74,13 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 							selectedWrap.setOpen(true);
 							try 
 							{
-								ReviewAccess.getInstance().loadReviewComments(reviewId);
+								ra.loadReviewComments(reviewId);
 							} catch (XmlException e) {
 								PluginLogger.logError(this.getClass().toString(), "execute", "Review "+selectedWrap.getReviewId()+" could not be opened", e);				
 							} catch (IOException e) {
 								PluginLogger.logError(this.getClass().toString(), "execute", "Review "+selectedWrap.getReviewId()+" could not be opened", e);
 							}
-							PropertiesManager.getInstance().addToOpenReviews(reviewId);
+							pm.addToOpenReviews(reviewId);
 						}	
 					}
 				}

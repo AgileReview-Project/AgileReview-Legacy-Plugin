@@ -24,6 +24,15 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
  * Handles refresh events for detail views
  */
 public class DeleteHandler extends AbstractHandler {
+	
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess	ra = ReviewAccess.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -36,9 +45,9 @@ public class DeleteHandler extends AbstractHandler {
 				}
 				Review r = (Review)o;
 				// If necessary load review before deleting stuff (so comments and tags will be deleted)
-				if (!ReviewAccess.getInstance().isReviewLoaded(r.getId())){
+				if (!ra.isReviewLoaded(r.getId())){
 					try {
-						ReviewAccess.getInstance().loadReviewComments(r.getId());
+						ra.loadReviewComments(r.getId());
 					} catch (XmlException e) {
 						PluginLogger.logError(this.getClass().toString(), "execute", "XmlException while loading comment of closed review "+r.getId(), e);
 					} catch (IOException e) {
@@ -50,17 +59,17 @@ public class DeleteHandler extends AbstractHandler {
 				if(ViewControl.isOpen(ReviewExplorer.class)) {
 					ReviewExplorer.getInstance().deleteReview(new MultipleReviewWrapper(r, r.getId()));
 				}
-				ReviewAccess.getInstance().deleteReview(r.getId());
+				ra.deleteReview(r.getId());
 				// Check if this was the active review
 				if (PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(r.getId()))
 				{
 					PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 				}
 				// Remove this review from the list of open reviews (regardless if it was open or not)
-				PropertiesManager.getInstance().removeFromOpenReviews(r.getId());
+				pm.removeFromOpenReviews(r.getId());
 			} else if(o instanceof Comment) {
 				Comment c = (Comment)o;
-				String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+				String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 				String commentTag = c.getReviewID()+keySeparator+c.getAuthor()+keySeparator+c.getId();
 				
 				if (!MessageDialog.openConfirm(null, "Comment Details - Delete", "Are you sure you want to delete comment \""+commentTag+"\"?"))
@@ -71,7 +80,7 @@ public class DeleteHandler extends AbstractHandler {
 					CommentTableView.getInstance().deleteComment(c);
 				}
 				try {
-					ReviewAccess.getInstance().deleteComment(c);
+					ra.deleteComment(c);
 				} catch (IOException e) {
 					PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+c, e);
 				}

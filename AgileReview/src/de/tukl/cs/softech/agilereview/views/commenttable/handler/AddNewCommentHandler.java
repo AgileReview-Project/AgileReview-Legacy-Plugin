@@ -25,6 +25,11 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
  * Handler for adding a new Comment
  */
 public class AddNewCommentHandler extends AbstractHandler {
+	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -48,7 +53,7 @@ public class AddNewCommentHandler extends AbstractHandler {
 						}
 					}
 					String user = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);
-					Comment newComment = ReviewAccess.getInstance().createNewComment(activeReview , user, pathToFile);
+					Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
 					// TODO Hiervon noch was auslagern (Parser, etc)
 					if(ViewControl.isOpen(CommentTableView.class)) {
 						CommentTableView.getInstance().addComment(newComment);
@@ -57,7 +62,7 @@ public class AddNewCommentHandler extends AbstractHandler {
 					if(ViewControl.isOpen(ReviewExplorer.class)) {
 						ReviewExplorer.getInstance().refresh();
 					}
-					ReviewAccess.getInstance().save();
+					ra.save();
 				} else {
 					// no open editor
 					MessageDialog.openWarning(null, "Warning: No open file", "Please open a file in an editor before adding comments!");
