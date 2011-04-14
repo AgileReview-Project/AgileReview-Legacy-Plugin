@@ -14,8 +14,6 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -84,13 +82,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 						}	
 					}
 				}
-				if(ViewControl.isOpen(ReviewExplorer.class)) {
-					ReviewExplorer.getInstance().refresh();
-					ReviewExplorer.getInstance().validateExplorerSelection();
-				}
-				if(ViewControl.isOpen(CommentTableView.class)) {
-					CommentTableView.getInstance().resetComments();
-				}
+				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER | ViewControl.COMMMENT_TABLE_VIEW, true);
 			}
 		}
 		return null;

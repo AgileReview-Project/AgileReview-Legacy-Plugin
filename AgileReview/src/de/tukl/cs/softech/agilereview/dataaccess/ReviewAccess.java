@@ -43,14 +43,13 @@ public class ReviewAccess {
 	// attributes //
 	////////////////
 	/**
-	 * Private instance for Singleton-Pattern
-	 */
-	private static ReviewAccess RA = new ReviewAccess();
-	
-	/**
 	 * Instance of PropertiesManager
 	 */
 	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
+	 * Private instance for Singleton-Pattern
+	 */
+	private static ReviewAccess RA = new ReviewAccess();
 	
 	/**
 	 * Reference to the folder where the review and comments xml files are located

@@ -1,3 +1,12 @@
+*BugFixes:
+	- last introduced bug fixed in ReviewAccess
+
+*Refactoring:
+	- added refreshViews function to ViewControl
+	- therefore applied changes in
+		views.reviewexplorer.handler.ActivateReviewHandler
+		views.reviewexplorer.handler.OpenCloseReviewHandler
+
 *Visibility Changes:
 	ExportReviewDataWizardPage:
 		methods:

@@ -35,6 +35,19 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 public class ViewControl implements ISelectionChangedListener, IPartListener2, IPerspectiveListener3 {
 	
 	/**
+	 * Public static field representing the detail view
+	 */
+	public static final int DETAIL_VIEW = 1;
+	/**
+	 * Public static field representing the comment summary
+	 */
+	public static final int COMMMENT_TABLE_VIEW = 2;
+	/**
+	 * Public static field representing the review explorer
+	 */
+	public static final int REVIEW_EXPLORER = 4;
+	
+	/**
 	 * Set of all active Views
 	 */
 	private static HashSet<Class<? extends IWorkbenchPart>> activeViews = new HashSet<Class<? extends IWorkbenchPart>>();
@@ -126,6 +139,38 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 */
 	public static boolean isPerspectiveOpen() {
 		return perspectiveIsOpen;
+	}
+	
+	/**
+	 * Calls the refreshViews(int, boolean) function with the given flags and false.
+	 * @param flags
+	 */
+	public static void refreshViews(int flags) {
+		refreshViews(flags, false);
+	}
+	
+	/**
+	 * This function refreshes the views specified in the flags parameter.
+	 * Therefore use the public fields delivered by this class and combine them with the
+	 * bitwise or operator.<br>
+	 * If the parameter validateExplorerSelection is set to true, the ReviewExplorers selection
+	 * will be validated. For example this is necessary when changing the open status of reviews.
+	 * @param flags
+	 * @param validateExplorerSelection
+	 */
+	public static void refreshViews(int flags, boolean validateExplorerSelection) {
+		if(flags >= REVIEW_EXPLORER && isOpen(ReviewExplorer.class)) {
+			ReviewExplorer.getInstance().refresh();
+			if(validateExplorerSelection) {
+				ReviewExplorer.getInstance().validateExplorerSelection();
+			}
+		}
+		if(flags >= COMMMENT_TABLE_VIEW && isOpen(CommentTableView.class)) {
+			CommentTableView.getInstance().resetComments();
+		}
+		if(flags >= DETAIL_VIEW && isOpen(DetailView.class)) {
+			
+		}
 	}
 	
 	/**
