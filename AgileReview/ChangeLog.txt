@@ -3,9 +3,14 @@
 
 *Refactoring:
 	- added refreshViews function to ViewControl
+	- dataaccess.SaveHandler moved to dataaccess.handler.SaveHandler
 	- therefore applied changes in
 		views.reviewexplorer.handler.ActivateReviewHandler
 		views.reviewexplorer.handler.OpenCloseReviewHandler
+		plugincontrol.refactoring.ExecutionListener
+		plugincontrol.DeleteCommentHandler
+		dataaccess.handler.CleanupHandler
+		dataaccess.handler.SaveHandler
 
 *Visibility Changes:
 	ExportReviewDataWizardPage:

@@ -384,7 +384,7 @@
       </activeWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.dataaccess.SaveHandler"
+         class="de.tukl.cs.softech.agilereview.dataaccess.handler.SaveHandler"
          commandId="de.tukl.cs.softech.agilereview.save">
    </handler>
    <handler

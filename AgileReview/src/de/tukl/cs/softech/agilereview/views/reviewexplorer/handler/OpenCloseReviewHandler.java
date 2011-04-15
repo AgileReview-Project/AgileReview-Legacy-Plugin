@@ -82,7 +82,8 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 						}	
 					}
 				}
-				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER | ViewControl.COMMMENT_TABLE_VIEW, true);
+				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
+				ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW, true);
 			}
 		}
 		return null;

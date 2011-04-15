@@ -8,7 +8,6 @@ import org.eclipse.core.commands.NotHandledException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * ExecutionListener which methods are executed, if a command is triggered.
@@ -48,11 +47,10 @@ public class ExecutionListener implements IExecutionListener {
 				|| commandId.equals("org.eclipse.ltk.ui.refactoring.commands.renameResource")
 				|| commandId.equals("org.eclipse.ui.edit.rename")
 				|| commandId.equals("org.eclipse.jdt.ui.edit.text.java.rename.element")) {
-			if(ViewControl.isOpen(ReviewExplorer.class)) {
-				ReviewExplorer.getInstance().refresh();
-			}
+			
+			ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
+			ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW, true);
 			if(ViewControl.isOpen(CommentTableView.class)) {
-				CommentTableView.getInstance().resetComments();
 				CommentTableView.getInstance().resetEditorReferences();
 			}
 		}

@@ -46,6 +46,10 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * Public static field representing the review explorer
 	 */
 	public static final int REVIEW_EXPLORER = 4;
+	/**
+	 * Public static field representing all existing views of this plugin
+	 */
+	public static final int ALL_VIEWS = 8;
 	
 	/**
 	 * Set of all active Views
@@ -142,11 +146,21 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	}
 	
 	/**
-	 * Calls the refreshViews(int, boolean) function with the given flags and false.
+	 * Calls the refreshViews(int, boolean, boolean) function with the given flags, false, false.
 	 * @param flags
 	 */
 	public static void refreshViews(int flags) {
-		refreshViews(flags, false);
+		refreshViews(flags, false, false);
+	}
+	
+	/**
+	 * Calls the refreshViews(int, boolean, boolean) function with the given flags, false and the given
+	 * value of refreshInputs.
+	 * @param flags
+	 * @param refreshInputs 
+	 */
+	public static void refreshViews(int flags, boolean refreshInputs) {
+		refreshViews(flags, false, refreshInputs);
 	}
 	
 	/**
@@ -157,19 +171,28 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * will be validated. For example this is necessary when changing the open status of reviews.
 	 * @param flags
 	 * @param validateExplorerSelection
+	 * @param refreshInputs 
 	 */
-	public static void refreshViews(int flags, boolean validateExplorerSelection) {
-		if(flags >= REVIEW_EXPLORER && isOpen(ReviewExplorer.class)) {
-			ReviewExplorer.getInstance().refresh();
+	public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {
+		if(((flags >> 3) % 2 == 1 || flags % 2 == 1) && isOpen(DetailView.class)) {
+			//TODO refresh detail view
+		}
+		if(((flags >> 3) % 2 == 1 || (flags >> 1) % 2 == 1) && isOpen(CommentTableView.class)) {
+			if(refreshInputs) {
+				CommentTableView.getInstance().resetComments();
+			} else {
+				CommentTableView.getInstance().refreshTable();
+			}
+		}
+		if(((flags >> 3) % 2 == 1 || (flags >> 2) % 2 == 1) && isOpen(ReviewExplorer.class)) {
 			if(validateExplorerSelection) {
 				ReviewExplorer.getInstance().validateExplorerSelection();
 			}
-		}
-		if(flags >= COMMMENT_TABLE_VIEW && isOpen(CommentTableView.class)) {
-			CommentTableView.getInstance().resetComments();
-		}
-		if(flags >= DETAIL_VIEW && isOpen(DetailView.class)) {
-			
+			if(refreshInputs) {
+				ReviewExplorer.getInstance().refreshInput();
+			} else {
+				ReviewExplorer.getInstance().refresh();
+			}
 		}
 	}
 	

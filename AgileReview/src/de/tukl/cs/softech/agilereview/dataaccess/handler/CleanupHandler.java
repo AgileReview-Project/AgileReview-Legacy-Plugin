@@ -29,7 +29,6 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * 
@@ -123,12 +122,7 @@ public class CleanupHandler extends AbstractHandler {
 					PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
 					ra.deleteComments(comments);
 					ra.save();
-					if (ViewControl.isOpen(CommentTableView.class)) {
-						CommentTableView.getInstance().resetComments();	
-					}
-					if (ViewControl.isOpen(ReviewExplorer.class)) {
-						ReviewExplorer.getInstance().refreshInput();
-					}
+					ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW | ViewControl.REVIEW_EXPLORER, true);
 				} catch (IOException e) {
 					PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to delete comments.", e);
 					success = false;

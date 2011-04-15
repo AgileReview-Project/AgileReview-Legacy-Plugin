@@ -11,7 +11,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import de.tukl.cs.softech.agilereview.dataaccess.SaveHandler;
+import de.tukl.cs.softech.agilereview.dataaccess.handler.SaveHandler;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
