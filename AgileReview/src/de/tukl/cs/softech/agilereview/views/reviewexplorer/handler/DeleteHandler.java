@@ -98,9 +98,7 @@ public class DeleteHandler extends AbstractHandler {
 							pm.removeFromOpenReviews(wrap.getReviewId());
 						}
 						// Refresh ReviewExplorer
-						if(ViewControl.isOpen(ReviewExplorer.class)) {
-							ReviewExplorer.getInstance().refresh();
-						}
+						ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 					}
 				}
 			}

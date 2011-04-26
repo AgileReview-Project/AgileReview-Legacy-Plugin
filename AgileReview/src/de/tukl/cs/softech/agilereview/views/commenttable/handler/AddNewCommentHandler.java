@@ -18,8 +18,6 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * Handler for adding a new Comment
@@ -33,7 +31,7 @@ public class AddNewCommentHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if (ViewControl.isOpen(CommentTableView.class) || ViewControl.isOpen(DetailView.class) || ViewControl.isOpen(ReviewExplorer.class)) {
+		if (!ViewControl.isPerspectiveOpen()) {
 			if (ViewControl.getInstance().shouldSwitchPerspective()) {
 				ViewControl.getInstance().switchPerspective();
 			}
@@ -59,9 +57,7 @@ public class AddNewCommentHandler extends AbstractHandler {
 						CommentTableView.getInstance().addComment(newComment);
 					}
 					// Refresh the Review Explorer
-					if(ViewControl.isOpen(ReviewExplorer.class)) {
-						ReviewExplorer.getInstance().refresh();
-					}
+					ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 					ra.save();
 				} else {
 					// no open editor

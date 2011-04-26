@@ -15,7 +15,6 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * Handler for deleting comments from the CommentTableView
@@ -47,9 +46,7 @@ public class DeleteCommentHandler extends AbstractHandler {
 							PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+c, e);
 						}
 						// Refresh the Review Explorer
-						if(ViewControl.isOpen(ReviewExplorer.class)) {
-							ReviewExplorer.getInstance().refresh();
-						}
+						ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 					}
 				}
 			}
