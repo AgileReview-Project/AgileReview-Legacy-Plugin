@@ -5,6 +5,9 @@
 *Other Changes / Optimizations:
 	- filenames which should be omitted during xsl export are now extracted and accessible
 	  via bundle.properties -> ".svn" files/folders are now omitted (27.04.11 - Malte)
+	- the TagCleaner now supports every comment tags corresponding to the specified file endings.
+	  If a tag should be deleted out of a file which is not listed as supported in the properties
+	  file, the tag will not be deleted
 
 *BugFixes:
 	- last introduced bug fixed in ReviewAccess (Malte)
