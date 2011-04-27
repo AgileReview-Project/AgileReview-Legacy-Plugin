@@ -1,7 +1,15 @@
-*BugFixes:
-	- last introduced bug fixed in ReviewAccess
+**************************************************************************
+** Please denote the date and your name behind your documented changes! **
+**************************************************************************
 
-*Refactoring:
+*Other Changes / Optimizations:
+	- filenames which should be omitted during xsl export are now extracted and accessible
+	  via bundle.properties -> ".svn" files/folders are now omitted (27.04.11 - Malte)
+
+*BugFixes:
+	- last introduced bug fixed in ReviewAccess (Malte)
+
+*Refactoring (Malte):
 	- added refreshViews function to ViewControl
 	- dataaccess.SaveHandler moved to dataaccess.handler.SaveHandler
 	- therefore applied changes in
@@ -12,7 +20,7 @@
 		dataaccess.handler.CleanupHandler
 		dataaccess.handler.SaveHandler
 
-*Visibility Changes:
+*Visibility Changes (Malte):
 	ExportReviewDataWizardPage:
 		methods:
 			getExportPath		public -> protected
@@ -37,12 +45,12 @@
 			editor				protected -> private
 			annotationModel		protected -> private
 
-*Deletions:
+*Deletions (Malte):
 	ExportReviewDataWizardPage:
 		methods:
 			getSelectedReviewIDs
 			
-*Code optimizations:
+*Code refactoring of often used references (Malte):
 	-> extract uses of classes implementing singleton-pattern as class attributes for better
 		visibility according to documentation. This was done in:
 			Class												(Variables)

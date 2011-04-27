@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import net.sf.jxls.exception.ParsePropertyException;
 import net.sf.jxls.transformer.Configuration;
@@ -25,6 +26,7 @@ import agileReview.softech.tukl.de.FolderDocument.Folder;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * This class represents the interface to jxls for exporting reviews and comments to xls, xlsx sheets
@@ -35,6 +37,10 @@ public class XSLExport {
 	 * Instance of ReviewAccess
 	 */
 	private static ReviewAccess ra = ReviewAccess.getInstance();
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
 	
 	/**
 	 * This function provides the functionality for exporting the given Reviews to the outputPath by using the xls/xlsx template
@@ -124,13 +130,15 @@ public class XSLExport {
 	private static ArrayList<FileExportWrapper> getAllWrappedFiles(java.io.File file, String project) {
 		ArrayList<FileExportWrapper> files = new ArrayList<FileExportWrapper>();
 		
-		//TODO exclude via preferences
+		TreeSet<String> omittings = new TreeSet<String>(Arrays.asList(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.EXPORT_OMITTINGS).split(",")));
 		java.io.File[] fs = file.listFiles();
 		for(java.io.File f : fs) {
-			if(f.isFile() && !f.getName().equals(".project") && !f.getName().equals(".classpath")) {
-				files.add(new FileExportWrapper(f, project));
-			} else if(f.isDirectory() && !f.getName().equals("bin") && !f.getName().equals(".settings")) {
-				files.addAll(getAllWrappedFiles(f, project));
+			if(!omittings.contains(f.getName())) {
+				if(f.isFile()) {
+					files.add(new FileExportWrapper(f, project));
+				} else if(f.isDirectory()) {
+					files.addAll(getAllWrappedFiles(f, project));
+				}
 			}
 		}
 		

@@ -72,6 +72,10 @@ public class PropertiesManager implements IInputValidator{
 		 * Correlated comment end tags for every set of file endings representing the same language
 		 */
 		public static String PARSER_COMMENT_END_TAG = "parser_comment_end_tag";
+		/**
+		 * Filenames which should be omitted during export
+		 */
+		public static String EXPORT_OMITTINGS = "export_omittings";
 		
 		/**
 		 * Static subclass: clustering of icon keys
