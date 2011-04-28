@@ -198,7 +198,7 @@ public class XSLExport implements IRunnableWithProgress {
 		java.io.File[] fs = file.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(java.io.File arg0, String arg1) {
-				if(omittings.contains(arg0.getName())) {
+				if(omittings.contains(arg1)) {
 					return false;
 				} else {
 					return true;
