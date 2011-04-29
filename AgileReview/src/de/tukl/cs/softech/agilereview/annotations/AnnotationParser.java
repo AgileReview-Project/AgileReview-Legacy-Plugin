@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
@@ -313,6 +314,7 @@ public class AnnotationParser implements IAnnotationParser {
 				int insertOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
 				
 				// Write tag -> get start+end-tag for current file-ending, insert into file
+				checkForComment(document, selStartLine, selEndLine);
 				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
 				document.replace(insertOffset, 0, tags[0]+"?"+commentTag+"?"+tags[1]);
 				
@@ -335,6 +337,7 @@ public class AnnotationParser implements IAnnotationParser {
 				int insertEndOffset = document.getLineOffset(selEndLine)+document.getLineLength(selEndLine)-lineDelimiterLength;
 				
 				// Write tags -> get tags for current file-ending, insert second tag, insert first tag
+				checkForComment(document, selStartLine, selEndLine);
 				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
 				document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
 				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+tags[1]);
@@ -349,6 +352,46 @@ public class AnnotationParser implements IAnnotationParser {
 			}
 		}
 		//VARIANT(return Position):return result;
+	}
+	
+	public boolean checkForComment(IDocument document, int startLine, int endLine) throws BadLocationException {
+		boolean result = false;
+		int openTagLineNr = -1;
+		int closeTagLineNr = -1;
+		String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+		// check for opening non-AgileReview comment tags
+		for (int i=0; i<=startLine;i++) {
+			// check if line contains comment and comment is no AgileReview tag
+			String line = document.get(document.getLineOffset(i), document.getLineLength(i)).trim();
+			boolean containsStartTag = line.contains(tags[0]);
+			boolean isNotAgileReviewTag = !line.matches(".*"+Pattern.quote(tags[0])+rawTagRegex+Pattern.quote(tags[1])+".*");
+			if (containsStartTag && isNotAgileReviewTag) {
+				openTagLineNr = i;
+			}
+		}
+		// if an opening non-AgileReview comment tag was found check for its closing tag
+		if (openTagLineNr>-1) {
+			boolean found = false;
+			int actLine = openTagLineNr;
+			while (actLine<document.getNumberOfLines() && !found) {
+				// check if line contains comment and comment is no AgileReview tag
+				String line = document.get(document.getLineOffset(actLine), document.getLineLength(actLine)).trim();
+				boolean containsEndTag = line.contains(tags[1]);
+				boolean isNotAgileReviewTag = !line.matches(".*"+Pattern.quote(tags[0])+rawTagRegex+Pattern.quote(tags[1])+".*");
+				if (containsEndTag && isNotAgileReviewTag) {
+					closeTagLineNr = actLine;
+					found = true;
+				}
+				actLine++;
+			}
+		}
+		
+		if (openTagLineNr <= startLine && closeTagLineNr >= endLine) {
+			result = true;
+			MessageDialog.openWarning(null, "Warning", "You just destroyed a code comment. Please do not insert AgileReview comments in code comments.");
+		}
+		
+		return result;
 	}
 	
 	/*
