@@ -41,6 +41,10 @@ public class AnnotationParser implements IAnnotationParser {
 	 */
 	private static PropertiesManager pm = PropertiesManager.getInstance();
 	/**
+	 * Supported files mapping to the corresponding comment tags
+	 */
+	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsAndTags();
+	/**
 	 * Key separator for tag creation
 	 */
 	private static String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
@@ -308,11 +312,9 @@ public class AnnotationParser implements IAnnotationParser {
 				
 				int insertOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
 				
-				if (editor.getEditorInput().getName().endsWith(".java")) {
-					document.replace(insertOffset, 0, "/*?"+commentTag+"?*/");
-				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
-					document.replace(insertOffset, 0, "<!--?"+commentTag+"?-->");
-				}
+				// Write tag -> get start+end-tag for current file-ending, insert into file
+				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+				document.replace(insertOffset, 0, tags[0]+"?"+commentTag+"?"+tags[1]);
 				
 				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
 			} else {
@@ -332,15 +334,11 @@ public class AnnotationParser implements IAnnotationParser {
 				}
 				int insertEndOffset = document.getLineOffset(selEndLine)+document.getLineLength(selEndLine)-lineDelimiterLength;
 				
-				// Write tags
-				if (editor.getEditorInput().getName().endsWith(".java")) {
-					document.replace(insertEndOffset, 0, "/*"+commentTag+"?*/");
-					document.replace(insertStartOffset, 0, "/*?"+commentTag+"*/");
-					
-				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
-					document.replace(insertEndOffset, 0, "<!--"+commentTag+"?-->");
-					document.replace(insertStartOffset, 0, "<!--?"+commentTag+"-->");
-				}
+				// Write tags -> get tags for current file-ending, insert second tag, insert first tag
+				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+				document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
+				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+tags[1]);
+
 				
 				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
 				//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
