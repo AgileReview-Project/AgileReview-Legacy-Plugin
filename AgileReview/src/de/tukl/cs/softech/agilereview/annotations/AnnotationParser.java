@@ -306,6 +306,7 @@ public class AnnotationParser implements IAnnotationParser {
 			
 			int[] newLines = checkForComment(document, selStartLine, selEndLine);
 			if (newLines[0] != -1 && newLines[1] != -1  && (newLines[0] != selStartLine || newLines[1] != selEndLine)) {
+				// TODO: check/discuss whether new line should be added before new start line in order to avoid collisions with other code lines!
 				int offset = document.getLineOffset(newLines[0]);
 				int length = document.getLineOffset(newLines[1])-document.getLineOffset(newLines[0])+document.getLineLength(newLines[1]);
 				editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
