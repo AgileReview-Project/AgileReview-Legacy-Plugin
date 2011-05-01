@@ -305,7 +305,7 @@ public class AnnotationParser implements IAnnotationParser {
 			String commentTag = keySeparator+commentKey+keySeparator;
 			
 			int[] newLines = checkForComment(document, selStartLine, selEndLine);
-			if (newLines[0] != selStartLine || newLines[1] != selEndLine) {
+			if (newLines[0] != -1 && newLines[1] != -1  && (newLines[0] != selStartLine || newLines[1] != selEndLine)) {
 				int offset = document.getLineOffset(newLines[0]);
 				int length = document.getLineOffset(newLines[1])-document.getLineOffset(newLines[0])+document.getLineLength(newLines[1]);
 				editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
@@ -374,7 +374,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @throws BadLocationException
 	 */
 	public int[] checkForComment(IDocument document, int startLine, int endLine) throws BadLocationException {
-		int[] result = new int[2];
+		int[] result = {-1, -1};
 		int openTagLineNr = -1;
 		int closeTagLineNr = -1;
 		String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
@@ -419,10 +419,7 @@ public class AnnotationParser implements IAnnotationParser {
 				result[1] = closeTagLineNr;	
 			} else {
 				result[1] = endLine;
-			}			
-		} else {
-			result[0] = -1;
-			result[1] = -1;
+			}
 		}
 		
 		return result;
