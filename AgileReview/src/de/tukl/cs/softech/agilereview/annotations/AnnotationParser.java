@@ -19,6 +19,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
@@ -303,6 +304,15 @@ public class AnnotationParser implements IAnnotationParser {
 			String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 			String commentTag = keySeparator+commentKey+keySeparator;
 			
+			int[] newLines = checkForComment(document, selStartLine, selEndLine);
+			if (newLines[0] != selStartLine || newLines[1] != selEndLine) {
+				int offset = document.getLineOffset(newLines[0]);
+				int length = document.getLineOffset(newLines[1])-document.getLineOffset(newLines[0])+document.getLineLength(newLines[1]);
+				editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
+				addTagsInDocument(comment, display);
+				return;
+			}
+			
 			if (selStartLine == selEndLine)	{
 				// Only one line is selected
 				String lineDelimiter = document.getLineDelimiter(selStartLine);
@@ -313,8 +323,7 @@ public class AnnotationParser implements IAnnotationParser {
 				
 				int insertOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
 				
-				// Write tag -> get start+end-tag for current file-ending, insert into file
-				checkForComment(document, selStartLine, selEndLine);
+				// Write tag -> get start+end-tag for current file-ending, insert into file				
 				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
 				document.replace(insertOffset, 0, tags[0]+"?"+commentTag+"?"+tags[1]);
 				
@@ -337,7 +346,6 @@ public class AnnotationParser implements IAnnotationParser {
 				int insertEndOffset = document.getLineOffset(selEndLine)+document.getLineLength(selEndLine)-lineDelimiterLength;
 				
 				// Write tags -> get tags for current file-ending, insert second tag, insert first tag
-				checkForComment(document, selStartLine, selEndLine);
 				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
 				document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
 				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+tags[1]);
@@ -354,13 +362,25 @@ public class AnnotationParser implements IAnnotationParser {
 		//VARIANT(return Position):return result;
 	}
 	
-	public boolean checkForComment(IDocument document, int startLine, int endLine) throws BadLocationException {
-		boolean result = false;
+	/**
+	 * Checks whether adding an AgileReview comment at the current selection<br>
+	 * would destroy a code comment and computes adapted line numbers to avoid<br>
+	 * destruction of code comments.
+	 * 
+	 * @param document the document in which the comment will be added
+	 * @param startLine the current startLine of the selection
+	 * @param endLine the current endLine of the selection
+	 * @return and array containing the new start (position 0) and endline (position 1)
+	 * @throws BadLocationException
+	 */
+	public int[] checkForComment(IDocument document, int startLine, int endLine) throws BadLocationException {
+		int[] result = new int[2];
 		int openTagLineNr = -1;
 		int closeTagLineNr = -1;
 		String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+		
 		// check for opening non-AgileReview comment tags
-		for (int i=0; i<=startLine;i++) {
+		for (int i=0; i<=endLine;i++) {
 			// check if line contains comment and comment is no AgileReview tag
 			String line = document.get(document.getLineOffset(i), document.getLineLength(i)).trim();
 			boolean containsStartTag = line.contains(tags[0]);
@@ -386,9 +406,23 @@ public class AnnotationParser implements IAnnotationParser {
 			}
 		}
 		
-		if (openTagLineNr <= startLine && closeTagLineNr >= endLine) {
-			result = true;
-			MessageDialog.openWarning(null, "Warning", "You just destroyed a code comment. Please do not insert AgileReview comments in code comments.");
+		// check if inserting a AgileReview comment at selected code region destroys a code comment
+		if (!(closeTagLineNr <= startLine || (startLine < openTagLineNr && closeTagLineNr < endLine) || endLine < openTagLineNr)) {
+			// check if startLine needs to be adapted
+			if (startLine >= openTagLineNr) {
+				result[0] = openTagLineNr-1;
+			} else {
+				result[0] = startLine;
+			}
+			// check if endLine needs to be adapted
+			if (closeTagLineNr > endLine) {
+				result[1] = closeTagLineNr;	
+			} else {
+				result[1] = endLine;
+			}			
+		} else {
+			result[0] = -1;
+			result[1] = -1;
 		}
 		
 		return result;
