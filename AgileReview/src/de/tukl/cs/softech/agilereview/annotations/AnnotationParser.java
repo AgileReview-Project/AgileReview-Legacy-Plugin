@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
@@ -20,6 +21,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -303,14 +305,20 @@ public class AnnotationParser implements IAnnotationParser {
 			String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 			String commentTag = keySeparator+commentKey+keySeparator;
 			
-			int[] newLines = checkForComment(document, selStartLine, selEndLine);
-			if (newLines[0] != -1 && newLines[1] != -1  && (newLines[0] != selStartLine || newLines[1] != selEndLine)) {
-				// TODO: check/discuss whether new line should be added before new start line in order to avoid collisions with other code lines!
-				int offset = document.getLineOffset(newLines[0]);
-				int length = document.getLineOffset(newLines[1])-document.getLineOffset(newLines[0])+document.getLineLength(newLines[1]);
+			// check if selection needs to be adapted
+			int[] newLines = computeSelectionAdapations(document, selStartLine, selEndLine);
+			if (newLines[0]!=-1 || newLines[1]!=-1) {
+				// inform user
+				MessageDialog.openWarning(Display.getCurrent().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
+				// adapt startline if necessary
+				selStartLine = (newLines[0]==-1) ? selStartLine : newLines[0];
+				// adapt endline if necessary
+				selEndLine = (newLines[1]==-1) ? selEndLine : newLines[1];
+				// compute new selection
+				int offset = document.getLineOffset(selStartLine);
+				int length = document.getLineOffset(selEndLine)-document.getLineOffset(selStartLine)+document.getLineLength(selEndLine);
+				// set new selection
 				editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
-				addTagsInDocument(comment, display);
-				return;
 			}
 			
 			if (selStartLine == selEndLine)	{
@@ -363,65 +371,86 @@ public class AnnotationParser implements IAnnotationParser {
 	}
 	
 	/**
-	 * Checks whether adding an AgileReview comment at the current selection<br>
-	 * would destroy a code comment and computes adapted line numbers to avoid<br>
-	 * destruction of code comments.
-	 * 
+	 * Checks whether adding an AgileReview comment at the current selection
+	 * would destroy a code comment and computes adapted line numbers to avoid
+	 * destruction of code comments. 
 	 * @param document the document in which the comment will be added
 	 * @param startLine the current startLine of the selection
 	 * @param endLine the current endLine of the selection
-	 * @return and array containing the new start (position 0) and endline (position 1)
+	 * @return and array containing the new start (position 0) and endline (position 1).
+	 * If not nothing is to be changed the content is -1 at position 0/1.
 	 * @throws BadLocationException
 	 */
-	public int[] checkForComment(IDocument document, int startLine, int endLine) throws BadLocationException {
+	private int[] computeSelectionAdapations(IDocument document, int startLine, int endLine) throws BadLocationException {
 		int[] result = {-1, -1};
-		int openTagLineNr = -1;
-		int closeTagLineNr = -1;
 		String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
 		
-		// check for opening non-AgileReview comment tags
-		for (int i=0; i<=endLine;i++) {
-			// check if line contains comment and comment is no AgileReview tag
-			String line = document.get(document.getLineOffset(i), document.getLineLength(i)).trim();
-			boolean containsStartTag = line.contains(tags[0]);
-			boolean isNotAgileReviewTag = !line.matches(".*"+Pattern.quote(tags[0])+rawTagRegex+Pattern.quote(tags[1])+".*");
-			if (containsStartTag && isNotAgileReviewTag) {
-				openTagLineNr = i;
+		int[] startLineAdaptions = checkForCodeComment(document, startLine, tags);
+		int[] endLineAdaptions = checkForCodeComment(document, endLine, tags);
+		
+		// check if inserting a AgileReview comment at selected code region destroys a code comment
+		if (startLineAdaptions[0] != -1 && startLineAdaptions[1] != -1 && startLineAdaptions[0] != startLine) {
+			result[0] = startLineAdaptions[0];
+		}
+		if (endLineAdaptions[0] != -1 && endLineAdaptions[1] != -1 && endLineAdaptions[1] != endLine) {
+			result[1] = endLineAdaptions[1];
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Checks whether the given line is within a code comment. If this holds
+	 * the code comments start and endline is returned, else {-1, -1}.
+	 * @param document The document that is currently parsed
+	 * @param line the line to check
+	 * @param tags the start and endtag of code comments
+	 * @return [-1, -1] if line is not within a code comment, else [startline, endline] of the code comment
+	 * @throws BadLocationException
+	 */
+	private int[] checkForCodeComment(IDocument document, int line, String[] tags) throws BadLocationException {
+		// TODO: optimize the search for tags
+		
+		int openTagLine = -1;
+		int closeTagLine = -1;
+		
+		// check for opening non-AgileReview comment tags before the line
+		for (int i=0; i<=line;i++) {
+			// get a content of current line
+			String lineContent = document.get(document.getLineOffset(i), document.getLineLength(i)).trim();
+			// get rid of possible AgileReview comment tags
+			lineContent = lineContent.replaceAll(Pattern.quote(tags[0])+rawTagRegex+Pattern.quote(tags[1]), "");
+			// if still contains a starting tag for a code comment remember line number
+			if (lineContent.contains(tags[0])) {
+				openTagLine = i;
 			}
 		}
-		// if an opening non-AgileReview comment tag was found check for its closing tag
-		if (openTagLineNr>-1) {
+		
+		// check for according closing non-AgileReview comment tag
+		if (openTagLine>-1) {
 			boolean found = false;
-			int actLine = openTagLineNr;
+			int actLine = openTagLine;
 			while (actLine<document.getNumberOfLines() && !found) {
-				// check if line contains comment and comment is no AgileReview tag
-				String line = document.get(document.getLineOffset(actLine), document.getLineLength(actLine)).trim();
-				boolean containsEndTag = line.contains(tags[1]);
-				boolean isNotAgileReviewTag = !line.matches(".*"+Pattern.quote(tags[0])+rawTagRegex+Pattern.quote(tags[1])+".*");
-				if (containsEndTag && isNotAgileReviewTag) {
-					closeTagLineNr = actLine;
+				// get a content of current line
+				String lineContent = document.get(document.getLineOffset(actLine), document.getLineLength(actLine)).trim();
+				// get rid of possible AgileReview comment tags
+				lineContent = lineContent.replaceAll(Pattern.quote(tags[0])+rawTagRegex+Pattern.quote(tags[1]), "");
+				// if still contains a ending tag for a code comment remember line number
+				if (lineContent.contains(tags[1])) {
+					closeTagLine = actLine;
 					found = true;
 				}
 				actLine++;
 			}
 		}
 		
-		// check if inserting a AgileReview comment at selected code region destroys a code comment
-		if (!(closeTagLineNr <= startLine || (startLine < openTagLineNr && closeTagLineNr < endLine) || endLine < openTagLineNr)) {
-			// check if startLine needs to be adapted
-			if (startLine >= openTagLineNr) {
-				result[0] = openTagLineNr-1;
-			} else {
-				result[0] = startLine;
-			}
-			// check if endLine needs to be adapted
-			if (closeTagLineNr > endLine) {
-				result[1] = closeTagLineNr;	
-			} else {
-				result[1] = endLine;
-			}
-		}
-		
+		// finally return the results if a comment was found
+		int[] result = {-1, -1};
+		if (openTagLine <= line && line <= closeTagLine) {
+			// TODO: not checked if line right before starting line of code comment contains also a code comment...
+			result[0] = openTagLine-1;
+			result[1] = closeTagLine;
+		}		
 		return result;
 	}
 	
