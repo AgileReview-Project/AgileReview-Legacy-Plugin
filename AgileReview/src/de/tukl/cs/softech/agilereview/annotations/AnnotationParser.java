@@ -308,6 +308,7 @@ public class AnnotationParser implements IAnnotationParser {
 			// check if selection needs to be adapted
 			int[] newLines = computeSelectionAdapations(document, selStartLine, selEndLine);
 			if (newLines[0]!=-1 || newLines[1]!=-1) {
+				PluginLogger.log(this.getClass().toString(), "addTagsInDocument", "Selection for inserting tags needs to be adapted, performing adaptation.");
 				// inform user
 				MessageDialog.openWarning(Display.getCurrent().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
 				// adapt startline if necessary
