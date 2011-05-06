@@ -449,7 +449,9 @@ public class AnnotationParser implements IAnnotationParser {
 		if (openTagLine <= line && line <= closeTagLine) {
 			// TODO: not checked if line right before starting line of code comment contains also a code comment...
 			result[0] = openTagLine-1;
-			result[1] = closeTagLine;
+			if (!(closeTagLine==line)) {
+				result[1] = closeTagLine;	
+			}			
 		}		
 		return result;
 	}
