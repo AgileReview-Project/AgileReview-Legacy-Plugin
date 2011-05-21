@@ -306,7 +306,7 @@ public class AnnotationParser implements IAnnotationParser {
 			String commentTag = keySeparator+commentKey+keySeparator;
 			
 			// check if selection needs to be adapted
-			int[] newLines = computeSelectionAdapations(document, selStartLine, selEndLine);
+			int[] newLines = computeSelectionAdapations(selStartLine, selEndLine);
 			if (newLines[0]!=-1 || newLines[1]!=-1) {
 				PluginLogger.log(this.getClass().toString(), "addTagsInDocument", "Selection for inserting tags needs to be adapted, performing adaptation.");
 				// inform user
@@ -375,19 +375,18 @@ public class AnnotationParser implements IAnnotationParser {
 	 * Checks whether adding an AgileReview comment at the current selection
 	 * would destroy a code comment and computes adapted line numbers to avoid
 	 * destruction of code comments. 
-	 * @param document the document in which the comment will be added
 	 * @param startLine the current startLine of the selection
 	 * @param endLine the current endLine of the selection
 	 * @return and array containing the new start (position 0) and endline (position 1).
 	 * If not nothing is to be changed the content is -1 at position 0/1.
 	 * @throws BadLocationException
 	 */
-	private int[] computeSelectionAdapations(IDocument document, int startLine, int endLine) throws BadLocationException {
+	private int[] computeSelectionAdapations(int startLine, int endLine) throws BadLocationException {
 		int[] result = {-1, -1};
 		String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
 		
-		int[] startLineAdaptions = checkForCodeComment(document, startLine, tags);
-		int[] endLineAdaptions = checkForCodeComment(document, endLine, tags);
+		int[] startLineAdaptions = checkForCodeComment(startLine, tags);
+		int[] endLineAdaptions = checkForCodeComment(endLine, tags);
 		
 		// check if inserting a AgileReview comment at selected code region destroys a code comment
 		if (startLineAdaptions[0] != -1 && startLineAdaptions[1] != -1 && startLineAdaptions[0] != startLine) {
@@ -403,13 +402,12 @@ public class AnnotationParser implements IAnnotationParser {
 	/**
 	 * Checks whether the given line is within a code comment. If this holds
 	 * the code comments start and endline is returned, else {-1, -1}.
-	 * @param document The document that is currently parsed
 	 * @param line the line to check
 	 * @param tags the start and endtag of code comments
 	 * @return [-1, -1] if line is not within a code comment, else [startline, endline] of the code comment
 	 * @throws BadLocationException
 	 */
-	private int[] checkForCodeComment(IDocument document, int line, String[] tags) throws BadLocationException {
+	private int[] checkForCodeComment(int line, String[] tags) throws BadLocationException {
 		// TODO: optimize the search for tags
 		
 		int openTagLine = -1;
