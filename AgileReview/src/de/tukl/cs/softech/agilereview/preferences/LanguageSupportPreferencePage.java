@@ -5,6 +5,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.preferences.lang.TableFieldEditor;
 
 /**
  * This Class represents the preferences page for the language support settings

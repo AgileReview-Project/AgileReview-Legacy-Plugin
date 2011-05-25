@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.preferences;
+package de.tukl.cs.softech.agilereview.preferences.lang;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,7 +66,7 @@ public class FileendingContentProvider implements IContentProvider, IStructuredC
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		return data.toArray(new SupportedLanguageEntity[0]);
+		return data.toArray();
 	}
 
 }

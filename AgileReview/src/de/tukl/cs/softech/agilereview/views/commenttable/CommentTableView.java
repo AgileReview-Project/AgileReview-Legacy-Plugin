@@ -302,7 +302,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 
 		// create viewer
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		createColumns(parent, viewer);
+		createColumns();
 
 		// set attributes of viewer's table
 		Table table = viewer.getTable();
@@ -414,10 +414,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	
 	/**
 	 * Creates the columns of the viewer and adds label providers to fill cells
-	 * @param parent The parent object of the viewer
-	 * @param viewer The viewer who's columns are to be created
 	 */
-	private void createColumns(Composite parent, TableViewer viewer) {
+	private void createColumns() {
 		// ReviewID
 		TableViewerColumn col = createColumn(titles[0], bounds[0], 0);
 		col.setLabelProvider(new ColumnLabelProvider() {
