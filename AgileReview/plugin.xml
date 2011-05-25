@@ -239,6 +239,12 @@
          id="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
          name="AgileReview">
    </page>
+   <page
+         category="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         class="de.tukl.cs.softech.agilereview.preferences.LanguageSupportPreferencePage"
+         id="de.tukl.cs.softech.agilereview.preferences.LanguageSupportPreferencePage"
+         name="Language support">
+   </page>
 </extension>
 <extension
       point="org.eclipse.core.runtime.preferences">

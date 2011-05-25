@@ -27,9 +27,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
  * be accessed directly via the preference store.
  */
 
-public class AgileReviewPreferencePage
-	extends FieldEditorPreferencePage
-	implements IWorkbenchPreferencePage{
+public class AgileReviewPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	
 	/**
 	 * Textfield for author
