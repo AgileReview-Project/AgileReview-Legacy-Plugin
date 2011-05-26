@@ -6,10 +6,10 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 
 /**
- * Editing support the file endings column
+ * Editing support the begin tag column
  */
-public class FileendingEditingSupport extends EditingSupport {
-	
+public class BeginTagEditingSupport extends EditingSupport {
+
 	/**
 	 * TableViewer on which this editing support is applied
 	 */
@@ -19,7 +19,7 @@ public class FileendingEditingSupport extends EditingSupport {
 	 * Creates a FileendingEditingSupport with the viewer on which it is applied
 	 * @param viewer
 	 */
-	FileendingEditingSupport(TableViewer viewer) {
+	BeginTagEditingSupport(TableViewer viewer) {
 		super(viewer);
 		this.viewer = viewer;
 	}
@@ -38,7 +38,7 @@ public class FileendingEditingSupport extends EditingSupport {
 	protected Object getValue(Object element) {
 		if(element instanceof SupportedLanguageEntity) {
 			System.err.println(((SupportedLanguageEntity) element).getFileendingsAsString());
-			return ((SupportedLanguageEntity)element).getFileendingsAsString();
+			return ((SupportedLanguageEntity)element).getBeginTag();
 		}
 		return null;
 	}
@@ -46,7 +46,7 @@ public class FileendingEditingSupport extends EditingSupport {
 	@Override
 	protected void setValue(Object element, Object value) {
 		if(element instanceof SupportedLanguageEntity && value instanceof String) {
-			((SupportedLanguageEntity)element).setFileendings((String)value);
+			((SupportedLanguageEntity)element).setBeginTag((String)value);
 			viewer.refresh();
 		}
 	}

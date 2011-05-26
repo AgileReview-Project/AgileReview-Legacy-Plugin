@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -12,6 +11,7 @@ import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.preferences.lang.SupportedLanguageEntity;
 
 /**
  * The PropertiesManager manages the internal configurations (in file: "OSGI-INF/l10n/bundle.properties")
@@ -239,13 +239,22 @@ public class PropertiesManager implements IInputValidator{
 	}
 	
 	/**
+	 * Sets the internal property according to the given key with the given value
+	 * @param key
+	 * @param value
+	 */
+	private void setInternalProperty(String key, String value) {
+		internalProperties.setProperty(key, value);
+	}
+	
+	/**
 	 * Returns the PreferencesStore to store/retrieve the workspace-specific preferences of this plugin
 	 * @return PreferencesStore of this plugin
 	 */
-	public static IPreferenceStore getPreferences()
-	{
+	public static IPreferenceStore getPreferences() {
 		return Activator.getDefault().getPreferenceStore();
 	}
+	
 	/**
 	 * Adds the given review to the list of open reviews in the workspace-specific preferences of this plugin
 	 * @param reviewId Id of the review to be added
@@ -416,5 +425,41 @@ public class PropertiesManager implements IInputValidator{
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Saves the new configuration for supported languages in the preferences
+	 * @param newConfig
+	 */
+	public void setParserFileendingsAndTags(SupportedLanguageEntity[] newConfig) {
+		String fileendings = "";
+		String beginTags = "";
+		String endTags = "";
+		
+		boolean first = true;
+		for(SupportedLanguageEntity e : newConfig) {
+			if(first) {
+				beginTags = e.getBeginTag();
+				endTags = e.getEndTag();
+			} else {
+				fileendings += ",";
+				beginTags += "," + e.getBeginTag();
+				endTags += "," + e.getEndTag();
+			}
+			boolean firstSpace = true;
+			for(String s : e.getFileendings()) {
+				if(firstSpace) {
+					fileendings += s;
+					firstSpace = false;
+				} else {
+					fileendings += " " + s;
+				}
+			}
+			first = false;
+		}
+		
+		setInternalProperty(INTERNAL_KEYS.PARSER_FILEENDINGS, fileendings);
+		setInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG, beginTags);
+		setInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_END_TAG, endTags);
 	}
 }

@@ -22,6 +22,10 @@ public class TableFieldEditor extends FieldEditor {
 	 */
 	private static PropertiesManager pm = PropertiesManager.getInstance();
 	/**
+	 * Content provider for the TableViewer
+	 */
+	private FileendingContentProvider cp;
+	/**
 	 * TableViewer managing the table
 	 */
 	private TableViewer table;
@@ -63,7 +67,8 @@ public class TableFieldEditor extends FieldEditor {
         table.setColumnProperties(new String[]{"fileendings","begin tag", "end tag"});
         table.getTable().setLinesVisible(true);
         table.getTable().setHeaderVisible(true);
-        table.setContentProvider(new FileendingContentProvider());
+        cp = new FileendingContentProvider();
+        table.setContentProvider(cp);
         
         gd = new GridData();
         gd.horizontalSpan = numColumns;
@@ -85,12 +90,11 @@ public class TableFieldEditor extends FieldEditor {
 
 	@Override
 	protected void doStore() {
-		//TODO
+		pm.setParserFileendingsAndTags(cp.data.toArray(new SupportedLanguageEntity[0]));
 	}
 
 	@Override
 	public int getNumberOfControls() {
-		// TODO Auto-generated method stub
 		return 1;
 	}
 
@@ -102,31 +106,53 @@ public class TableFieldEditor extends FieldEditor {
 	 */
 	private void createColumn(String title, int bound, final int colNumber) {
 		TableViewerColumn viewerColumn = new TableViewerColumn(table, SWT.NONE);
-		viewerColumn.setEditingSupport(new FileendingEditingSupport(table));
+		
+		switch(colNumber) {
+		case 0:
+			viewerColumn.setEditingSupport(new FileendingEditingSupport(table));
+			viewerColumn.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(Object element) {
+					String result = "";
+					if(element instanceof SupportedLanguageEntity) {
+						result = ((SupportedLanguageEntity)element).getFileendingsAsString();
+					}
+					return result;
+				}
+			});
+			break;
+		case 1:
+			viewerColumn.setEditingSupport(new BeginTagEditingSupport(table));
+			viewerColumn.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(Object element) {
+					String result = "";
+					if(element instanceof SupportedLanguageEntity) {
+						result = ((SupportedLanguageEntity)element).getBeginTag();
+					}
+					return result;
+				}
+			});
+			break;
+		case 2:
+			viewerColumn.setEditingSupport(new EndTagEditingSupport(table));
+			viewerColumn.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public String getText(Object element) {
+					String result = "";
+					if(element instanceof SupportedLanguageEntity) {
+						result = ((SupportedLanguageEntity)element).getEndTag();
+					}
+					return result;
+				}
+			});
+			break;
+		
+		}
+		
 		TableColumn column = viewerColumn.getColumn();
 		column.setText(title);
 		column.setWidth(bound);
 		column.setResizable(true);
-		
-		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				String result = "";
-				if(element instanceof SupportedLanguageEntity) {
-					switch(colNumber) {
-					case 0:
-						result = ((SupportedLanguageEntity)element).getFileendingsAsString();
-						break;
-					case 1:
-						result = ((SupportedLanguageEntity)element).getBeginTag();
-						break;
-					case 2:
-						result = ((SupportedLanguageEntity)element).getEndTag();
-						break;
-					}
-				}
-				return result;
-			}
-		});
 	}
 }

@@ -1,8 +1,5 @@
 package de.tukl.cs.softech.agilereview.preferences.lang;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,10 +8,8 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-
 public class FileendingContentProvider implements IContentProvider, IStructuredContentProvider {
 
-//	private Map<String, String[]> data = new HashMap<String, String[]>();
 	List<SupportedLanguageEntity> data = new LinkedList<SupportedLanguageEntity>();
 	
 	FileendingContentProvider() {
@@ -26,9 +21,6 @@ public class FileendingContentProvider implements IContentProvider, IStructuredC
 //		data.clear();
 	}
 
-	/**
-	 * 
-	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if(newInput instanceof Map<?,?>) {

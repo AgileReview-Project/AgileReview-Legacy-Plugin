@@ -20,7 +20,7 @@ public class SupportedLanguageEntity {
 		fileendings.add(fileending);
 	}
 
-	List<String> getFileendings() {
+	public List<String> getFileendings() {
 		return fileendings;
 	}
 	
@@ -50,11 +50,19 @@ public class SupportedLanguageEntity {
 		}
 	}
 
-	String getBeginTag() {
+	public String getBeginTag() {
 		return beginTag;
 	}
+	
+	void setBeginTag(String beginTag) {
+		this.beginTag = beginTag;
+	}
 
-	String getEndTag() {
+	public String getEndTag() {
 		return endTag;
+	}
+	
+	void setEndTag(String endTag) {
+		this.endTag = endTag;
 	}
 }
