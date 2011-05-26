@@ -6,8 +6,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -15,7 +18,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * The TableFieldEditor represents the configurable table of languages supported by AgileReview
  */
-public class TableFieldEditor extends FieldEditor {
+public class TableFieldEditor extends FieldEditor implements Listener {
 	
 	/**
 	 * Instance of PropertiesManager
@@ -76,6 +79,16 @@ public class TableFieldEditor extends FieldEditor {
         gd.verticalAlignment = GridData.FILL;
         gd.grabExcessHorizontalSpace = true;
         table.getTable().setLayoutData(gd);
+        
+        Button but = new Button(parent, SWT.PUSH);
+        but.setText("add new row");
+        but.addListener(SWT.PUSH, this);
+        gd = new GridData();
+        gd.horizontalSpan = numColumns;
+        gd.horizontalAlignment = SWT.END;
+        gd.verticalAlignment = SWT.BOTTOM;
+        but.setLayoutData(gd);
+        
 	}
 
 	@Override
@@ -154,5 +167,10 @@ public class TableFieldEditor extends FieldEditor {
 		column.setText(title);
 		column.setWidth(bound);
 		column.setResizable(true);
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		//TODO
 	}
 }

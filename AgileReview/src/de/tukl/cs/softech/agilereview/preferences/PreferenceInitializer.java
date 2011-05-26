@@ -34,6 +34,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		
 		// active review
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, "");
+		
+		//language support defaults
+		store.setDefault(PropertiesManager.EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG, 
+				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG));
+		store.setDefault(PropertiesManager.EXTERNAL_KEYS.PARSER_COMMENT_END_TAG, 
+				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.EXTERNAL_KEYS.PARSER_COMMENT_END_TAG));
+		store.setDefault(PropertiesManager.EXTERNAL_KEYS.PARSER_FILEENDINGS, 
+				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.EXTERNAL_KEYS.PARSER_FILEENDINGS));
 	}
 
 }

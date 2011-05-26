@@ -62,18 +62,6 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String COMMENT_EMPTY_REPLY_MESSAGE = "reply_inf_completeness";
 		/**
-		 * File endings supported by the parser
-		 */
-		public static String PARSER_FILEENDINGS = "parser_fileendings";
-		/**
-		 * Correlated comment begin tags for every set of file endings representing the same language
-		 */
-		public static String PARSER_COMMENT_BEGIN_TAG ="parser_comment_begin_tag";
-		/**
-		 * Correlated comment end tags for every set of file endings representing the same language
-		 */
-		public static String PARSER_COMMENT_END_TAG = "parser_comment_end_tag";
-		/**
 		 * Filenames which should be omitted during export
 		 */
 		public static String EXPORT_OMITTINGS = "export_omittings";
@@ -165,6 +153,18 @@ public class PropertiesManager implements IInputValidator{
 		 * States whether the AgileReview Perspective should automatically be opened on certain events
 		 */
 		public static String AUTO_OPEN_PERSPECTIVE = "autoOpenPerspective";
+		/**
+		 * File endings supported by the parser
+		 */
+		public static String PARSER_FILEENDINGS = "parser_fileendings";
+		/**
+		 * Correlated comment begin tags for every set of file endings representing the same language
+		 */
+		public static String PARSER_COMMENT_BEGIN_TAG ="parser_comment_begin_tag";
+		/**
+		 * Correlated comment end tags for every set of file endings representing the same language
+		 */
+		public static String PARSER_COMMENT_END_TAG = "parser_comment_end_tag";
 		
 	}
 	
@@ -236,15 +236,6 @@ public class PropertiesManager implements IInputValidator{
 	 */
 	public String getInternalProperty(String key) {
 		return internalProperties.getProperty(key);
-	}
-	
-	/**
-	 * Sets the internal property according to the given key with the given value
-	 * @param key
-	 * @param value
-	 */
-	private void setInternalProperty(String key, String value) {
-		internalProperties.setProperty(key, value);
 	}
 	
 	/**
@@ -413,9 +404,9 @@ public class PropertiesManager implements IInputValidator{
 	 */
 	public HashMap<String, String[]> getParserFileendingsAndTags() {
 		HashMap<String, String[]> result = new HashMap<String, String[]>();
-		String[] languages = getInternalProperty(INTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
-		String[] beginTags = getInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
-		String[] endTags = getInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
+		String[] languages = getPreferences().getString(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
+		String[] beginTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
+		String[] endTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
 		
 		for(int i = 0; i < languages.length; i++) {
 			String[] endings = languages[i].split("\\s");
@@ -458,8 +449,8 @@ public class PropertiesManager implements IInputValidator{
 			first = false;
 		}
 		
-		setInternalProperty(INTERNAL_KEYS.PARSER_FILEENDINGS, fileendings);
-		setInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG, beginTags);
-		setInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_END_TAG, endTags);
+		getPreferences().setValue(EXTERNAL_KEYS.PARSER_FILEENDINGS, fileendings);
+		getPreferences().setValue(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG, beginTags);
+		getPreferences().setValue(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG, endTags);
 	}
 }
