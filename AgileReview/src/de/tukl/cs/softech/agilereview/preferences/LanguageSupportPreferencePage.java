@@ -35,7 +35,6 @@ public class LanguageSupportPreferencePage extends FieldEditorPreferencePage imp
 	 */
 	@Override
 	protected void createFieldEditors() {
-		addField(new TableFieldEditor("", "Table", getFieldEditorParent()));
+		addField(new TableFieldEditor(getFieldEditorParent()));
 	}
-	
 }

@@ -1,37 +1,19 @@
 package de.tukl.cs.softech.agilereview.preferences.lang;
 
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TextCellEditor;
 
 /**
  * Editing support the begin tag column
  */
-public class BeginTagEditingSupport extends EditingSupport {
+public class BeginTagEditingSupport extends AbstractEditingSupport {
 
 	/**
-	 * TableViewer on which this editing support is applied
-	 */
-	private TableViewer viewer;
-
-	/**
-	 * Creates a FileendingEditingSupport with the viewer on which it is applied
+	 * Creates a BeginTagEditingSupport with the viewer on which it is applied
 	 * @param viewer
+	 * @param tableFieldEditor 
 	 */
-	BeginTagEditingSupport(TableViewer viewer) {
-		super(viewer);
-		this.viewer = viewer;
-	}
-
-	@Override
-	protected CellEditor getCellEditor(Object element) {
-		return new TextCellEditor(viewer.getTable());
-	}
-
-	@Override
-	protected boolean canEdit(Object element) {
-		return true;
+	BeginTagEditingSupport(TableViewer viewer, TableFieldEditor tableFieldEditor) {
+		super(viewer, tableFieldEditor);
 	}
 
 	@Override
@@ -47,6 +29,7 @@ public class BeginTagEditingSupport extends EditingSupport {
 		if(element instanceof SupportedLanguageEntity && value instanceof String) {
 			((SupportedLanguageEntity)element).setBeginTag((String)value);
 			viewer.refresh();
+			tableFieldEditor.checkValidity();
 		}
 	}
 }

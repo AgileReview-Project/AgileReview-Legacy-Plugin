@@ -1,9 +1,9 @@
 package de.tukl.cs.softech.agilereview.preferences.lang;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.jface.preference.FieldEditor;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -43,12 +43,10 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 	
 	/**
 	 * Creates a new TableFieldEditor
-	 * @param name
-	 * @param labelText
 	 * @param parent
 	 */
-	public TableFieldEditor(String name, String labelText, Composite parent) {
-		super(name, labelText, parent);
+	public TableFieldEditor(Composite parent) {
+		super("", "", parent);
 	}
 
 	/**
@@ -113,6 +111,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
         gd.verticalAlignment = SWT.TOP;
         but.setLayoutData(gd);
         
+        checkValidity();
 	}
 
 	@Override
@@ -127,15 +126,19 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 
 	@Override
 	protected void doStore() {
-		List<SupportedLanguageEntity> langs = cp.data;
-		Iterator<SupportedLanguageEntity> it = langs.iterator();
+		if(!checkValidity()) {
+			return;
+		}
+		//delete empty entities for saving issues
+		Iterator<SupportedLanguageEntity> it = cp.data.iterator();
 		while(it.hasNext()) {
 			SupportedLanguageEntity lang = it.next();
 			if(lang.isEmpty()) {
 				it.remove();
 			}
 		}
-		pm.setParserFileendingsAndTags(langs.toArray(new SupportedLanguageEntity[0]));
+		//save
+		pm.setParserFileendingsAndTags(cp.data.toArray(new SupportedLanguageEntity[0]));
 	}
 
 	@Override
@@ -167,7 +170,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 			});
 			break;
 		case 1:
-			viewerColumn.setEditingSupport(new BeginTagEditingSupport(table));
+			viewerColumn.setEditingSupport(new BeginTagEditingSupport(table, this));
 			viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 				@Override
 				public String getText(Object element) {
@@ -180,7 +183,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 			});
 			break;
 		case 2:
-			viewerColumn.setEditingSupport(new EndTagEditingSupport(table));
+			viewerColumn.setEditingSupport(new EndTagEditingSupport(table, this));
 			viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 				@Override
 				public String getText(Object element) {
@@ -213,7 +216,29 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 				}
 			}
 			cp.inputChanged(table, null, cp.data);
+			checkValidity();
 		}
 		parent.layout();
+	}
+	
+	/**
+	 * Checks the validity of user inputs
+	 * @return true, if all entries are valid<br>false, otherwise
+	 */
+	boolean checkValidity() {
+		for(SupportedLanguageEntity e : cp.data) {
+			if(!e.isValid()) {
+				if(getPage() != null && getPage() instanceof PreferencePage) {
+					((PreferencePage) getPage()).setValid(false);
+					((PreferencePage) getPage()).setErrorMessage("At least begin and end tag have to be specified pairwise!");
+				}
+				return false;
+			}
+		}
+		if(getPage() != null && getPage() instanceof PreferencePage) {
+			((PreferencePage) getPage()).setValid(true);
+			((PreferencePage) getPage()).setErrorMessage(null);
+		}
+		return true;
 	}
 }

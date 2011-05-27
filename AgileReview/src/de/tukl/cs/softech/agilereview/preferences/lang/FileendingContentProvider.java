@@ -8,16 +8,29 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+/**
+ * The {@link FileendingContentProvider} manages the contents for the configuration table in the preferences dialog
+ */
 public class FileendingContentProvider implements IContentProvider, IStructuredContentProvider {
 
+	/**
+	 * {@link List} of {@link SupportedLanguageEntity}s which lists the contents for the table
+	 */
 	List<SupportedLanguageEntity> data = new LinkedList<SupportedLanguageEntity>();
 	
+	/**
+	 * Creates a new instance of the {@link FileendingContentProvider}
+	 */
 	FileendingContentProvider() {
 	}
 	
+	/**
+	 * Clears the hold data of the {@link FileendingContentProvider}
+	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+	 */
 	@Override
 	public void dispose() {
-//		data.clear();
+		data.clear();
 	}
 
 	@Override
@@ -63,9 +76,6 @@ public class FileendingContentProvider implements IContentProvider, IStructuredC
 			}
 			data = tmp;
 		}
-//		if(viewer instanceof TableViewer) {
-//			((TableViewer)viewer).getTable().layout();
-//		}
 		viewer.refresh();
 	}
 
