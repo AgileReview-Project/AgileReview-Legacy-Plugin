@@ -409,7 +409,7 @@ public class PropertiesManager implements IInputValidator{
 		String[] endTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
 		
 		for(int i = 0; i < languages.length; i++) {
-			String[] endings = languages[i].split("\\s");
+			String[] endings = languages[i].split("\\s+");
 			for(String e : endings) {
 				result.put(e, new String[]{beginTags[i], endTags[i]});
 			}

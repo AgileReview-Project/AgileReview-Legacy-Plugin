@@ -37,7 +37,6 @@ public class BeginTagEditingSupport extends EditingSupport {
 	@Override
 	protected Object getValue(Object element) {
 		if(element instanceof SupportedLanguageEntity) {
-			System.err.println(((SupportedLanguageEntity) element).getFileendingsAsString());
 			return ((SupportedLanguageEntity)element).getBeginTag();
 		}
 		return null;

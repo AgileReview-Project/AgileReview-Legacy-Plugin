@@ -10,6 +10,11 @@ public class SupportedLanguageEntity {
 	private String beginTag;
 	private String endTag;
 	
+	SupportedLanguageEntity() {
+		this.beginTag = "";
+		this.endTag = "";
+	}
+	
 	SupportedLanguageEntity(String fileendings, String beginTag, String endTag) {
 		this.fileendings.add(fileendings);
 		this.beginTag = beginTag;
@@ -17,7 +22,9 @@ public class SupportedLanguageEntity {
 	}
 	
 	public void addFileending(String fileending) {
-		fileendings.add(fileending);
+		if(!fileending.isEmpty()) {
+			fileendings.add(fileending);
+		}
 	}
 
 	public List<String> getFileendings() {
@@ -64,5 +71,13 @@ public class SupportedLanguageEntity {
 	
 	void setEndTag(String endTag) {
 		this.endTag = endTag;
+	}
+	
+
+	boolean isEmpty() {
+		if(fileendings.isEmpty() && beginTag.isEmpty() && endTag.isEmpty()) {
+			return true;
+		}
+		return false;
 	}
 }

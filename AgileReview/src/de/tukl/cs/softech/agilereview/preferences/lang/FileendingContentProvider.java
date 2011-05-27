@@ -13,7 +13,6 @@ public class FileendingContentProvider implements IContentProvider, IStructuredC
 	List<SupportedLanguageEntity> data = new LinkedList<SupportedLanguageEntity>();
 	
 	FileendingContentProvider() {
-		
 	}
 	
 	@Override
@@ -54,6 +53,20 @@ public class FileendingContentProvider implements IContentProvider, IStructuredC
 				}
 			}
 		}
+		if(newInput instanceof List<?>) {
+			List<?> list = ((List<?>)newInput);
+			LinkedList<SupportedLanguageEntity> tmp = new LinkedList<SupportedLanguageEntity>();
+			for(Object o : list) {
+				if(o instanceof SupportedLanguageEntity) {
+					tmp.add((SupportedLanguageEntity)o);
+				}
+			}
+			data = tmp;
+		}
+//		if(viewer instanceof TableViewer) {
+//			((TableViewer)viewer).getTable().layout();
+//		}
+		viewer.refresh();
 	}
 
 	@Override

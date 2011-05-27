@@ -1,5 +1,8 @@
 package de.tukl.cs.softech.agilereview.preferences.lang;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -12,6 +15,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
@@ -32,6 +36,10 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 	 * TableViewer managing the table
 	 */
 	private TableViewer table;
+	/**
+	 * Parent composite of this field editor
+	 */
+	private Composite parent;
 	
 	/**
 	 * Creates a new TableFieldEditor
@@ -52,7 +60,9 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 	}
 
 	@Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {		
+	protected void doFillIntoGrid(Composite parent, int numColumns) {
+		this.parent = parent;
+		
 		Label label = new Label(parent, SWT.WRAP);
 		label.setText("More than one fileendings in one cell should be managed by comma separation." +
 				"The begin and end tag should specify the tags of a multiline comment in the corresponding programming " +
@@ -63,7 +73,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
         gd.widthHint = parent.getSize().x;
         label.setLayoutData(gd);
 		
-		table = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+		table = new TableViewer(parent, SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.BORDER);
 		createColumn("fileendings",200,0);
         createColumn("begin tag",100,1);
         createColumn("end tag",100,2);
@@ -74,19 +84,33 @@ public class TableFieldEditor extends FieldEditor implements Listener {
         table.setContentProvider(cp);
         
         gd = new GridData();
-        gd.horizontalSpan = numColumns;
+        gd.horizontalSpan = numColumns-1;
+        gd.verticalSpan = 2;
         gd.horizontalAlignment = GridData.FILL;
         gd.verticalAlignment = GridData.FILL;
         gd.grabExcessHorizontalSpace = true;
         table.getTable().setLayoutData(gd);
         
         Button but = new Button(parent, SWT.PUSH);
-        but.setText("add new row");
-        but.addListener(SWT.PUSH, this);
+        but.setText("+");
+        but.setData("+");
+        but.addListener(SWT.Selection, this);
         gd = new GridData();
-        gd.horizontalSpan = numColumns;
+        gd.widthHint = 40;
+        gd.horizontalSpan = 1;
         gd.horizontalAlignment = SWT.END;
-        gd.verticalAlignment = SWT.BOTTOM;
+        gd.verticalAlignment = SWT.TOP;
+        but.setLayoutData(gd);
+        
+        but = new Button(parent, SWT.PUSH);
+        but.setText("-");
+        but.setData("-");
+        but.addListener(SWT.Selection, this);
+        gd = new GridData();
+        gd.widthHint = 40;
+        gd.horizontalSpan = 1;
+        gd.horizontalAlignment = SWT.END;
+        gd.verticalAlignment = SWT.TOP;
         but.setLayoutData(gd);
         
 	}
@@ -103,12 +127,20 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 
 	@Override
 	protected void doStore() {
-		pm.setParserFileendingsAndTags(cp.data.toArray(new SupportedLanguageEntity[0]));
+		List<SupportedLanguageEntity> langs = cp.data;
+		Iterator<SupportedLanguageEntity> it = langs.iterator();
+		while(it.hasNext()) {
+			SupportedLanguageEntity lang = it.next();
+			if(lang.isEmpty()) {
+				it.remove();
+			}
+		}
+		pm.setParserFileendingsAndTags(langs.toArray(new SupportedLanguageEntity[0]));
 	}
 
 	@Override
 	public int getNumberOfControls() {
-		return 1;
+		return 2;
 	}
 
 	/**
@@ -171,6 +203,17 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 
 	@Override
 	public void handleEvent(Event event) {
-		//TODO
+		if(event.widget.getData().equals("+")) {
+			cp.data.add(new SupportedLanguageEntity());
+			cp.inputChanged(table, null, cp.data);
+		} else if(event.widget.getData().equals("-")) {
+			for(TableItem i : table.getTable().getSelection()) {
+				if(i.getData() instanceof SupportedLanguageEntity) {
+					cp.data.remove((SupportedLanguageEntity)i.getData());
+				}
+			}
+			cp.inputChanged(table, null, cp.data);
+		}
+		parent.layout();
 	}
 }
