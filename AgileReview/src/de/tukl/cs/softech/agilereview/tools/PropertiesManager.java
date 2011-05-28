@@ -453,4 +453,14 @@ public class PropertiesManager implements IInputValidator{
 		getPreferences().setValue(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG, beginTags);
 		getPreferences().setValue(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG, endTags);
 	}
+	
+	/**
+	 * Sets the template and export path for the export dialog
+	 * @param template
+	 * @param output
+	 */
+	public void setDefaultExportPaths(String template, String output) {
+		getPreferences().setValue(EXTERNAL_KEYS.EXPORT_PATH, output);
+		getPreferences().setValue(EXTERNAL_KEYS.TEMPLATE_PATH, template);
+	}
 }

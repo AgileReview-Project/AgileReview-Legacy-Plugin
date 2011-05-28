@@ -68,6 +68,10 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 */
 	private CheckboxTreeViewer cbtreeviewer;
 	/**
+	 * Checkbox for "check as default" property
+	 */
+	private Button checkSave;
+	/**
 	 * a map of all reviews that are currently opened and their ids
 	 */
 	private HashMap<String, Review> reviews = new HashMap<String, Review>();
@@ -100,23 +104,25 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		container.setLayout(layout);
-		layout.numColumns = 3;
+		layout.numColumns = 4;
 		
 		// ui elements for template selection
 		Label templateLabel = new Label(container, SWT.NULL);
 		templateLabel.setText("Template for XLS export:");
 		
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = layout.numColumns - 2;
 		templatePathText = new Text(container, SWT.BORDER | SWT.SINGLE);
 		templatePathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH));			
 		templatePathText.setEditable(false);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		templatePathText.setLayoutData(gd);
 		templatePathText.addModifyListener(this);
+		templatePathText.setLayoutData(gd);
+		
 		Button browseButtonTemplate = new Button(container, SWT.NULL);
 		browseButtonTemplate.setText("Browse...");
 		browseButtonTemplate.setData("template");
 		browseButtonTemplate.addSelectionListener(this);
-		
+				
 		// ui elements for selecting export path
 		Label pathLabel = new Label(container, SWT.NULL);
 		pathLabel.setText("XLS export location:");
@@ -124,23 +130,28 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		exportPathText = new Text(container, SWT.BORDER | SWT.SINGLE);
 		exportPathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH));	
 		exportPathText.setEditable(false);
-		exportPathText.setLayoutData(gd);
 		exportPathText.addModifyListener(this);
+		exportPathText.setLayoutData(gd);
 		
 		Button browseButton = new Button(container, SWT.NULL);
 		browseButton.setText("Browse...");
 		browseButton.setData("path");
 		browseButton.addSelectionListener(this);
 		
+		//check save as default button
 		GridData rlGD = new GridData(GridData.FILL_HORIZONTAL);
-		rlGD.horizontalSpan = 3;
-//		errorLabel = new Label(container, SWT.NULL);
-//		errorLabel.setText("");
-//		errorLabel.setAlignment(SWT.CENTER);
-//		errorLabel.setForeground(new Color(this.getShell().getDisplay(), 255, 0, 0));
-//		errorLabel.setLayoutData(rlGD);
+		rlGD.horizontalSpan = layout.numColumns;
+		rlGD.horizontalAlignment = GridData.END;
+		
+		checkSave = new Button(container, SWT.CHECK);
+		checkSave.setText("save as default");
+		checkSave.setSelection(false);
+		checkSave.setLayoutData(rlGD);
 		
 		// spacer to generate some space between path and review selection
+		rlGD = new GridData(GridData.FILL_HORIZONTAL);
+		rlGD.horizontalSpan = layout.numColumns;
+		
 		Label spacer = new Label(container, SWT.NULL);
 		spacer.setText("");
 		spacer.setLayoutData(rlGD);
@@ -150,9 +161,15 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		reviewLabel.setText("Select AgileReviews to export:");
 		reviewLabel.setLayoutData(rlGD);
 		
+		GridData tvGridData = new GridData(GridData.FILL_BOTH);
+		tvGridData.verticalSpan = 2;
+		tvGridData.horizontalSpan = layout.numColumns / 2;
 		cbtreeviewer = new CheckboxTreeViewer(container);
 		cbtreeviewer.setContentProvider(new ExportTreeViewContentProvider());
 		cbtreeviewer.setLabelProvider(new ExportTreeViewLabelProvider());
+		cbtreeviewer.getTree().addSelectionListener(this);
+		cbtreeviewer.getTree().setLayoutData(tvGridData);
+		
 		Collection<Review> allReviews = reviews.values();
 		ArrayList<Review> openReviews = new ArrayList<Review>();
 		for (Review r : allReviews) {
@@ -161,28 +178,21 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 			}
 		}
 		cbtreeviewer.setInput(openReviews);
-		GridData tvGridData = new GridData(GridData.FILL_BOTH);
-		tvGridData.verticalSpan = 2;
-		tvGridData.horizontalSpan = 2;
-		cbtreeviewer.getTree().setLayoutData(tvGridData);
-		cbtreeviewer.getTree().addSelectionListener(this);
 		
-		//select initial reviews
+		//- select initial reviews
 		for(String id : selectedReviewIDs) {
 			cbtreeviewer.setChecked(reviews.get(id), true);
 		}
 
+		//show review data of selected review
 		GridData resGridData = new GridData(GridData.FILL_HORIZONTAL);
-		resGridData.horizontalSpan = 1;
-		
+		resGridData.horizontalSpan = layout.numColumns / 2;
 		responsibility = new Label(container, SWT.NULL);
 		responsibility.setText("Responsibility:");
 		responsibility.setLayoutData(resGridData);
 		
 		GridData descGridData = new GridData(GridData.FILL_BOTH);
-		descGridData.horizontalSpan = 1;
 		description = new Label(container, SWT.WRAP);
-		
 		description.setText("Description:");
 		description.setLayoutData(descGridData);
 		
@@ -329,5 +339,13 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		this.selectedReviewIDs.clear();
 		this.selectedReviewIDs.addAll(selectedReviews);
 		reviewsSelected = true;
+	}
+	
+	/**
+	 * Returns whether the checkbox for saving the given paths is checked
+	 * @return true, if the paths should be set as default<br>false, otherwise
+	 */
+	boolean isSavePathAsDefault() {
+		return checkSave.getSelection();
 	}
 }

@@ -13,12 +13,17 @@ import org.eclipse.ui.PlatformUI;
 
 import de.tukl.cs.softech.agilereview.export.XSLExport;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * Provides a wizard for creating a new Review via the NewWizard
  */
 public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
 	/**
 	 * The first and sole page of the wizard 
 	 */
@@ -62,6 +67,9 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 			pmd.open();
 			pmd.run(true, false, new XSLExport(page1.getSelectedReviews(), page1.getTemplatePath(), page1.getExportPath()));
 			pmd.close();
+			if(page1.isSavePathAsDefault()) {
+				pm.setDefaultExportPaths(page1.getTemplatePath(), page1.getExportPath());
+			}
 		} catch (InvocationTargetException e) {
 			PluginLogger.logError(this.getClass().toString(),"performFinish", "InvocationTargetException", e);
 			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error while exporting Reviews", "An Eclipse internal error occured!\nRetry and please report the bug when it occurs again.\nCode:1");
