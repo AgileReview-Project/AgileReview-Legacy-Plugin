@@ -14,7 +14,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -64,10 +63,6 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 * The textfield containing the path
 	 */
 	private Text exportPathText;
-	/**
-	 * Label which displays usage errors
-	 */
-	private Label errorLabel;
 	/**
 	 * TreeViewer of Reviews to be exported
 	 */
@@ -139,11 +134,11 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		
 		GridData rlGD = new GridData(GridData.FILL_HORIZONTAL);
 		rlGD.horizontalSpan = 3;
-		errorLabel = new Label(container, SWT.NULL);
-		errorLabel.setText("");
-		errorLabel.setAlignment(SWT.CENTER);
-		errorLabel.setForeground(new Color(this.getShell().getDisplay(), 255, 0, 0));
-		errorLabel.setLayoutData(rlGD);
+//		errorLabel = new Label(container, SWT.NULL);
+//		errorLabel.setText("");
+//		errorLabel.setAlignment(SWT.CENTER);
+//		errorLabel.setForeground(new Color(this.getShell().getDisplay(), 255, 0, 0));
+//		errorLabel.setLayoutData(rlGD);
 		
 		// spacer to generate some space between path and review selection
 		Label spacer = new Label(container, SWT.NULL);
@@ -293,10 +288,10 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		File templatePath = new File(templatePathText.getText());
 		File exportPath = new File(exportPathText.getText());
 		if (templatePath.exists() && exportPath.exists() && !templatePathText.getText().isEmpty() && !exportPathText.getText().isEmpty()) {
-			this.errorLabel.setText("");
+			this.setErrorMessage(null);
 			return true;
 		} else {
-			this.errorLabel.setText("One or more of the selected paths do not exist.");
+			this.setErrorMessage("One or more of the selected paths do not exist.");
 			return false;
 		}
 	}
