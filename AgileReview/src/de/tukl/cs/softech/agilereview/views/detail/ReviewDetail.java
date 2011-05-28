@@ -1,9 +1,15 @@
 package de.tukl.cs.softech.agilereview.views.detail;
 
+import java.awt.Desktop;
+import java.net.URI;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -13,14 +19,16 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
+import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * The ReviewDetail class describes one detail representation of a Review Object
  */
-public class ReviewDetail extends AbstractDetail<Review> {
+public class ReviewDetail extends AbstractDetail<Review> implements SelectionListener{
 	
 	/**
 	 * TextArea to edit the person in charge of the given Review
@@ -42,6 +50,10 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	 * TextArea to edit an external reference to this Review
 	 */
 	private Text reference;
+	/**
+	 * Button for opening the external reference in a browser
+	 */
+	private Button referenceButton;
  
 	/**
 	 * Creates a new ReviewDetail Composite onto the given parent with the specified SWT styles
@@ -59,7 +71,7 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	@Override
 	protected void initUI() {
 		GridLayout gridLayout = new GridLayout();
-		int numColumns = 2;
+		int numColumns = 3;
 		gridLayout.numColumns = numColumns;
 		this.setLayout(gridLayout);
 		
@@ -75,12 +87,19 @@ public class ReviewDetail extends AbstractDetail<Review> {
 	    Label refId = new Label(this, SWT.PUSH);
 	    refId.setText("External reference: ");
 	    
-	    reference = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
+	    reference = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP );
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
-	    gridData.horizontalSpan = numColumns-1;
+	    gridData.horizontalSpan = numColumns-3;
 	    reference.setLayoutData(gridData);
 	    reference.addFocusListener(this);
+	    
+	    referenceButton = new Button(this, SWT.WRAP | SWT.PUSH | SWT.FILL);
+	    referenceButton.setImage(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons"+System.getProperty("file.separator")+"discovery.gif").createImage());
+	    gridData = new GridData();
+	    gridData.horizontalAlignment = GridData.END;
+	    referenceButton.setLayoutData(gridData);
+	    referenceButton.addSelectionListener(this);
 
 	    Label author = new Label(this, SWT.PUSH);
 	    author.setText("Responsibility: ");
@@ -208,7 +227,6 @@ public class ReviewDetail extends AbstractDetail<Review> {
 			this.backupObject = (Review)review.copy();
 			this.editedObject = review;
 			this.reference.setText(review.getReferenceId());
-			this.reference.setText(review.getReferenceId());
 			this.authorInstance.setText(review.getPersonInCharge().getName());
 			this.authorInstance.setToolTipText(review.getPersonInCharge().getName());
 			this.reviewInstance.setText(review.getId());
@@ -226,4 +244,26 @@ public class ReviewDetail extends AbstractDetail<Review> {
 		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
 		sp.setVariable(SourceProvider.REVERTABLE, false);
 	}
+
+	@Override
+	public void widgetSelected(SelectionEvent e) {
+		try 
+		{
+			URI uri = new URI(this.reference.getText());
+			if (Desktop.isDesktopSupported() & uri.isAbsolute())
+			{
+				Desktop.getDesktop().browse(uri);
+			} else {
+				PluginLogger.logWarning(this.getClass().toString(), "widgetSelected", "Either \"java.awt.Desktop\" not supported by OS or \""+this.reference.getText()+"\" is no absolute URI");
+			}
+		} catch (Exception ex) { 
+			PluginLogger.logError(this.getClass().toString(), "widgetSelected", "Can not open \""+this.reference.getText()+"\": It may not be a valid URI", ex);
+		}
+	}
+
+	@Override
+	public void widgetDefaultSelected(SelectionEvent e) {
+		widgetSelected(e);		
+	}
+
 }

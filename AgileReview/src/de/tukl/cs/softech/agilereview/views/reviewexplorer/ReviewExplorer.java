@@ -199,33 +199,53 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		ISelection sel = event.getSelection();
 		if (sel instanceof IStructuredSelection)
 		{
-			// On Double-Click there can only be one item selected
 			Object o = ((IStructuredSelection)sel).getFirstElement();
-			if (treeViewer.getExpandedState(o)) {
-				treeViewer.collapseToLevel(o, 1);
-			} else {
-				treeViewer.expandToLevel(o, 1);
-			}
+			
 			if (o instanceof MultipleReviewWrapper)
 			{
-				// Only open reviews, done close them
-				if (!props.isReviewOpen(((MultipleReviewWrapper)o).getReviewId()))
-				{
-					// Execute open/close command
-					IHandlerService handlerService = (IHandlerService)getSite().getService(IHandlerService.class);
-					try {
-						handlerService.executeCommand("de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose", null);
-					} catch (ExecutionException e) {
-						PluginLogger.logError(this.getClass().toString(), "doubleClick", "Problems occured executing command \"de.tukl.cs.softech.agilereview.views.reviewexplorer.openCloseSelectedReview\"", e);
-					} catch (NotDefinedException e) {
-						PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"de.tukl.cs.softech.agilereview.views.reviewexplorer.openCloseSelectedReview\" is not defined", e);
-					} catch (NotEnabledException e) {
-						PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"de.tukl.cs.softech.agilereview.views.reviewexplorer.openCloseSelectedReview\" is not enabled", e);
-					} catch (NotHandledException e) {
-						PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"de.tukl.cs.softech.agilereview.views.reviewexplorer.openCloseSelectedReview\" is not handled", e);
+				String command = "";
+				try {
+					// If the review is closed -> open it
+					if (props.isReviewOpen(((MultipleReviewWrapper)o).getReviewId()))
+					{
+						// Check if already active, then expand, else activate
+						String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+						if (activeReview.equals(((MultipleReviewWrapper)o).getReviewId())) {
+							if (treeViewer.getExpandedState(o)) {
+								treeViewer.collapseToLevel(o, 1);
+							} else {
+								treeViewer.expandToLevel(o, 1);
+							}
+						} else {
+							// Review is open -> activate it
+							command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.activate";
+							// Execute activation command
+							IHandlerService handlerService = (IHandlerService)getSite().getService(IHandlerService.class);
+							handlerService.executeCommand(command, null);	
+						}
+					} else {
+						command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose";
+						// Execute open/close command
+						IHandlerService handlerService = (IHandlerService)getSite().getService(IHandlerService.class);
+						handlerService.executeCommand(command, null);
 					}
+				} catch (ExecutionException e) {
+					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Problems occured executing command \""+command+"\"", e);
+				} catch (NotDefinedException e) {
+					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \""+command+"\" is not defined", e);
+				} catch (NotEnabledException e) {
+					PluginLogger.logError(this.getClass().toString(), "doubleClick", ""+command+"\" is not enabled", e);
+				} catch (NotHandledException e) {
+					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \""+command+"\" is not handled", e);
 				}
-			}
+			} else {
+				// On Double-Click there can only be one item selected
+				if (treeViewer.getExpandedState(o)) {
+					treeViewer.collapseToLevel(o, 1);
+				} else {
+					treeViewer.expandToLevel(o, 1);
+				}
+			}		
 		}
 	}
 	
