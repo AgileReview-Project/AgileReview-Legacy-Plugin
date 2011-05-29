@@ -4,14 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
  * The {@link FileendingContentProvider} manages the contents for the configuration table in the preferences dialog
  */
-public class FileendingContentProvider implements IContentProvider, IStructuredContentProvider {
+public class FileendingContentProvider implements IStructuredContentProvider {
 
 	/**
 	 * {@link List} of {@link SupportedLanguageEntity}s which lists the contents for the table

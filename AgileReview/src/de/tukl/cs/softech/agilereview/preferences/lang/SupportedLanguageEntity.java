@@ -47,7 +47,7 @@ public class SupportedLanguageEntity {
 	 * Adds a new file ending to this Entity
 	 * @param fileending
 	 */
-	public void addFileending(String fileending) {
+	void addFileending(String fileending) {
 		if(!fileending.isEmpty()) {
 			fileendings.add(fileending);
 		}

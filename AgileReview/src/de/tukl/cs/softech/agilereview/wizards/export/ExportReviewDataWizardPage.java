@@ -309,21 +309,21 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	/**
 	 * @return the path selected for exporting review data
 	 */
-	protected String getExportPath() {
+	String getExportPath() {
 		return exportPathText.getText();
 	}
 	
 	/**
 	 * @return the path selected for export template
 	 */
-	protected String getTemplatePath() {
+	String getTemplatePath() {
 		return templatePathText.getText();
 	}
 	
 	/**
 	 * @return the reviews currently selected in the checkboxtreeviewer
 	 */
-	protected ArrayList<Review> getSelectedReviews() {
+	ArrayList<Review> getSelectedReviews() {
 		ArrayList<Review> result = new ArrayList<Review>();
 		for (String id : selectedReviewIDs) {
 			result.add(reviews.get(id));
@@ -335,7 +335,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 * Sets the reviews to be selected
 	 * @param selectedReviews
 	 */
-	protected void setSelectedReviews(Set<String> selectedReviews) {
+	void setSelectedReviews(Set<String> selectedReviews) {
 		this.selectedReviewIDs.clear();
 		this.selectedReviewIDs.addAll(selectedReviews);
 		reviewsSelected = true;
