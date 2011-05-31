@@ -17,7 +17,7 @@ public class ParserFactory {
 	/**
 	 * Supported files mapping to the corresponding comment tags
 	 */
-	private static final HashMap<String, String[]> supportedFiles = PropertiesManager.getInstance().getParserFileendingsAndTags();
+	private static final HashMap<String, String[]> supportedFiles = PropertiesManager.getInstance().getParserFileendingsMappingTags();
 	
 	/**
 	 * Parser Factory in order to create an {@link IAnnotationParser} fitting to the given {@link ITextEditor}

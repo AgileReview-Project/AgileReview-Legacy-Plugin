@@ -1,6 +1,7 @@
 package de.tukl.cs.softech.agilereview.preferences.lang;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -116,12 +117,12 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 
 	@Override
 	protected void doLoad() {
-		table.setInput(pm.getParserFileendingsAndTags());
+		table.setInput(pm.getParserFileendingsAndTagsAsEntity());
 	}
 
 	@Override
 	protected void doLoadDefault() {
-		table.setInput(pm.getParserFileendingsAndTags());
+		table.setInput(pm.getParserFileendingsAndTagsAsEntity());
 	}
 
 	@Override
@@ -157,7 +158,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 		
 		switch(colNumber) {
 		case 0:
-			viewerColumn.setEditingSupport(new FileendingEditingSupport(table));
+			viewerColumn.setEditingSupport(new FileendingEditingSupport(table, this));
 			viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 				@Override
 				public String getText(Object element) {
@@ -207,8 +208,9 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 	@Override
 	public void handleEvent(Event event) {
 		if(event.widget.getData().equals("+")) {
-			cp.data.add(new SupportedLanguageEntity());
-			cp.inputChanged(table, null, cp.data);
+			LinkedList<SupportedLanguageEntity> workset = new LinkedList<SupportedLanguageEntity>(cp.data);
+			workset.add(new SupportedLanguageEntity());
+			cp.inputChanged(table, null, workset);
 		} else if(event.widget.getData().equals("-")) {
 			for(TableItem i : table.getTable().getSelection()) {
 				if(i.getData() instanceof SupportedLanguageEntity) {
@@ -230,7 +232,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 			if(!e.isValid()) {
 				if(getPage() != null && getPage() instanceof PreferencePage) {
 					((PreferencePage) getPage()).setValid(false);
-					((PreferencePage) getPage()).setErrorMessage("At least begin and end tag have to be specified pairwise!");
+					((PreferencePage) getPage()).setErrorMessage("One or more lines are not specified correctly!");
 				}
 				return false;
 			}

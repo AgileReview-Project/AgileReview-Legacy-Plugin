@@ -1,8 +1,9 @@
 package de.tukl.cs.softech.agilereview.preferences.lang;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A {@link SupportedLanguageEntity} represents a package of file endings which all correspond to the same
@@ -13,7 +14,7 @@ public class SupportedLanguageEntity {
 	/**
 	 * List of file endings
 	 */
-	private List<String> fileendings = new LinkedList<String>();
+	private TreeSet<String> fileendings = new TreeSet<String>();
 	/**
 	 * Comment begin tag
 	 */
@@ -37,8 +38,8 @@ public class SupportedLanguageEntity {
 	 * @param beginTag
 	 * @param endTag
 	 */
-	SupportedLanguageEntity(String fileending, String beginTag, String endTag) {
-		this.fileendings.add(fileending);
+	public SupportedLanguageEntity(String[] fileending, String beginTag, String endTag) {
+		this.fileendings = new TreeSet<String>(Arrays.asList(fileending));
 		this.beginTag = beginTag;
 		this.endTag = endTag;
 	}
@@ -52,12 +53,24 @@ public class SupportedLanguageEntity {
 			fileendings.add(fileending);
 		}
 	}
+	
+	/**
+	 * Adds all passed file endings to this Entity
+	 * @param fileendings
+	 */
+	public void addFileendings(Set<String> fileendings) {
+		for(String s : fileendings) {
+			if(!s.isEmpty()) {
+				this.fileendings.add(s);
+			}
+		}
+	}
 
 	/**
 	 * Returns all file endings in a {@link List}
 	 * @return a {@link List} of all file endings of this Entity
 	 */
-	public List<String> getFileendings() {
+	public Set<String> getFileendings() {
 		return fileendings;
 	}
 	
@@ -145,7 +158,8 @@ public class SupportedLanguageEntity {
 	 * @return true, if each begin and end tag is set with arbitrary an arbitrary string not equals empty<br>false, otherwise
 	 */
 	boolean isValid() {
-		if((beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty())) {
+		if((beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||
+				(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty())) {
 			return false;
 		}
 		return true;

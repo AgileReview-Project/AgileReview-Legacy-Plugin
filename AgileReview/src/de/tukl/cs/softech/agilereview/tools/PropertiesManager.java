@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -402,16 +403,48 @@ public class PropertiesManager implements IInputValidator{
 	 * Returns a map of all supported file endings with the correlated comment tags (first begin, then end tag)
 	 * @return map of all supported file endings with the correlated comment tags
 	 */
-	public HashMap<String, String[]> getParserFileendingsAndTags() {
+	public HashMap<String, String[]> getParserFileendingsMappingTags() {
 		HashMap<String, String[]> result = new HashMap<String, String[]>();
+		String[] languages = getInternalProperty(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
+		String[] beginTags = getInternalProperty(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
+		String[] endTags = getInternalProperty(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
+		
+		for(int i = 0; i < languages.length; i++) {
+		 	String[] endings = languages[i].split("\\s");
+		 	for(String e : endings) {
+		 		result.put(e, new String[]{beginTags[i], endTags[i]});
+		 	}
+		}
+		return result;
+	}
+	
+	/**
+	 * Returns an array of entities containing file endings, begin and end tag
+	 * @return an array of entities containing file endings, begin and end tag
+	 */
+	public SupportedLanguageEntity[] getParserFileendingsAndTagsAsEntity() {
 		String[] languages = getPreferences().getString(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
 		String[] beginTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
 		String[] endTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
 		
-		for(int i = 0; i < languages.length; i++) {
-			String[] endings = languages[i].split("\\s+");
-			for(String e : endings) {
-				result.put(e, new String[]{beginTags[i], endTags[i]});
+		//get max length for result array
+		int[] lengths = new int[]{languages.length, beginTags.length, endTags.length};
+		Arrays.sort(lengths);
+		SupportedLanguageEntity[] result = new SupportedLanguageEntity[lengths[0]];
+		
+		//create result
+		for(int i = 0; i < lengths[0]; i++) {
+			boolean b = false, e = false;
+			if(i < beginTags.length) b = true;
+			if(i < endTags.length) e = true;
+			
+			if(i < languages.length) {
+				String[] endings = languages[i].split("\\s+");
+				
+				
+				result[i] = new SupportedLanguageEntity(endings, b ? beginTags[i] : "", e ? endTags[i] : "");
+			} else {
+				result[i] = new SupportedLanguageEntity(new String[0], b ? beginTags[i] : "", e ? endTags[i] : "");
 			}
 		}
 		
@@ -419,19 +452,44 @@ public class PropertiesManager implements IInputValidator{
 	}
 	
 	/**
-	 * Saves the new configuration for supported languages in the preferences
+	 * Saves the new configuration for supported languages in the preferences.
+	 * Beforehand all double entities will be removed.
 	 * @param newConfig
 	 */
 	public void setParserFileendingsAndTags(SupportedLanguageEntity[] newConfig) {
+		//clean up input
+		//search for duplicated entities
+		LinkedList<SupportedLanguageEntity> cleaned = new LinkedList<SupportedLanguageEntity>();
+		for(SupportedLanguageEntity e1 : newConfig) {
+			boolean contained = false;
+			SupportedLanguageEntity toAddTo = null;
+			//search for entries having the same begin and end tag
+			for(SupportedLanguageEntity e2 : cleaned) {
+				if(e2.getBeginTag().equals(e1.getBeginTag()) && e2.getEndTag().equals(e1.getEndTag())) {
+					contained = true;
+					toAddTo = e2;
+					break;
+				}
+			}
+			//apply search result
+			if(!contained) {
+				cleaned.add(e1);
+			} else if(toAddTo != null) {
+				toAddTo.addFileendings(e1.getFileendings());
+			}
+		}
+		
+		//create storable strings
 		String fileendings = "";
 		String beginTags = "";
 		String endTags = "";
-		
 		boolean first = true;
-		for(SupportedLanguageEntity e : newConfig) {
+		
+		for(SupportedLanguageEntity e : cleaned) {
 			if(first) {
 				beginTags = e.getBeginTag();
 				endTags = e.getEndTag();
+				first = false; 
 			} else {
 				fileendings += ",";
 				beginTags += "," + e.getBeginTag();
@@ -446,7 +504,6 @@ public class PropertiesManager implements IInputValidator{
 					fileendings += " " + s;
 				}
 			}
-			first = false;
 		}
 		
 		getPreferences().setValue(EXTERNAL_KEYS.PARSER_FILEENDINGS, fileendings);

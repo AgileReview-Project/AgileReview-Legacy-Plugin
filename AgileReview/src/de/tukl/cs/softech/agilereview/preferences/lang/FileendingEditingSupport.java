@@ -10,9 +10,10 @@ public class FileendingEditingSupport extends AbstractEditingSupport {
 	/**
 	 * Creates a FileendingEditingSupport with the viewer on which it is applied
 	 * @param viewer
+	 * @param tableFieldEditor 
 	 */
-	FileendingEditingSupport(TableViewer viewer) {
-		super(viewer, null);
+	FileendingEditingSupport(TableViewer viewer, TableFieldEditor tableFieldEditor) {
+		super(viewer, tableFieldEditor);
 	}
 
 	@Override
@@ -28,6 +29,7 @@ public class FileendingEditingSupport extends AbstractEditingSupport {
 		if(element instanceof SupportedLanguageEntity && value instanceof String) {
 			((SupportedLanguageEntity)element).setFileendingsAsString((String)value);
 			viewer.refresh();
+			tableFieldEditor.checkValidity();
 		}
 	}
 }

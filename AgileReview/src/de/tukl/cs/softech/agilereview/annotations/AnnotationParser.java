@@ -46,7 +46,7 @@ public class AnnotationParser implements IAnnotationParser {
 	/**
 	 * Supported files mapping to the corresponding comment tags
 	 */
-	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsAndTags();
+	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsMappingTags();
 	/**
 	 * Key separator for tag creation
 	 */
