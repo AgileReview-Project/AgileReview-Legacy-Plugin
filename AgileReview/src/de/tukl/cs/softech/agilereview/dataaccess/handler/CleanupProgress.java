@@ -1,0 +1,180 @@
+package de.tukl.cs.softech.agilereview.dataaccess.handler;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.apache.xmlbeans.XmlException;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
+
+import agileReview.softech.tukl.de.CommentDocument.Comment;
+import agileReview.softech.tukl.de.ReviewDocument.Review;
+import de.tukl.cs.softech.agilereview.annotations.TagCleaner;
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+
+public class CleanupProgress implements IRunnableWithProgress {
+	
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
+	 * Supported files mapping to the corresponding comment tags
+	 */
+	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsMappingTags();
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private static ReviewAccess ra = ReviewAccess.getInstance();
+	
+	private IProject selProject;
+	private boolean deleteComments;
+	
+	public CleanupProgress(IProject selProject, boolean deleteComments) {
+		this.selProject = selProject;
+		this.deleteComments = deleteComments;
+	}
+
+	@Override
+	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		monitor.beginTask("Performing cleanup: ", IProgressMonitor.UNKNOWN);
+		monitor.worked(0);
+
+		// get all reviews (not only open ones)
+		ArrayList<Review> reviews = ra.getAllReviews();
+		
+		// some helper variables
+		ArrayList<Comment> comments = new ArrayList<Comment>();
+		HashSet<String> paths = new HashSet<String>();
+		String selProjectPath = selProject.getFullPath().toOSString().replaceAll(Pattern.quote(System.getProperty("file.separator")), "");
+
+		monitor.worked(10);
+		monitor.subTask("Loading all reviews...");
+		// load all comments for all reviews
+		try {
+			ra.fillDatabaseCompletely();
+		} catch (XmlException e1) {
+			PluginLogger.logError(this.getClass().toString(), "execute", "XMLException while trying to fill database.", e1);
+			throw new InterruptedException("An XmlException occured: "+e1);
+		} catch (IOException e1) {
+			PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to fill database.", e1);
+			throw new InterruptedException("An IOException occured: "+e1);
+		}
+		
+		// save all comments for the given project
+		for (Review r : reviews) {
+			comments.addAll(ra.getComments(r.getId(), selProjectPath));
+		}
+		
+		monitor.worked(20);
+		monitor.subTask("Searching for project files...");
+		// save the paths of all files of the project
+		paths.addAll(getFilesOfProject(selProject));
+		
+		monitor.worked(30);
+		monitor.subTask("Removing tags...");
+		// remove tags from files
+		PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from "+paths.toString());
+		for (String path : paths) {
+			IPath actPath = new Path(path);
+			if (!TagCleaner.removeAllTags(actPath)) {
+				throw new InterruptedException("Tags of file "+actPath.toOSString()+" not successfully removed!");
+			}
+		}
+		
+		monitor.worked(60);
+		// delete comments based on users decision
+		if (deleteComments) {
+			monitor.subTask("Deleting comments...");
+			try {
+				PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
+				ra.deleteComments(comments);
+				ra.save();
+			} catch (IOException e) {
+				PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to delete comments.", e);
+				throw new InterruptedException("An IOException occured: "+e);
+			}
+		}
+		
+		monitor.worked(90);
+		// unload closed reviews again
+		monitor.subTask("Unloading closed reviews...");
+		List<String> openReviews = Arrays.asList(PropertiesManager.getInstance().getOpenReviews());
+		for (Review r : reviews) {				
+			if (!openReviews.contains(r.getId())) {
+				ra.unloadReviewComments(r.getId());
+			}
+		}
+
+		monitor.worked(100);
+		monitor.done();
+	}
+	
+
+	
+	/**
+	 * Get all files of the given project
+	 * @param project the project
+	 * @return list of paths of files relatively to the workspace
+	 */
+	private HashSet<String> getFilesOfProject(IProject project) {
+		HashSet<String> paths = new HashSet<String>();
+		try {
+			for (IResource r : project.members()) {
+				if (r instanceof IFolder) {
+					paths.addAll(getFilesOfFolderRecursively((IFolder)r));
+				} else if (r instanceof IFile) {
+					if (supportedFiles.containsKey(((IFile)r).getFileExtension())) {
+						paths.add(r.getFullPath().toOSString());	
+					}					
+				}
+			}
+		} catch (CoreException e) {
+			PluginLogger.logError(this.getClass().toString(), "getFilesOfProject", "CoreException while trying to fetch files of project "+project.getName()+".", e);
+		}
+		return paths;
+	}
+	
+	/**
+	 * Recursively get all files of the given folder 
+	 * @param folder the folder
+	 * @return set of paths of files relatively to the workspace 
+	 * @throws CoreException
+	 */
+	private HashSet<String> getFilesOfFolderRecursively(IFolder folder) throws CoreException {
+		HashSet<String> paths = new HashSet<String>();
+		for (IResource r: folder.members()) {
+			if (r instanceof IFolder) {
+				paths.addAll(getFilesOfFolderRecursively((IFolder)r));
+			} else if (r instanceof IFile) {
+				if (supportedFiles.containsKey(((IFile)r).getFileExtension())) {
+					paths.add(r.getFullPath().toOSString());	
+				}	
+			}
+		}		
+		return paths;
+	}
+
+}
