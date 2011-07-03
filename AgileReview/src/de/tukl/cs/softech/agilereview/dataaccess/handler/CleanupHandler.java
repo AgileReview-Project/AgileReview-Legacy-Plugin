@@ -3,15 +3,22 @@ package de.tukl.cs.softech.agilereview.dataaccess.handler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
 
 import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -34,6 +41,15 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  * 
  */
 public class CleanupHandler extends AbstractHandler {
+	
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
+	 * Supported files mapping to the corresponding comment tags
+	 */
+	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsMappingTags();
 	
 	/**
 	 * Instance of ReviewAccess
@@ -95,10 +111,8 @@ public class CleanupHandler extends AbstractHandler {
 				comments.addAll(ra.getComments(r.getId(), selProjectPath));
 			}
 			
-			// save the paths of all files that are being reviewed (ergo that comments exist for)
-			for (Comment c : comments) {
-				paths.add(ReviewAccess.computePath(c));
-			}
+			// save the paths of all files of the project
+			paths.addAll(getFilesOfProject(selProject));
 			
 			// remove tags from files
 			PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from "+paths.toString());
@@ -147,6 +161,49 @@ public class CleanupHandler extends AbstractHandler {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Get all files of the given project
+	 * @param project the project
+	 * @return list of paths of files relatively to the workspace
+	 */
+	private HashSet<String> getFilesOfProject(IProject project) {
+		HashSet<String> paths = new HashSet<String>();
+		try {
+			for (IResource r : project.members()) {
+				if (r instanceof IFolder) {
+					paths.addAll(getFilesOfFolderRecursively((IFolder)r));
+				} else if (r instanceof IFile) {
+					if (supportedFiles.containsKey(((IFile)r).getFileExtension())) {
+						paths.add(r.getFullPath().toOSString());	
+					}					
+				}
+			}
+		} catch (CoreException e) {
+			PluginLogger.logError(this.getClass().toString(), "getFilesOfProject", "CoreException while trying to fetch files of project "+project.getName()+".", e);
+		}
+		return paths;
+	}
+	
+	/**
+	 * Recursively get all files of the given folder 
+	 * @param folder the folder
+	 * @return set of paths of files relatively to the workspace 
+	 * @throws CoreException
+	 */
+	private HashSet<String> getFilesOfFolderRecursively(IFolder folder) throws CoreException {
+		HashSet<String> paths = new HashSet<String>();
+		for (IResource r: folder.members()) {
+			if (r instanceof IFolder) {
+				paths.addAll(getFilesOfFolderRecursively((IFolder)r));
+			} else if (r instanceof IFile) {
+				if (supportedFiles.containsKey(((IFile)r).getFileExtension())) {
+					paths.add(r.getFullPath().toOSString());	
+				}	
+			}
+		}		
+		return paths;
 	}
 
 }
