@@ -87,7 +87,7 @@ public class CleanupHandler extends AbstractHandler {
 			try {
 				ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
 				pmd.open();			
-				pmd.run(true, false, new CleanupProgress(selProject, deleteComments));
+				pmd.run(true, false, new CleanupProcess(selProject, deleteComments));
 				pmd.close();
 			} catch (InvocationTargetException e) {
 				PluginLogger.logError(this.getClass().toString(),"execute", "InvocationTargetException", e);

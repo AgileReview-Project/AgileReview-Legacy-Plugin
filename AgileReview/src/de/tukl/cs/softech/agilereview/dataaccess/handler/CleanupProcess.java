@@ -34,7 +34,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
-public class CleanupProgress implements IRunnableWithProgress {
+public class CleanupProcess implements IRunnableWithProgress {
 	
 	/**
 	 * Instance of PropertiesManager
@@ -52,7 +52,7 @@ public class CleanupProgress implements IRunnableWithProgress {
 	private IProject selProject;
 	private boolean deleteComments;
 	
-	public CleanupProgress(IProject selProject, boolean deleteComments) {
+	public CleanupProcess(IProject selProject, boolean deleteComments) {
 		this.selProject = selProject;
 		this.deleteComments = deleteComments;
 	}
