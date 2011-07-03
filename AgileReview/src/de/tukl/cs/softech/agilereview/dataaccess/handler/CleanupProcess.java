@@ -10,20 +10,15 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlException;
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
@@ -31,9 +26,10 @@ import de.tukl.cs.softech.agilereview.annotations.TagCleaner;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
+/**
+ * Class that performs the cleanup process
+ */
 public class CleanupProcess implements IRunnableWithProgress {
 	
 	/**
@@ -48,10 +44,20 @@ public class CleanupProcess implements IRunnableWithProgress {
 	 * Instance of ReviewAccess
 	 */
 	private static ReviewAccess ra = ReviewAccess.getInstance();
-	
+	/**
+	 * the project to clean 
+	 */
 	private IProject selProject;
+	/**
+	 * delete (true) or keep (false) comments
+	 */
 	private boolean deleteComments;
 	
+	/**
+	 * Constructor of the Cleanup process
+	 * @param selProject the project to clean (remove tags)
+	 * @param deleteComments indicates whether to delete (true) or keep (false) comments
+	 */
 	public CleanupProcess(IProject selProject, boolean deleteComments) {
 		this.selProject = selProject;
 		this.deleteComments = deleteComments;
