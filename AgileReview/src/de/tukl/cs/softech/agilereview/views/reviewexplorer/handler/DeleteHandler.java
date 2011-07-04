@@ -31,11 +31,11 @@ public class DeleteHandler extends AbstractHandler {
 	/**
 	 * Instance of ReviewAccess
 	 */
-	private static ReviewAccess ra = ReviewAccess.getInstance();
+	private ReviewAccess ra = ReviewAccess.getInstance();
 	/**
 	 * Instance of PropertiesManager
 	 */
-	private static PropertiesManager pm = PropertiesManager.getInstance();
+	private PropertiesManager pm = PropertiesManager.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {

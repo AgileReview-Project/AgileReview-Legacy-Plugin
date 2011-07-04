@@ -215,7 +215,20 @@
          hasPages="true"
          icon="icons/review/review_add_15x15.png"
          id="de.tukl.cs.softech.agilereview.newReviewWizard"
-         name="%wizard.name">
+         name="%wizard.review.name"
+         project="false">
+   </wizard>
+   <wizard
+         canFinishEarly="false"
+         category="AgileReview.AgileReviewCategory"
+         class="de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWizard"
+         finalPerspective="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
+         hasPages="true"
+         icon="icons/agile_icon.png"
+         id="de.tukl.cs.softech.agilereview.newReviewSourceWizard"
+         name="%wizard.reviewSource.name"
+         preferredPerspectives="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
+         project="true">
    </wizard>
 </extension>
 <extension
@@ -229,7 +242,7 @@
          class="de.tukl.cs.softech.agilereview.wizards.export.ExportReviewDataWizard"
          icon="icons/agile_icon.png"
          id="AgileReview.exportReviewDataWizard"
-         name="%wizard.name">
+         name="%wizard.export.name">
    </wizard>
 </extension>
 <extension
@@ -911,7 +924,7 @@
    <image
          icon="icons/agile_icon.png"
          id="de.tukl.cs.softech.agilereview.nature.image"
-         natureId="de.tukl.cs.softech.agilereview.nature">
+         natureId="%agileReview_nature.id">
    </image>
 </extension>
 </plugin>

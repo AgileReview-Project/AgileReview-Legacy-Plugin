@@ -33,6 +33,7 @@ import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Class for accessing the review and comment data (xml and internal model).  
@@ -49,12 +50,12 @@ public class ReviewAccess {
 	/**
 	 * Private instance for Singleton-Pattern
 	 */
-	private static ReviewAccess RA = new ReviewAccess();
+	private static ReviewAccess RA = null;
 	
 	/**
 	 * Reference to the folder where the review and comments xml files are located
 	 */
-	private static File REVIEW_REPO_FOLDER;
+	private static File REVIEW_REPO_FOLDER = null;
 	
 	/**
 	 * Instance of the comment model
@@ -65,6 +66,11 @@ public class ReviewAccess {
 	 * Instance of the review file model
 	 */
 	private ReviewFileModel rFileModel = new ReviewFileModel();	
+	
+	/**
+	 * Cache of the current ReviewSourceProject, to check if it changed
+	 */
+	private String currentReviewSourceProject;
 	
 	////////////////////
 	// static methods //
@@ -183,15 +189,53 @@ public class ReviewAccess {
 	}
 	
 	/**
+	 * Creates the given Review Source Project
+	 * @param projectName project name
+	 * @return <i>true</i> if everything worked,<i>false</i> if something went wrong
+	 */
+	public static boolean createAndOpenReviewProject(String projectName){
+		boolean result = true;
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IProject p = workspaceRoot.getProject(projectName);
+		try
+		{
+			// Create a new Project, if necessary
+			if (!p.exists())
+			{
+				p.create(null);// TODO: Use ProgressMonitor
+				while (!p.exists()){}				
+			}
+					
+			// Open the Project, if necessary
+			if (!p.isOpen())
+			{
+				p.open(null);// TODO: Use ProgressMonitor
+			}
+			while (!p.isOpen()){}	
+			// Set project description
+			IProjectDescription projectDesc = p.getDescription();
+			projectDesc.setNatureIds(new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
+			p.setDescription(projectDesc, null);// TODO: Use ProgressMonitor
+		}
+		catch (CoreException e)
+		{
+			PluginLogger.logError(ReviewAccess.class.toString(), "createReviewProject", "CoreException in ReviewAccess constructor", e);
+			result = false;
+		}
+		return result;
+	}
+	
+	/**
 	 * Singleton Pattern
 	 * @return Instance of this class
 	 */
 	public static ReviewAccess getInstance()
 	{
+		if (RA == null) {
+			RA = new ReviewAccess();
+		}
 		return RA;
 	}
-	
-	
 	
 	////////////////////////////////
 	// private non-static methods //
@@ -203,45 +247,13 @@ public class ReviewAccess {
 	{
 		PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
 		// Set the directory where the comments are located
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IProject p = workspaceRoot.getProject(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
-		try
-		{
-			// Create a new Project, if necessary
-			if (!p.exists())
-			{
-				p.create(null);
-				while (!p.exists()){}				
-			}
-					
-			// Open the Project, if necessary
-			if (!p.isOpen())
-			{
-				p.open(null);
-			}
-			while (!p.isOpen()){}	
-			// Set project description
-			IProjectDescription projectDesc = p.getDescription();
-			projectDesc.setNatureIds(new String[] {"de.tukl.cs.softech.agilereview.nature"});
-			p.setDescription(projectDesc, null);
-		}
-		catch (CoreException e)
-		{
-			PluginLogger.logError(this.getClass().toString(), "Constructor", "CoreException in ReviewAccess constructor", e);
-		}
-		
-		REVIEW_REPO_FOLDER = p.getLocation().toFile();
-		
-		// Load open reviews initially
-		try {
-			fillDatabaseForOpenReviews();
-		} catch (XmlException e) {
-			PluginLogger.logError(this.getClass().toString(), "constructor", "XmlException while filling database", e);
-		} catch (IOException e) {
-			PluginLogger.logError(this.getClass().toString(), "constructor", "IOException while filling database", e);
+		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
+		if (!loadReviewSourceProject(projectName)) {
+			// TODO: ReviewInitInteraction
+			// Maybe create or open it then? ReviewAccess.createAndOpenReviewProject(projectName);
 		}
 	}
-
+	
 	/**
 	 * Clears all used models
 	 */
@@ -250,6 +262,34 @@ public class ReviewAccess {
 		this.rFileModel.clearModel();
 		this.rModel.clearModel();
 		System.gc();
+	}
+	
+	/**
+	 * Loads the given project as AgileReview source project
+	 * @param projectName project name
+	 * @return <i>true</i> if everything works, <i>false</i> otherwise (e.g. when the project does not exist)
+	 */
+	private boolean loadReviewSourceProject(String projectName){
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IProject p = workspaceRoot.getProject(projectName);
+		if(!p.exists()) {
+			return false;
+		} else {
+			REVIEW_REPO_FOLDER = p.getLocation().toFile();
+			
+			// Load open reviews initially
+			try {
+				fillDatabaseForOpenReviews();
+			} catch (XmlException e) {
+				PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "XmlException while filling database", e);
+				return false;
+			} catch (IOException e) {
+				PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "IOException while filling database", e);
+				return false;
+			}
+			currentReviewSourceProject = projectName;
+			return true;
+		}
 	}
 	
 	/**
@@ -805,6 +845,16 @@ public class ReviewAccess {
 		if (!activeReviewFound){
 			PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		}
+	}
+	
+	/**
+	 * Tells the ReviewAccess to get the current ReviewSourceProject (which should have changed) and reload the comments
+	 */
+	public void updateReviewSourceProject() {
+		if (!currentReviewSourceProject.equals(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER))) {
+			loadReviewSourceProject(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
+			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
+		}	
 	}
 	
 	

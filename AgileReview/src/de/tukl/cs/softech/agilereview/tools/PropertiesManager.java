@@ -66,6 +66,10 @@ public class PropertiesManager implements IInputValidator{
 		 * Filenames which should be omitted during export
 		 */
 		public static String EXPORT_OMITTINGS = "export_omittings";
+		/**
+		 * Nature id of the AgileReview source folder
+		 */
+		public static String AGILEREVIEW_NATURE = "agileReview_nature.id";
 		
 		/**
 		 * Static subclass: clustering of icon keys
@@ -202,6 +206,7 @@ public class PropertiesManager implements IInputValidator{
 	 * Creates a new instance of PropertiesManager
 	 */
 	private PropertiesManager() {		
+		System.out.println("PropertiesManager created");
 		
 		// Internal properties
 		internalProperties = new Properties();

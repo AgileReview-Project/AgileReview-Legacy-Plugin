@@ -44,7 +44,7 @@ public class XSLExport implements IRunnableWithProgress {
 	/**
 	 * Instance of ReviewAccess
 	 */
-	private static ReviewAccess ra = ReviewAccess.getInstance();
+	private ReviewAccess ra = ReviewAccess.getInstance();
 	/**
 	 * Instance of PropertiesManager
 	 */

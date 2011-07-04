@@ -27,11 +27,6 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  */
 public class ShowCommentHandler extends AbstractHandler {
 	
-	/**
-	 * Instance of ReviewAccess
-	 */
-	private static ReviewAccess ra = ReviewAccess.getInstance();
-
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "\"Show Comment\" triggered");
@@ -79,8 +74,8 @@ public class ShowCommentHandler extends AbstractHandler {
 					author = tagPart[1];
 					commentId = tagPart[2];
 					
-					// Get the right comment
-					Comment c = ra.getComment(reviewId, author, commentId);
+					// Get the right comment static PropertiesManager
+					Comment c = ReviewAccess.getInstance().getComment(reviewId, author, commentId);
 					
 					// select it
 					if (ViewControl.isOpen(CommentTableView.class)) {

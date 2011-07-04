@@ -26,16 +26,17 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 	/**
 	 * Instance of ReviewAccess
 	 */
-	private static ReviewAccess ra = ReviewAccess.getInstance();
+	private ReviewAccess ra = ReviewAccess.getInstance();
 	/**
 	 * Instance of PropertiesManager
 	 */
-	private static PropertiesManager pm = PropertiesManager.getInstance();
+	private PropertiesManager pm = PropertiesManager.getInstance();
+	
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "\"Open/Close in ReviewExplorer selected review\" triggered");
-		
+				
 		ISelection sel1 = HandlerUtil.getCurrentSelection(event);
 		if (sel1 != null){
 			if (sel1 instanceof IStructuredSelection)

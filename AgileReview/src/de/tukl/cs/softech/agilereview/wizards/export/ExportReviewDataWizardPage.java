@@ -38,7 +38,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	/**
 	 * Instance of ReviewAccess
 	 */
-	private static ReviewAccess ra = ReviewAccess.getInstance();
+	private ReviewAccess ra = ReviewAccess.getInstance();
 	/**
 	 * indicates whether a path for exporting are valid or not
 	 */

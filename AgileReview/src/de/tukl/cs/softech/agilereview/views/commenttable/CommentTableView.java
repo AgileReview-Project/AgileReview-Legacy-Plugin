@@ -83,11 +83,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Instance of ReviewAccess
 	 */
-	private static ReviewAccess ra = ReviewAccess.getInstance();
+	private ReviewAccess ra = ReviewAccess.getInstance();
 	/**
 	 * Instance of PropertiesManager
 	 */
-	private static PropertiesManager pm = PropertiesManager.getInstance();
+	private PropertiesManager pm = PropertiesManager.getInstance();
 	/**
 	 * The comments to be displayed (model of TableViewer viewer) 
 	 */

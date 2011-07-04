@@ -34,10 +34,6 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 	 * the text field for retrieving the description
 	 */
 	private Text description;
-	/**
-	 * Label to show an message to the user, if the reviewId is invlaid
-	 */
-	private Label lValid;
 	
 	/**
 	 * Creates a new page
@@ -81,22 +77,15 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 		//Text descTextField = new Text(container, SWT.BORDER | SWT.SINGLE);
 		description = new Text(container, SWT.BORDER | SWT.H_SCROLL | SWT.MULTI);
 		
-		// not valid label + check
-		lValid = new Label(container, SWT.NULL);
-		// lValid.setText("*) Review-ID is mandatory and has to be set");
-		
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		id.setLayoutData(gd);
 		reference.setLayoutData(gd);
 		responsibility.setLayoutData(gd);
 		description.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridData gdValid = new GridData(GridData.FILL_HORIZONTAL);
-		gdValid.horizontalSpan = 2;
-		lValid.setLayoutData(gdValid);
 		// Required to avoid an error in the system
 		setControl(container);
 		this.modifyText(null);
-		//setPageComplete(false);
+		setErrorMessage(null);
 	}
 	
 	/**
@@ -134,15 +123,15 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 		if (validMessage == null){
 			// Try if reviewId is already existent
 			if (!ReviewAccess.getInstance().reviewExists(this.id.getText())) {
-				setPageComplete(true);
-				lValid.setText("");
+				setErrorMessage(null);
+				setPageComplete(true);	
 			} else {
+				setErrorMessage("ReviewId already in use");
 				setPageComplete(false);
-				lValid.setText("* "+"ReviewId already in use");
 			}
 		} else {
+			setErrorMessage("* "+validMessage);
 			setPageComplete(false);
-			lValid.setText("* "+validMessage);
 		}
 	}
 }

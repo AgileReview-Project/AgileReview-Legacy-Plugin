@@ -23,7 +23,7 @@ public class RefreshHandler extends AbstractHandler {
 	/**
 	 * Instance of ReviewAccess
 	 */
-	private static ReviewAccess ra = ReviewAccess.getInstance();
+	private  ReviewAccess ra = ReviewAccess.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException 

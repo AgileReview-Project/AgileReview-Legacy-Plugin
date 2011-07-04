@@ -38,6 +38,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void addPages() {
+		super.addPages();
 		page1 = new NewReviewWizardPage();
 		addPage(page1);
 	}
