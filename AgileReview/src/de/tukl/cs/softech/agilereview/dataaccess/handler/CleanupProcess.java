@@ -145,7 +145,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 	 * @param project the project
 	 * @return list of paths of files relatively to the workspace
 	 */
-	private HashSet<String> getFilesOfProject(IProject project) {
+	private HashSet<String> getFilesOfProject(IProject project) {/*?|AR_release0.7|Philipp|c0|?*/
 		HashSet<String> paths = new HashSet<String>();
 		try {
 			for (IResource r : project.members()) {
