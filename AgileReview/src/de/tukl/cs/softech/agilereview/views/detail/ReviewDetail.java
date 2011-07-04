@@ -100,7 +100,8 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    gridData.horizontalAlignment = GridData.END;
 	    referenceButton.setLayoutData(gridData);
 	    referenceButton.addSelectionListener(this);
-
+	    referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");
+	    
 	    Label author = new Label(this, SWT.PUSH);
 	    author.setText("Responsibility: ");
 	    
@@ -250,11 +251,11 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 		try 
 		{
 			URI uri = new URI(this.reference.getText());
-			if (Desktop.isDesktopSupported() & uri.isAbsolute())
+			if (Desktop.isDesktopSupported())
 			{
 				Desktop.getDesktop().browse(uri);
 			} else {
-				PluginLogger.logWarning(this.getClass().toString(), "widgetSelected", "Either \"java.awt.Desktop\" not supported by OS or \""+this.reference.getText()+"\" is no absolute URI");
+				PluginLogger.logWarning(this.getClass().toString(), "widgetSelected", "\"java.awt.Desktop\" not supported by OS");
 			}
 		} catch (Exception ex) { 
 			PluginLogger.logError(this.getClass().toString(), "widgetSelected", "Can not open \""+this.reference.getText()+"\": It may not be a valid URI", ex);
