@@ -7,6 +7,7 @@ import org.eclipse.ui.IWorkbench;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Wizard for creating a new AgileReview source project
@@ -52,7 +53,9 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 			
 		if (useDirectly) {
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
-			ReviewAccess.getInstance().updateReviewSourceProject();
+			if (ReviewAccess.getInstance().updateReviewSourceProject()) {
+				ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
+			}
 		}
 		
 		return result;

@@ -33,7 +33,6 @@ import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Class for accessing the review and comment data (xml and internal model).  
@@ -849,12 +848,15 @@ public class ReviewAccess {
 	
 	/**
 	 * Tells the ReviewAccess to get the current ReviewSourceProject (which should have changed) and reload the comments
+	 * @return true, if something has changed, false otherwise
 	 */
-	public void updateReviewSourceProject() {
+	public boolean updateReviewSourceProject() {
+		boolean result = false;
 		if (!currentReviewSourceProject.equals(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER))) {
 			loadReviewSourceProject(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
-			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
+			result = true;
 		}	
+		return result;
 	}
 	
 	

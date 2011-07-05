@@ -21,6 +21,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * This class represents a preference page that
@@ -147,7 +148,9 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	public boolean performOk(){
 		boolean result = super.performOk();
 		new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
-		ReviewAccess.getInstance().updateReviewSourceProject();
+		if (ReviewAccess.getInstance().updateReviewSourceProject()) {
+			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
+		}
 		return result;
 	}
 
