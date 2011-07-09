@@ -63,7 +63,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 		this.parent = parent;
 		
 		Label label = new Label(parent, SWT.WRAP);
-		label.setText("More than one fileendings in one cell should be managed by comma separation." +
+		label.setText("More than one fileendings in one cell should be managed by comma separation. " +
 				"The begin and end tag should specify the tags of a multiline comment in the corresponding programming " +
 				"language.");
 		GridData gd = new GridData();
@@ -128,7 +128,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 	@Override
 	protected void doStore() {
 		if(!checkValidity()) {
-			return;
+			return;/*?|3309698-preferenceslang|reuter|c8|?*/
 		}
 		//delete empty entities for saving issues
 		Iterator<SupportedLanguageEntity> it = cp.data.iterator();
@@ -155,7 +155,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 	 */
 	private void createColumn(String title, int bound, final int colNumber) {
 		TableViewerColumn viewerColumn = new TableViewerColumn(table, SWT.NONE);
-		
+
 		switch(colNumber) {
 		case 0:
 			viewerColumn.setEditingSupport(new FileendingEditingSupport(table, this));
@@ -196,9 +196,9 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 				}
 			});
 			break;
-		
+
 		}
-		
+
 		TableColumn column = viewerColumn.getColumn();
 		column.setText(title);
 		column.setWidth(bound);
@@ -218,7 +218,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 				}
 			}
 			cp.inputChanged(table, null, cp.data);
-			checkValidity();
+			checkValidity();/*?|3309698-preferenceslang|reuter|c9|?*/
 		}
 		parent.layout();
 	}

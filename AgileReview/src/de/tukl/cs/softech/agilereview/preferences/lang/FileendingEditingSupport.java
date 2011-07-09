@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.preferences.lang;
+package de.tukl.cs.softech.agilereview.preferences.lang;/*?|3309698-preferenceslang|reuter|c10|*/
 
 import org.eclipse.jface.viewers.TableViewer;
 
@@ -32,4 +32,4 @@ public class FileendingEditingSupport extends AbstractEditingSupport {
 			tableFieldEditor.checkValidity();
 		}
 	}
-}
+}/*|3309698-preferenceslang|reuter|c10|?*/

@@ -38,7 +38,7 @@ public class SupportedLanguageEntity {
 	 * @param beginTag
 	 * @param endTag
 	 */
-	public SupportedLanguageEntity(String[] fileending, String beginTag, String endTag) {
+	public SupportedLanguageEntity(String[] fileending, String beginTag, String endTag) {/*?|3309698-preferenceslang|reuter|c0|?*/
 		this.fileendings = new TreeSet<String>(Arrays.asList(fileending));
 		this.beginTag = beginTag;
 		this.endTag = endTag;
@@ -58,7 +58,7 @@ public class SupportedLanguageEntity {
 	 * Adds all passed file endings to this Entity
 	 * @param fileendings
 	 */
-	public void addFileendings(Set<String> fileendings) {
+	public void addFileendings(Set<String> fileendings) {/*?|3309698-preferenceslang|reuter|c1|?*/
 		for(String s : fileendings) {
 			if(!s.isEmpty()) {
 				this.fileendings.add(s);
@@ -70,7 +70,7 @@ public class SupportedLanguageEntity {
 	 * Returns all file endings in a {@link List}
 	 * @return a {@link List} of all file endings of this Entity
 	 */
-	public Set<String> getFileendings() {
+	public Set<String> getFileendings() {/*?|3309698-preferenceslang|reuter|c2|?*/
 		return fileendings;
 	}
 	
@@ -96,7 +96,7 @@ public class SupportedLanguageEntity {
 	 * Sets the file endings as a comma separated list
 	 * @param in a comma separated list of file endings
 	 */
-	void setFileendingsAsString(String in) {
+	void setFileendingsAsString(String in) {/*?|3309698-preferenceslang|reuter|c3|?*/
 		in = in.trim();
 		if(!in.isEmpty()) {
 			String[] endings = in.split(",");
@@ -147,8 +147,8 @@ public class SupportedLanguageEntity {
 	 * @return true, if this representation is empty<br>false, otherwise
 	 */
 	boolean isEmpty() {
-		if(fileendings.isEmpty() && beginTag.isEmpty() && endTag.isEmpty()) {
-			return true;
+		if(fileendings.isEmpty() && beginTag.isEmpty() && endTag.isEmpty()) {/*?|3309698-preferenceslang|reuter|c6|?*/
+			return true;/*?|3309698-preferenceslang|reuter|c4|?*/
 		}
 		return false;
 	}
@@ -158,9 +158,9 @@ public class SupportedLanguageEntity {
 	 * @return true, if each begin and end tag is set with arbitrary an arbitrary string not equals empty<br>false, otherwise
 	 */
 	boolean isValid() {
-		if((beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||
+		if((beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||/*?|3309698-preferenceslang|reuter|c7|?*/
 				(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty())) {
-			return false;
+			return false;/*?|3309698-preferenceslang|reuter|c5|?*/
 		}
 		return true;
 	}

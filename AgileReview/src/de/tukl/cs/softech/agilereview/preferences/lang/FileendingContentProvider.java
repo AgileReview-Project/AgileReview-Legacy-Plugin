@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.preferences.lang;
+package de.tukl.cs.softech.agilereview.preferences.lang;/*?|3309698-preferenceslang|reuter|c14|*/
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -55,4 +55,4 @@ public class FileendingContentProvider implements IStructuredContentProvider {
 		return data.toArray();
 	}
 
-}
+}/*|3309698-preferenceslang|reuter|c14|?*/
