@@ -7,6 +7,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -18,6 +19,8 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
+import de.tukl.cs.softech.agilereview.wizards.newreview.NewReviewWizard;
 
 /**
  * Handler for adding a new Comment
@@ -69,7 +72,15 @@ public class AddNewCommentHandler extends AbstractHandler {
 			}
 
 		} else {
-			MessageDialog.openWarning(null, "Warning: No active review", "Please activate a review before adding comments!");
+			if (this.ra.getAllReviews().isEmpty()) {
+				MessageDialog.openInformation(null, "No reviews existent", "Please create a review before adding comments!");
+				NewReviewWizard wizard = new NewReviewWizard();
+				WizardDialog wd = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);
+				wd.setTitle(wizard.getWindowTitle());
+				wd.open();
+			} else {
+				MessageDialog.openInformation(null, "No active review", "Please activate a review before adding comments!");
+			}
 			PluginLogger.logWarning(this.getClass().toString(), "addNewComment", "No active review!");
 		}
 
