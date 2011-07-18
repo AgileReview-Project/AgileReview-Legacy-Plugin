@@ -217,6 +217,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void refreshTable() {
 		PluginLogger.log(this.getClass().toString(), "refreshTable", "Reloading current table input");
 		viewer.refresh();
+		filterComments();
 	}
 	
 	/**
@@ -756,8 +757,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 				this.selectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
 				
 				
-				ICommandService cmdService = (ICommandService) getSite().getService(
-					    ICommandService.class);
+				ICommandService cmdService = (ICommandService) getSite().getService(ICommandService.class);
 				Command linkExplorerCommand = cmdService.getCommand("de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer");
 				Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
 				// If "Link Editor" is enabled, then filter also

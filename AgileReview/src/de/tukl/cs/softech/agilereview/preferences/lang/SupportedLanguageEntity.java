@@ -34,12 +34,12 @@ public class SupportedLanguageEntity {
 	
 	/**
 	 * Creates a new {@link SupportedLanguageEntity} with the given parameter
-	 * @param fileending
+	 * @param fileendings
 	 * @param beginTag
 	 * @param endTag
 	 */
-	public SupportedLanguageEntity(String[] fileending, String beginTag, String endTag) {/*?|3309698-preferenceslang|reuter|c0|?*/
-		this.fileendings = new TreeSet<String>(Arrays.asList(fileending));
+	public SupportedLanguageEntity(String[] fileendings, String beginTag, String endTag) {/*?|3309698-preferenceslang|reuter|c0|?*/
+		this.fileendings = new TreeSet<String>(Arrays.asList(fileendings));
 		this.beginTag = beginTag;
 		this.endTag = endTag;
 	}
@@ -147,10 +147,7 @@ public class SupportedLanguageEntity {
 	 * @return true, if this representation is empty<br>false, otherwise
 	 */
 	boolean isEmpty() {
-		if(fileendings.isEmpty() && beginTag.isEmpty() && endTag.isEmpty()) {/*?|3309698-preferenceslang|reuter|c6|?*/
-			return true;/*?|3309698-preferenceslang|reuter|c4|?*/
-		}
-		return false;
+		return fileendings.isEmpty() && beginTag.isEmpty() && endTag.isEmpty();/*?|3309698-preferenceslang|reuter|c6|?*//*?|3309698-preferenceslang|reuter|c4|?*/
 	}
 	
 	/**
@@ -158,10 +155,7 @@ public class SupportedLanguageEntity {
 	 * @return true, if each begin and end tag is set with arbitrary an arbitrary string not equals empty<br>false, otherwise
 	 */
 	boolean isValid() {
-		if((beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||/*?|3309698-preferenceslang|reuter|c7|?*/
-				(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty())) {
-			return false;/*?|3309698-preferenceslang|reuter|c5|?*/
-		}
-		return true;
+		return (beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||
+		(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty());/*?|3309698-preferenceslang|reuter|c7|?*//*?|3309698-preferenceslang|reuter|c5|?*/
 	}
 }
