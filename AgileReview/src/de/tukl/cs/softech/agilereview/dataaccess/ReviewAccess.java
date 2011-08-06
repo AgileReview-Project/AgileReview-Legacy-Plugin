@@ -1,8 +1,6 @@
 package de.tukl.cs.softech.agilereview.dataaccess;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,6 +13,8 @@ import javax.xml.namespace.QName;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -22,14 +22,14 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 
-import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.CommentsDocument;
+import agileReview.softech.tukl.de.ReviewDocument;
+import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.CommentsDocument.Comments;
 import agileReview.softech.tukl.de.FilesDocument.Files;
 import agileReview.softech.tukl.de.FolderDocument.Folder;
 import agileReview.softech.tukl.de.PersonInChargeDocument.PersonInCharge;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
-import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -54,7 +54,7 @@ public class ReviewAccess {
 	/**
 	 * Reference to the folder where the review and comments xml files are located
 	 */
-	private static File REVIEW_REPO_FOLDER = null;
+	private static IProject REVIEW_REPO_FOLDER = null;
 	
 	/**
 	 * Instance of the comment model
@@ -80,9 +80,17 @@ public class ReviewAccess {
 	 * @param author
 	 * @return File for the given parameter pair
 	 */
-	private static File createCommentFile(String reviewId, String author)
+	private static IFile createCommentFile(String reviewId, String author)
 	{
-		return new File(ReviewAccess.createReviewFolder(reviewId)+System.getProperty("file.separator")+"author_"+author+".xml");
+		IFile file = ReviewAccess.createReviewFolder(reviewId).getFile("author_"+author+".xml");
+		if (!file.exists()) {
+			try {
+				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
+			} catch (CoreException e) {
+				PluginLogger.logError(ReviewAccess.class.toString(), "createCommentFile", "CoreException while creating comment file", e);
+			}
+		}
+		return file;
 	}
 	
 	/**
@@ -90,9 +98,19 @@ public class ReviewAccess {
 	 * @param reviewId
 	 * @return Folder for this review
 	 */
-	private static File createReviewFolder(String reviewId)
+	private static IFolder createReviewFolder(String reviewId)
 	{
-		return new File(REVIEW_REPO_FOLDER+System.getProperty("file.separator")+"review."+reviewId);
+		IFolder folder = REVIEW_REPO_FOLDER.getFolder("review."+reviewId);
+		if (!folder.exists()) {
+			try {
+				folder.create(IResource.NONE, true, null);
+			} catch (CoreException e) {
+				PluginLogger.logError(ReviewAccess.class.toString(), "createReviewFolder", "CoreException while creating review folder", e);
+			}
+		} else {
+			
+		}
+		return folder;
 	}
 	
 	/**
@@ -100,9 +118,17 @@ public class ReviewAccess {
 	 * @param reviewId
 	 * @return review file for this review
 	 */
-	private static File createReviewFile(String reviewId)
+	private static IFile createReviewFile(String reviewId)
 	{
-		return new File(ReviewAccess.createReviewFolder(reviewId)+System.getProperty("file.separator")+"review.xml");
+		IFile file = ReviewAccess.createReviewFolder(reviewId).getFile("review.xml");
+		if (!file.exists()) {
+			try {
+				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
+			} catch (CoreException e) {
+				PluginLogger.logError(ReviewAccess.class.toString(), "createReviewFile", "CoreException while creating review file", e);
+			}
+		}
+		return file;
 	}
 	
 	/**
@@ -274,7 +300,7 @@ public class ReviewAccess {
 		if(!p.exists()) {
 			return false;
 		} else {
-			REVIEW_REPO_FOLDER = p.getLocation().toFile();
+			REVIEW_REPO_FOLDER = p;
 			
 			// Load open reviews initially
 			try {
@@ -301,33 +327,25 @@ public class ReviewAccess {
 		PluginLogger.log(this.getClass().toString(), "loadAllComments", 
 				"All comment files will be loaded from file (including closed reviews). Exception thrown when parsing xml-file");
 		// Get all relevant folders in the review repository
-		FileFilter folderFilter = new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory();
-			}
-		};
-		File[] allFolders = REVIEW_REPO_FOLDER.listFiles(folderFilter);
-		
-		// Iterate all folders
-		for (File currFolder : allFolders)
-		{
-			FilenameFilter fileFilter = new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.startsWith("author_");
+		try {
+			IResource[] allFolders = REVIEW_REPO_FOLDER.members();
+			// Iterate all folders
+			for (IResource currFolder : allFolders) {
+				if (currFolder instanceof IFolder) {
+					IResource[] allFiles = ((IFolder)currFolder).members();
+					// Iterate all files in the current folder
+					for (IResource currFile : allFiles) {
+						if (currFile instanceof IFile) {
+							// Open file and read basic information
+							CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+							this.rFileModel.addXmlDocument(doc, (IFile)currFile);
+							readCommentsDocument(doc);
+						}
+					}
 				}
-			};
-			File[] allFiles = currFolder.listFiles(fileFilter);
-			
-			// Iterate all files in the current folder
-			for (File currFile : allFiles)
-			{
-				// Open file and read basic information
-				CommentsDocument doc = CommentsDocument.Factory.parse(currFile);
-				this.rFileModel.addXmlDocument(doc, currFile);
-				readCommentsDocument(doc);
 			}
+		} catch (CoreException e) {
+			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
 		}
 	}
 	
@@ -340,36 +358,28 @@ public class ReviewAccess {
 	{
 		PluginLogger.log(this.getClass().toString(), "loadAllReviews", "All reviews will be loaded from files");
 		// Get all relevant folders in the review repository
-		FileFilter folderFilter = new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory();
-			}
-		};
-		File[] allFolders = REVIEW_REPO_FOLDER.listFiles(folderFilter);
-		
-		// Iterate all folders
-		for (File currFolder : allFolders)
-		{
-			// Get all relevant files in the review repository (only review files(no "." in author names allowed))
-			FilenameFilter filter = new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.equals("review.xml");		
+		try {
+			IResource[] allFolders = REVIEW_REPO_FOLDER.members();
+			// Iterate all folders
+			for (IResource currFolder : allFolders) {
+				if (currFolder instanceof IFolder) {
+					// Get all relevant files in the review repository (only review files(no "." in author names allowed))
+					IResource[] allFiles = ((IFolder)currFolder).members();
+					// Fill internal database
+					// Iterate all review-files in directory (should only be one)
+					for (int i=0;i<allFiles.length;i++) {
+						if (allFiles[i] instanceof IFile && ((IFile)allFiles[i]).getName().equals("review.xml")) {
+							// Open file and store review
+							ReviewDocument doc = ReviewDocument.Factory.parse(((IFile)allFiles[i]).getContents());
+							this.rFileModel.addXmlDocument(doc, (IFile)allFiles[i]);
+							Review currReview = doc.getReview();
+							rModel.addReview(currReview);
+						}
+					}
 				}
-			};
-			File[] allFiles = currFolder.listFiles(filter);
-			
-			// Fill internal database
-			// Iterate all review-files in directory (should only be one)
-			for (int i=0;i<allFiles.length;i++)
-			{
-				// Open file and store review
-				ReviewDocument doc = ReviewDocument.Factory.parse(allFiles[i]);
-				this.rFileModel.addXmlDocument(doc, allFiles[i]);
-				Review currReview = doc.getReview();
-				rModel.addReview(currReview);		
 			}
+		} catch (CoreException e) {
+			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllReviews", "CoreException while filling review model", e);
 		}
 	}
 
@@ -491,7 +501,7 @@ public class ReviewAccess {
 	{		
 		PluginLogger.log(this.getClass().toString(), "createNewComment", "Comment created for:\n reviewId: "+reviewId+" \n author: "+author+" \n path: "+path);
 		// Check if file for this author in this review does already exist (assumption: database and file system are synch)
-		File commentFile = ReviewAccess.createCommentFile(reviewId, author);
+		IFile commentFile = ReviewAccess.createCommentFile(reviewId, author);
 		// Check if file for this author does already exist
 		if (!this.rFileModel.containsFile(commentFile))
 		{
@@ -558,7 +568,7 @@ public class ReviewAccess {
 		{
 			// Last comment of this author in this review has been deleted
 			// -> Remove from file system
-			File fileToDelete = ReviewAccess.createCommentFile(reviewId, author);
+			IFile fileToDelete = ReviewAccess.createCommentFile(reviewId, author);
 			this.rFileModel.removeXmlDocument(fileToDelete);
 		}
 	}
@@ -715,14 +725,18 @@ public class ReviewAccess {
 		this.rModel.createModelEntry(reviewId);
 		
 		// Create the folder for this review
-		File commentFolder = ReviewAccess.createReviewFolder(reviewId);
+		IFolder commentFolder = ReviewAccess.createReviewFolder(reviewId);
 		if (!commentFolder.exists())
 		{
-			commentFolder.mkdir();
+			try {
+				commentFolder.create(IResource.NONE, true, null);
+			} catch (CoreException e) {
+				PluginLogger.logError(ReviewAccess.class.toString(), "createNewReview", "CoreException while creating new review", e);
+			}
 		}
 		
 		// Create the file
-		File revFile = ReviewAccess.createReviewFile(reviewId);
+		IFile revFile = ReviewAccess.createReviewFile(reviewId);
 		
 		// save new review file
 		this.rFileModel.addXmlDocument(revDoc, revFile);
@@ -738,7 +752,7 @@ public class ReviewAccess {
 	public void deleteReview(String reviewId) 
 	{	
 		PluginLogger.log(this.getClass().toString(), "deleteReview", "Delete review: "+reviewId);
-		File delFile = ReviewAccess.createReviewFile(reviewId);
+		IFile delFile = ReviewAccess.createReviewFile(reviewId);
 		
 		// Delete review from Model
 		this.rModel.removeReview(reviewId, true);
@@ -757,26 +771,26 @@ public class ReviewAccess {
 	public void loadReviewComments(String reviewId) throws XmlException, IOException
 	{
 		PluginLogger.log(this.getClass().toString(), "loadReviewComments", "Load comments of review: "+reviewId);
-		File currFolder = ReviewAccess.createReviewFolder(reviewId);
+		IFolder currFolder = ReviewAccess.createReviewFolder(reviewId);
 		
-		FilenameFilter fileFilter = new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.startsWith("author_");
-			}
-		};
-		File[] allFiles = currFolder.listFiles(fileFilter);
-		
-		this.rModel.createModelEntry(reviewId);
-				
-		// Iterate all files in the current folder
-		for (File currFile : allFiles)
-		{
-			// Open file and read basic information
-			CommentsDocument doc = CommentsDocument.Factory.parse(currFile);
-			this.rFileModel.addXmlDocument(doc, currFile);
+		try {
+			IResource[] allFiles = currFolder.members();
 			
-			readCommentsDocument(doc);
+			this.rModel.createModelEntry(reviewId);
+					
+			// Iterate all files in the current folder
+			for (IResource currFile : allFiles)
+			{
+				if (currFile instanceof IFile) {
+					// Open file and read basic information
+					CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+					this.rFileModel.addXmlDocument(doc, (IFile)currFile);
+					
+					readCommentsDocument(doc);	
+				}
+			}
+		} catch (CoreException e) {
+			PluginLogger.logError(ReviewAccess.class.toString(), "loadReviewComments", "CoreException while loading comments of review "+reviewId+" into database", e);
 		}
 	}
 	
