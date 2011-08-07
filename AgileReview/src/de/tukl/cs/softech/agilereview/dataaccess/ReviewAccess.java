@@ -23,6 +23,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 
 import agileReview.softech.tukl.de.CommentsDocument;
+import agileReview.softech.tukl.de.FileDocument.File;
 import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.CommentsDocument.Comments;
@@ -86,6 +87,7 @@ public class ReviewAccess {
 		if (!file.exists()) {
 			try {
 				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
+				while (!file.exists()) {};
 			} catch (CoreException e) {
 				PluginLogger.logError(ReviewAccess.class.toString(), "createCommentFile", "CoreException while creating comment file", e);
 			}
@@ -104,12 +106,11 @@ public class ReviewAccess {
 		if (!folder.exists()) {
 			try {
 				folder.create(IResource.NONE, true, null);
+				while (!folder.exists()) {}
 			} catch (CoreException e) {
 				PluginLogger.logError(ReviewAccess.class.toString(), "createReviewFolder", "CoreException while creating review folder", e);
 			}
-		} else {
-			
-		}
+		} 
 		return folder;
 	}
 	
@@ -124,6 +125,7 @@ public class ReviewAccess {
 		if (!file.exists()) {
 			try {
 				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
+				while (!file.exists()) {}
 			} catch (CoreException e) {
 				PluginLogger.logError(ReviewAccess.class.toString(), "createReviewFile", "CoreException while creating review file", e);
 			}
@@ -137,7 +139,7 @@ public class ReviewAccess {
 	 * @param name name of the file
 	 * @return The newly created project or null if the given parent does not support project children
 	 */
-	private static Project createProject (XmlObject parent, String name)
+	private static Project createXmlProject (XmlObject parent, String name)
 	{
 		Project p = null;
 		if (parent instanceof Files)
@@ -155,7 +157,7 @@ public class ReviewAccess {
 	 * @param name name of the folder
 	 * @return The newly created folder or null if the given parent does not support folder children
 	 */
-	private static Folder createFolder(XmlObject parent, String name)
+	private static Folder createXmlFolder(XmlObject parent, String name)
 	{
 		Folder f = null;
 		if (parent instanceof Project)
@@ -177,7 +179,7 @@ public class ReviewAccess {
 	 * @param name name of the file
 	 * @return The newly created file or null if the given parent does not support file children
 	 */
-	private static agileReview.softech.tukl.de.FileDocument.File createFile(XmlObject parent, String name)
+	private static File createXmlFile(XmlObject parent, String name)
 	{
 		agileReview.softech.tukl.de.FileDocument.File f = null;
 		if (parent instanceof Project)
@@ -337,9 +339,11 @@ public class ReviewAccess {
 					for (IResource currFile : allFiles) {
 						if (currFile instanceof IFile) {
 							// Open file and read basic information
-							CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
-							this.rFileModel.addXmlDocument(doc, (IFile)currFile);
-							readCommentsDocument(doc);
+							if (!((IFile)currFile).getName().equals("review.xml")) {
+								CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+								this.rFileModel.addXmlDocument(doc, (IFile)currFile);
+								readCommentsDocument(doc);
+							}
 						}
 					}
 				}
@@ -434,22 +438,22 @@ public class ReviewAccess {
 				else if (i==0)
 				{
 					// First element: Create a project
-					currObject = createProject(currObject, pathArray[i]);
+					currObject = createXmlProject(currObject, pathArray[i]);
 				}
 				else if (i==pathArray.length-1)
 				{
 					// Last element: Create the given type
 					switch (type) 
 					{
-						case IResource.PROJECT:  currObject = createProject(currObject, pathArray[pathArray.length-1]); break;
-						case IResource.FOLDER:	currObject = createFolder(currObject, pathArray[pathArray.length-1]); break;
-						case IResource.FILE:	currObject = createFile(currObject,  pathArray[pathArray.length-1]); break;
+						case IResource.PROJECT: currObject = createXmlProject(currObject, pathArray[pathArray.length-1]); break;
+						case IResource.FOLDER:	currObject = createXmlFolder(currObject, pathArray[pathArray.length-1]); break;
+						case IResource.FILE:	currObject = createXmlFile(currObject,  pathArray[pathArray.length-1]); break;
 					}
 				}
 				else
 				{
 					// As we do neither consider the last element nor the first, we always create a folder
-					currObject = createFolder(currObject, pathArray[i]);
+					currObject = createXmlFolder(currObject, pathArray[i]);
 				}
 
 			}
@@ -725,15 +729,7 @@ public class ReviewAccess {
 		this.rModel.createModelEntry(reviewId);
 		
 		// Create the folder for this review
-		IFolder commentFolder = ReviewAccess.createReviewFolder(reviewId);
-		if (!commentFolder.exists())
-		{
-			try {
-				commentFolder.create(IResource.NONE, true, null);
-			} catch (CoreException e) {
-				PluginLogger.logError(ReviewAccess.class.toString(), "createNewReview", "CoreException while creating new review", e);
-			}
-		}
+		ReviewAccess.createReviewFolder(reviewId);
 		
 		// Create the file
 		IFile revFile = ReviewAccess.createReviewFile(reviewId);
@@ -782,11 +778,13 @@ public class ReviewAccess {
 			for (IResource currFile : allFiles)
 			{
 				if (currFile instanceof IFile) {
-					// Open file and read basic information
-					CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
-					this.rFileModel.addXmlDocument(doc, (IFile)currFile);
-					
-					readCommentsDocument(doc);	
+					if (!((IFile)currFile).getName().equals("review.xml")) {
+						// Open file and read basic information
+						CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+						this.rFileModel.addXmlDocument(doc, (IFile)currFile);
+						
+						readCommentsDocument(doc);	
+					}
 				}
 			}
 		} catch (CoreException e) {

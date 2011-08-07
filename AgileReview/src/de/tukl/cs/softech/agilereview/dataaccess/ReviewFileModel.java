@@ -94,7 +94,7 @@ class ReviewFileModel {
 	{
 		// Delete the given file
 		this.deleteResource(file);
-		// Try the comments first
+		// If it was a review-file, delete the whole review
 		if (this.xmlCommentDocuments.remove(file)==null && this.xmlReviewDocuments.remove(file)!=null)
 		{
 			// Get the parent Folder

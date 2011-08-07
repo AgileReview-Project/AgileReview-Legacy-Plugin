@@ -3,6 +3,7 @@ package de.tukl.cs.softech.agilereview.views.detail;
 import java.awt.Desktop;
 import java.net.URI;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionEvent;
@@ -259,6 +260,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 			}
 		} catch (Exception ex) { 
 			PluginLogger.logError(this.getClass().toString(), "widgetSelected", "Can not open \""+this.reference.getText()+"\": It may not be a valid URI", ex);
+			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Invalid URI", "External Reference is an unvalid URI:\n"+ex.getLocalizedMessage());
 		}
 	}
 
@@ -266,5 +268,5 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);		
 	}
-
+;
 }
