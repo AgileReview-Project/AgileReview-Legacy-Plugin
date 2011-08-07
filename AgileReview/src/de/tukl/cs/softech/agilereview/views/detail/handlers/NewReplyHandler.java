@@ -24,8 +24,8 @@ public class NewReplyHandler extends AbstractHandler {
 		
 		Shell shell = new Shell(HandlerUtil.getActiveShell(event));
 		shell.setText("New Reply");
-		ReplyDialog dialog = new ReplyDialog(shell, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM | SWT.SHELL_TRIM);
-		dialog.setSize(250, 150);
+		ReplyDialog dialog = new ReplyDialog(shell, SWT.APPLICATION_MODAL);
+		dialog.setSize(400, 300);
 	    shell.pack();
 	    shell.open();
 		while (!shell.isDisposed()) {
