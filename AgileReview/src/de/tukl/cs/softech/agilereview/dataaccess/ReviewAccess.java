@@ -18,19 +18,26 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
-import agileReview.softech.tukl.de.CommentsDocument;
-import agileReview.softech.tukl.de.FileDocument.File;
-import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.CommentDocument.Comment;
+import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.CommentsDocument.Comments;
+import agileReview.softech.tukl.de.FileDocument.File;
 import agileReview.softech.tukl.de.FilesDocument.Files;
 import agileReview.softech.tukl.de.FolderDocument.Folder;
 import agileReview.softech.tukl.de.PersonInChargeDocument.PersonInCharge;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
+import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -50,7 +57,7 @@ public class ReviewAccess {
 	/**
 	 * Private instance for Singleton-Pattern
 	 */
-	private static ReviewAccess RA = null;
+	private static ReviewAccess RA = new ReviewAccess();
 	
 	/**
 	 * Reference to the folder where the review and comments xml files are located
@@ -70,7 +77,7 @@ public class ReviewAccess {
 	/**
 	 * Cache of the current ReviewSourceProject, to check if it changed
 	 */
-	private String currentReviewSourceProject;
+	private String currentReviewSourceProject = "";
 	
 	////////////////////
 	// static methods //
@@ -256,12 +263,13 @@ public class ReviewAccess {
 	 * Singleton Pattern
 	 * @return Instance of this class
 	 */
-	public static ReviewAccess getInstance()
+	public static synchronized ReviewAccess getInstance()
 	{
-		if (RA == null) {
-			RA = new ReviewAccess();
-		}
 		return RA;
+//		if (RA == null) {
+//			RA = new ReviewAccess();
+//		}
+//		return RA;
 	}
 	
 	////////////////////////////////
@@ -276,8 +284,43 @@ public class ReviewAccess {
 		// Set the directory where the comments are located
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
 		if (!loadReviewSourceProject(projectName)) {
-			// TODO: ReviewInitInteraction
-			// Maybe create or open it then? ReviewAccess.createAndOpenReviewProject(projectName);
+			// TODO: A cool ReviewInitInteraction
+			String msg = "In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed." +
+					"You now have to create such a folder in order to use AgileReview correctly." +
+					"Later you can create new 'AgileReview Source Project' and use the Properties to determine which one should be used.\n\n" +
+					"If you cancel, the default 'AgileReview Source Project' will be created";
+			Shell currentShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+			InputDialog in = new InputDialog(currentShell, "AgileReview - Review Source Project creation", msg, projectName, new IInputValidator() {
+				@Override
+				public String isValid(String newText) {
+			        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+			        String projectFieldContents = newText;
+			        if (projectFieldContents.equals("")) {
+			            return "Project name cannot be empty!";
+			        }
+
+			        IStatus nameStatus = workspace.validateName(projectFieldContents,
+			                IResource.PROJECT);
+			        if (!nameStatus.isOK()) {
+			            return nameStatus.getMessage();
+			        }
+			 
+			        IProject project = workspace.getRoot().getProject(
+							projectFieldContents);
+			        
+			        if (project.exists()) {
+			            return "Project does already exist!";
+			        }
+					return null;
+				}
+			});
+			if (in.open() == Window.OK) {
+				projectName = in.getValue();
+			}
+			if (ReviewAccess.createAndOpenReviewProject(projectName)) {
+				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);	
+			}
 		}
 	}
 	
@@ -863,7 +906,7 @@ public class ReviewAccess {
 	 * @return true, if something has changed, false otherwise
 	 */
 	public boolean updateReviewSourceProject() {
-		boolean result = false;
+		boolean result = false;	
 		if (!currentReviewSourceProject.equals(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER))) {
 			loadReviewSourceProject(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
 			result = true;
