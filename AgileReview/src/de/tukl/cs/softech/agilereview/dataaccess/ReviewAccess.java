@@ -285,10 +285,10 @@ public class ReviewAccess {
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
 		if (!loadReviewSourceProject(projectName)) {
 			// TODO: A cool ReviewInitInteraction
-			String msg = "In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed." +
+			String msg = "In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed." +/*?|0000006|Malte|c1|*/
 					"You now have to create such a folder in order to use AgileReview correctly." +
 					"Later you can create new 'AgileReview Source Project' and use the Properties to determine which one should be used.\n\n" +
-					"If you cancel, the default 'AgileReview Source Project' will be created";
+					"If you cancel, the default 'AgileReview Source Project' will be created";/*|0000006|Malte|c1|?*/
 			Shell currentShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			InputDialog in = new InputDialog(currentShell, "AgileReview - Review Source Project creation", msg, projectName, new IInputValidator() {
 				@Override
@@ -309,17 +309,17 @@ public class ReviewAccess {
 			        IProject project = workspace.getRoot().getProject(
 							projectFieldContents);
 			        
-			        if (project.exists()) {
+			        if (project.exists()) {/*?|0000006|Malte|c2|*/
 			            return "Project does already exist!";
 			        }
-					return null;
+					return null;/*|0000006|Malte|c2|?*/
 				}
 			});
 			if (in.open() == Window.OK) {
 				projectName = in.getValue();
 			}
 			if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);	
+				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);	/*?|0000006|Malte|c0|?*/
 			}
 		}
 	}
