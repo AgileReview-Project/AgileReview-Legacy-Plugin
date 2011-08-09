@@ -538,6 +538,10 @@
          </with>
       </activeWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.RepositioningHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning">
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -639,6 +643,12 @@
             id="de.tukl.cs.softech.agilereview.editor.delete"
             name="Delete comment in Editor">
       </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Relocates the current selected comment"
+            id="de.tukl.cs.softech.agilereview.views.detail.repositioning"
+            name="Repositioning of a Comment">
+      </command>
 </extension>
 <extension
       point="org.eclipse.ui.menus">
@@ -688,6 +698,20 @@
                checkEnabled="false">
             <with
                   variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning"
+            label="Relocate"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
                <equals
                      value="true">
                </equals>

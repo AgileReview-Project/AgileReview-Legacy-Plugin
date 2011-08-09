@@ -571,7 +571,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	}
 	
 	/**
-	 * @return the currently active editor
+	 * @return the currently active editor or null if no editor is active
 	 */
 	private IEditorPart getActiveEditor() {
 		return getSite().getPage().getActiveEditor();
@@ -583,7 +583,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @return true, if the current open editor contains the given comment<br>
 	 * false, otherwise
 	 */
-	private boolean openEditorContains(Comment comment) {
+	public boolean openEditorContains(Comment comment) {
 		boolean result = false;
 		IPath path = new Path(ReviewAccess.computePath(comment));
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
@@ -641,6 +641,24 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	//###############################################################################
 	//######### functions which provide functionality for AnnotationParser ##########
 	//###############################################################################
+	
+	/**
+	 * Relocates the comment passed to the current selection within the same file
+	 * @param comment comment which should be relocated
+	 */
+	public void relocateComment(Comment comment) {
+		IEditorPart editor;
+		if((editor = getActiveEditor()) != null) {
+			try {
+				parserMap.get(editor).removeCommentTags(comment);
+				parserMap.get(editor).addTagsInDocument(comment, getFilteredComments().contains(comment));
+			} catch (BadLocationException e) {
+				PluginLogger.logError(this.getClass().toString(), "relocateComment", "BadLocationException when trying to add/remove tags", e);
+			} catch (CoreException e) {
+				PluginLogger.log(this.getClass().toString(), "relocateComment", "CoreException when trying to add/remove tags", e);
+			}
+		}
+	}
 	
 	/**
 	 * Clears the current parserMap and deletes all done Annotations.<br>
