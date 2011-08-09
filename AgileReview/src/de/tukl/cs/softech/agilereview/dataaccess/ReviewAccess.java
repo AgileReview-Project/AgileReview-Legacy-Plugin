@@ -62,7 +62,7 @@ public class ReviewAccess {
 	/**
 	 * Reference to the folder where the review and comments xml files are located
 	 */
-	private static IProject REVIEW_REPO_FOLDER = null;
+	private static IProject REVIEW_REPO_FOLDER;
 	
 	/**
 	 * Instance of the comment model
@@ -73,11 +73,6 @@ public class ReviewAccess {
 	 * Instance of the review file model
 	 */
 	private ReviewFileModel rFileModel = new ReviewFileModel();	
-	
-	/**
-	 * Cache of the current ReviewSourceProject, to check if it changed
-	 */
-	private String currentReviewSourceProject = "";
 	
 	////////////////////
 	// static methods //
@@ -266,10 +261,6 @@ public class ReviewAccess {
 	public static synchronized ReviewAccess getInstance()
 	{
 		return RA;
-//		if (RA == null) {
-//			RA = new ReviewAccess();
-//		}
-//		return RA;
 	}
 	
 	////////////////////////////////
@@ -319,7 +310,8 @@ public class ReviewAccess {
 				projectName = in.getValue();
 			}
 			if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);	/*?|0000006|Malte|c0|?*/
+				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);/*?|0000006|Malte|c0|?*/
+				loadReviewSourceProject(projectName);
 			}
 		}
 	}
@@ -357,7 +349,6 @@ public class ReviewAccess {
 				PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "IOException while filling database", e);
 				return false;
 			}
-			currentReviewSourceProject = projectName;
 			return true;
 		}
 	}
@@ -907,7 +898,7 @@ public class ReviewAccess {
 	 */
 	public boolean updateReviewSourceProject() {
 		boolean result = false;	
-		if (!currentReviewSourceProject.equals(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER))) {
+		if (!REVIEW_REPO_FOLDER.getName().equals(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER))) {
 			loadReviewSourceProject(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
 			result = true;
 		}	
