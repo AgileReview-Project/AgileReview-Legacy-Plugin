@@ -39,11 +39,11 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @param style with which this Composite will be styled
 	 * @param bg background color for this view
 	 */
-	protected AbstractDetail(Composite parent, int style, Color bg) {
+	protected AbstractDetail(Composite parent, int style, Color bg) {/*?|0000020|Malte|c0|*/
 		super(parent, style);
 		this.setBackground(bg);
 		initUI(bg);
-	}
+	}/*|0000020|Malte|c0|?*/
 
 	/**
 	 * this method will be automatically called by the constructor and should

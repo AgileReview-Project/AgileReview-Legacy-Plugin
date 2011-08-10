@@ -63,16 +63,16 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	 * @param style with which this Composite will be styled
 	 * @param bg background color for this view
 	 */
-	protected ReviewDetail(Composite parent, int style, Color bg) {
+	protected ReviewDetail(Composite parent, int style, Color bg) {/*?|0000020|Malte|c5|*/
 		super(parent, style, bg);
-	}
+	}/*|0000020|Malte|c5|?*/
 
 	/*
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
 	@Override
-	protected void initUI(Color bg) {
+	protected void initUI(Color bg) {/*?|0000020|Malte|c4|*/
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 3;
 		gridLayout.numColumns = numColumns;
@@ -160,7 +160,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    txt.setLayoutData(gridData);
 	    
 	    setPropertyConfigurations();
-	}
+	}/*|0000020|Malte|c4|?*/
 
 	/*
 	 * (non-Javadoc)

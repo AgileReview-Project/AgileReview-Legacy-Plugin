@@ -66,15 +66,15 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @param style in which this component should be displayed
 	 * @param bg background color for this view
 	 */
-	protected CommentDetail(Composite parent, int style, Color bg) {
+	protected CommentDetail(Composite parent, int style, Color bg) {/*?|0000020|Malte|c1|*/
 		super(parent, style, bg);
-	}
+	}/*|0000020|Malte|c1|?*/
 
 	/*
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
-	protected void initUI(Color bg) {
+	protected void initUI(Color bg) {/*?|0000020|Malte|c6|*/
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 2;
 		gridLayout.numColumns = numColumns;
@@ -173,17 +173,9 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    replys.setWordWrap(true);
 	    replys.addFocusListener(this);
 	    replys.addModifyListener(this);
-
-//	    Composite g = new Composite(this, SWT.NONE);
-//	    GridLayout glayout = new GridLayout(3, false);
-//		g.setLayout(glayout);
-//	    gridData = new GridData();
-//	    gridData.horizontalAlignment = GridData.END;
-//	    gridData.horizontalSpan = numColumns-1;
-//	    g.setLayoutData(gridData);
 	    
 	    setPropertyConfigurations();
-	}
+	}/*|0000020|Malte|c6|?*/
 	
 	/*
 	 * (non-Javadoc)
