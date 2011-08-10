@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.views.detail;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -87,7 +88,9 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
-			this.actParent = new CommentDetail(this.parentParent, this.parentStyle);
+			CommentDetail cDetail = new CommentDetail(this.parentParent, this.parentStyle);
+			cDetail.setBackground(new Color(PlatformUI.getWorkbench().getDisplay(), 158, 234, 255));
+			this.actParent = cDetail;
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, true);
@@ -95,7 +98,9 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
-			this.actParent = new ReviewDetail(this.parentParent, this.parentStyle);
+			ReviewDetail rDetail = new ReviewDetail(this.parentParent, this.parentStyle);
+			rDetail.setBackground(new Color(PlatformUI.getWorkbench().getDisplay(), 218, 253, 167));
+			this.actParent = rDetail;
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
