@@ -51,7 +51,7 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String COMMENT_STATUS = "comment_status";
 		/**
-		 * Possible values for a review's status
+		 * Possible values for a review's status 
 		 */
 		public static String REVIEW_STATUS = "review_status";
 		/**
@@ -97,13 +97,17 @@ public class PropertiesManager implements IInputValidator{
 			 */
 			public static String COMMENT_DELETE = "icon_comment_delete";
 			/**
-			 * Icon "ok" for comments
+			 * Icon "ok" for comments 
 			 */
 			public static String COMMENT_OK = "icon_comment_ok";
 			/**
 			 * Icon for "syncronize" buttons
 			 */
 			public static String SYNCED = "icon_synced";
+			/**
+			 * Icon for "repositioning" buttons
+			 */
+			public static String COMMENT_REPOS = "icon_comment_repos";
 		}
 	}
 	

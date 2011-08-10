@@ -706,6 +706,7 @@
       </command>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning"
+            icon="icons/comment/comment_repos_15x15.png"
             label="Relocate"
             style="push">
          <visibleWhen
