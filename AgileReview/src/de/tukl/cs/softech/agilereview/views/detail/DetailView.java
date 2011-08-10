@@ -88,9 +88,7 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
-			CommentDetail cDetail = new CommentDetail(this.parentParent, this.parentStyle);
-			cDetail.setBackground(new Color(PlatformUI.getWorkbench().getDisplay(), 209, 245, 255));
-			this.actParent = cDetail;
+			this.actParent = new CommentDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 185, 210, 220));
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, true);
@@ -98,9 +96,7 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
-			ReviewDetail rDetail = new ReviewDetail(this.parentParent, this.parentStyle);
-			rDetail.setBackground(new Color(PlatformUI.getWorkbench().getDisplay(), 218, 253, 167));
-			this.actParent = rDetail;
+			this.actParent = new ReviewDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 205, 230, 170));
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);

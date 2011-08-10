@@ -656,6 +656,21 @@
          allPopups="false"
          locationURI="toolbar:de.tukl.cs.softech.agilereview.view.commentdetailview.view">
       <command
+            commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning"
+            icon="icons/comment/comment_repos_15x15.png"
+            label="Relocate"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
+      </command>
+      <command
             commandId="de.tukl.cs.softech.agilereview.views.detail.newReply"
             icon="icons/comment/comment_newReply_15x15.png"
             label="New Reply"
@@ -698,21 +713,6 @@
                checkEnabled="false">
             <with
                   variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
-               <equals
-                     value="true">
-               </equals>
-            </with>
-         </visibleWhen>
-      </command>
-      <command
-            commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning"
-            icon="icons/comment/comment_repos_15x15.png"
-            label="Relocate"
-            style="push">
-         <visibleWhen
-               checkEnabled="false">
-            <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
                <equals
                      value="true">
                </equals>

@@ -8,6 +8,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -60,9 +61,10 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	 * Creates a new ReviewDetail Composite onto the given parent with the specified SWT styles
 	 * @param parent onto the ReviewDetail Composite will be added
 	 * @param style with which this Composite will be styled
+	 * @param bg background color for this view
 	 */
-	protected ReviewDetail(Composite parent, int style) {
-		super(parent, style);
+	protected ReviewDetail(Composite parent, int style, Color bg) {
+		super(parent, style, bg);
 	}
 
 	/*
@@ -70,22 +72,25 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
 	@Override
-	protected void initUI() {
+	protected void initUI(Color bg) {
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 3;
 		gridLayout.numColumns = numColumns;
 		this.setLayout(gridLayout);
 		
 		Label review = new Label(this, SWT.PUSH);
+		review.setBackground(bg);
 		review.setText("Review: ");
 	    
 	    reviewInstance = new Label(this, SWT.WRAP);
+	    reviewInstance.setBackground(bg);
 	    GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    reviewInstance.setLayoutData(gridData);
 	    
 	    Label refId = new Label(this, SWT.PUSH);
+	    refId.setBackground(bg);
 	    refId.setText("External reference: ");
 	    
 	    reference = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP );
@@ -104,6 +109,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");
 	    
 	    Label author = new Label(this, SWT.PUSH);
+	    author.setBackground(bg);
 	    author.setText("Responsibility: ");
 	    
 	    authorInstance = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
@@ -115,6 +121,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    authorInstance.addModifyListener(this);
 	    
 	    Label status = new Label(this, SWT.PUSH);
+	    status.setBackground(bg);
 	    status.setText("Status: ");
 	    
 	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
@@ -125,9 +132,11 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    statusDropDown.addFocusListener(this);
 	    statusDropDown.addModifyListener(this);
 	    
-	    new Sash(this, SWT.PUSH);
+	    Sash sash = new Sash(this, SWT.PUSH);
+	    sash.setVisible(false);
 	    
 	    Label caption = new Label(this, SWT.PUSH);
+	    caption.setBackground(bg);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns;
@@ -149,14 +158,6 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    gridData.grabExcessVerticalSpace = true;
 	    gridData.grabExcessHorizontalSpace = true;
 	    txt.setLayoutData(gridData);
-	    
-	    Composite g = new Composite(this, SWT.NONE);
-	    GridLayout glayout = new GridLayout(3, false);
-		g.setLayout(glayout);
-	    gridData = new GridData();
-	    gridData.horizontalAlignment = GridData.END;
-	    gridData.horizontalSpan = numColumns;
-	    g.setLayoutData(gridData);
 	    
 	    setPropertyConfigurations();
 	}

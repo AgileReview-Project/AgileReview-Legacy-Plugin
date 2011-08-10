@@ -5,6 +5,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -36,17 +37,20 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * Creates a new AbstractDetail Composite onto the given parent with the specified SWT styles
 	 * @param parent onto the ReviewDetail Composite will be added
 	 * @param style with which this Composite will be styled
+	 * @param bg background color for this view
 	 */
-	protected AbstractDetail(Composite parent, int style) {
+	protected AbstractDetail(Composite parent, int style, Color bg) {
 		super(parent, style);
-		initUI();
+		this.setBackground(bg);
+		initUI(bg);
 	}
 
 	/**
 	 * this method will be automatically called by the constructor and should
 	 * contain the initialization of the UI especially of the saveButton and revertButton
+	 * @param bg background color of the view
 	 */
-	protected abstract void initUI();
+	protected abstract void initUI(Color bg);
 	
 	/**
 	 * saveChanges will be called by the IPartListener and FocusListener and should contain

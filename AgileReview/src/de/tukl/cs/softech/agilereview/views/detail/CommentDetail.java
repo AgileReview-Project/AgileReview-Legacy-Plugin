@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -63,40 +64,46 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * Creates the CommentDetail Composite and creates the initial UI
 	 * @param parent on which this component should be added
 	 * @param style in which this component should be displayed
+	 * @param bg background color for this view
 	 */
-	protected CommentDetail(Composite parent, int style) {
-		super(parent, style);
+	protected CommentDetail(Composite parent, int style, Color bg) {
+		super(parent, style, bg);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
-	protected void initUI() {
+	protected void initUI(Color bg) {
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 2;
 		gridLayout.numColumns = numColumns;
 		this.setLayout(gridLayout);
 
 		Label tagID = new Label(this, SWT.NONE);
+		tagID.setBackground(bg);
 		tagID.setText("Tag-ID: ");
 		
 		tagInstance = new Label(this, SWT.WRAP);
+		tagInstance.setBackground(bg);
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    tagInstance.setLayoutData(gridData);
 		
 	    Label author = new Label(this, SWT.PUSH);
+	    author.setBackground(bg);
 	    author.setText("Author: ");
 	    
 	    authorInstance = new Label(this, SWT.WRAP);
+	    authorInstance.setBackground(bg);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    authorInstance.setLayoutData(gridData);
 	    
 	    Label status = new Label(this, SWT.PUSH);
+	    status.setBackground(bg);
 	    status.setText("Status: ");
 	    
 	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
@@ -108,6 +115,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    statusDropDown.addModifyListener(this);
 	    
 	    Label priority = new Label(this, SWT.PUSH);
+	    priority.setBackground(bg);
 	    priority.setText("Priority: ");
 	    
 	    priorityDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
@@ -119,6 +127,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    priorityDropDown.addModifyListener(this);
 	    	
 	    Label recipient = new Label(this, SWT.PUSH);
+	    recipient.setBackground(bg);
 	    recipient.setText("Recipient: ");
 	    
 	    recipientText = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
@@ -129,9 +138,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    recipientText.addFocusListener(this);
 	    recipientText.addModifyListener(this);
 	    
-	    new Sash(this, SWT.PUSH);
+	    Sash sash = new Sash(this, SWT.PUSH);
+	    sash.setVisible(false);
 	    
 	    Label caption = new Label(this, SWT.PUSH);
+	    caption.setBackground(bg);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns;
@@ -163,13 +174,13 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    replys.addFocusListener(this);
 	    replys.addModifyListener(this);
 
-	    Composite g = new Composite(this, SWT.NONE);
-	    GridLayout glayout = new GridLayout(3, false);
-		g.setLayout(glayout);
-	    gridData = new GridData();
-	    gridData.horizontalAlignment = GridData.END;
-	    gridData.horizontalSpan = numColumns-1;
-	    g.setLayoutData(gridData);
+//	    Composite g = new Composite(this, SWT.NONE);
+//	    GridLayout glayout = new GridLayout(3, false);
+//		g.setLayout(glayout);
+//	    gridData = new GridData();
+//	    gridData.horizontalAlignment = GridData.END;
+//	    gridData.horizontalSpan = numColumns-1;
+//	    g.setLayoutData(gridData);
 	    
 	    setPropertyConfigurations();
 	}
