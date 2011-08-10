@@ -89,7 +89,7 @@ public class DetailView extends ViewPart {
 			break;
 		case COMMENT_DETAIL:
 			CommentDetail cDetail = new CommentDetail(this.parentParent, this.parentStyle);
-			cDetail.setBackground(new Color(PlatformUI.getWorkbench().getDisplay(), 158, 234, 255));
+			cDetail.setBackground(new Color(PlatformUI.getWorkbench().getDisplay(), 209, 245, 255));
 			this.actParent = cDetail;
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
