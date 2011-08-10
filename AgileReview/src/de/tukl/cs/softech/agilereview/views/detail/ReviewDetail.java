@@ -93,14 +93,15 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    refId.setBackground(bg);
 	    refId.setText("External reference: ");
 	    
-	    reference = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP );
+	    reference = new Text(this, SWT.BORDER | SWT.SINGLE );
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
-	    gridData.horizontalSpan = numColumns-3;
+	    gridData.grabExcessHorizontalSpace = true;
+	    gridData.horizontalSpan = numColumns-2;
 	    reference.setLayoutData(gridData);
 	    reference.addFocusListener(this);
 	    
-	    referenceButton = new Button(this, SWT.WRAP | SWT.PUSH | SWT.FILL);
+	    referenceButton = new Button(this, SWT.PUSH );
 	    referenceButton.setImage(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons"+System.getProperty("file.separator")+"discovery.gif").createImage());
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.END;
