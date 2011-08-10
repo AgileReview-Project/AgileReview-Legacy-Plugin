@@ -16,7 +16,6 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -216,8 +215,6 @@ public class DetailView extends ViewPart {
 					this.changeParent(DetailView.REVIEW_DETAIL);
 				}
 				((ReviewDetail)this.actParent).fillContents((MultipleReviewWrapper)e);
-			} else if(e instanceof AbstractMultipleWrapper) {
-				this.changeParent(EMPTY);
 			} else if(e instanceof Comment) {
 				if(!(this.actParent instanceof CommentDetail)) {
 					this.changeParent(DetailView.COMMENT_DETAIL);
