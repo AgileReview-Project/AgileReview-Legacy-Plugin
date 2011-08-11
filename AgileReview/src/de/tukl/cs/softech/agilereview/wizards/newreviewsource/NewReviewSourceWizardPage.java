@@ -16,6 +16,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+
 /**
  * The single page of the NewReview Wizard
  */
@@ -53,7 +55,8 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 		Label lReviewId = new Label(container, SWT.NULL);
 		lReviewId.setText("Review Source Project-Name*:");
 		name = new Text(container, SWT.BORDER | SWT.SINGLE);
-		name.setText("");
+		name.setText(PropertiesManager.getPreferences().getDefaultString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
+		name.selectAll();
 		name.setToolTipText("Review Source Folder -Name must be set.");
 		name.addModifyListener(this);
 		

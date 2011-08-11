@@ -62,6 +62,9 @@
             relationship="right"
             relative="org.eclipse.ui.editorss">
       </view>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
+      </newWizardShortcut>
    </perspectiveExtension>
    <perspectiveExtension
          targetID="org.eclipse.jdt.ui.JavaPerspective">
@@ -71,6 +74,9 @@
       <newWizardShortcut
             id="de.tukl.cs.softech.agilereview.newReviewWizard">
       </newWizardShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
+      </newWizardShortcut>
    </perspectiveExtension>
    <perspectiveExtension
          targetID="org.eclipse.ui.resourcePerspective">
@@ -79,6 +85,9 @@
       </perspectiveShortcut>
       <newWizardShortcut
             id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
       </newWizardShortcut>
    </perspectiveExtension>
 </extension>
@@ -222,6 +231,7 @@
          canFinishEarly="false"
          category="AgileReview.AgileReviewCategory"
          class="de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWizard"
+         descriptionImage="icons/agile_icon.png"
          finalPerspective="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
          hasPages="true"
          icon="icons/agile_icon.png"
@@ -538,10 +548,6 @@
          </with>
       </activeWhen>
    </handler>
-   <handler
-         class="de.tukl.cs.softech.agilereview.views.detail.handlers.RepositioningHandler"
-         commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning">
-   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -645,9 +651,17 @@
       </command>
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            defaultHandler="de.tukl.cs.softech.agilereview.views.detail.handlers.RepositioningHandler"
             description="Relocates the current selected comment"
             id="de.tukl.cs.softech.agilereview.views.detail.repositioning"
             name="Repositioning of a Comment">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.SwitchReviewSourceProjectHandler"
+            description="Switch AgileReview Source Project"
+            id="de.tukl.cs.softech.agilereview.views.reviewexplorer.switchReviewSourceProject"
+            name="Switch AgileReview Source Project in ReviewExplorer">
       </command>
 </extension>
 <extension
@@ -753,6 +767,16 @@
             visible="true">
       </separator>
       <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.switchReviewSourceProject"
+            label="Switch AgileReview Source Project"
+            style="push"
+            tooltip="Switch AgileReview Source Project">
+      </command>
+      <separator
+            name="AgileReview.separator5"
+            visible="true">
+      </separator>
+      <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.export"
             icon="icons/export_wiz.gif"
             label="Export selected review"
@@ -813,6 +837,16 @@
       </command>
       <separator
             name="AgileReview.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.switchReviewSourceProject"
+            label="Switch AgileReview Source Project"
+            style="push"
+            tooltip="Switch AgileReview Source Project">
+      </command>
+      <separator
+            name="AgileReview.separator5"
             visible="true">
       </separator>
       <command

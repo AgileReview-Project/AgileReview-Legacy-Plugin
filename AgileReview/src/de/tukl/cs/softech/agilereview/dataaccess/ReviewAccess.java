@@ -18,6 +18,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -25,9 +27,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.CommentsDocument;
@@ -60,7 +66,8 @@ public class ReviewAccess {
 	private static ReviewAccess RA = new ReviewAccess();
 	
 	/**
-	 * Reference to the folder where the review and comments xml files are located
+	 * Reference to the folder where the review and comments xml files are located.
+	 * This must never be null (after creation of ReviewAccess)
 	 */
 	private static IProject REVIEW_REPO_FOLDER;
 	
@@ -276,8 +283,8 @@ public class ReviewAccess {
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
 		if (!loadReviewSourceProject(projectName)) {
 			// TODO: A cool ReviewInitInteraction
-			String msg = "In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed." +/*?|0000006|Malte|c1|*/
-					"You now have to create such a folder in order to use AgileReview correctly." +
+			String msg = "In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed. " +/*?|0000006|Malte|c1|*/
+					"You now have to create such a folder. " +
 					"Later you can create new 'AgileReview Source Project' and use the Properties to determine which one should be used.\n\n" +
 					"If you cancel, the default 'AgileReview Source Project' will be created";/*|0000006|Malte|c1|?*/
 			Shell currentShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
@@ -314,6 +321,32 @@ public class ReviewAccess {
 				loadReviewSourceProject(projectName);
 			}
 		}
+		// Attach a ResourceChangeListener to monitor the AgileReview Source project
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
+			
+			@Override
+			public void resourceChanged(final IResourceChangeEvent event) {
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						if (REVIEW_REPO_FOLDER.equals(event.getResource())){
+							Shell currentShell = Display.getDefault().getActiveShell();
+							String msg = "You deleted or closed the current 'Agile Review Source Project'.\n" +
+									"Please select an other 'Agile Review Source Project' for AgileReview to stay functional.";
+							MessageDialog.openWarning(currentShell, "Warning: AgileReview Source Project", msg);
+							
+							PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(currentShell, "de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage", null, null);
+							// TODO: not finished here. I can not intercept.
+							if (dialog.open() == Window.OK) {
+								System.out.println("toll");
+							} else {
+								System.out.println("doof");
+							}
+						}
+					}
+				});
+			}
+		},  IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.PRE_CLOSE);
 	}
 	
 	/**
@@ -334,7 +367,7 @@ public class ReviewAccess {
 	private boolean loadReviewSourceProject(String projectName){
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject p = workspaceRoot.getProject(projectName);
-		if(!p.exists()) {
+		if(!p.exists() || !p.isOpen()) {
 			return false;
 		} else {
 			REVIEW_REPO_FOLDER = p;
@@ -898,8 +931,9 @@ public class ReviewAccess {
 	 */
 	public boolean updateReviewSourceProject() {
 		boolean result = false;	
-		if (!REVIEW_REPO_FOLDER.getName().equals(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER))) {
-			loadReviewSourceProject(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
+		String strPropManReviewSourceName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
+		if (!REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName)) {
+			loadReviewSourceProject(strPropManReviewSourceName);
 			result = true;
 		}	
 		return result;
