@@ -204,7 +204,7 @@ public class DetailView extends ViewPart {
 	 * Reaction of selection changes in {@link CommentTableView} or {@link ReviewExplorer}
 	 * @param event will be forwarded from the {@link ViewControl}
 	 */
-	public void selectionChanged(SelectionChangedEvent event) {
+	public void selectionChanged(SelectionChangedEvent event) {/*?|0000017|Peter Reuter|c0|*/
 		if(event.getSelection().isEmpty()) {
 			this.changeParent(DetailView.EMPTY);
 		} else if(event.getSelection() instanceof IStructuredSelection) {
@@ -222,5 +222,5 @@ public class DetailView extends ViewPart {
 				((CommentDetail)this.actParent).fillContents((Comment)e);
 			}
 		}
-	}
+	}/*|0000017|Peter Reuter|c0|?*/
 }
