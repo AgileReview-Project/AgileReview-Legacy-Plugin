@@ -842,6 +842,7 @@
       </separator>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.switchReviewSourceProject"
+            icon="icons/switch_source_15x15.png"
             label="Switch AgileReview Source Project"
             style="push"
             tooltip="Switch AgileReview Source Project">

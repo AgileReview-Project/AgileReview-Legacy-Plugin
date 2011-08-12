@@ -49,6 +49,7 @@ public class RelocateDialog extends Composite implements Listener {
 		data.horizontalSpan = 2;
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.FILL;
+		data.grabExcessHorizontalSpace = true;
 		label.setLayoutData(data);
 		
 		Button confirm = new Button(this, SWT.PUSH);
