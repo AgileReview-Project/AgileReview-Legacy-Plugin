@@ -651,7 +651,7 @@
       </command>
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-            defaultHandler="de.tukl.cs.softech.agilereview.views.detail.handlers.RepositioningHandler"
+            defaultHandler="de.tukl.cs.softech.agilereview.views.detail.handlers.RelocateHandler"
             description="Relocates the current selected comment"
             id="de.tukl.cs.softech.agilereview.views.detail.repositioning"
             name="Repositioning of a Comment">

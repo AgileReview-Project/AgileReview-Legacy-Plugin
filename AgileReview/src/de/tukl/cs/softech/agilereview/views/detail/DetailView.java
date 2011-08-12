@@ -35,6 +35,7 @@ public class DetailView extends ViewPart {
 	 * Static Field for describing a view displaying review details
 	 */
 	public static final int REVIEW_DETAIL = 2;
+	private static final int RELOCATE_DIALOG = 3;
 	
 	/**
 	 * The current shown UI (one of the defined static fields)
@@ -51,7 +52,11 @@ public class DetailView extends ViewPart {
 	/**
 	 * The current parent composite, which will change for different view sites
 	 */
-	private Composite actParent;
+	private Composite currentParent;
+	/**
+	 * Cached comment when temporary showing the relocate dialog
+	 */
+	private Comment cachedComment;
 	 /**
 	  * The current instance in which the createPartControl procedure was called
 	  */
@@ -70,7 +75,14 @@ public class DetailView extends ViewPart {
 	 * @param type static Field of class DetailView
 	 */
 	public void changeParent(int type) {
-		this.actParent.dispose();
+		//optimization and protection of cachedComment reset for changeParent to relocate dialog twice
+		if(this.currentDisplay == type) {
+			return;
+		}
+		
+		//reset all variables
+		this.currentParent.dispose();
+		this.cachedComment = null;
 		
 		//get SourceProvider for configuration
 		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
@@ -79,7 +91,7 @@ public class DetailView extends ViewPart {
 		
 		switch(type) {
 		case EMPTY:
-			this.actParent = new Composite(this.parentParent, this.parentStyle);
+			this.currentParent = new Composite(this.parentParent, this.parentStyle);
 			this.setPartName("Detail View");
 			this.currentDisplay = EMPTY;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
@@ -87,7 +99,7 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
-			this.actParent = new CommentDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 185, 210, 220));/*?|0000020|Malte|c2|?*/
+			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 185, 210, 220));/*?|0000020|Malte|c2|?*/
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, true);
@@ -95,12 +107,21 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
-			this.actParent = new ReviewDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 205, 230, 170));/*?|0000020|Malte|c3|?*/
+			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 205, 230, 170));/*?|0000020|Malte|c3|?*/
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to REVIEW_DETAIL");
+			break;
+		case RELOCATE_DIALOG:
+			cachedComment = (Comment) getContent();
+			currentParent = new RelocateDialog(this.parentParent, this.parentStyle, cachedComment);
+			this.setPartName("Comment Details");
+			this.currentDisplay = RELOCATE_DIALOG;
+			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
+			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, false);
+			PluginLogger.log(this.getClass().toString(), "changeParent", "to RELOCATE_DIALOG");
 			break;
 		}
 		this.parentParent.layout(true);
@@ -111,8 +132,8 @@ public class DetailView extends ViewPart {
 	 * @return true, if the current parent is revertable<br>false, otherwise
 	 */
 	public boolean isRevertable() {
-		if(actParent instanceof AbstractDetail<?>) {
-			return ((AbstractDetail<?>) actParent).isReparentable();
+		if(currentParent instanceof AbstractDetail<?>) {
+			return ((AbstractDetail<?>) currentParent).isReparentable();
 		} else {
 			return false;
 		}
@@ -125,8 +146,8 @@ public class DetailView extends ViewPart {
 	 */
 	public void addReply(String author, String text) {
 		if(currentDisplay == COMMENT_DETAIL) {
-			((CommentDetail) actParent).saveChanges();
-			((CommentDetail) actParent).addReply(author, text);
+			((CommentDetail) currentParent).saveChanges();
+			((CommentDetail) currentParent).addReply(author, text);
 		}
 	}
 
@@ -134,8 +155,8 @@ public class DetailView extends ViewPart {
 	 * Reverts all unsaved changes
 	 */
 	public void revert() {
-		if(actParent instanceof AbstractDetail<?>) {
-			((AbstractDetail<?>) actParent).revert();
+		if(currentParent instanceof AbstractDetail<?>) {
+			((AbstractDetail<?>) currentParent).revert();
 		}
 	}
 	
@@ -144,10 +165,30 @@ public class DetailView extends ViewPart {
 	 * @return current content representation or null if no content is displayed
 	 */
 	public Object getContent() {
-		if(actParent instanceof AbstractDetail<?>) {
-			return ((AbstractDetail<?>) actParent).getContent();
+		if(cachedComment != null) {
+			return cachedComment;
+		} else if(currentParent instanceof AbstractDetail<?>) {
+			return ((AbstractDetail<?>) currentParent).getContent();
 		} else {
 			return null;
+		}
+	}
+	
+	/**
+	 * Triggers the relocation process for the current shown comment 
+	 * and checks some security issues
+	 */
+	public void relocateComment() {
+		//for security reasons, but should not occur
+		if(!(getContent() instanceof Comment)) {
+			return; 
+		}
+		
+		//initiate or finish the relocation with the same command
+		if(currentParent instanceof RelocateDialog) {
+			((RelocateDialog)currentParent).performCommentRelocation();
+		} else {
+			changeParent(RELOCATE_DIALOG);
 		}
 	}
 	
@@ -160,7 +201,7 @@ public class DetailView extends ViewPart {
 		PluginLogger.log(this.getClass().toString(), "createPartControl", "DetailView will be created");
 		instance = this;
 
-		this.actParent = parent;
+		this.currentParent = parent;
 		this.parentParent = parent.getParent();
 		this.parentStyle = parent.getStyle();
 		
@@ -181,10 +222,10 @@ public class DetailView extends ViewPart {
 		case EMPTY:
 			break;
 		case COMMENT_DETAIL:
-			actParent.setFocus();
+			currentParent.setFocus();
 			break;
 		case REVIEW_DETAIL:
-			actParent.setFocus();
+			currentParent.setFocus();
 			break;
 		}
 	}
@@ -195,8 +236,8 @@ public class DetailView extends ViewPart {
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	public void partClosedOrDeactivated(IWorkbenchPart part) {
-		if(actParent instanceof AbstractDetail<?> && !actParent.isDisposed()) {
-			((AbstractDetail<?>)actParent).partClosedOrDeactivated(part);
+		if(currentParent instanceof AbstractDetail<?> && !currentParent.isDisposed()) {
+			((AbstractDetail<?>)currentParent).partClosedOrDeactivated(part);
 		}
 	}
 
@@ -211,15 +252,15 @@ public class DetailView extends ViewPart {
 			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 			Object e = sel.getFirstElement();
 			if(e instanceof MultipleReviewWrapper) {
-				if(!(this.actParent instanceof ReviewDetail)) {
+				if(!(this.currentParent instanceof ReviewDetail)) {
 					this.changeParent(DetailView.REVIEW_DETAIL);
 				}
-				((ReviewDetail)this.actParent).fillContents((MultipleReviewWrapper)e);
+				((ReviewDetail)this.currentParent).fillContents((MultipleReviewWrapper)e);
 			} else if(e instanceof Comment) {
-				if(!(this.actParent instanceof CommentDetail)) {
+				if(!(this.currentParent instanceof CommentDetail)) {
 					this.changeParent(DetailView.COMMENT_DETAIL);
 				}
-				((CommentDetail)this.actParent).fillContents((Comment)e);
+				((CommentDetail)this.currentParent).fillContents((Comment)e);
 			}
 		}
 	}/*|0000017|Peter Reuter|c0|?*/
