@@ -49,7 +49,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	/**
 	 * Public static field representing all existing views of this plugin
 	 */
-	public static final int ALL_VIEWS = 7;
+	public static final int ALL_VIEWS = 7;/*?|0000020|Malte|c2|?*/
 	
 	/**
 	 * Set of all active Views
@@ -173,7 +173,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * @param validateExplorerSelection
 	 * @param refreshInputs 
 	 */
-	public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {
+	public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {/*?|0000020|Malte|c3|*/
 		if((flags % 2 == 1) && isOpen(DetailView.class)) {
 			DetailView.getInstance().backgroundChanged();
 		}
@@ -194,7 +194,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 				ReviewExplorer.getInstance().refresh();
 			}
 		}
-	}
+	}/*|0000020|Malte|c3|?*/
 	
 	/**
 	 * Indicates whether the perspective should be switched (user preferences or actual user decision)

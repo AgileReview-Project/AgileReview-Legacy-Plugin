@@ -83,12 +83,12 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * Changes the background color for this AbstractDetail.
 	 * @param bg
 	 */
-	protected void changeBackgroundColor(Color bg) {
+	protected void changeBackgroundColor(Color bg) {/*?|0000020|Malte|c0|*/
 		this.setBackground(bg);
 		for(Control c : bgComponents) {
 			c.setBackground(bg);
 		}
-	}
+	}/*|0000020|Malte|c0|?*/
 	
 	/**
 	 * saves every changes made in the current Detail View

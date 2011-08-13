@@ -217,7 +217,7 @@ public class DetailView extends ViewPart {
 	/**
 	 * Should only be called if the intended background of the view was changed by the user
 	 */
-	public void backgroundChanged() {
+	public void backgroundChanged() {/*?|0000020|Malte|c4|*/
 		System.err.println("test");
 		if(currentDisplay == COMMENT_DETAIL) {
 			String prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
@@ -225,7 +225,7 @@ public class DetailView extends ViewPart {
 			Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
 			((AbstractDetail<?>)currentParent).changeBackgroundColor(color);
 		}
-	}
+	}/*|0000020|Malte|c4|?*/
 	
 	/*
 	 * (non-Javadoc)
