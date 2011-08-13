@@ -24,17 +24,20 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
 public class DetailView extends ViewPart {
 
 	/**
-	 * Static Field for describing an empty view
+	 * Static Field describing an empty view
 	 */
 	public static final int EMPTY = 0;
 	/**
-	 * Static Field for describing a view displaying comment details
+	 * Static Field describing a view displaying comment details
 	 */
 	public static final int COMMENT_DETAIL = 1;
 	/**
-	 * Static Field for describing a view displaying review details
+	 * Static Field describing a view displaying review details
 	 */
 	public static final int REVIEW_DETAIL = 2;
+	/**
+	 * Static Field describing a view displaying the relocate dialog
+	 */
 	private static final int RELOCATE_DIALOG = 3;/*?|0000020|smokie88|c5|?*/
 	
 	/**

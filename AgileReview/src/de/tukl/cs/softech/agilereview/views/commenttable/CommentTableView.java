@@ -203,6 +203,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 				parserMap.get(getActiveEditor()).removeCommentTags(comment);
 			} else {
 				TagCleaner.removeTag(new Path(ReviewAccess.computePath(comment)), generateCommentKey(comment), false);
+				reparseAllEditors();
 			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "deleteComment", "BadLocationException when trying to delete comment", e);
