@@ -548,6 +548,18 @@
          </with>
       </activeWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.RelocateHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning">
+      <activeWhen>
+         <with
+               variable="de.tukl.cs.softech.agilereview.views.detail.variables.relocatePossible">
+            <equals
+                  value="true">
+            </equals>
+         </with>
+      </activeWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -651,7 +663,6 @@
       </command>
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-            defaultHandler="de.tukl.cs.softech.agilereview.views.detail.handlers.RelocateHandler"
             description="Relocates the current selected comment"
             id="de.tukl.cs.softech.agilereview.views.detail.repositioning"
             name="Repositioning of a Comment">
@@ -677,7 +688,7 @@
          <visibleWhen
                checkEnabled="false">
             <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.relocatePossible">
                <equals
                      value="true">
                </equals>
@@ -959,6 +970,10 @@
       </variable>
       <variable
             name="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable"
+            priorityLevel="workbench">
+      </variable>
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.detail.variables.relocatePossible"
             priorityLevel="workbench">
       </variable>
       <variable

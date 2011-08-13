@@ -13,6 +13,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
@@ -90,7 +91,8 @@ public class DetailView extends ViewPart {
 		//get SourceProvider for configuration
 		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 		SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.REPLY_POSSIBLE);
-		SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTENT_AVAILABLE);		
+		SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTENT_AVAILABLE);
+		SourceProvider sp3 = (SourceProvider) isps.getSourceProvider(SourceProvider.RELOCATE_POSSIBLE);
 		
 		switch(type) {
 		case EMPTY:
@@ -99,22 +101,28 @@ public class DetailView extends ViewPart {
 			this.currentDisplay = EMPTY;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, false);
+			sp3.setVariable(SourceProvider.RELOCATE_POSSIBLE, false);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
-			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 185, 210, 220));/*?|0000020|smokie88|c6|?*/
+			String prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
+			String[] rgb = prop.split(",");
+			Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
+			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, color);/*?|0000020|smokie88|c6|?*/
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, true);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, true);
+			sp3.setVariable(SourceProvider.RELOCATE_POSSIBLE, true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
-			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 205, 230, 170));/*?|0000020|smokie88|c7|?*/
+			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 185, 210, 220));/*?|0000020|smokie88|c7|?*/
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, true);
+			sp3.setVariable(SourceProvider.RELOCATE_POSSIBLE, false);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to REVIEW_DETAIL");
 			break;
 		case RELOCATE_DIALOG:
@@ -124,6 +132,7 @@ public class DetailView extends ViewPart {
 			this.currentDisplay = RELOCATE_DIALOG;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, false);
+			sp3.setVariable(SourceProvider.RELOCATE_POSSIBLE, true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to RELOCATE_DIALOG");
 			break;
 		}
