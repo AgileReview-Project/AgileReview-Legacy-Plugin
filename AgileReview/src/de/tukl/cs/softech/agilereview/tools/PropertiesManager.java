@@ -59,6 +59,10 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String DEFAULT_ANNOTATION_COLOR = "annotations.default.color";
 		/**
+		 * Default color of Reviews
+		 */
+		public static String DEFAULT_REVIEW_COLOR = "review.default.color";
+		/**
 		 * Message the display when saving a reply on a comment, without all fields filled out
 		 */
 		public static String COMMENT_EMPTY_REPLY_MESSAGE = "reply_inf_completeness";

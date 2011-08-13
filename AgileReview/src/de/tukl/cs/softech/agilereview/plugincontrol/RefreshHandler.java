@@ -50,7 +50,7 @@ public class RefreshHandler extends AbstractHandler {
 		}
 		
 		if(ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().changeParent(DetailView.EMPTY);
+			DetailView.getInstance().clearView();
 		}
 		if(ViewControl.isOpen(ReviewExplorer.class)) {
 			ReviewExplorer.getInstance().refreshInput();

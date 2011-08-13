@@ -49,7 +49,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	/**
 	 * Public static field representing all existing views of this plugin
 	 */
-	public static final int ALL_VIEWS = 8;
+	public static final int ALL_VIEWS = 7;
 	
 	/**
 	 * Set of all active Views
@@ -174,17 +174,17 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * @param refreshInputs 
 	 */
 	public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {
-		if(((flags >> 3) % 2 == 1 || flags % 2 == 1) && isOpen(DetailView.class)) {
-			//TODO refresh detail view
+		if((flags % 2 == 1) && isOpen(DetailView.class)) {
+			DetailView.getInstance().backgroundChanged();
 		}
-		if(((flags >> 3) % 2 == 1 || (flags >> 1) % 2 == 1) && isOpen(CommentTableView.class)) {
+		if(((flags >> 1) % 2 == 1) && isOpen(CommentTableView.class)) {
 			if(refreshInputs) {
 				CommentTableView.getInstance().resetComments();
 			} else {
 				CommentTableView.getInstance().refreshTable();
 			}
 		}
-		if(((flags >> 3) % 2 == 1 || (flags >> 2) % 2 == 1) && isOpen(ReviewExplorer.class)) {
+		if(((flags >> 2) % 2 == 1) && isOpen(ReviewExplorer.class)) {
 			if(validateExplorerSelection) {
 				ReviewExplorer.getInstance().validateExplorerSelection();
 			}

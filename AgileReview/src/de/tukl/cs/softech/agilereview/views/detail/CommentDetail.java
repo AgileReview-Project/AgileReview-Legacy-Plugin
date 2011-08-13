@@ -74,37 +74,37 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
-	protected void initUI(Color bg) {
+	protected void initUI() {
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 2;
 		gridLayout.numColumns = numColumns;
 		this.setLayout(gridLayout);
 
 		Label tagID = new Label(this, SWT.NONE);
-		tagID.setBackground(bg);
 		tagID.setText("Tag-ID: ");
+		super.bgComponents.add(tagID);
 		
 		tagInstance = new Label(this, SWT.WRAP);
-		tagInstance.setBackground(bg);
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    tagInstance.setLayoutData(gridData);
+	    super.bgComponents.add(tagInstance);
 		
 	    Label author = new Label(this, SWT.PUSH);
-	    author.setBackground(bg);
 	    author.setText("Author: ");
+	    super.bgComponents.add(author);
 	    
 	    authorInstance = new Label(this, SWT.WRAP);
-	    authorInstance.setBackground(bg);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    authorInstance.setLayoutData(gridData);
+	    super.bgComponents.add(authorInstance);
 	    
 	    Label status = new Label(this, SWT.PUSH);
-	    status.setBackground(bg);
 	    status.setText("Status: ");
+	    super.bgComponents.add(status);
 	    
 	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);/*?|0000020|smokie88|c0|*/
 	    gridData = new GridData();
@@ -113,10 +113,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    statusDropDown.setLayoutData(gridData);
 	    statusDropDown.addFocusListener(this);
 	    statusDropDown.addModifyListener(this);/*|0000020|smokie88|c0|?*/
+	    super.bgComponents.add(statusDropDown);
 	    
 	    Label priority = new Label(this, SWT.PUSH);
-	    priority.setBackground(bg);
 	    priority.setText("Priority: ");
+	    super.bgComponents.add(priority);
 	    
 	    priorityDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
 	    gridData = new GridData();
@@ -125,10 +126,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    priorityDropDown.setLayoutData(gridData);
 	    priorityDropDown.addFocusListener(this);
 	    priorityDropDown.addModifyListener(this);
+	    super.bgComponents.add(priorityDropDown);
 	    	
 	    Label recipient = new Label(this, SWT.PUSH);
-	    recipient.setBackground(bg);
 	    recipient.setText("Recipient: ");
+	    super.bgComponents.add(recipient);
 	    
 	    recipientText = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
 	    gridData = new GridData();
@@ -142,12 +144,12 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    sash.setVisible(false);/*?|0000020|smokie88|c1|?*/
 	    
 	    Label caption = new Label(this, SWT.PUSH);
-	    caption.setBackground(bg);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns;
 	    caption.setLayoutData(gridData);
 	    caption.setText("Description / Replys:");
+	    super.bgComponents.add(caption);
 	    
 	    SashForm texts = new SashForm(this, SWT.VERTICAL);
 	    gridData = new GridData();
@@ -158,6 +160,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.grabExcessVerticalSpace = true;
 	    gridData.grabExcessHorizontalSpace = true;
 	    texts.setLayoutData(gridData);
+	    super.bgComponents.add(texts);
 	    
 	    txt = new StyledText(texts, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
 	    txt.setVisible(true);
@@ -340,4 +343,5 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 		return commentTag;
 	}
+
 }

@@ -150,6 +150,8 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
 		if (ReviewAccess.getInstance().updateReviewSourceProject()) {
 			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
+		} else {
+			ViewControl.refreshViews(ViewControl.DETAIL_VIEW);
 		}
 		return result;
 	}

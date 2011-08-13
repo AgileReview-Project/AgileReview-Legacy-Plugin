@@ -72,26 +72,26 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
 	@Override
-	protected void initUI(Color bg) {
+	protected void initUI() {
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 3;
 		gridLayout.numColumns = numColumns;
 		this.setLayout(gridLayout);
 		
 		Label review = new Label(this, SWT.PUSH);
-		review.setBackground(bg);
 		review.setText("Review: ");
+		super.bgComponents.add(review);
 	    
 	    reviewInstance = new Label(this, SWT.WRAP);
-	    reviewInstance.setBackground(bg);
 	    GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    reviewInstance.setLayoutData(gridData);
+	    super.bgComponents.add(reviewInstance);
 	    
 	    Label refId = new Label(this, SWT.PUSH);
-	    refId.setBackground(bg);
 	    refId.setText("External reference: ");
+	    super.bgComponents.add(refId);
 	    
 	    reference = new Text(this, SWT.BORDER | SWT.SINGLE );/*?|0000020|smokie88|c2|*/
 	    gridData = new GridData();
@@ -108,10 +108,11 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    referenceButton.setLayoutData(gridData);
 	    referenceButton.addSelectionListener(this);
 	    referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");/*|0000020|smokie88|c3|?*/
+	    super.bgComponents.add(referenceButton);
 	    
 	    Label author = new Label(this, SWT.PUSH);
-	    author.setBackground(bg);
 	    author.setText("Responsibility: ");
+	    super.bgComponents.add(author);
 	    
 	    authorInstance = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
 	    gridData = new GridData();
@@ -122,8 +123,8 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    authorInstance.addModifyListener(this);
 	    
 	    Label status = new Label(this, SWT.PUSH);
-	    status.setBackground(bg);
 	    status.setText("Status: ");
+	    super.bgComponents.add(status);
 	    
 	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
 	    gridData = new GridData();
@@ -132,17 +133,18 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    statusDropDown.setLayoutData(gridData);
 	    statusDropDown.addFocusListener(this);
 	    statusDropDown.addModifyListener(this);
+	    super.bgComponents.add(statusDropDown);
 	    
 	    Sash sash = new Sash(this, SWT.PUSH);/*?|0000020|smokie88|c4|*/
 	    sash.setVisible(false);/*|0000020|smokie88|c4|?*/
 	    
 	    Label caption = new Label(this, SWT.PUSH);
-	    caption.setBackground(bg);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns;
 	    caption.setLayoutData(gridData);
 	    caption.setText("Description:");
+	    super.bgComponents.add(caption);
 	    
 	    txt = new StyledText(this, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
 	    txt.setVisible(true);

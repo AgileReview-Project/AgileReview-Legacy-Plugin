@@ -31,11 +31,11 @@ public class DetailView extends ViewPart {
 	/**
 	 * Static Field describing a view displaying comment details
 	 */
-	public static final int COMMENT_DETAIL = 1;
+	private static final int COMMENT_DETAIL = 1;
 	/**
 	 * Static Field describing a view displaying review details
 	 */
-	public static final int REVIEW_DETAIL = 2;
+	private static final int REVIEW_DETAIL = 2;
 	/**
 	 * Static Field describing a view displaying the relocate dialog
 	 */
@@ -75,10 +75,17 @@ public class DetailView extends ViewPart {
 	}
 	
 	/**
+	 * Changes the ViewPart UI to {@link #EMPTY}
+	 */
+	public void clearView() {
+		changeParent(EMPTY);
+	}
+	
+	/**
 	 * changes the ViewPart UI
 	 * @param type static Field of class DetailView
 	 */
-	public void changeParent(int type) {
+	private void changeParent(int type) {
 		//optimization and protection of cachedComment reset for changeParent to relocate dialog twice
 		if(this.currentDisplay == type) {
 			return;
@@ -117,7 +124,10 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
-			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 185, 210, 220));/*?|0000020|smokie88|c7|?*/
+			prop = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_REVIEW_COLOR);
+			rgb = prop.split(",");
+			color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
+			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, color);/*?|0000020|smokie88|c7|?*/
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
@@ -201,6 +211,19 @@ public class DetailView extends ViewPart {
 			((RelocateDialog)currentParent).performCommentRelocation();
 		} else {
 			changeParent(RELOCATE_DIALOG);
+		}
+	}
+	
+	/**
+	 * Should only be called if the intended background of the view was changed by the user
+	 */
+	public void backgroundChanged() {
+		System.err.println("test");
+		if(currentDisplay == COMMENT_DETAIL) {
+			String prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
+			String[] rgb = prop.split(",");
+			Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
+			((AbstractDetail<?>)currentParent).changeBackgroundColor(color);
 		}
 	}
 	

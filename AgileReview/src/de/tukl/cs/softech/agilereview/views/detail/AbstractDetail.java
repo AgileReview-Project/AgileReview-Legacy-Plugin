@@ -1,5 +1,7 @@
 package de.tukl.cs.softech.agilereview.views.detail;
 
+import java.util.HashSet;
+
 import org.apache.xmlbeans.XmlObject;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -7,6 +9,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -32,6 +35,10 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * backup of the current displayed object
 	 */
 	protected E backupObject;
+	/**
+	 * This set represents all components which should adapt the composite background color
+	 */
+	protected HashSet<Control> bgComponents = new HashSet<Control>();
 
 	/**
 	 * Creates a new AbstractDetail Composite onto the given parent with the specified SWT styles
@@ -41,16 +48,15 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 */
 	protected AbstractDetail(Composite parent, int style, Color bg) {
 		super(parent, style);
-		this.setBackground(bg);
-		initUI(bg);
+		initUI();
+		changeBackgroundColor(bg);
 	}
 
 	/**
 	 * this method will be automatically called by the constructor and should
 	 * contain the initialization of the UI especially of the saveButton and revertButton
-	 * @param bg background color of the view
 	 */
-	protected abstract void initUI(Color bg);
+	protected abstract void initUI();
 	
 	/**
 	 * saveChanges will be called by the IPartListener and FocusListener and should contain
@@ -72,6 +78,17 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @param input which should be displayed
 	 */
 	protected abstract void fillContents(E input);
+	
+	/**
+	 * Changes the background color for this AbstractDetail.
+	 * @param bg
+	 */
+	protected void changeBackgroundColor(Color bg) {
+		this.setBackground(bg);
+		for(Control c : bgComponents) {
+			c.setBackground(bg);
+		}
+	}
 	
 	/**
 	 * saves every changes made in the current Detail View
