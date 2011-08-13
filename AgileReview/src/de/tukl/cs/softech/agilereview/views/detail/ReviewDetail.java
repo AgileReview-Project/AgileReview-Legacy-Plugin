@@ -63,16 +63,16 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	 * @param style with which this Composite will be styled
 	 * @param bg background color for this view
 	 */
-	protected ReviewDetail(Composite parent, int style, Color bg) {/*?|0000020|Malte|c5|*/
+	protected ReviewDetail(Composite parent, int style, Color bg) {
 		super(parent, style, bg);
-	}/*|0000020|Malte|c5|?*/
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
 	@Override
-	protected void initUI(Color bg) {/*?|0000020|Malte|c4|*/
+	protected void initUI(Color bg) {
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 3;
 		gridLayout.numColumns = numColumns;
@@ -93,21 +93,21 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    refId.setBackground(bg);
 	    refId.setText("External reference: ");
 	    
-	    reference = new Text(this, SWT.BORDER | SWT.SINGLE );
+	    reference = new Text(this, SWT.BORDER | SWT.SINGLE );/*?|0000020|smokie88|c2|*/
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.grabExcessHorizontalSpace = true;
 	    gridData.horizontalSpan = numColumns-2;
 	    reference.setLayoutData(gridData);
-	    reference.addFocusListener(this);
+	    reference.addFocusListener(this);/*|0000020|smokie88|c2|?*/
 	    
-	    referenceButton = new Button(this, SWT.PUSH );
+	    referenceButton = new Button(this, SWT.PUSH );/*?|0000020|smokie88|c3|*/
 	    referenceButton.setImage(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons"+System.getProperty("file.separator")+"discovery.gif").createImage());
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.END;
 	    referenceButton.setLayoutData(gridData);
 	    referenceButton.addSelectionListener(this);
-	    referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");
+	    referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");/*|0000020|smokie88|c3|?*/
 	    
 	    Label author = new Label(this, SWT.PUSH);
 	    author.setBackground(bg);
@@ -133,8 +133,8 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    statusDropDown.addFocusListener(this);
 	    statusDropDown.addModifyListener(this);
 	    
-	    Sash sash = new Sash(this, SWT.PUSH);
-	    sash.setVisible(false);
+	    Sash sash = new Sash(this, SWT.PUSH);/*?|0000020|smokie88|c4|*/
+	    sash.setVisible(false);/*|0000020|smokie88|c4|?*/
 	    
 	    Label caption = new Label(this, SWT.PUSH);
 	    caption.setBackground(bg);
@@ -161,7 +161,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    txt.setLayoutData(gridData);
 	    
 	    setPropertyConfigurations();
-	}/*|0000020|Malte|c4|?*/
+	}
 
 	/*
 	 * (non-Javadoc)

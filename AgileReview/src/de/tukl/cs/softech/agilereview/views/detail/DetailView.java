@@ -35,7 +35,7 @@ public class DetailView extends ViewPart {
 	 * Static Field for describing a view displaying review details
 	 */
 	public static final int REVIEW_DETAIL = 2;
-	private static final int RELOCATE_DIALOG = 3;
+	private static final int RELOCATE_DIALOG = 3;/*?|0000020|smokie88|c5|?*/
 	
 	/**
 	 * The current shown UI (one of the defined static fields)
@@ -99,7 +99,7 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
-			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 185, 210, 220));/*?|0000020|Malte|c2|?*/
+			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 185, 210, 220));/*?|0000020|smokie88|c6|?*/
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, true);
@@ -107,7 +107,7 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
-			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 205, 230, 170));/*?|0000020|Malte|c3|?*/
+			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, new Color(PlatformUI.getWorkbench().getDisplay(), 205, 230, 170));/*?|0000020|smokie88|c7|?*/
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
 			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);

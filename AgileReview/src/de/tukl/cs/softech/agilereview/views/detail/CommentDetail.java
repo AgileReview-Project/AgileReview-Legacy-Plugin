@@ -66,15 +66,15 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @param style in which this component should be displayed
 	 * @param bg background color for this view
 	 */
-	protected CommentDetail(Composite parent, int style, Color bg) {/*?|0000020|Malte|c1|*/
+	protected CommentDetail(Composite parent, int style, Color bg) {
 		super(parent, style, bg);
-	}/*|0000020|Malte|c1|?*/
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#initUI()
 	 */
-	protected void initUI(Color bg) {/*?|0000020|Malte|c6|*/
+	protected void initUI(Color bg) {
 		GridLayout gridLayout = new GridLayout();
 		int numColumns = 2;
 		gridLayout.numColumns = numColumns;
@@ -106,13 +106,13 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    status.setBackground(bg);
 	    status.setText("Status: ");
 	    
-	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
+	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);/*?|0000020|smokie88|c0|*/
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    statusDropDown.setLayoutData(gridData);
 	    statusDropDown.addFocusListener(this);
-	    statusDropDown.addModifyListener(this);
+	    statusDropDown.addModifyListener(this);/*|0000020|smokie88|c0|?*/
 	    
 	    Label priority = new Label(this, SWT.PUSH);
 	    priority.setBackground(bg);
@@ -139,7 +139,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    recipientText.addModifyListener(this);
 	    
 	    Sash sash = new Sash(this, SWT.PUSH);
-	    sash.setVisible(false);
+	    sash.setVisible(false);/*?|0000020|smokie88|c1|?*/
 	    
 	    Label caption = new Label(this, SWT.PUSH);
 	    caption.setBackground(bg);
@@ -175,7 +175,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    replys.addModifyListener(this);
 	    
 	    setPropertyConfigurations();
-	}/*|0000020|Malte|c6|?*/
+	}
 	
 	/*
 	 * (non-Javadoc)

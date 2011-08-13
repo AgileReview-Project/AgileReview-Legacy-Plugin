@@ -14,12 +14,12 @@ import org.eclipse.swt.widgets.Shell;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
- * The ReplyDialog is a small Wizard to insert new Replys to a document
+ * The CommentChooserDialog is a small Dialog to choose between multiple comments
  */
 public class CommentChooserDialog extends Composite implements Listener {
 	
 	/**
-	 * TextBox to insert the reply text
+	 * Drop down box to choose the right comment
 	 */
 	private Combo replyText;
 	/**
