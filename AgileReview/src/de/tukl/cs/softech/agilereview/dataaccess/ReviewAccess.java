@@ -30,10 +30,13 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.CommentsDocument;
@@ -282,45 +285,67 @@ public class ReviewAccess {
 		// Set the directory where the comments are located
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
 		if (!loadReviewSourceProject(projectName)) {
-			// TODO: A cool ReviewInitInteraction
-			String msg = "In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed. " +/*?|0000006|Malte|c1|*/
-					"You now have to create such a folder. " +
-					"Later you can create new 'AgileReview Source Project' and use the Properties to determine which one should be used.\n\n" +
-					"If you cancel, the default 'AgileReview Source Project' will be created";/*|0000006|Malte|c1|?*/
-			Shell currentShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			InputDialog in = new InputDialog(currentShell, "AgileReview - Review Source Project creation", msg, projectName, new IInputValidator() {
-				@Override
-				public String isValid(String newText) {
-			        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
-			        String projectFieldContents = newText;
-			        if (projectFieldContents.equals("")) {
-			            return "Project name cannot be empty!";
-			        }
-
-			        IStatus nameStatus = workspace.validateName(projectFieldContents,
-			                IResource.PROJECT);
-			        if (!nameStatus.isOK()) {
-			            return nameStatus.getMessage();
-			        }
-			 
-			        IProject project = workspace.getRoot().getProject(
-							projectFieldContents);
-			        
-			        if (project.exists()) {/*?|0000006|Malte|c2|*/
-			            return "Project does already exist!";
-			        }
-					return null;/*|0000006|Malte|c2|?*/
-				}
-			});
-			if (in.open() == Window.OK) {
-				projectName = in.getValue();
-			}
+			
+			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+			Shell shell = new Shell(parent);
+			ARSourceProjectInitDialog dialog = new ARSourceProjectInitDialog(shell, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM | SWT.SHELL_TRIM);
+			dialog.pack();
+		    shell.setText("No active AgileReview Source Project found");
+			shell.pack();
+		    shell.open();
+			while (!shell.isDisposed()) {
+				if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
+		    }
+			projectName = dialog.getChosenProjectName();		
 			if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);/*?|0000006|Malte|c0|?*/
+				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
 				loadReviewSourceProject(projectName);
 			}
+			
+			
+			
+			
+			
+//			// TODO: A cool ReviewInitInteraction
+//			String msg = "In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed. " +/*?|0000006|Malte|c1|*/
+//					"You now have to create such a folder. " +
+//					"Later you can create new 'AgileReview Source Project' and use the Properties to determine which one should be used.\n\n" +
+//					"If you cancel, the default 'AgileReview Source Project' will be created";/*|0000006|Malte|c1|?*/
+//			Shell currentShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+//			InputDialog in = new InputDialog(currentShell, "AgileReview - Review Source Project creation", msg, projectName, new IInputValidator() {
+//				@Override
+//				public String isValid(String newText) {
+//			        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+//
+//			        String projectFieldContents = newText;
+//			        if (projectFieldContents.equals("")) {
+//			            return "Project name cannot be empty!";
+//			        }
+//
+//			        IStatus nameStatus = workspace.validateName(projectFieldContents,
+//			                IResource.PROJECT);
+//			        if (!nameStatus.isOK()) {
+//			            return nameStatus.getMessage();
+//			        }
+//			 
+//			        IProject project = workspace.getRoot().getProject(
+//							projectFieldContents);
+//			        
+//			        if (project.exists()) {/*?|0000006|Malte|c2|*/
+//			            return "Project does already exist!";
+//			        }
+//					return null;/*|0000006|Malte|c2|?*/
+//				}
+//			});
+//			if (in.open() == Window.OK) {
+//				projectName = in.getValue();
+//			}
+//			if (ReviewAccess.createAndOpenReviewProject(projectName)) {
+//				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);/*?|0000006|Malte|c0|?*/
+//				loadReviewSourceProject(projectName);
+//			}
 		}
+		
 		// Attach a ResourceChangeListener to monitor the AgileReview Source project
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
 			
@@ -587,7 +612,7 @@ public class ReviewAccess {
 		
 		// Now get the right document and find the right place in it
 		CommentsDocument currCommentsDoc =  this.rFileModel.getCommentsDoc(commentFile);
-		agileReview.softech.tukl.de.FileDocument.File currFile = (agileReview.softech.tukl.de.FileDocument.File)findXmlPath(currCommentsDoc, path, IResource.FILE, true);
+		File currFile = (File)findXmlPath(currCommentsDoc, path, IResource.FILE, true);
 		
 		// Prepare new Comment
 		Comment result = currFile.addNewComment();

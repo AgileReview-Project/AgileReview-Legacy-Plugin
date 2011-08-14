@@ -31,15 +31,27 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 	 * Checkbox button to determine if folder should be used directly
 	 */
 	private Button use;
+	/**
+	 * Specifies whether the useDirectly check-box is initially selected or not
+	 */
+	private boolean bUseDirectlyInitial;
+	/**
+	 * Specifies whether the useDirectly check-box is enabled or not
+	 */
+	private boolean bFixUseDirectly;
 
 	
 	/**
 	 * Creates a new page
+	 * @param useDirectlyInitial specifies whether the useDirectly check-box is initially selected or not
+	 * @param fixUseDirectly specifies whether the useDirectly check-box is enabled or not
 	 */
-	protected NewReviewSourceWizardPage() {
+	protected NewReviewSourceWizardPage(boolean useDirectlyInitial, boolean fixUseDirectly) {
 		super("New Review Source Project");
 		setTitle("New Review Source Project");
 		setDescription("This wizard creates a new Review Source Project.");
+		this.bUseDirectlyInitial = useDirectlyInitial;
+		this.bFixUseDirectly = fixUseDirectly;
 	}
 
 	/* (non-Javadoc)
@@ -50,6 +62,7 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		container.setLayout(layout);
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		
 		// Textfield + Label
 		Label lReviewId = new Label(container, SWT.NULL);
@@ -59,16 +72,16 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 		name.selectAll();
 		name.setToolTipText("Review Source Folder -Name must be set.");
 		name.addModifyListener(this);
+		name.setLayoutData(gd);
 		
 		// Check-Box
 		use = new Button(container, SWT.CHECK);
 		use.setText("use this project after creation");
 		use.setSelection(true);
-	
-		
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		name.setLayoutData(gd);
 		use.setLayoutData(gd);
+		use.setSelection(bUseDirectlyInitial);
+		use.setEnabled(!bFixUseDirectly);
+		
 		// Required to avoid an error in the system
 		setControl(container);
 		this.modifyText(null);

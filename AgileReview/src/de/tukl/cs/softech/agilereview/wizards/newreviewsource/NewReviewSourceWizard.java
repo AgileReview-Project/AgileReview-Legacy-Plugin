@@ -18,9 +18,32 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 	 * The first and sole page of the wizard 
 	 */
 	private NewReviewSourceWizardPage page1;
+	/**
+	 * Specifies whether the useDirectly check-box is initially selected or not (default: true)
+	 */
+	private boolean bUseDirectlyInitial = true;
+	/**
+	 * Specifies whether the useDirectly check-box is enabled or not (default: false)
+	 */
+	private boolean bFixUseDirectly = false;
+	/**
+	 * The name of the project created by this wizard
+	 */
+	private String createdProjectName = null;
 	
 	/**
-	 * Constructor
+	 * Constructor with arguments for customized calling
+	 * @param useDirectlyInitial specifies whether the useDirectly check-box is initially selected or not
+	 * @param fixUseDirectly specifies whether the useDirectly check-box is enabled or not
+	 */
+	public NewReviewSourceWizard(boolean useDirectlyInitial, boolean fixUseDirectly) {
+		super();
+		setNeedsProgressMonitor(true);
+		this.bUseDirectlyInitial = useDirectlyInitial;
+		this.bFixUseDirectly = fixUseDirectly;
+	}
+	/**
+	 * Empty constructor for calling from eclipse
 	 */
 	public NewReviewSourceWizard() {
 		super();
@@ -40,7 +63,7 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 	@Override
 	public void addPages() {
 		super.addPages();
-		page1 = new NewReviewSourceWizardPage();
+		page1 = new NewReviewSourceWizardPage(bUseDirectlyInitial, bFixUseDirectly);
 		addPage(page1);
 	}
 
@@ -50,7 +73,10 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 		boolean useDirectly = page1.getUseDirectly();
 		
 		boolean result = ReviewAccess.createAndOpenReviewProject(projectName);
-			
+		if (result) {
+			createdProjectName = projectName;
+		}
+		
 		if (useDirectly) {
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
 			if (ReviewAccess.getInstance().updateReviewSourceProject()) {
@@ -59,6 +85,13 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 		}
 		
 		return result;
+	}
+	/**
+	 * Returns the "result" of this wizard: The name of the created project
+	 * @return name of the created project or null if project was not created
+	 */
+	public String getCreatedProjectName() {
+		return createdProjectName;
 	}
 
 }
