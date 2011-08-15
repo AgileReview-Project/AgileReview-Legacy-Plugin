@@ -168,7 +168,7 @@ public class ARSourceProjectInitDialog extends Composite implements Listener {
 		if (event.widget == btOk) {
 			if (comboChooseProject.getText() != ""){
 				returnText = comboChooseProject.getText();
-				dispose();
+				getParent().dispose();
 			}
 		} else if (event.widget == btOpenClosed) {
 			if (comboClosedProjects.getText() != ""){
