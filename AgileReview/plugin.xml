@@ -550,7 +550,7 @@
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.views.detail.handlers.RelocateHandler"
-         commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning">
+         commandId="de.tukl.cs.softech.agilereview.views.detail.relocateComment">
       <activeWhen>
          <with
                variable="de.tukl.cs.softech.agilereview.views.detail.variables.relocatePossible">
@@ -664,7 +664,7 @@
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
             description="Relocates the current selected comment"
-            id="de.tukl.cs.softech.agilereview.views.detail.repositioning"
+            id="de.tukl.cs.softech.agilereview.views.detail.relocateComment"
             name="Repositioning of a Comment">
       </command>
       <command
@@ -681,7 +681,7 @@
          allPopups="false"
          locationURI="toolbar:de.tukl.cs.softech.agilereview.view.commentdetailview.view">
       <command
-            commandId="de.tukl.cs.softech.agilereview.views.detail.repositioning"
+            commandId="de.tukl.cs.softech.agilereview.views.detail.relocateComment"
             icon="icons/comment/comment_repos_15x15.png"
             label="Relocate"
             style="push">
