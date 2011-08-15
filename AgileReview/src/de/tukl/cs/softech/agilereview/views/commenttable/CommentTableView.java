@@ -651,14 +651,14 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		IEditorPart editor;
 		if((editor = getActiveEditor()) != null) {
 			try {
-				parserMap.get(editor).removeCommentTags(comment);/*?|0000008|Peter|c0|*/
-				parserMap.get(editor).addTagsInDocument(comment, getFilteredComments().contains(comment));/*|0000008|Peter|c0|?*/
+				parserMap.get(editor).removeCommentTags(comment);
+				parserMap.get(editor).addTagsInDocument(comment, getFilteredComments().contains(comment));
 			} catch (BadLocationException e) {
 				PluginLogger.logError(this.getClass().toString(), "relocateComment", "BadLocationException when trying to add/remove tags", e);
 			} catch (CoreException e) {
 				PluginLogger.log(this.getClass().toString(), "relocateComment", "CoreException when trying to add/remove tags", e);
 			}
-		}/*?|0000008|Peter|c1|?*/
+		}
 	}
 	
 	/**
