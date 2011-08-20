@@ -1,5 +1,7 @@
 package de.tukl.cs.softech.agilereview.views.detail.handlers;
 
+import java.util.Calendar;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -34,7 +36,7 @@ public class NewReplyHandler extends AbstractHandler {
 		
 		if(dialog.getSaved()) {
 			if (ViewControl.isOpen(DetailView.class)) {
-				DetailView.getInstance().addReply(dialog.getReplyAuthor(), dialog.getReplyText());
+				DetailView.getInstance().addReply(dialog.getReplyAuthor(), dialog.getReplyText(), Calendar.getInstance());
 				DetailView.getInstance().setFocus();
 			}
 		}

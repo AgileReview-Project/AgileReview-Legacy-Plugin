@@ -1,5 +1,7 @@
 package de.tukl.cs.softech.agilereview.views.detail;
 
+import java.util.Calendar;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.graphics.Color;
@@ -165,11 +167,12 @@ public class DetailView extends ViewPart {
 	 * Add Reply if and only if the comment detail part is opened
 	 * @param author author of the reply
 	 * @param text text of the reply
+	 * @param creationDate of the reply
 	 */
-	public void addReply(String author, String text) {
+	public void addReply(String author, String text, Calendar creationDate) {
 		if(currentDisplay == COMMENT_DETAIL) {
 			((CommentDetail) currentParent).saveChanges();
-			((CommentDetail) currentParent).addReply(author, text);
+			((CommentDetail) currentParent).addReply(author, text, creationDate);
 		}
 	}
 

@@ -230,7 +230,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			Reply[] replys = comment.getReplies().getReplyArray();
 			this.replys.setText("");
 			for(int i = 0; i < replys.length; i++) {
-				addReply(replys[i].getAuthor(), replys[i].newCursor().getTextValue().trim());
+				addReply(replys[i].getAuthor(), replys[i].newCursor().getTextValue().trim(), replys[i].getCreationDate());
 			}
 
 			priorityDropDown.select(comment.getPriority());
@@ -255,15 +255,18 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * adds a reply to the reply list shown in the view
 	 * @param author of the reply
 	 * @param text of the reply
+	 * @param creationDate of the reply
 	 */
-	public void addReply(String author, String text) {
-		
+	void addReply(String author, String text, Calendar creationDate) {
 		String replyText = this.replys.getText();
 		DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-		replyText += (replyText.equals("") ? "" : "\n\n") + "----- "+author+":"
-			+df.format(Calendar.getInstance().getTime())+" -----\n";
+		replyText += (replyText.equals("") ? "" : "\n\n") + "----- "+author+": "
+			+df.format(creationDate.getTime())+" -----\n";
 		replyText += text;
 		this.replys.setText(replyText);
+		
+		//save the current comment in order to save the reply creation time
+		super.partClosedOrDeactivated(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
 	}
 	
 	/**
