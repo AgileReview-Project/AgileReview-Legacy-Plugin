@@ -169,9 +169,9 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * bitwise or operator.<br>
 	 * If the parameter validateExplorerSelection is set to true, the ReviewExplorers selection
 	 * will be validated. For example this is necessary when changing the open status of reviews.
-	 * @param flags
-	 * @param validateExplorerSelection
-	 * @param refreshInputs 
+	 * @param flags views which should be refreshed
+	 * @param validateExplorerSelection if true, the ReviewExplorers selection will be validated
+	 * @param refreshInputs if true, data of ReviewExplorer and CommentTableView will be freshly loaded
 	 *//*|0000020|Thilo|c0|?*/
 	public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {
 		if((flags % 2 == 1) && isOpen(DetailView.class)) {

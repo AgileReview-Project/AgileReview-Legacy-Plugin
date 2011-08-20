@@ -218,7 +218,7 @@ public class DetailView extends ViewPart {
 	 * Should only be called if the intended background of the view was changed by the user
 	 */
 	public void backgroundChanged() {
-		System.err.println("test");/*?|0000020|Thilo|c1|?*/
+		/*?|0000020|Thilo|c1|?*/
 		if(currentDisplay == COMMENT_DETAIL) {
 			String prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
 			String[] rgb = prop.split(",");

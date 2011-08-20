@@ -8,6 +8,8 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPart;
@@ -85,8 +87,17 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 */
 	protected void changeBackgroundColor(Color bg) {
 		this.setBackground(bg);
+		String osName = System.getProperty("os.name");
 		for(Control c : bgComponents) {
-			c.setBackground(bg);
+			//only paint comboboxes and buttons when the running system is windows
+			//as on linux the background is also set for the components itself
+			if(c instanceof Combo || c instanceof Button) {
+				if(osName.contains("windows")) {
+					c.setBackground(bg);
+				}
+			} else {
+				c.setBackground(bg);
+			}
 		}
 	}
 	
