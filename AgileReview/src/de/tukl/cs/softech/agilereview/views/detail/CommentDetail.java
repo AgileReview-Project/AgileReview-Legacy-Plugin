@@ -32,13 +32,13 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class CommentDetail extends AbstractDetail<Comment> {
 	
 	/**
-	 * Label to show the comment tag of the shown Comment
+	 * Text to show the comment tag of the shown Comment
 	 */
-	private Label tagInstance;
+	private Text tagInstance;
 	/**
-	 * Label to show the author of the shown Comment
+	 * Text to show the author of the shown Comment
 	 */
-	private Label authorInstance;
+	private Text authorInstance;
 	/**
 	 * TextField to represent the recipient in a modifiable way
 	 */
@@ -84,10 +84,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		tagID.setText("Tag-ID: ");
 		super.bgComponents.add(tagID);
 		
-		tagInstance = new Label(this, SWT.WRAP);
+		tagInstance = new Text(this, SWT.WRAP);
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
+	    tagInstance.setEditable(false);
 	    tagInstance.setLayoutData(gridData);
 	    super.bgComponents.add(tagInstance);
 		
@@ -95,10 +96,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    author.setText("Author: ");
 	    super.bgComponents.add(author);
 	    
-	    authorInstance = new Label(this, SWT.WRAP);
+	    authorInstance = new Text(this, SWT.WRAP);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
+	    authorInstance.setEditable(false);
 	    authorInstance.setLayoutData(gridData);
 	    super.bgComponents.add(authorInstance);
 	    

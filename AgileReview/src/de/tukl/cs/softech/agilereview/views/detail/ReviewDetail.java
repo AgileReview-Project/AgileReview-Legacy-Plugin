@@ -39,7 +39,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	/**
 	 * Label to show the Review Name
 	 */
-	private Label reviewInstance;
+	private Text reviewInstance;
 	/**
 	 * ComboBox to provide a choice for the Review status
 	 */
@@ -82,11 +82,12 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 		review.setText("Review: ");
 		super.bgComponents.add(review);
 	    
-	    reviewInstance = new Label(this, SWT.WRAP);
+	    reviewInstance = new Text(this, SWT.WRAP);
 	    GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    reviewInstance.setLayoutData(gridData);
+	    reviewInstance.setEditable(false);
 	    super.bgComponents.add(reviewInstance);
 	    
 	    Label refId = new Label(this, SWT.PUSH);
