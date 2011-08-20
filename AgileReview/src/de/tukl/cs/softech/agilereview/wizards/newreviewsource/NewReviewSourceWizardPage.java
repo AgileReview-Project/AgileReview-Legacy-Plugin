@@ -34,11 +34,11 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 	/**
 	 * Specifies whether the useDirectly check-box is initially selected or not
 	 */
-	private boolean bUseDirectlyInitial;
+	private boolean bUseDirectlyInitial;/*?|0000004 + 0000006|Thilo|c4|*/
 	/**
 	 * Specifies whether the useDirectly check-box is enabled or not
 	 */
-	private boolean bFixUseDirectly;
+	private boolean bFixUseDirectly;/*|0000004 + 0000006|Thilo|c4|?*/
 
 	
 	/**
@@ -47,9 +47,9 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 	 * @param fixUseDirectly specifies whether the useDirectly check-box is enabled or not
 	 */
 	protected NewReviewSourceWizardPage(boolean useDirectlyInitial, boolean fixUseDirectly) {
-		super("New Review Source Project");
-		setTitle("New Review Source Project");
-		setDescription("This wizard creates a new Review Source Project.");
+		super("New AgileReview Source Project");
+		setTitle("New AgileReview Source Project");
+		setDescription("This wizard creates a new AgileReview Source Project.");
 		this.bUseDirectlyInitial = useDirectlyInitial;
 		this.bFixUseDirectly = fixUseDirectly;
 	}
@@ -66,11 +66,11 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 		
 		// Textfield + Label
 		Label lReviewId = new Label(container, SWT.NULL);
-		lReviewId.setText("Review Source Project-Name*:");
+		lReviewId.setText("AgileReview Source Project-Name*:");
 		name = new Text(container, SWT.BORDER | SWT.SINGLE);
 		name.setText(PropertiesManager.getPreferences().getDefaultString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
 		name.selectAll();
-		name.setToolTipText("Review Source Folder -Name must be set.");
+		name.setToolTipText("'AgileReview Source Folder'-Name must be set.");
 		name.addModifyListener(this);
 		name.setLayoutData(gd);
 		

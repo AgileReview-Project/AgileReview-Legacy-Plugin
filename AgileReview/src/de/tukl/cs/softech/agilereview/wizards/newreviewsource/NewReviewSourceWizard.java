@@ -21,11 +21,11 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 	/**
 	 * Specifies whether the useDirectly check-box is initially selected or not (default: true)
 	 */
-	private boolean bUseDirectlyInitial = true;
+	private boolean bUseDirectlyInitial = true;/*?|0000004 + 0000006|Thilo|c3|*/
 	/**
 	 * Specifies whether the useDirectly check-box is enabled or not (default: false)
 	 */
-	private boolean bFixUseDirectly = false;
+	private boolean bFixUseDirectly = false;/*|0000004 + 0000006|Thilo|c3|?*/
 	/**
 	 * The name of the project created by this wizard
 	 */
@@ -39,6 +39,7 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 	public NewReviewSourceWizard(boolean useDirectlyInitial, boolean fixUseDirectly) {
 		super();
 		setNeedsProgressMonitor(true);
+		setWindowTitle("New AgileReview Source Project");
 		this.bUseDirectlyInitial = useDirectlyInitial;
 		this.bFixUseDirectly = fixUseDirectly;
 	}

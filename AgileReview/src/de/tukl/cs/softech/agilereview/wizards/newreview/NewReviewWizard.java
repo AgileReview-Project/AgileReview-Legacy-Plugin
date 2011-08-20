@@ -30,6 +30,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
 	public NewReviewWizard() {
 		super();
 		setNeedsProgressMonitor(true);
+		setWindowTitle("New Review");
 	}
 	
 	/**

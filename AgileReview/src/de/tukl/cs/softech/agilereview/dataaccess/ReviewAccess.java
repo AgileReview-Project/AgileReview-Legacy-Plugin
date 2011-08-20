@@ -20,23 +20,15 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.CommentsDocument;
@@ -50,6 +42,7 @@ import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizard;
 
 /**
  * Class for accessing the review and comment data (xml and internal model).  
@@ -228,7 +221,7 @@ public class ReviewAccess {
 	}
 	
 	/**
-	 * Creates the given Review Source Project
+	 * Creates and opens the given AgileReview Source Project (if not existent or closed)
 	 * @param projectName project name
 	 * @return <i>true</i> if everything worked,<i>false</i> if something went wrong
 	 */
@@ -285,65 +278,17 @@ public class ReviewAccess {
 		// Set the directory where the comments are located
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
 		if (!loadReviewSourceProject(projectName)) {
+			NoReviewSourceWizard dialog = new NoReviewSourceWizard();/*?|0000004 + 0000006|Thilo|c0|*/
+			WizardDialog wDialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), dialog);
+			wDialog.setBlockOnOpen(true);
 			
-			Shell parent = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-			Shell shell = new Shell(parent);
-			ARSourceProjectInitDialog dialog = new ARSourceProjectInitDialog(shell, SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM | SWT.SHELL_TRIM);
-			dialog.pack();
-		    shell.setText("No active AgileReview Source Project found");
-			shell.pack();
-		    shell.open();
-			while (!shell.isDisposed()) {
-				if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
-		    }
-			projectName = dialog.getChosenProjectName();		
-			if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
-				loadReviewSourceProject(projectName);
-			}
-			
-			
-			
-			
-			
-//			// TODO: A cool ReviewInitInteraction
-//			String msg = "In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed. " +/*?|0000006|Malte|c1|*/
-//					"You now have to create such a folder. " +
-//					"Later you can create new 'AgileReview Source Project' and use the Properties to determine which one should be used.\n\n" +
-//					"If you cancel, the default 'AgileReview Source Project' will be created";/*|0000006|Malte|c1|?*/
-//			Shell currentShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-//			InputDialog in = new InputDialog(currentShell, "AgileReview - Review Source Project creation", msg, projectName, new IInputValidator() {
-//				@Override
-//				public String isValid(String newText) {
-//			        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-//
-//			        String projectFieldContents = newText;
-//			        if (projectFieldContents.equals("")) {
-//			            return "Project name cannot be empty!";
-//			        }
-//
-//			        IStatus nameStatus = workspace.validateName(projectFieldContents,
-//			                IResource.PROJECT);
-//			        if (!nameStatus.isOK()) {
-//			            return nameStatus.getMessage();
-//			        }
-//			 
-//			        IProject project = workspace.getRoot().getProject(
-//							projectFieldContents);
-//			        
-//			        if (project.exists()) {/*?|0000006|Malte|c2|*/
-//			            return "Project does already exist!";
-//			        }
-//					return null;/*|0000006|Malte|c2|?*/
-//				}
-//			});
-//			if (in.open() == Window.OK) {
-//				projectName = in.getValue();
-//			}
-//			if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-//				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);/*?|0000006|Malte|c0|?*/
-//				loadReviewSourceProject(projectName);
-//			}
+			if (wDialog.open() == Window.OK) {
+				projectName = dialog.getChosenProjectName();		
+				if (ReviewAccess.createAndOpenReviewProject(projectName)) {
+					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
+					loadReviewSourceProject(projectName);
+				}
+			}/*|0000004 + 0000006|Thilo|c0|?*/
 		}
 		
 		// Attach a ResourceChangeListener to monitor the AgileReview Source project
@@ -360,12 +305,16 @@ public class ReviewAccess {
 									"Please select an other 'Agile Review Source Project' for AgileReview to stay functional.";
 							MessageDialog.openWarning(currentShell, "Warning: AgileReview Source Project", msg);
 							
-							PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(currentShell, "de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage", null, null);
-							// TODO: not finished here. I can not intercept.
-							if (dialog.open() == Window.OK) {
-								System.out.println("toll");
-							} else {
-								System.out.println("doof");
+							NoReviewSourceWizard dialog = new NoReviewSourceWizard();
+							WizardDialog wDialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), dialog);
+							wDialog.setBlockOnOpen(true);
+							
+							if (wDialog.open() == Window.OK) {
+								String projectName = dialog.getChosenProjectName();		
+								if (ReviewAccess.createAndOpenReviewProject(projectName)) {
+									PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
+									loadReviewSourceProject(projectName);
+								}
 							}
 						}
 					}
