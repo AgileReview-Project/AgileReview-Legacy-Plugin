@@ -279,7 +279,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		boolean result = false;
 		
 		//save replies before
-		Pattern p = Pattern.compile("-----([^:]*):([^\\n]*)-----\\n(.*)");
+		Pattern p = Pattern.compile("-----([^:]*):([^\\n]*)-----\\n([^-]*)");
 		Matcher m = p.matcher(this.replys.getText());
 		ArrayList<String[]> shownReplies = new ArrayList<String[]>();
 		while(m.find()) {
