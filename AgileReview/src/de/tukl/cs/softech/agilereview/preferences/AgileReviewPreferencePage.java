@@ -151,7 +151,7 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		if (ReviewAccess.getInstance().updateReviewSourceProject()) {
 			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
 		} else {
-			ViewControl.refreshViews(ViewControl.DETAIL_VIEW);/*?|0000020|Malte|c1|?*/
+			ViewControl.refreshViews(ViewControl.DETAIL_VIEW);
 		}
 		return result;
 	}
