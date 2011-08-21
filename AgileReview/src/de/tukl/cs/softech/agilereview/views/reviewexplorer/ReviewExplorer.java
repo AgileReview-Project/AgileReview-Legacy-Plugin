@@ -29,6 +29,7 @@ import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -183,6 +184,22 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
 		root.deleteReview(r);
 		this.refresh();
 		treeViewer.getTree().setRedraw(true);
+	}
+	
+	/**
+	 * Expands all sub nodes of the passed node 
+	 * @param selection node which should be expanded
+	 */
+	public void expandAllSubNodes(AbstractMultipleWrapper selection) {
+		treeViewer.expandToLevel(selection, TreeViewer.ALL_LEVELS);
+	}
+	
+	/**
+	 * Collapses all sub nodes of the passed node 
+	 * @param selection node which should be expanded
+	 */
+	public void collapseAllSubNodes(AbstractMultipleWrapper selection) {
+		treeViewer.collapseToLevel(selection, TreeViewer.ALL_LEVELS);
 	}
 	
 	

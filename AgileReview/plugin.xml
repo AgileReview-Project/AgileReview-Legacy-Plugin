@@ -674,6 +674,20 @@
             id="de.tukl.cs.softech.agilereview.views.reviewexplorer.switchReviewSourceProject"
             name="Switch AgileReview Source Project in ReviewExplorer">
       </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ExpandHandler"
+            description="Expands all sub nodes of a given node in the ReviewExplorer"
+            id="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+            name="Expand all sub nodes">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CollapseHandler"
+            description="Collapses all sub nodes of a given node in the ReviewExplorer"
+            id="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+            name="Collapse all sub nodes">
+      </command>
 </extension>
 <extension
       point="org.eclipse.ui.menus">
@@ -777,6 +791,16 @@
             style="push"
             tooltip="Open/Close reviews">
       </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+            label="Expand all sub nodes"
+            style="push">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+            label="Collapse all sub nodes"
+            style="push">
+      </command>
       <separator
             name="AgileReview.separator4"
             visible="true">
@@ -850,6 +874,16 @@
             label="Open/Close selected reviews"
             style="push"
             tooltip="Open/Close reviews">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+            label="Expand all subnodes"
+            style="push">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+            label="Collapse all sub nodes"
+            style="push">
       </command>
       <separator
             name="AgileReview.separator4"
