@@ -184,7 +184,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 			this.editedObject.setStatus(this.statusDropDown.getSelectionIndex());
 			result = true;
 		} else if(!(newStr = this.txt.getText().trim()).equals(this.editedObject.getDescription())) {
-			this.editedObject.setDescription(newStr);
+			this.editedObject.setDescription(super.convertLineBreaks(newStr));
 			result = true;
 		}
 		return result;

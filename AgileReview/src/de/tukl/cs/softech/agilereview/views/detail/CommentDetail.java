@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.xmlbeans.XmlCursor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
@@ -232,7 +233,9 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			Reply[] replys = comment.getReplies().getReplyArray();
 			this.replys.setText("");
 			for(int i = 0; i < replys.length; i++) {
-				addReply(replys[i].getAuthor(), replys[i].newCursor().getTextValue().trim(), replys[i].getCreationDate());
+				XmlCursor cursor = replys[i].newCursor();
+				addReply(replys[i].getAuthor(), cursor.getTextValue().trim(), replys[i].getCreationDate());
+				cursor.dispose();
 			}
 
 			priorityDropDown.select(comment.getPriority());
@@ -284,19 +287,35 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		ArrayList<String[]> shownReplies = new ArrayList<String[]>();
 		while(m.find()) {
 			//trim() to delete non used whitespace
-			shownReplies.add(new String[]{m.group(1).trim(),m.group(2).trim(),m.group(3).trim()});
+			shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
 		}
-		//XXX should be changed if someone can edit saved replies:
+		
+		String newStr = "";
+		//XXX should be changed if someone can delete saved replies:
 		//delete and edit of replies not considered in this implementation
-		int savedReplies = this.editedObject.getReplies().getReplyArray().length;
+		int savedReplies = editedObject.getReplies().getReplyArray().length;
 		if(savedReplies != shownReplies.size()) {
 			result = true;
 			for(int i = savedReplies; i < shownReplies.size(); i++) {
-				Reply newReply = this.editedObject.getReplies().addNewReply();
+				Reply newReply = editedObject.getReplies().addNewReply();
 				newReply.setAuthor(shownReplies.get(i)[0]);
 				newReply.setCreationDate(Calendar.getInstance());
-				newReply.newCursor().setTextValue(shownReplies.get(i)[2]);
+				
+				XmlCursor cursor = newReply.newCursor();
+				cursor.setTextValue(super.convertLineBreaks(shownReplies.get(i)[2]));
+				cursor.dispose();
 			}
+		}
+		
+		//XXX should be changed if someone can delete saved replies:
+		//check for changes within the reply description and to convert line breaks in old replies
+		for(int i = 0; i < savedReplies; i++) {
+			XmlCursor cursor = editedObject.getReplies().getReplyArray(i).newCursor();
+			if(!(newStr = super.convertLineBreaks(shownReplies.get(i)[2])).equals(cursor.getTextValue())) {
+				result = true;
+				cursor.setTextValue(newStr);
+			}
+			cursor.dispose();
 		}
 		
 		if(editedObject.getPriority() != this.priorityDropDown.getSelectionIndex()) {
@@ -306,12 +325,12 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		} else if(editedObject.getStatus() != this.statusDropDown.getSelectionIndex()) {
 			editedObject.setStatus(this.statusDropDown.getSelectionIndex());
 			result = true;
-		} else if(!editedObject.getRecipient().equals(this.recipientText.getText().trim())) {
+		} else if(!(newStr = this.recipientText.getText().trim()).equals(editedObject.getRecipient())) {
 			editedObject.setRecipient(this.recipientText.getText().trim());
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT, recipientText.getText().trim());
 			result = true;
-		} else if(!editedObject.getText().equals(this.txt.getText().trim())) {
-			editedObject.setText(this.txt.getText().trim());
+		} else if(!(newStr = super.convertLineBreaks(this.txt.getText().trim())).equals(editedObject.getText())) {
+			editedObject.setText(newStr);
 			result = true;
 		}
 

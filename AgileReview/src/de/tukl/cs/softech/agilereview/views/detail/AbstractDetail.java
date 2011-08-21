@@ -82,6 +82,17 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	protected abstract void fillContents(E input);
 	
 	/**
+	 * Converts all line breaks either \n or \r to \r\n line breaks
+	 * @param in the string which line breaks should be converted
+	 * @return the converted string
+	 */
+	protected String convertLineBreaks(String in) {
+		String result = in.replaceAll("\r\n", "\r");
+		result = result.replaceAll("\r|\n", "\r\n");
+		return result;
+	}
+	
+	/**
 	 * Changes the background color for this AbstractDetail.
 	 * @param bg
 	 */
