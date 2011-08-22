@@ -560,6 +560,38 @@
          </with>
       </activeWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CollapseHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes">
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ExpandHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes">
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -676,14 +708,12 @@
       </command>
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-            defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ExpandHandler"
             description="Expands all sub nodes of a given node in the ReviewExplorer"
             id="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
             name="Expand all sub nodes">
       </command>
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-            defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CollapseHandler"
             description="Collapses all sub nodes of a given node in the ReviewExplorer"
             id="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
             name="Collapse all sub nodes">
@@ -793,11 +823,13 @@
       </command>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+            icon="icons/expandall.gif"
             label="Expand all sub nodes"
             style="push">
       </command>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+            icon="icons/collapseall.gif"
             label="Collapse all sub nodes"
             style="push">
       </command>
@@ -877,11 +909,13 @@
       </command>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+            icon="icons/expandall.gif"
             label="Expand all subnodes"
             style="push">
       </command>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+            icon="icons/collapseall.gif"
             label="Collapse all sub nodes"
             style="push">
       </command>
@@ -979,6 +1013,18 @@
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M1+M2+-">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+NUMPAD_MULTIPLY">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+NUMPAD_DIVIDE">
    </key>
 </extension>
 <extension
