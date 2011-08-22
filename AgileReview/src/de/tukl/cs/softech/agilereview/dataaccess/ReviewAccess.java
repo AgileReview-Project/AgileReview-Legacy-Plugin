@@ -278,7 +278,7 @@ public class ReviewAccess {
 		// Set the directory where the comments are located
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
 		if (!loadReviewSourceProject(projectName)) {
-			NoReviewSourceWizard dialog = new NoReviewSourceWizard();/*?|0000004 + 0000006|Thilo|c0|*/
+			NoReviewSourceWizard dialog = new NoReviewSourceWizard();
 			WizardDialog wDialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), dialog);
 			wDialog.setBlockOnOpen(true);
 			
@@ -288,7 +288,7 @@ public class ReviewAccess {
 					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
 					loadReviewSourceProject(projectName);
 				}
-			}/*|0000004 + 0000006|Thilo|c0|?*/
+			}/*?|0000004 + 0000006|Malte|c0|?*/
 		}
 		
 		// Attach a ResourceChangeListener to monitor the AgileReview Source project

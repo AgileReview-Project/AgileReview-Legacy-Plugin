@@ -21,11 +21,12 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 	/**
 	 * Specifies whether the useDirectly check-box is initially selected or not (default: true)
 	 */
-	private boolean bUseDirectlyInitial = true;/*?|0000004 + 0000006|Thilo|c3|*/
+	private boolean bUseDirectlyInitial = true;
+	/*?|0000004 + 0000006|Malte|c12|*/
 	/**
 	 * Specifies whether the useDirectly check-box is enabled or not (default: false)
 	 */
-	private boolean bFixUseDirectly = false;/*|0000004 + 0000006|Thilo|c3|?*/
+	private boolean bFixUseDirectly = false;/*|0000004 + 0000006|Malte|c12|?*/
 	/**
 	 * The name of the project created by this wizard
 	 */
@@ -51,11 +52,11 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 		setNeedsProgressMonitor(true);
 	}
 
-	@Override
+	@Override/*?|0000004 + 0000006|Malte|c11|*/
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		// TODO Auto-generated method stub
 
-	}
+	}/*|0000004 + 0000006|Malte|c11|?*/
 	
 	/**
 	 * adds all needed pages to the wizard

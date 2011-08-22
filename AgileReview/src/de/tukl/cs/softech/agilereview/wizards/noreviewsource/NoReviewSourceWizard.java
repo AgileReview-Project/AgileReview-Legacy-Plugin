@@ -7,7 +7,7 @@ import org.eclipse.jface.wizard.Wizard;
 /**
  * Wizard for choosing a AgileReview Source Project if non is existent
  */
-public class NoReviewSourceWizard extends Wizard implements IWizard {/*?|0000004 + 0000006|Thilo|c1|?*/
+public class NoReviewSourceWizard extends Wizard implements IWizard {
 
 	/**
 	 * The first and sole page of the wizard 

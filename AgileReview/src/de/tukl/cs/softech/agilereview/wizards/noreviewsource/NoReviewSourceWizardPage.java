@@ -32,7 +32,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 /**
  * The single page of the NewReview Wizard
  */
-public class NoReviewSourceWizardPage extends WizardPage implements ModifyListener, Listener {/*?|0000004 + 0000006|Thilo|c2|?*/
+public class NoReviewSourceWizardPage extends WizardPage implements ModifyListener, Listener {
 
 	/**
 	 * Drop-Down-Box to choose which AgileReview Source Project should be chosen
@@ -66,7 +66,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
 	/**
 	 * Creates a new page
 	 */
-	protected NoReviewSourceWizardPage() {
+	protected NoReviewSourceWizardPage() {/*?|0000004 + 0000006|Malte|c1|?*/
 		super("No Review Source Project");
 		setTitle("No Review Source Project");
 		setDescription("In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed.");
@@ -157,21 +157,21 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
 			}
 		}
 		
-		comboChooseProject.setItems(listOpenARProjects.toArray(new String[listOpenARProjects.size()]));
-		comboClosedProjects.setItems(listClosedARProjects.toArray(new String[listClosedARProjects.size()]));
+		comboChooseProject.setItems(listOpenARProjects.toArray(new String[listOpenARProjects.size()]));/*?|0000004 + 0000006|Malte|c2|*/
+		comboClosedProjects.setItems(listClosedARProjects.toArray(new String[listClosedARProjects.size()]));/*|0000004 + 0000006|Malte|c2|?*/
 		
 		// Select the preferred Project
 		if (prefProject != null) {
 			String [] items = comboChooseProject.getItems();
 			for (int i=0;i<items.length;i++) {
 				if (items[i].equals(prefProject)) {
-					comboChooseProject.select(i);
+					comboChooseProject.select(i);/*?|0000004 + 0000006|Malte|c3|?*/
 				}
 			}
 		}
-		if (comboChooseProject.getSelectionIndex() == -1) {
+		if (comboChooseProject.getSelectionIndex() == -1) {/*?|0000004 + 0000006|Malte|c4|*/
 			comboChooseProject.select(0);
-		}
+		}/*|0000004 + 0000006|Malte|c4|?*/
 		
 		comboChooseProject.pack();
 		comboClosedProjects.pack();
@@ -187,7 +187,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
     private boolean validatePage() {
         String projectFieldContents = comboChooseProject.getText();
         if (projectFieldContents.equals("")) { //$NON-NLS-1$
-            setErrorMessage(null);
+            setErrorMessage(null);/*?|0000004 + 0000006|Malte|c5|?*/
             return false;
         }
 
@@ -204,12 +204,12 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
 	
 	@Override
 	public void handleEvent(Event event) {
-		if (event.widget == btOpenClosed) {
+		if (event.widget == btOpenClosed) {/*?|0000004 + 0000006|Malte|c7|?*/
 			if (comboClosedProjects.getSelectionIndex() != -1){
 				IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 				IProject p = workspaceRoot.getProject(comboClosedProjects.getText());
 				try {
-					// TODO: use ProgressMonitor here
+					// TODO: use ProgressMonitor here/*?|0000004 + 0000006|Malte|c6|?*/
 					p.open(null);
 					while (!p.isOpen()) {}
 					updateComboBoxes(p.getName());
