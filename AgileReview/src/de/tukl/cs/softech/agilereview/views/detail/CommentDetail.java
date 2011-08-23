@@ -278,7 +278,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * checks whether changes on the current Comment are made and saves this changes
 	 * @return true, if changes have been made<br> false, if no changes have been made
 	 */
-	private boolean attributesChanged() {
+	private boolean attributesChanged() {/*?|0000035|Peter|c1|*/
 		boolean result = false;
 		
 		//save replies before
@@ -335,7 +335,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		}
 
 		return result;
-	}
+	}/*|0000035|Peter|c1|?*/
 	
 	/**
 	 * Sets the levels for the status and priority configuration of a comment.
