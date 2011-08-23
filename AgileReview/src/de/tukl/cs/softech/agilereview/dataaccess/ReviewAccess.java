@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -229,6 +230,7 @@ public class ReviewAccess {
 		boolean result = true;
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject p = workspaceRoot.getProject(projectName);
+		
 		try
 		{
 			// Create a new Project, if necessary
@@ -243,7 +245,8 @@ public class ReviewAccess {
 			{
 				p.open(null);// TODO: Use ProgressMonitor
 			}
-			while (!p.isOpen()){}	
+			while (!p.isOpen()){}
+			
 			// Set project description
 			IProjectDescription projectDesc = p.getDescription();
 			projectDesc.setNatureIds(new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
@@ -344,7 +347,33 @@ public class ReviewAccess {
 		if(!p.exists() || !p.isOpen()) {
 			return false;
 		} else {
+			ResourceAttributes resAtt;
+			//set writable for old source project if there is one
+			if(REVIEW_REPO_FOLDER != null) {
+				resAtt = new ResourceAttributes();
+				resAtt.setExecutable(false);
+				resAtt.setReadOnly(false);
+				IProject oldP = workspaceRoot.getProject(REVIEW_REPO_FOLDER.getName());
+				if(oldP.exists()) { //have to be open as nobody can close it as it is readOnly
+					try {
+						oldP.setResourceAttributes(resAtt);
+					} catch (CoreException e) {
+						PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "CoreException while setting ResourceAttributes of the old project", e);
+					}
+				}
+			}
+			
 			REVIEW_REPO_FOLDER = p;
+			
+			// set source project to readOnly and notExecutable
+			resAtt = new ResourceAttributes();
+			resAtt.setExecutable(false);
+			resAtt.setReadOnly(true);
+			try {
+				p.setResourceAttributes(resAtt);
+			} catch (CoreException e) {
+				PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "CoreException while setting ResourceAttributes of the new project", e);
+			}
 			
 			// Load open reviews initially
 			try {
