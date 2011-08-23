@@ -19,16 +19,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -294,36 +290,9 @@ public class ReviewAccess {
 			}/*?|0000004 + 0000006|Malte|c0|?*/
 		}
 		
-		// Attach a ResourceChangeListener to monitor the AgileReview Source project
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
-			
-			@Override
-			public void resourceChanged(final IResourceChangeEvent event) {
-				Display.getDefault().syncExec(new Runnable() {
-					@Override
-					public void run() {
-						if (REVIEW_REPO_FOLDER.equals(event.getResource())){
-							Shell currentShell = Display.getDefault().getActiveShell();
-							String msg = "You deleted or closed the current 'Agile Review Source Project'.\n" +
-									"Please select an other 'Agile Review Source Project' for AgileReview to stay functional.";
-							MessageDialog.openWarning(currentShell, "Warning: AgileReview Source Project", msg);
-							
-							NoReviewSourceWizard dialog = new NoReviewSourceWizard();
-							WizardDialog wDialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), dialog);
-							wDialog.setBlockOnOpen(true);
-							
-							if (wDialog.open() == Window.OK) {
-								String projectName = dialog.getChosenProjectName();		
-								if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-									PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
-									loadReviewSourceProject(projectName);
-								}
-							}
-						}
-					}
-				});
-			}
-		},  IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.PRE_CLOSE);
+		// Attach a ResourceChangeListener to monitor the AgileReview Source project for close operation
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(new CloseProjectResourceListener(), IResourceChangeEvent.PRE_CLOSE 
+				| IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);
 	}
 	
 	/**
@@ -341,16 +310,16 @@ public class ReviewAccess {
 	 * @param projectName project name
 	 * @return <i>true</i> if everything works, <i>false</i> otherwise (e.g. when the project does not exist)
 	 */
-	private boolean loadReviewSourceProject(String projectName){
+	boolean loadReviewSourceProject(String projectName){
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject p = workspaceRoot.getProject(projectName);
 		if(!p.exists() || !p.isOpen()) {
 			return false;
 		} else {
-			ResourceAttributes resAtt;
+			//ResourceAttributes resAtt;
 			//set writable for old source project if there is one
 			if(REVIEW_REPO_FOLDER != null) {
-				resAtt = new ResourceAttributes();
+				ResourceAttributes resAtt = new ResourceAttributes();
 				resAtt.setExecutable(false);
 				resAtt.setReadOnly(false);
 				IProject oldP = workspaceRoot.getProject(REVIEW_REPO_FOLDER.getName());
@@ -366,11 +335,11 @@ public class ReviewAccess {
 			REVIEW_REPO_FOLDER = p;
 			
 			// set source project to readOnly and notExecutable
-			resAtt = new ResourceAttributes();
-			resAtt.setExecutable(false);
-			resAtt.setReadOnly(true);
+			ResourceAttributes resAtt2 = new ResourceAttributes();
+			resAtt2.setExecutable(false);
+			resAtt2.setReadOnly(true);
 			try {
-				p.setResourceAttributes(resAtt);
+				p.setResourceAttributes(resAtt2);
 			} catch (CoreException e) {
 				PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "CoreException while setting ResourceAttributes of the new project", e);
 			}
@@ -562,6 +531,14 @@ public class ReviewAccess {
 		///////////////////////////
 		// comment functionality // 
 		///////////////////////////
+	
+	/**
+	 * Returns the current active source folder
+	 * @return the current active source folder
+	 */
+	IProject getCurrentSourceFolder() {
+		return REVIEW_REPO_FOLDER;
+	}
 	
 	/**
 	 *  Creates a new empty Comment at the right position in the xml, which is returned
