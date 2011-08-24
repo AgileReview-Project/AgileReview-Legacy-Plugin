@@ -99,18 +99,16 @@ public class DetailView extends ViewPart {
 		
 		//get SourceProvider for configuration
 		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
-		SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.REPLY_POSSIBLE);
+		SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.COMMENT_SHOWN);
 		SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTENT_AVAILABLE);
-		SourceProvider sp3 = (SourceProvider) isps.getSourceProvider(SourceProvider.RELOCATE_POSSIBLE);
 		
 		switch(type) {
 		case EMPTY:
 			this.currentParent = new Composite(this.parentParent, this.parentStyle);
 			this.setPartName("Detail View");
 			this.currentDisplay = EMPTY;
-			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
+			sp1.setVariable(SourceProvider.COMMENT_SHOWN, false);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, false);
-			sp3.setVariable(SourceProvider.RELOCATE_POSSIBLE, false);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
@@ -120,9 +118,8 @@ public class DetailView extends ViewPart {
 			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, color);/*?|0000020|smokie88|c6|?*/
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
-			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, true);
+			sp1.setVariable(SourceProvider.COMMENT_SHOWN, true);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, true);
-			sp3.setVariable(SourceProvider.RELOCATE_POSSIBLE, true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
@@ -132,9 +129,8 @@ public class DetailView extends ViewPart {
 			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, color);/*?|0000020|smokie88|c7|?*/
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
-			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
+			sp1.setVariable(SourceProvider.COMMENT_SHOWN, false);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, true);
-			sp3.setVariable(SourceProvider.RELOCATE_POSSIBLE, false);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to REVIEW_DETAIL");
 			break;
 		case RELOCATE_DIALOG:
@@ -142,9 +138,8 @@ public class DetailView extends ViewPart {
 			currentParent = new RelocateDialog(this.parentParent, this.parentStyle, cachedComment);
 			this.setPartName("Comment Details");
 			this.currentDisplay = RELOCATE_DIALOG;
-			sp1.setVariable(SourceProvider.REPLY_POSSIBLE, false);
+			sp1.setVariable(SourceProvider.COMMENT_SHOWN, false);
 			sp2.setVariable(SourceProvider.CONTENT_AVAILABLE, false);
-			sp3.setVariable(SourceProvider.RELOCATE_POSSIBLE, true);
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to RELOCATE_DIALOG");
 			break;
 		}

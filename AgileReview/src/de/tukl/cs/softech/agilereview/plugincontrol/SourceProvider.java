@@ -15,17 +15,13 @@ public class SourceProvider extends AbstractSourceProvider {
 	 */
 	public static final String REVERTABLE = "de.tukl.cs.softech.agilereview.views.detail.variables.revertable";
 	/**
-	 * Variable for the state "reply possible"
+	 * States whether a comment is shown in the detail view
 	 */
-	public static final String REPLY_POSSIBLE = "de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible";
+	public static final String COMMENT_SHOWN = "de.tukl.cs.softech.agilereview.views.detail.variables.commentShown";
 	/**
 	 * Variable for the state "content available"
 	 */
 	public static final String CONTENT_AVAILABLE = "de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable";
-	/**
-	 * Variable for the state "relocate possible"
-	 */
-	public static final String RELOCATE_POSSIBLE = "de.tukl.cs.softech.agilereview.views.detail.variables.relocatePossible";
 	/**
 	 * Variable for the state "contains closed review"
 	 */
@@ -44,11 +40,10 @@ public class SourceProvider extends AbstractSourceProvider {
 	 */
 	public SourceProvider() {
 		map.put(REVERTABLE, false);
-		map.put(REPLY_POSSIBLE, false);
+		map.put(COMMENT_SHOWN, false);
 		map.put(CONTENT_AVAILABLE, false);
 		map.put(CONTAINS_CLOSED_REVIEW, false);
 		map.put(IS_ACTIVE_REVIEW, false);
-		map.put(RELOCATE_POSSIBLE, false);
 	}
 
 	@Override

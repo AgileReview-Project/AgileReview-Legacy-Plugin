@@ -405,7 +405,7 @@
          commandId="de.tukl.cs.softech.agilereview.views.detail.newReply">
       <activeWhen>
          <with
-               variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+               variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
             <equals
                   value="true">
             </equals>
@@ -553,7 +553,7 @@
          commandId="de.tukl.cs.softech.agilereview.views.detail.relocateComment">
       <activeWhen>
          <with
-               variable="de.tukl.cs.softech.agilereview.views.detail.variables.relocatePossible">
+               variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
             <equals
                   value="true">
             </equals>
@@ -732,7 +732,7 @@
          <visibleWhen
                checkEnabled="false">
             <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.relocatePossible">
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
                <equals
                      value="true">
                </equals>
@@ -751,7 +751,7 @@
          <visibleWhen
                checkEnabled="false">
             <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
                <equals
                      value="true">
                </equals>
@@ -1045,15 +1045,11 @@
             priorityLevel="workbench">
       </variable>
       <variable
-            name="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible"
+            name="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown"
             priorityLevel="workbench">
       </variable>
       <variable
             name="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable"
-            priorityLevel="workbench">
-      </variable>
-      <variable
-            name="de.tukl.cs.softech.agilereview.views.detail.variables.relocatePossible"
             priorityLevel="workbench">
       </variable>
       <variable
