@@ -86,10 +86,8 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @param in the string which line breaks should be converted
 	 * @return the converted string
 	 */
-	protected String convertLineBreaks(String in) {
-		String result = in.replaceAll("\r\n", "\r");/*?|0000035|Peter|c0|*/
-		result = result.replaceAll("\r|\n", "\r\n");/*|0000035|Peter|c0|?*/
-		return result;
+	protected String convertLineBreaks(String in) {/*?|0000035|Peter|c0|*/
+		return in.replaceAll("\r\n|\r|\n", System.getProperty("line.separator"));/*|0000035|Peter|c0|?*/
 	}
 	
 	/**
