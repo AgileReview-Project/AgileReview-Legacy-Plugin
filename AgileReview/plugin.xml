@@ -592,6 +592,40 @@
          </with>
       </enabledWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.DeleteAbortHandler"
+         commandId="org.eclipse.ui.edit.delete">
+      <activeWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="or">
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="de.tukl.cs.softech.agilereview.nature">
+               </test>
+            </iterate>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.CloseAbortHandler"
+         commandId="org.eclipse.ui.project.closeProject">
+      <activeWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="or">
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="de.tukl.cs.softech.agilereview.nature">
+               </test>
+            </iterate>
+         </with>
+      </activeWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
