@@ -13,6 +13,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -32,7 +34,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 /**
  * The single page of the NewReview Wizard
  */
-public class NoReviewSourceWizardPage extends WizardPage implements ModifyListener, Listener {
+public class NoReviewSourceWizardPage extends WizardPage implements Listener {
 
 	/**
 	 * Drop-Down-Box to choose which AgileReview Source Project should be chosen
@@ -93,6 +95,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
 		labelChoose.setText("Please choose a AgileReview Source Folder:");
 	
 		comboChooseProject = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+		comboChooseProject.addListener(SWT.Modify, this);
 		
 		Group bottom = new Group(container, SWT.NONE);
 		bottom.setText("You may first want to do one of the following");
@@ -130,7 +133,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
 
 		// Required to avoid an error in the system
 		setControl(container);
-		this.modifyText(null);
+		setPageComplete(validatePage());
 		setErrorMessage(null);
 	}
 	
@@ -186,7 +189,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
      */
     private boolean validatePage() {
         String projectFieldContents = comboChooseProject.getText();
-        if (projectFieldContents.equals("")) { //$NON-NLS-1$
+        if (projectFieldContents.isEmpty()) { //$NON-NLS-1$
             setErrorMessage(null);/*?|0000004 + 0000006|Malte|c5|?*/
             return false;
         }
@@ -195,12 +198,6 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
         setMessage(null);
         return true;
     }
-	
-
-	@Override
-	public void modifyText(ModifyEvent e) {
-		setPageComplete(validatePage());		
-	}
 	
 	@Override
 	public void handleEvent(Event event) {
@@ -248,6 +245,9 @@ public class NoReviewSourceWizardPage extends WizardPage implements ModifyListen
 				}
 				updateComboBoxes(newProject);
 			}
-		}		
+		} else if(event.widget == comboChooseProject) {
+			setPageComplete(validatePage());
+		}
 	}
+	
 }
