@@ -485,9 +485,13 @@
             <iterate
                   ifEmpty="false"
                   operator="and">
-               <instanceof
+               
+               <or><instanceof
                      value="org.eclipse.jdt.core.IJavaProject">
                </instanceof>
+                   <instanceof
+                         value="org.eclipse.core.resources.IProject">
+                   </instanceof></or>
             </iterate>
          </with>
       </activeWhen>
