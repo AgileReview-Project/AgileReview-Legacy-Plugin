@@ -63,17 +63,17 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
 		
 		// external reference
 		Label lReference = new Label(container, SWT.NULL);
-		lReference.setText("Reference");
+		lReference.setText("Reference:");
 		reference = new Text(container, SWT.BORDER | SWT.SINGLE);
 		
 		// responsibility
 		Label lResponsibility = new Label(container, SWT.NULL);
-		lResponsibility.setText("Responsibility");
+		lResponsibility.setText("Responsibility:");
 		responsibility = new Text(container, SWT.BORDER | SWT.SINGLE);
 		
 		// description
 		Label lDescription = new Label(container, SWT.NULL);
-		lDescription.setText("Description");
+		lDescription.setText("Description:");
 		//Text descTextField = new Text(container, SWT.BORDER | SWT.SINGLE);
 		description = new Text(container, SWT.BORDER | SWT.H_SCROLL | SWT.MULTI);
 		
