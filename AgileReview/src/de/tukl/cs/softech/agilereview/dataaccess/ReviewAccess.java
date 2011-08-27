@@ -23,8 +23,11 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -244,9 +247,7 @@ public class ReviewAccess {
 			while (!p.isOpen()){}
 			
 			// Set project description
-			IProjectDescription projectDesc = p.getDescription();
-			projectDesc.setNatureIds(new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
-			p.setDescription(projectDesc, null);// TODO: Use ProgressMonitor
+			setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
 		}
 		catch (CoreException e)
 		{
@@ -254,6 +255,22 @@ public class ReviewAccess {
 			result = false;
 		}
 		return result;
+	}
+
+	/**
+	 * Sets the given project natures to those specified by those in "natures".
+	 * @param p The project.
+	 * @param natures The natures.
+	 */
+	private static void setProjectNatures(IProject p, String[] natures) {
+		try {
+			IProjectDescription projectDesc = p.getDescription();
+			projectDesc.setNatureIds(natures);
+			p.setDescription(projectDesc, null);// TODO: Use ProgressMonitor
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -316,33 +333,26 @@ public class ReviewAccess {
 		if(!p.exists() || !p.isOpen()) {
 			return false;
 		} else {
-			//ResourceAttributes resAtt;
-			//set writable for old source project if there is one
+			// remove active nature from old project
 			if(REVIEW_REPO_FOLDER != null) {
-				ResourceAttributes resAtt = new ResourceAttributes();
-				resAtt.setExecutable(false);
-				resAtt.setReadOnly(false);
 				IProject oldP = workspaceRoot.getProject(REVIEW_REPO_FOLDER.getName());
-				if(oldP.exists()) { //have to be open as nobody can close it as it is readOnly
-					try {
-						oldP.setResourceAttributes(resAtt);
-					} catch (CoreException e) {
-						PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "CoreException while setting ResourceAttributes of the old project", e);
-					}
+				if(oldP.exists()) {
+					setProjectNatures(oldP, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
 				}
 			}
 			
+			// set new project
 			REVIEW_REPO_FOLDER = p;
-			
-			// set source project to readOnly and notExecutable
-			ResourceAttributes resAtt2 = new ResourceAttributes();
-			resAtt2.setExecutable(false);
-			resAtt2.setReadOnly(true);
-			try {
-				p.setResourceAttributes(resAtt2);
-			} catch (CoreException e) {
-				PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "CoreException while setting ResourceAttributes of the new project", e);
-			}
+			// add active nature to new project
+			setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});
+			// update decorator
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					while(PlatformUI.getWorkbench() == null) {}
+					PlatformUI.getWorkbench().getDecoratorManager().update("de.tukl.cs.softech.agilereview.active_decorator");
+				}
+			});
 			
 			// Load open reviews initially
 			try {

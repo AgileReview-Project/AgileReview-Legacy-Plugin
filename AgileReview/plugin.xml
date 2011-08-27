@@ -1105,9 +1105,16 @@
             class="de.tukl.cs.softech.agilereview.plugincontrol.AgileReviewNature">
       </run>
    </runtime>
-   <one-of-nature
-         id="de.tukl.cs.softech.agilereview.naturegroup">
-   </one-of-nature>
+</extension>
+<extension
+      id="de.tukl.cs.softech.agilereview.active_nature"
+      name="Active AgileReview Source Folder"
+      point="org.eclipse.core.resources.natures">
+   <runtime>
+      <run
+            class="de.tukl.cs.softech.agilereview.plugincontrol.AgileReviewNature">
+      </run>
+   </runtime>
 </extension>
 <extension
       point="org.eclipse.ui.ide.projectNatureImages">
@@ -1116,5 +1123,29 @@
          id="de.tukl.cs.softech.agilereview.nature.image"
          natureId="%agileReview_nature.id">
    </image>
+</extension>
+<extension
+      id="de.tukl.cs.softech.agilereview.decorators"
+      name="AgileReview Decorators"
+      point="org.eclipse.ui.decorators">
+   <decorator
+         adaptable="true"
+         icon="icons/agile_active_icon.png"
+         id="de.tukl.cs.softech.agilereview.active_decorator"
+         label="Active AgileReview Source Folder Decorator"
+         lightweight="true"
+         location="BOTTOM_RIGHT"
+         objectClass="org.eclipse.core.resources.IProject"
+         state="true">
+      <description>
+         Adds a small green hook to the current AgileReview Source Folder...
+      </description>
+      <enablement>
+         <objectState
+               name="nature"
+               value="%agileReview_active_nature.id">
+         </objectState>
+      </enablement>
+   </decorator>
 </extension>
 </plugin>

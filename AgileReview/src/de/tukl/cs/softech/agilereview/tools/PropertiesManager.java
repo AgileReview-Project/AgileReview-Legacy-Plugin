@@ -74,6 +74,7 @@ public class PropertiesManager implements IInputValidator{
 		 * Nature id of the AgileReview source folder
 		 */
 		public static String AGILEREVIEW_NATURE = "agileReview_nature.id";
+		public static String ACTIVE_AGILEREVIEW_NATURE = "agileReview_active_nature.id";
 		
 		/**
 		 * Static subclass: clustering of icon keys
