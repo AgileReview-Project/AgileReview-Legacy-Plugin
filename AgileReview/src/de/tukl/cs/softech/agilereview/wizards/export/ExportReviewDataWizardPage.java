@@ -114,7 +114,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		container.setLayout(layout);
 		layout.numColumns = 4;
 		
-		// ui elements for template selection
+		// ui elements for template selection/*?|0000044|Peter|c4|*/
 		Label templateLabel = new Label(container, SWT.NULL);
 		templateLabel.setText("Template for XLS export:");
 		
@@ -146,7 +146,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		browseButton.setData("path");
 		browseButton.addSelectionListener(this);
 		
-		//example template link/*?|0000044|Malte|c3|*/
+		//example template link
 		GridData rlGD = new GridData(GridData.FILL_HORIZONTAL);
 		rlGD.horizontalSpan = layout.numColumns-1;
 		rlGD.horizontalAlignment = GridData.BEGINNING;
@@ -155,7 +155,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		label.setText("Follow this <a>link</a> for downloading an example template.");
 		label.setLayoutData(rlGD);
 		label.setData("exampleTemplates");
-		label.addListener(SWT.Selection, this);/*|0000044|Malte|c3|?*/
+		label.addListener(SWT.Selection, this);/*|0000044|Peter|c4|?*/
 		
 		//check save as default button
 		rlGD = new GridData(GridData.FILL_HORIZONTAL);
@@ -375,13 +375,13 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 			try {
 				PlatformUI.getWorkbench().getBrowserSupport().createBrowser(null).openURL(
 						new URL(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
-			} catch (PartInitException e) {
+			} catch (PartInitException e) {/*?|0000044|Peter|c5|*/
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
 						"An Error occured while opening a new browser window (1)");
 			} catch (MalformedURLException e) {
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
 						"An Error occured while opening a new browser window (2)");
-			}
+			}/*|0000044|Peter|c5|?*/
 		}
 	}
 }

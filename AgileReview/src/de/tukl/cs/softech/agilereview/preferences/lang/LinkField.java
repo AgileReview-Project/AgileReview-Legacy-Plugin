@@ -15,12 +15,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-
+/*?|0000044|Peter|c0|*/
 /**
  * Not yet a generic class, which currently displays the following text: 
  * "Follow this link for downloading an example template."<br>The link opens
  * 
- */
+ *//*|0000044|Peter|c0|?*/
 public class LinkField extends FieldEditor implements Listener {/*?|0000044|Malte|c0|?*/
 	
 	/**
@@ -33,7 +33,7 @@ public class LinkField extends FieldEditor implements Listener {/*?|0000044|Malt
 
 	@Override
 	protected void adjustForNumColumns(int numColumns) {
-		
+
 	}
 
 	@Override
@@ -72,13 +72,13 @@ public class LinkField extends FieldEditor implements Listener {/*?|0000044|Malt
 			try {
 				PlatformUI.getWorkbench().getBrowserSupport().createBrowser(null).openURL(
 						new URL(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
-			} catch (PartInitException e) {
+			} catch (PartInitException e) {/*?|0000044|Peter|c2|*/
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
-						"An Error occured while opening a new browser window (1)");
-			} catch (MalformedURLException e) {
+						"An Error occured while opening a new browser window (1)");/*|0000044|Peter|c2|?*/
+			} catch (MalformedURLException e) {/*?|0000044|Peter|c1|*/
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
 						"An Error occured while opening a new browser window (2)");
-			}
+			}/*|0000044|Peter|c1|?*/
 		}
 	}
 }

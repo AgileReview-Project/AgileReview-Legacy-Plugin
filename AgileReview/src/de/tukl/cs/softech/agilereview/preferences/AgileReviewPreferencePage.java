@@ -130,7 +130,7 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 		
-		// export template file
+		// export template file/*?|0000044|Peter|c3|*/
 		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, 
 				"Default template for XLS export:", getFieldEditorParent());
 		fileExportTemplateField.setFileExtensions(new String[]{"*.xls*"});
@@ -141,8 +141,8 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				"Default XLS export location:", getFieldEditorParent());
 		addField(directoryExportField);
 		
-		// link text/*?|0000044|Malte|c1|*/
-		addField(new LinkField(getFieldEditorParent()));/*|0000044|Malte|c1|?*/
+		// link text
+		addField(new LinkField(getFieldEditorParent()));/*|0000044|Peter|c3|?*/
 	}
 
 	
