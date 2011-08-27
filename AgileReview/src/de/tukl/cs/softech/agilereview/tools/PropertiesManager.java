@@ -78,6 +78,10 @@ public class PropertiesManager implements IInputValidator{
 		 * Nature id of the active AgileReview source folder 
 		 */
 		public static String ACTIVE_AGILEREVIEW_NATURE = "agileReview_active_nature.id";
+		/**
+		 * The URL directing to the export templates
+		 */
+		public static String URL_EXAMPLE_EXPORT_TEMPLATES = "url_example_export_templates";
 		
 		/**
 		 * Static subclass: clustering of icon keys

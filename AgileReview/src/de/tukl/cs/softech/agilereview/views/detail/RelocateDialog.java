@@ -56,7 +56,7 @@ public class RelocateDialog extends Composite implements Listener {
 		this.setLayout(gridLayout);
 		
 		StyledText label = new StyledText(this, SWT.WRAP);
-		label.setText("Select the new location the comment should be moved to and confirm here or run the relocate command again");
+		label.setText("Select the new location the comment should be moved to and confirm the selection here using Relocate.");
 		label.setBackground(this.getParent().getBackground());
 		label.setWordWrap(true);
 		label.setEditable(false);

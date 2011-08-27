@@ -1,12 +1,15 @@
 package de.tukl.cs.softech.agilereview.wizards.export;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -19,12 +22,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
@@ -33,7 +41,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * The single page of the NewReview Wizard
  */
-public class ExportReviewDataWizardPage extends WizardPage implements SelectionListener, ModifyListener {
+public class ExportReviewDataWizardPage extends WizardPage implements SelectionListener, ModifyListener, Listener {
 
 	/**
 	 * Instance of ReviewAccess
@@ -138,9 +146,20 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		browseButton.setData("path");
 		browseButton.addSelectionListener(this);
 		
-		//check save as default button
+		//example template link
 		GridData rlGD = new GridData(GridData.FILL_HORIZONTAL);
-		rlGD.horizontalSpan = layout.numColumns;
+		rlGD.horizontalSpan = layout.numColumns-1;
+		rlGD.horizontalAlignment = GridData.BEGINNING;
+		
+		Link label = new Link(container, SWT.NONE);
+		label.setText("Follow this <a>link</a> for downloading an example template.");
+		label.setLayoutData(rlGD);
+		label.setData("exampleTemplates");
+		label.addListener(SWT.Selection, this);
+		
+		//check save as default button
+		rlGD = new GridData(GridData.FILL_HORIZONTAL);
+		rlGD.horizontalSpan = 1;
 		rlGD.horizontalAlignment = GridData.END;
 		
 		checkSave = new Button(container, SWT.CHECK);
@@ -347,5 +366,22 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 */
 	boolean isSavePathAsDefault() {
 		return checkSave.getSelection();
+	}
+	
+
+	@Override
+	public void handleEvent(Event event) {
+		if(event.widget.getData().equals("exampleTemplates") && event.text.equals("link")) {
+			try {
+				PlatformUI.getWorkbench().getBrowserSupport().createBrowser(null).openURL(
+						new URL(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
+			} catch (PartInitException e) {
+				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
+						"An Error occured while opening a new browser window (1)");
+			} catch (MalformedURLException e) {
+				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
+						"An Error occured while opening a new browser window (2)");
+			}
+		}
 	}
 }
