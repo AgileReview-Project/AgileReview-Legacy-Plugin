@@ -81,7 +81,7 @@ public class PropertiesManager implements IInputValidator{
 		/**
 		 * The URL directing to the export templates
 		 */
-		public static String URL_EXAMPLE_EXPORT_TEMPLATES = "url_example_export_templates";
+		public static String URL_EXAMPLE_EXPORT_TEMPLATES = "url_example_export_templates";/*?|0000044|Malte|c2|?*/
 		
 		/**
 		 * Static subclass: clustering of icon keys

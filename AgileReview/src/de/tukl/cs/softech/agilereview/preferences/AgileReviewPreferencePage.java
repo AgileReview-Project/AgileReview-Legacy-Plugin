@@ -141,8 +141,8 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				"Default XLS export location:", getFieldEditorParent());
 		addField(directoryExportField);
 		
-		// link text
-		addField(new LinkField(getFieldEditorParent()));
+		// link text/*?|0000044|Malte|c1|*/
+		addField(new LinkField(getFieldEditorParent()));/*|0000044|Malte|c1|?*/
 	}
 
 	

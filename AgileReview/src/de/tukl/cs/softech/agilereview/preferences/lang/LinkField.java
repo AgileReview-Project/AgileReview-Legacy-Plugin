@@ -21,7 +21,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
  * "Follow this link for downloading an example template."<br>The link opens
  * 
  */
-public class LinkField extends FieldEditor implements Listener {
+public class LinkField extends FieldEditor implements Listener {/*?|0000044|Malte|c0|?*/
 	
 	/**
 	 * Creates a new instance

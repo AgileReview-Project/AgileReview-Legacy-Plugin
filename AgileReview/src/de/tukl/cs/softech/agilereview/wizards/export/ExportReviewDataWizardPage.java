@@ -146,7 +146,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		browseButton.setData("path");
 		browseButton.addSelectionListener(this);
 		
-		//example template link
+		//example template link/*?|0000044|Malte|c3|*/
 		GridData rlGD = new GridData(GridData.FILL_HORIZONTAL);
 		rlGD.horizontalSpan = layout.numColumns-1;
 		rlGD.horizontalAlignment = GridData.BEGINNING;
@@ -155,7 +155,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		label.setText("Follow this <a>link</a> for downloading an example template.");
 		label.setLayoutData(rlGD);
 		label.setData("exampleTemplates");
-		label.addListener(SWT.Selection, this);
+		label.addListener(SWT.Selection, this);/*|0000044|Malte|c3|?*/
 		
 		//check save as default button
 		rlGD = new GridData(GridData.FILL_HORIZONTAL);
