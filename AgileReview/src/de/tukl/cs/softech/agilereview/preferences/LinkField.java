@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.preferences.lang;
+package de.tukl.cs.softech.agilereview.preferences;
 
 import java.net.MalformedURLException;
 import java.net.URL;
