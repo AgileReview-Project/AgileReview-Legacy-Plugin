@@ -114,12 +114,30 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		container.setLayout(layout);
 		layout.numColumns = 4;
 		
+		// ui elements for selecting export path
+		Label pathLabel = new Label(container, SWT.NULL);
+		pathLabel.setText("XLS export location:");
+		
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = layout.numColumns - 2;
+		exportPathText = new Text(container, SWT.BORDER | SWT.SINGLE);
+		exportPathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH));	
+		exportPathText.setEditable(false);
+		exportPathText.addModifyListener(this);
+		exportPathText.setLayoutData(gd);
+		
+		GridData bGD = new GridData(GridData.FILL_HORIZONTAL);
+		bGD.horizontalSpan = 1;
+		Button browseButton = new Button(container, SWT.NULL);
+		browseButton.setText("Browse...");
+		browseButton.setData("path");
+		browseButton.addSelectionListener(this);
+		browseButton.setLayoutData(bGD);
+		
 		// ui elements for template selection/*?|0000044|Peter|c4|*/
 		Label templateLabel = new Label(container, SWT.NULL);
 		templateLabel.setText("Template for XLS export:");
 		
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = layout.numColumns - 2;
 		templatePathText = new Text(container, SWT.BORDER | SWT.SINGLE);
 		templatePathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH));			
 		templatePathText.setEditable(false);
@@ -130,21 +148,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		browseButtonTemplate.setText("Browse...");
 		browseButtonTemplate.setData("template");
 		browseButtonTemplate.addSelectionListener(this);
-				
-		// ui elements for selecting export path
-		Label pathLabel = new Label(container, SWT.NULL);
-		pathLabel.setText("XLS export location:");
-		
-		exportPathText = new Text(container, SWT.BORDER | SWT.SINGLE);
-		exportPathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH));	
-		exportPathText.setEditable(false);
-		exportPathText.addModifyListener(this);
-		exportPathText.setLayoutData(gd);
-		
-		Button browseButton = new Button(container, SWT.NULL);
-		browseButton.setText("Browse...");
-		browseButton.setData("path");
-		browseButton.addSelectionListener(this);
+		browseButtonTemplate.setLayoutData(bGD);
 		
 		//example template link
 		GridData rlGD = new GridData(GridData.FILL_HORIZONTAL);

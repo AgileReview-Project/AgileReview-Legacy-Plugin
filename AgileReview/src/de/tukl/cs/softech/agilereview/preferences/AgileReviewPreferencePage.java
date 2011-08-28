@@ -20,7 +20,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
-import de.tukl.cs.softech.agilereview.preferences.lang.LinkField;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 
@@ -130,16 +129,16 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 		
+		// Directory Browser for export folder
+		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, 
+				"Default XLS export location:", getFieldEditorParent());
+		addField(directoryExportField);
+		
 		// export template file/*?|0000044|Peter|c3|*/
 		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, 
 				"Default template for XLS export:", getFieldEditorParent());
 		fileExportTemplateField.setFileExtensions(new String[]{"*.xls*"});
 		addField(fileExportTemplateField);
-		
-		// Directory Browser for export folder
-		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, 
-				"Default XLS export location:", getFieldEditorParent());
-		addField(directoryExportField);
 		
 		// link text
 		addField(new LinkField(getFieldEditorParent()));/*|0000044|Peter|c3|?*/
