@@ -381,10 +381,14 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 						new URL(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
 			} catch (PartInitException e) {/*?|0000044|Peter|c5|*/
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
-						"An Error occured while opening a new browser window (1)");
+						"An Error occured while opening a new browser window (1)\n" +
+						"You can download the template manually on http://sourceforge.net/projects/agilereview/files/raw%20export%20templates/\n" +
+						"In oder to solve this bug, please contact us on agilereview.org");
 			} catch (MalformedURLException e) {
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
-						"An Error occured while opening a new browser window (2)");
+						"An Error occured while opening a new browser window (2)\n" +
+						"You can download the template manually on http://sourceforge.net/projects/agilereview/files/raw%20export%20templates/\n" +
+						"In oder to solve this bug, please contact us on agilereview.org");
 			}/*|0000044|Peter|c5|?*/
 		}
 	}
