@@ -222,8 +222,6 @@ public class PropertiesManager implements IInputValidator{
 	 * Creates a new instance of PropertiesManager
 	 */
 	private PropertiesManager() {		
-		System.out.println("PropertiesManager created");
-		
 		// Internal properties
 		internalProperties = new Properties();
 		// TODO: Is there a better way to access the bundle properties?
