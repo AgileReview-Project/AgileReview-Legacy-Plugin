@@ -24,7 +24,7 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 	private boolean bUseDirectlyInitial = true;
 	/*?|0000004 + 0000006|Malte|c12|*/
 	/**
-	 * Specifies whether the useDirectly check-box is enabled or not (default: false)
+	 * Specifies whether the user can choose if he wants to use the newly created AgileReview Source folder (default: yes)
 	 */
 	private boolean bFixUseDirectly = false;/*|0000004 + 0000006|Malte|c12|?*/
 	/**
@@ -35,7 +35,7 @@ public class NewReviewSourceWizard extends Wizard implements INewWizard {
 	/**
 	 * Constructor with arguments for customized calling
 	 * @param useDirectlyInitial specifies whether the useDirectly check-box is initially selected or not
-	 * @param fixUseDirectly specifies whether the useDirectly check-box is enabled or not
+	 * @param fixUseDirectly Specifies whether the user can choose if he wants to use the newly created AgileReview Source folder
 	 */
 	public NewReviewSourceWizard(boolean useDirectlyInitial, boolean fixUseDirectly) {
 		super();

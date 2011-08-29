@@ -20,14 +20,11 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -311,6 +308,8 @@ public class ReviewAccess {
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(new CloseProjectResourceListener(), IResourceChangeEvent.PRE_CLOSE 
 				| IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);
 	}
+	
+	
 	
 	/**
 	 * Clears all used models

@@ -21,7 +21,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * The single page of the NewReview Wizard
  */
-public class NewReviewSourceWizardPage extends WizardPage implements ModifyListener {
+final class NewReviewSourceWizardPage extends WizardPage implements ModifyListener {
 
 	/**
 	 * the text field for retrieving the id
@@ -36,7 +36,7 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 	 */
 	private boolean bUseDirectlyInitial;
 	/**
-	 * Specifies whether the useDirectly check-box is enabled or not
+	 * Specifies whether the user can choose if he wants to use the newly created AgileReview Source folder
 	 */
 	private boolean bFixUseDirectly;/*?|0000004 + 0000006|Malte|c9|?*/
 
@@ -44,9 +44,9 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 	/**
 	 * Creates a new page
 	 * @param useDirectlyInitial specifies whether the useDirectly check-box is initially selected or not
-	 * @param fixUseDirectly specifies whether the useDirectly check-box is enabled or not
+	 * @param fixUseDirectly specifies whether the user can choose if he wants to use the newly created AgileReview Source folder
 	 */
-	protected NewReviewSourceWizardPage(boolean useDirectlyInitial, boolean fixUseDirectly) {/*?|0000004 + 0000006|Malte|c8|?*/
+	NewReviewSourceWizardPage(boolean useDirectlyInitial, boolean fixUseDirectly) {/*?|0000004 + 0000006|Malte|c8|?*/
 		super("New AgileReview Source Project");
 		setTitle("New AgileReview Source Project");
 		setDescription("This wizard creates a new AgileReview Source Project.");
@@ -91,14 +91,14 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 	/**
 	 * @return the review ID entered
 	 */
-	protected String getReviewSourceName() {
+	String getReviewSourceName() {
 		return this.name.getText().trim();
 	}
 	
 	/**
 	 * @return the review reference entered
 	 */
-	protected boolean getUseDirectly() {
+	boolean getUseDirectly() {
 		return this.use.getSelection();
 	}
 	
@@ -115,7 +115,7 @@ public class NewReviewSourceWizardPage extends WizardPage implements ModifyListe
 
         String projectFieldContents = name.getText();
         if (projectFieldContents.equals("")) { //$NON-NLS-1$
-            setErrorMessage(null);/*?|0000004 + 0000006|Malte|c10|?*/
+            setErrorMessage("Name for the new project can not be empty!");/*?|0000004 + 0000006|Malte|c10|?*/
             return false;
         }
 

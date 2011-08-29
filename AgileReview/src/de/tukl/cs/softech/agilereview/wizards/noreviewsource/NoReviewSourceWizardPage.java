@@ -11,10 +11,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -34,7 +30,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 /**
  * The single page of the NewReview Wizard
  */
-public class NoReviewSourceWizardPage extends WizardPage implements Listener {
+ final class NoReviewSourceWizardPage extends WizardPage implements Listener {
 
 	/**
 	 * Drop-Down-Box to choose which AgileReview Source Project should be chosen
@@ -68,7 +64,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements Listener {
 	/**
 	 * Creates a new page
 	 */
-	protected NoReviewSourceWizardPage() {/*?|0000004 + 0000006|Malte|c1|?*/
+	NoReviewSourceWizardPage() {/*?|0000004 + 0000006|Malte|c1|?*/
 		super("No Review Source Project");
 		setTitle("No Review Source Project");
 		setDescription("In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed.");
@@ -77,7 +73,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements Listener {
 	/**
 	 * @return the review ID entered
 	 */
-	protected String getReviewSourceName() {
+	String getReviewSourceName() {
 		return this.comboChooseProject.getText();
 	}
 	
@@ -89,6 +85,8 @@ public class NoReviewSourceWizardPage extends WizardPage implements Listener {
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
+		layout.horizontalSpacing = 20;
+		layout.verticalSpacing = 30;
 		container.setLayout(layout);
 		
 		Label labelChoose = new Label(container, SWT.NONE);
@@ -105,6 +103,8 @@ public class NoReviewSourceWizardPage extends WizardPage implements Listener {
 		bottom.setLayoutData(gridData);
 		GridLayout gridLayoutBottom = new GridLayout();
 		gridLayoutBottom.numColumns = 2;
+		gridLayoutBottom.horizontalSpacing = 20;
+		gridLayoutBottom.verticalSpacing = 15;
 		bottom.setLayout(gridLayoutBottom);
 		
 		comboClosedProjects = new Combo(bottom, SWT.READ_ONLY | SWT.DROP_DOWN);
@@ -134,7 +134,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements Listener {
 		// Required to avoid an error in the system
 		setControl(container);
 		setPageComplete(validatePage());
-		setErrorMessage(null);
+//		setErrorMessage(null);
 	}
 	
 	/**
@@ -169,12 +169,13 @@ public class NoReviewSourceWizardPage extends WizardPage implements Listener {
 			for (int i=0;i<items.length;i++) {
 				if (items[i].equals(prefProject)) {
 					comboChooseProject.select(i);/*?|0000004 + 0000006|Malte|c3|?*/
+					break;
 				}
 			}
 		}
-		if (comboChooseProject.getSelectionIndex() == -1) {/*?|0000004 + 0000006|Malte|c4|*/
-			comboChooseProject.select(0);
-		}/*|0000004 + 0000006|Malte|c4|?*/
+//		if (comboChooseProject.getSelectionIndex() == -1) {/*?|0000004 + 0000006|Malte|c4|*/
+//			comboChooseProject.select(0);
+//		}/*|0000004 + 0000006|Malte|c4|?*/
 		
 		comboChooseProject.pack();
 		comboClosedProjects.pack();
@@ -190,7 +191,7 @@ public class NoReviewSourceWizardPage extends WizardPage implements Listener {
     private boolean validatePage() {
         String projectFieldContents = comboChooseProject.getText();
         if (projectFieldContents.isEmpty()) { //$NON-NLS-1$
-            setErrorMessage(null);/*?|0000004 + 0000006|Malte|c5|?*/
+            setErrorMessage("Please select a AgileReview Source Folder to use");/*?|0000004 + 0000006|Malte|c5|?*/
             return false;
         }
 
