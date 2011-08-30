@@ -560,7 +560,7 @@ public class ReviewAccess {
 	
 	/**
 	 * Returns the current active source folder
-	 * @return the current active source folder
+	 * @return the current active source folder (may be null)
 	 */
 	IProject getCurrentSourceFolder() {
 		return REVIEW_REPO_FOLDER;

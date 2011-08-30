@@ -33,12 +33,38 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 	 */
 	private IPath deletedProjectPath = null;
 	
+	/**
+	 * Displays the NoAgileReviewSourceProject wizard
+	 */
+	private void showNoSourceProjectWizard() {
+		// Has to be done in new thread, as the resourceChanged method blocks the building of the workspace
+		Display.getDefault().asyncExec(new Runnable() {								
+			@Override
+			public void run() {
+				NoReviewSourceWizard dialog = new NoReviewSourceWizard();
+				WizardDialog wDialog = new WizardDialog(Display.getDefault().getActiveShell(), dialog);
+				wDialog.setBlockOnOpen(true);
+				if (wDialog.open() == Window.OK) {
+					String projectName = dialog.getChosenProjectName();		
+					if (ReviewAccess.createAndOpenReviewProject(projectName)) {
+						PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
+						ReviewAccess.getInstance().loadReviewSourceProject(projectName);
+					}
+				}
+			}
+		});
+	}
+	
 	@Override
 	public void resourceChanged(final IResourceChangeEvent event) {
-		Display.getDefault().syncExec(new Runnable() {
+			Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
 				ReviewAccess ra = ReviewAccess.getInstance();
+				
+				///////////////
+				// PRE_CLOSE //
+				///////////////
 				if(event.getType() == IResourceChangeEvent.PRE_CLOSE) {
 					closedBefore = true;
 					// Remove active nature, if needed
@@ -51,14 +77,17 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 					}
 				}
 				
+				////////////////
+				// POST_CLOSE //
+				////////////////
 				if(event.getType() == IResourceChangeEvent.POST_BUILD && closedBefore) {
+					closedBefore = false;
 					if(ra.getCurrentSourceFolder() != null) {
 						//check whether the project was one of the closed project
 						IResourceDelta[] deltaArr = event.getDelta().getAffectedChildren();
 						if(deltaArr.length > 0) {
 							for(IResourceDelta delta : deltaArr) {
 								if (ra.getCurrentSourceFolder().equals(delta.getResource())) {
-									
 									Shell currentShell = Display.getDefault().getActiveShell();
 									String msg = "You closed the currently used 'Agile Review Source Project'.\n" +
 									"Do you want to reopen it to avoid a crash of AgileReview?";
@@ -69,27 +98,20 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 										} catch (CoreException e) {
 											PluginLogger.logError(this.getClass().toString(), "resourceChanged", "An exception occured while reopening the closed source project", e);
 										}
-										break;
 									} else {
 										// Show NoAgileReviewSourceProject wizard
-										NoReviewSourceWizard dialog = new NoReviewSourceWizard();
-										WizardDialog wDialog = new WizardDialog(currentShell, dialog);
-										wDialog.setBlockOnOpen(true);
-										if (wDialog.open() == Window.OK) {
-											String projectName = dialog.getChosenProjectName();		
-											if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-												PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
-												ra.loadReviewSourceProject(projectName);
-											}
-										}
+										showNoSourceProjectWizard();
 									}
+									break;
 								}
 							}
 						}
 					}
-					closedBefore = false;
 				}
 				
+				////////////////
+				// PRE_DELETE //
+				////////////////
 				if(event.getType() == IResourceChangeEvent.PRE_DELETE) {
 					IProject currProject = ra.getCurrentSourceFolder();
 					if(currProject != null) {
@@ -100,6 +122,9 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 					}
 				}
 				
+				/////////////////
+				// POST_DELETE //
+				/////////////////
 				if(event.getType() == IResourceChangeEvent.POST_BUILD && deletedProjectPath != null) {
 					if(ra.getCurrentSourceFolder() != null) {
 						//check whether the project was one of the closed project
@@ -114,16 +139,8 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 										"Please choose an other 'AgileReview Source Project' for AgileReview to stay functional";
 										MessageDialog.openWarning(currentShell, "'Agile Review Source Project' deleted", msg);
 										// Show NoAgileReviewSourceProject wizard
-										NoReviewSourceWizard dialog = new NoReviewSourceWizard();
-										WizardDialog wDialog = new WizardDialog(currentShell, dialog);
-										wDialog.setBlockOnOpen(true);
-										if (wDialog.open() == Window.OK) {
-											String projectName = dialog.getChosenProjectName();		
-											if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-												PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
-												ra.loadReviewSourceProject(projectName);
-											}
-										}
+										deletedProjectPath = null; // needed for correct wizard behavior
+										showNoSourceProjectWizard();
 									} else {
 										String msg = "You deleted the current 'Agile Review Source Project' from your internal explorer.\n" +
 												"Do you want to re-import it directly to avoid a crash of AgileReview?";
@@ -138,25 +155,18 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 											} catch (CoreException e) {
 												PluginLogger.logError(this.getClass().toString(), "resourceChanged", "An exception occured while reimporting the closed source project", e);
 											}
-											break;
 										} else {
 											// Show NoAgileReviewSourceProject wizard
-											NoReviewSourceWizard dialog1 = new NoReviewSourceWizard();
-											WizardDialog wDialog1 = new WizardDialog(currentShell, dialog1);
-											wDialog1.setBlockOnOpen(true);
-											if (wDialog1.open() == Window.OK) {
-												String projectName = dialog1.getChosenProjectName();		
-												if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-													PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
-													ra.loadReviewSourceProject(projectName);
-												}
-											}
+											deletedProjectPath = null; // needed for correct wizard behavior
+											showNoSourceProjectWizard();
 										}
 									}
+									break;
 								}
 							}
 						}
 					}
+					
 					deletedProjectPath = null;
 				}
 			}
