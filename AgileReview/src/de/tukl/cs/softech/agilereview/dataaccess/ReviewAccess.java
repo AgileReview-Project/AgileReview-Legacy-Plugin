@@ -258,15 +258,18 @@ public class ReviewAccess {
 	 * Sets the given project natures to those specified by those in "natures".
 	 * @param p The project.
 	 * @param natures The natures.
+	 * @return <code>true</code> if everything worked, <code>false</code> otherwise
 	 */
-	private static void setProjectNatures(IProject p, String[] natures) {
+	private static boolean setProjectNatures(IProject p, String[] natures) {
 		try {
 			IProjectDescription projectDesc = p.getDescription();
 			projectDesc.setNatureIds(natures);
 			p.setDescription(projectDesc, null);// TODO: Use ProgressMonitor
+			return true;
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
@@ -322,6 +325,25 @@ public class ReviewAccess {
 	}
 	
 	/**
+	 * Removes the "active" nature from the current AgileReview Source Project
+	 */
+	void unloadCurrentReviewSourceProject(){
+		if(REVIEW_REPO_FOLDER != null) {
+			if(REVIEW_REPO_FOLDER.exists() && REVIEW_REPO_FOLDER.isOpen()) {
+				setProjectNatures(REVIEW_REPO_FOLDER, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
+				// update decorator
+				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						while(PlatformUI.getWorkbench() == null) {}
+						PlatformUI.getWorkbench().getDecoratorManager().update("de.tukl.cs.softech.agilereview.active_decorator");
+					}
+				});
+			}
+		}
+	}
+	
+	/**
 	 * Loads the given project as AgileReview source project
 	 * @param projectName project name
 	 * @return <i>true</i> if everything works, <i>false</i> otherwise (e.g. when the project does not exist)
@@ -333,17 +355,12 @@ public class ReviewAccess {
 			return false;
 		} else {
 			// remove active nature from old project
-			if(REVIEW_REPO_FOLDER != null) {
-				IProject oldP = workspaceRoot.getProject(REVIEW_REPO_FOLDER.getName());
-				if(oldP.exists()) {
-					setProjectNatures(oldP, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
-				}
-			}
+			unloadCurrentReviewSourceProject();
 			
 			// set new project
 			REVIEW_REPO_FOLDER = p;
 			// add active nature to new project
-			setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});
+			setProjectNatures(REVIEW_REPO_FOLDER, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});
 			// update decorator
 			Display.getCurrent().asyncExec(new Runnable() {
 				@Override
