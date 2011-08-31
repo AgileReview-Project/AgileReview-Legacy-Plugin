@@ -596,6 +596,31 @@
          </with>
       </enabledWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.dataaccess.handler.ActivateSourceProjectHandler"
+         commandId="de.tukl.cs.softech.agilereview.activateReviewSource">
+      <activeWhen>
+         <with
+               variable="selection">
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="de.tukl.cs.softech.agilereview.nature">
+                     </test>
+                  </adapt>
+               </iterate>
+            </and>
+         </with>
+      </activeWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -721,6 +746,12 @@
             description="Collapses all sub nodes of a given node in the ReviewExplorer"
             id="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
             name="Collapse all sub nodes">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Activates the currently selected AgileReview Source Project"
+            id="de.tukl.cs.softech.agilereview.activateReviewSource"
+            name="Activate AgileReview Source Project">
       </command>
 </extension>
 <extension
@@ -973,6 +1004,13 @@
             label="AgileReview Project CleanUp"
             style="push"
             tooltip="Remove AgileReview comments tags from all files of this project">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.activateReviewSource"
+            icon="icons/agile_icon_activated.png"
+            label="Activate AgileReview Source Project"
+            style="push"
+            tooltip="Activate this AgileReview Source Project">
       </command>
       <separator
             name="AgileReview.PackageExplorer.separator2"

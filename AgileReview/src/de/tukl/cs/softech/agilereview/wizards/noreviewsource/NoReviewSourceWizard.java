@@ -5,7 +5,6 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
-import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * Wizard for choosing a AgileReview Source Project if non is existent
@@ -61,7 +60,6 @@ public class NoReviewSourceWizard extends Wizard implements IWizard {
 		boolean result = chosenProjectName != null;
 		if (result && setDirectly) {
 			if (ReviewAccess.createAndOpenReviewProject(chosenProjectName)) {
-				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, chosenProjectName);
 				ReviewAccess.getInstance().loadReviewSourceProject(chosenProjectName);
 			}
 		}

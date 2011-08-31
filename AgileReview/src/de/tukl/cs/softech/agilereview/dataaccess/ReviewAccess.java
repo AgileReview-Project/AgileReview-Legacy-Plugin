@@ -306,7 +306,6 @@ public class ReviewAccess {
 			if (wDialog.open() == Window.OK) {
 				String chosenProjectName = dialog.getChosenProjectName();
 				if (ReviewAccess.createAndOpenReviewProject(chosenProjectName)) {
-					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, chosenProjectName);
 					loadReviewSourceProject(chosenProjectName);
 				}
 			}/*?|0000004 + 0000006|Malte|c0|?*/
@@ -368,6 +367,7 @@ public class ReviewAccess {
 			
 			// set new project
 			REVIEW_REPO_FOLDER = p;
+			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, p.getName());
 			// add active nature to new project
 			setProjectNatures(REVIEW_REPO_FOLDER, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});
 			// update decorator

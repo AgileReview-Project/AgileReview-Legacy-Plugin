@@ -33,7 +33,7 @@ public class CleanupHandler extends AbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-
+		PluginLogger.log(this.getClass().toString(), "execute", "Cleanup triggered in Package-Explorer");
 		// get the element selected in the packageexplorer
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getActiveMenuSelection(event);
 		Object firstElement = selection.getFirstElement();
