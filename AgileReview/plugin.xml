@@ -90,6 +90,18 @@
             id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
       </newWizardShortcut>
    </perspectiveExtension>
+   <perspectiveExtension
+         targetID="org.eclipse.pde.ui.PDEPerspective">
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
+      </newWizardShortcut>
+      <perspectiveShortcut
+            id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+      </perspectiveShortcut>
+   </perspectiveExtension>
 </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -613,7 +625,7 @@
                         type="org.eclipse.core.resources.IResource">
                      <test
                            property="org.eclipse.core.resources.projectNature"
-                           value="de.tukl.cs.softech.agilereview.nature">
+                           value="%agileReview_nature.id">
                      </test>
                   </adapt>
                </iterate>
