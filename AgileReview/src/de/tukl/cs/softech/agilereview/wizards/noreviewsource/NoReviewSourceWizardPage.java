@@ -110,7 +110,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 		comboClosedProjects = new Combo(bottom, SWT.READ_ONLY | SWT.DROP_DOWN);
 		
 		btOpenClosed = new Button(bottom, SWT.PUSH);
-		btOpenClosed.setText("Open AgileReview Source Project");
+		btOpenClosed.setText("Open Project");
 		btOpenClosed.addListener(SWT.Selection, this);		
 				
 		btCreateNew = new Button(bottom, SWT.PUSH);

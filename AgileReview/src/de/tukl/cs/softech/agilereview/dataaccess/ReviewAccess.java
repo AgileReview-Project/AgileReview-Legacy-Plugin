@@ -22,9 +22,11 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -294,15 +296,18 @@ public class ReviewAccess {
 		// Set the directory where the comments are located
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
 		if (!loadReviewSourceProject(projectName)) {
-			NoReviewSourceWizard dialog = new NoReviewSourceWizard();
+			Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+			String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
+					"Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
+			MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);
+			NoReviewSourceWizard dialog = new NoReviewSourceWizard(false);
 			WizardDialog wDialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), dialog);
 			wDialog.setBlockOnOpen(true);
-			
 			if (wDialog.open() == Window.OK) {
-				projectName = dialog.getChosenProjectName();		
-				if (ReviewAccess.createAndOpenReviewProject(projectName)) {
-					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, projectName);
-					loadReviewSourceProject(projectName);
+				String chosenProjectName = dialog.getChosenProjectName();
+				if (ReviewAccess.createAndOpenReviewProject(chosenProjectName)) {
+					PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, chosenProjectName);
+					loadReviewSourceProject(chosenProjectName);
 				}
 			}/*?|0000004 + 0000006|Malte|c0|?*/
 		}
@@ -326,8 +331,10 @@ public class ReviewAccess {
 	
 	/**
 	 * Removes the "active" nature from the current AgileReview Source Project
+	 * @return the old project, which was unloaded
 	 */
-	void unloadCurrentReviewSourceProject(){
+	IProject unloadCurrentReviewSourceProject(){
+		IProject oldProject = REVIEW_REPO_FOLDER;
 		if(REVIEW_REPO_FOLDER != null) {
 			if(REVIEW_REPO_FOLDER.exists() && REVIEW_REPO_FOLDER.isOpen()) {
 				setProjectNatures(REVIEW_REPO_FOLDER, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
@@ -339,8 +346,10 @@ public class ReviewAccess {
 						PlatformUI.getWorkbench().getDecoratorManager().update("de.tukl.cs.softech.agilereview.active_decorator");
 					}
 				});
+				REVIEW_REPO_FOLDER = null;
 			}
 		}
+		return oldProject;
 	}
 	
 	/**
@@ -348,7 +357,7 @@ public class ReviewAccess {
 	 * @param projectName project name
 	 * @return <i>true</i> if everything works, <i>false</i> otherwise (e.g. when the project does not exist)
 	 */
-	boolean loadReviewSourceProject(String projectName){
+	public boolean loadReviewSourceProject(String projectName){
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject p = workspaceRoot.getProject(projectName);
 		if(!p.exists() || !p.isOpen()) {
@@ -564,6 +573,18 @@ public class ReviewAccess {
 	 */
 	IProject getCurrentSourceFolder() {
 		return REVIEW_REPO_FOLDER;
+	}
+	
+	/**
+	 * States, whether the ReviewAccess has a valid Source Project at the moment
+	 * @return <code>true</code> if the current Source Folder is valid, <code>false</code> otherwise
+	 */
+	public boolean isCurrentSourceValid() {
+		boolean result = REVIEW_REPO_FOLDER != null;
+		if (result) {
+			result &= REVIEW_REPO_FOLDER.exists() && REVIEW_REPO_FOLDER.isOpen();
+		}
+		return result;
 	}
 	
 	/**
@@ -938,7 +959,7 @@ public class ReviewAccess {
 	public boolean updateReviewSourceProject() {
 		boolean result = false;	
 		String strPropManReviewSourceName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
-		if (!REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName)) {
+		if (REVIEW_REPO_FOLDER == null || !REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName)) {
 			loadReviewSourceProject(strPropManReviewSourceName);
 			result = true;
 		}	

@@ -4,6 +4,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
 
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+
 /**
  * Wizard for choosing a AgileReview Source Project if non is existent
  */
@@ -18,16 +21,28 @@ public class NoReviewSourceWizard extends Wizard implements IWizard {
 	 * The name of the project created by this wizard
 	 */
 	private String chosenProjectName = null;
+	/**
+	 * Indicates, if the project should directly be set as 'AgileReview Source Project'
+	 */
+	private boolean setDirectly = true;
 	
 	/**
-	 * Standard constructor
+	 * Standard constructor. Equal to NoReviewSourceWizard(true)
 	 */
 	public NoReviewSourceWizard() {
+		this(true);
+	}
+
+	/**
+	 * Constructor for this wizard
+	 * @param setDirectly if <code>true</code> the project will be set as 'AgileReview Source Project' directly, else the name will only be provided
+	 */
+	public NoReviewSourceWizard(boolean setDirectly) {
 		super();
 		setNeedsProgressMonitor(true);
 		setWindowTitle("No AgileReview Source Project");
+		this.setDirectly = setDirectly;
 	}
-
 	
 	/**
 	 * adds all needed pages to the wizard
@@ -43,7 +58,14 @@ public class NoReviewSourceWizard extends Wizard implements IWizard {
 	@Override
 	public boolean performFinish() {
 		chosenProjectName = page1.getReviewSourceName();
-		return chosenProjectName != null;
+		boolean result = chosenProjectName != null;
+		if (result && setDirectly) {
+			if (ReviewAccess.createAndOpenReviewProject(chosenProjectName)) {
+				PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, chosenProjectName);
+				ReviewAccess.getInstance().loadReviewSourceProject(chosenProjectName);
+			}
+		}
+		return result;
 	}
 	
 	@Override
