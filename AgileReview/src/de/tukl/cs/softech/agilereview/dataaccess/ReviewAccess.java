@@ -582,15 +582,7 @@ public class ReviewAccess {
 		///////////////////////////
 		// comment functionality // 
 		///////////////////////////
-	
-	/**
-	 * Returns the current active source folder
-	 * @return the current active source folder (may be null)
-	 */
-	IProject getCurrentSourceFolder() {
-		return REVIEW_REPO_FOLDER;
-	}
-	
+
 	/**
 	 * States, whether the ReviewAccess has a valid Source Project at the moment
 	 * @return <code>true</code> if the current Source Folder is valid, <code>false</code> otherwise
