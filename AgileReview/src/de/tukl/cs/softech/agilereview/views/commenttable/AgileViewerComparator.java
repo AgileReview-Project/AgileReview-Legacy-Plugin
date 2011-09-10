@@ -10,6 +10,9 @@ import org.eclipse.jface.viewers.ViewerComparator;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 
+/**
+ * The class compares the comment entries of the comment summary view table
+ */
 public class AgileViewerComparator extends ViewerComparator {
 
 	/**

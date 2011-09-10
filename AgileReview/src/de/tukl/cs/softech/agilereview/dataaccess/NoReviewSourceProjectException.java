@@ -5,6 +5,9 @@ package de.tukl.cs.softech.agilereview.dataaccess;
  */
 public class NoReviewSourceProjectException extends Exception {
 
+	/**
+	 * Unique generated version id
+	 */
 	private static final long serialVersionUID = 7377883227128311393L;
 
 }

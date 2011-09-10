@@ -284,6 +284,21 @@ public class ReviewAccess {
 		return RA;
 	}
 	
+	
+	////////////////////////////////
+	// default non-static methods //
+	////////////////////////////////
+	
+	/*?|0000005+0000007|Peter|c4|*/
+	/**
+	 * Returns the current active source folder
+	 * @return the current active source folder
+	 */
+	IProject getCurrentSourceFolder() {
+		return REVIEW_REPO_FOLDER;
+	}/*|0000005+0000007|Peter|c4|?*/
+	
+	
 	////////////////////////////////
 	// private non-static methods //
 	////////////////////////////////
@@ -312,8 +327,8 @@ public class ReviewAccess {
 		}
 		
 		// Attach a ResourceChangeListener to monitor the AgileReview Source project for close operation
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(new CloseProjectResourceListener(), IResourceChangeEvent.PRE_CLOSE 
-				| IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(new CloseProjectResourceListener(), IResourceChangeEvent.PRE_CLOSE /*?|0000005+0000007|Peter|c3|*/
+				| IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);/*|0000005+0000007|Peter|c3|?*/
 	}
 	
 	
@@ -369,9 +384,10 @@ public class ReviewAccess {
 			REVIEW_REPO_FOLDER = p;
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, p.getName());
 			// add active nature to new project
-			setProjectNatures(REVIEW_REPO_FOLDER, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});
+			//TODO This should be when a decoration is available for active source folder 
+			setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});/*?|0000005+0000007|Peter|c2|?*/
 			// update decorator
-			Display.getCurrent().asyncExec(new Runnable() {
+			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					while(PlatformUI.getWorkbench() == null) {}
@@ -975,45 +991,6 @@ public class ReviewAccess {
 	{
 		PluginLogger.log(this.getClass().toString(), "save", "Save all data to disk");
 		rFileModel.saveAll();
-	}
-	
-	
-	/**
-	 * Refactors the whole database according to the given parameters and saves it automatically
-	 * @param oldPath old path of the refactored item
-	 * @param newPath new path of the refactored item
-	 * @param type type of the refactored item (see static fields PROJECT, FOLDER, FILE in {@link IResource})
-	 * @throws IOException 
-	 * @throws XmlException 
-	 */
-	public void refactorPath(String oldPath, String newPath, int type) throws IOException, XmlException
-	{
-		PluginLogger.log(this.getClass().toString(), "refactorPath", "Refactors path \""+oldPath+"\" to \""+newPath+"\"");
-		// First of all, load the whole database
-		this.fillDatabaseCompletely();
-		
-		// Do the refactoring
-		for (CommentsDocument cDoc : this.rFileModel.getAllCommentsDocument())
-		{
-			// Find old path
-			XmlObject oldObject = findXmlPath(cDoc, oldPath, type, false);
-			// If not found in document, then no refactoring has to be done
-			if (oldObject !=null)
-			{
-				// create new path
-				XmlObject newObject = findXmlPath(cDoc, newPath, type, true);
-				// Move children
-				XmlCursor c = newObject.newCursor();
-				c.toFirstContentToken();
-				oldObject.newCursor().moveXmlContents(c);
-				// Delete old path
-				cleanXmlPath(oldObject);
-			}	
-		}
-		this.save();
-		
-		// Load only open reviews again
-		this.fillDatabaseForOpenReviews();
 	}
 	
 }

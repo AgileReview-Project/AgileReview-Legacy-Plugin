@@ -1,13 +1,20 @@
 package de.tukl.cs.softech.agilereview.plugincontrol.refactoring;
 
+import java.io.IOException;
+
+import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * ExecutionListener which methods are executed, if a command is triggered.
@@ -48,9 +55,35 @@ public class ExecutionListener implements IExecutionListener {
 				|| commandId.equals("org.eclipse.ui.edit.rename")
 				|| commandId.equals("org.eclipse.jdt.ui.edit.text.java.rename.element")) {
 			
-			ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
-			ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW, true);
+			// Refill the database
+			ReviewAccess ra = ReviewAccess.getInstance();
+			try {
+				ra.fillDatabaseForOpenReviews();
+			} catch (XmlException e) {
+				PluginLogger.logError(this.getClass().toString(), "execute", "XMLException is thrown", e);
+			} catch (IOException e) {
+				PluginLogger.logError(this.getClass().toString(), "execute", "IOException is thrown", e);
+			}
+			
+			// Test if active review may have vanished
+			String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+			if (!ra.reviewExists(activeReview))
+			{
+				if (!ra.isReviewLoaded(activeReview))
+				{
+					// Active review has vanished --> deactivate it
+					PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+				}
+			}
+			
+			if(ViewControl.isOpen(DetailView.class)) {
+				DetailView.getInstance().clearView();
+			}
+			if(ViewControl.isOpen(ReviewExplorer.class)) {
+				ReviewExplorer.getInstance().refreshInput();
+			}
 			if(ViewControl.isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().resetComments();
 				CommentTableView.getInstance().resetEditorReferences();
 			}
 		}

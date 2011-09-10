@@ -73,7 +73,7 @@ class ReviewFileModel {
 	 * @param doc 
 	 * @param path 
 	 */
-	protected void addXmlDocument(XmlTokenSource doc, IFile path)
+	void addXmlDocument(XmlTokenSource doc, IFile path)
 	{
 		if (doc instanceof ReviewDocument)
 		{
@@ -90,7 +90,7 @@ class ReviewFileModel {
 	 * Removes this file from the model
 	 * @param file
 	 */
-	protected void removeXmlDocument(IFile file)
+	void removeXmlDocument(IFile file)
 	{
 		// Delete the given file
 		this.deleteResource(file);
@@ -121,7 +121,7 @@ class ReviewFileModel {
 	/**
 	 * Clears this model
 	 */
-	protected void clearModel()
+	void clearModel()
 	{
 		PluginLogger.log(this.getClass().toString(), "clearModel", "Review and Comment file model cleared");
 		this.xmlReviewDocuments.clear();
@@ -133,7 +133,7 @@ class ReviewFileModel {
 	 * @param f
 	 * @throws IOException
 	 */
-	protected void save(IFile f) throws IOException
+	void save(IFile f) throws IOException
 	{
 		XmlTokenSource document = null;
 		// Try comment-file
@@ -153,7 +153,7 @@ class ReviewFileModel {
 	 * Saves all files of this model
 	 * @throws IOException
 	 */
-	protected void saveAll() throws IOException
+	void saveAll() throws IOException
 	{
 		// First the reviews
 		for (Entry<IFile, ReviewDocument> currEntry :this.xmlReviewDocuments.entrySet())
@@ -171,12 +171,21 @@ class ReviewFileModel {
 	////////////
 	// Getter //
 	////////////
+	
+	/**
+	 * Returns all files saving comments persistently
+	 * @return all files saving comments persistently
+	 */
+	Collection<IFile> getAllCommentFiles() {
+		return xmlCommentDocuments.keySet();
+	}
+	
 	/**
 	 * Returns the Comments document which is represented by the given file
 	 * @param file 
 	 * @return Comments document represented by this file
 	 */
-	protected CommentsDocument getCommentsDoc(IFile file)
+	CommentsDocument getCommentsDoc(IFile file)
 	{
 		return this.xmlCommentDocuments.get(file);
 	}
@@ -186,7 +195,7 @@ class ReviewFileModel {
 	 * @param file
 	 * @return <i>true</i> if this file is stored in this model, <i>false</i> otherwise
 	 */
-	protected boolean containsFile(IFile file)
+	boolean containsFile(IFile file)
 	{
 		return this.xmlCommentDocuments.containsKey(file) || this.xmlReviewDocuments.containsKey(file);
 	}
@@ -195,7 +204,7 @@ class ReviewFileModel {
 	 * Returns all stored CommentsDocuments
 	 * @return all stored CommentsDocuments
 	 */
-	protected Collection<CommentsDocument> getAllCommentsDocument()
+	Collection<CommentsDocument> getAllCommentsDocument()
 	{
 		return this.xmlCommentDocuments.values();
 	}
@@ -204,7 +213,7 @@ class ReviewFileModel {
 	 * Returns all stored ReviewDocuments
 	 * @return all stored ReviewDocuments
 	 */
-	protected Collection<ReviewDocument> getAllReviewDocument()
+	Collection<ReviewDocument> getAllReviewDocument()
 	{
 		return this.xmlReviewDocuments.values();
 	}

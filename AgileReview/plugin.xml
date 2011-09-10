@@ -295,9 +295,14 @@
       <activeWhen>
          <with
                variable="activePart">
-            <instanceof
-                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
-            </instanceof>
+            <or>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+               </instanceof>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+               </instanceof>
+            </or>
          </with>
       </activeWhen>
    </handler>
@@ -1167,5 +1172,52 @@
          </objectState>
       </enablement>
    </decorator>
+</extension>
+<extension
+      point="org.eclipse.ltk.core.refactoring.renameParticipants">
+   <renameParticipant
+         class="de.tukl.cs.softech.agilereview.plugincontrol.refactoring.AuthorFileRenameParticipant"
+         id="de.tukl.cs.softech.agilereview.refactoring.rename"
+         name="AgileReview Rename Processor">
+      <enablement>
+         <with
+               variable="element">
+            <or>
+               <instanceof
+                     value="org.eclipse.jdt.core.IPackageFragment">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.jdt.core.IPackageFragmentRoot">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </or>
+         </with>
+      </enablement>
+   </renameParticipant>
+</extension>
+<extension
+      point="org.eclipse.ltk.core.refactoring.moveParticipants">
+   <moveParticipant
+         class="de.tukl.cs.softech.agilereview.plugincontrol.refactoring.AuthorFileMoveParticipant"
+         id="de.tukl.cs.softech.agilereview.refactoring.move"
+         name="AgileReview Move Processor">
+      <enablement>
+         <with
+               variable="element">
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.jdt.core.IPackageFragment">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.jdt.core.IPackageFragmentRoot">
+               </instanceof>
+            </or>
+         </with></enablement>
+   </moveParticipant>
 </extension>
 </plugin>
