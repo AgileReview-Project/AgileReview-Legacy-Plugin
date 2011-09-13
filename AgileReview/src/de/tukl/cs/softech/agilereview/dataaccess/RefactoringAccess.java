@@ -49,7 +49,7 @@ public class RefactoringAccess {
 	/**
 	 * List of files that are affected by the refactoring. 
 	 */
-	private Collection<IFile> affectedFilesBuffer;
+	private Collection<IFile> affectedFilesBuffer = new HashSet<IFile>();
 	
 	/**
 	 * Constructor of the RefactoringAccess. Initially loads all comments from the database.
@@ -69,14 +69,13 @@ public class RefactoringAccess {
 	public Collection<IFile> getAffectedFiles(IResource refactoringTarget, int type) {
 		
 		Collection<IFile> affectedFiles = new HashSet<IFile>();
-		
 		for (IFile f : rFileModel.getAllCommentFiles()) {
 			if(findXmlPath(rFileModel.getCommentsDoc(f), refactoringTarget.getFullPath().toOSString(), type, false) != null && !affectedFiles.contains(f)) {
 				affectedFiles.add(f);
 			}
 		}
 		
-		this.affectedFilesBuffer = affectedFiles;
+		this.affectedFilesBuffer.addAll(affectedFiles);
 		
 		return affectedFiles;
 	}

@@ -696,11 +696,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	public void reparseActiveEditor() {
 		IEditorPart editor;
-		if((editor = this.getActiveEditor()) != null) {
-			if(editor instanceof IEditorPart) {
-				this.parserMap.get(editor).reload();
-				this.parserMap.get(editor).filter(getFilteredComments());
-			}
+		if((editor = this.getActiveEditor()) != null && editor instanceof IEditorPart && this.parserMap.get(editor) != null) {
+			this.parserMap.get(editor).reload();
+			this.parserMap.get(editor).filter(getFilteredComments());
 		}
 	}
 	

@@ -1,8 +1,11 @@
 package de.tukl.cs.softech.agilereview.plugincontrol.refactoring;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 import org.apache.xmlbeans.XmlException;
@@ -56,7 +59,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	/**
 	 * A set of affected files for the given refactoring issue
 	 */
-	private Collection<IFile> affectedFiles;
+	private Collection<IFile> affectedFiles = new HashSet<IFile>();
 	/**
 	 * This integer will be set != 0 when an error occurred before checkConditions in order to report them to the user
 	 */
@@ -65,15 +68,16 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	/**
 	 * The old path of the element to be refactored
 	 */
-	private String oldPath;
+	private ArrayList<String> oldPath = new ArrayList<String>();
 	/**
 	 * The new path the element should be refactored to
 	 */
-	private String newPath;
+	private ArrayList<String> newPath = new ArrayList<String>();
 	/**
 	 * The type of the element to be refactored corresponding to the static fields of @link{IResource}
 	 */
-	private int type;
+	private ArrayList<Integer> type = new ArrayList<Integer>();
+	private ArrayList<Boolean> moveSubfolders = new ArrayList<Boolean>();
 	
 	/**
 	 * A map representing the printed document of each file to be changed before the refactoring
@@ -101,9 +105,6 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 		if(errorWhileInitialization != 0) {
 			//participate and display the error as otherwise the agile review files will be corrupted
 			return true;
-		} else {
-			affectedFiles = ra.getAffectedFiles(this.element, type);
-			prevDocs = ra.getPrevDocuments();
 		}
 		
 		if(affectedFiles.isEmpty()) {
@@ -119,10 +120,6 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	 * @param arguments passed by the refactoring event
 	 */
 	private synchronized void addRefactoringIssue(Object element, RefactoringArguments arguments) {
-		//as sub packages will be moved also by this MoveRefactoring we only consider the first refactoring issue
-		if(affectedFiles != null && affectedFiles.isEmpty()) {
-			return;
-		}
 		
 		MoveArguments mArguments;
 		if(arguments instanceof MoveArguments) {
@@ -146,41 +143,67 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			return;
 		}
 		
+		boolean newFiles = false;
+		String fSep = System.getProperty("file.separator");
+		
 		if(element instanceof IPackageFragment) {
 			try {
 				this.element = ((IPackageFragment)element).getCorrespondingResource();
-				oldPath = this.element.getFullPath().toOSString()+System.getProperty("file.separator")+this.element.getName();
-				newPath = dest.getFullPath().toOSString();
-				type = IResource.FOLDER;
 			} catch (JavaModelException e) {
 				errorWhileInitialization = 3;
 				return;
 			}
+			
+			String oldTmp = this.element.getFullPath().toOSString();
+			oldPath.add(oldTmp);
+			Pattern p = Pattern.compile(Pattern.quote(fSep)+"[^"+Pattern.quote(fSep)+"]+"+Pattern.quote(fSep)+"[^"+Pattern.quote(fSep)+"]+"+Pattern.quote(fSep)+"(.*)");
+			newPath.add(dest.getFullPath().toOSString());
+			System.out.println("src: IPackageFragment");
+			System.out.println("oldPath: "+oldPath);
+			System.out.println("newPath: "+newPath);
+			type.add(IResource.FOLDER);
+			moveSubfolders.add(false);
+			
 		} else if(element instanceof IResource) {
 			this.element = (IResource) element;
-			oldPath = this.element.getFullPath().toOSString();
-			newPath = dest.getFullPath().toOSString()+System.getProperty("file.separator")+this.element.getName();
+			oldPath.add(this.element.getFullPath().toOSString());
+			newPath.add(dest.getFullPath().toOSString()+fSep+this.element.getName());
+			System.out.println("src: IResource");
+			System.out.println("oldPath: "+oldPath);
+			System.out.println("newPath: "+newPath);
 			
 			if(this.element instanceof IProject) {
-				type = IResource.PROJECT;
+				type.add(IResource.PROJECT);
 			} else if(this.element instanceof IFolder) {
-				type = IResource.FOLDER;
+				type.add(IResource.FOLDER);
 			} else if(this.element instanceof IFile) {
-				type = IResource.FILE;
+				type.add(IResource.FILE);
 			} else {
 				errorWhileInitialization = 5;
 				return;
 			}
+			moveSubfolders.add(true);
+			
 		} else if(element instanceof IPackageFragmentRoot) {
 			try {
 				this.element = ((IPackageFragmentRoot)element).getCorrespondingResource();
-				oldPath = this.element.getFullPath().toOSString();
-				newPath = dest.getFullPath().toOSString()+System.getProperty("file.separator")+this.element.getName();
-				type = IResource.FOLDER;
 			} catch (JavaModelException e) {
 				errorWhileInitialization = 4;
 				return;
 			}
+			
+			oldPath.add(this.element.getFullPath().toOSString());
+			newPath.add(dest.getFullPath().toOSString()+System.getProperty("file.separator")+this.element.getName());
+			System.out.println("src: IPackageFragmentRoot");
+			System.out.println("oldPath: "+oldPath);
+			System.out.println("newPath: "+newPath);
+			type.add(IResource.FOLDER);
+			moveSubfolders.add(true);
+		}
+		
+		if(newFiles) {
+			affectedFiles.addAll(ra.getAffectedFiles(this.element, type.get(type.size()-1)));
+			prevDocs = ra.getPrevDocuments();
 		}
 	}
 	
@@ -225,7 +248,9 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 		//simulate changes
 		try {
 			//do refactoring
-			postDocs = ra.getPostDocumentsOfRefactoring(oldPath, newPath, type, true);
+			for(int i = 0; i < oldPath.size(); i++) {
+				postDocs = ra.getPostDocumentsOfRefactoring(oldPath.get(i), newPath.get(i), type.get(i), moveSubfolders.get(i));
+			}
 		} catch (IOException e) {
 			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (1)"));
 		} catch (XmlException e) {
