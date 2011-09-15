@@ -153,9 +153,6 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			
 			oldPath.add(resource.getFullPath().toOSString());
 			newPath.add(dest.getFullPath().toOSString()+fSep+((IPackageFragment)element).getElementName().replaceAll("\\.", "\\"+fSep));
-			System.out.println("src: IPackageFragment");
-			System.out.println("oldPath: "+oldPath);
-			System.out.println("newPath: "+newPath);
 			type.add(IResource.FOLDER);
 			moveSubfolders.add(false);
 			
@@ -181,9 +178,6 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 				
 			oldPath.add(oldPathTmp);
 			newPath.add(dest.getFullPath().toOSString()+fSep+resource.getName());
-			System.out.println("src: IResource");
-			System.out.println("oldPath: "+oldPath);
-			System.out.println("newPath: "+newPath);
 			
 			if(resource instanceof IProject) {
 				type.add(IResource.PROJECT);
@@ -207,9 +201,6 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			
 			oldPath.add(resource.getFullPath().toOSString());
 			newPath.add(dest.getFullPath().toOSString()+System.getProperty("file.separator")+resource.getName());
-			System.out.println("src: IPackageFragmentRoot");
-			System.out.println("oldPath: "+oldPath);
-			System.out.println("newPath: "+newPath);
 			type.add(IResource.FOLDER);
 			moveSubfolders.add(true);
 		} else {

@@ -673,13 +673,13 @@ public class ReviewAccess {
 			PluginLogger.logError(this.getClass().toString(), "deleteComment", "IOException occured while deleting comment: "+reviewId+"|"+author+"|"+commentId, e);
 		}/*|0000026|Thilo|c3|?*/
 		
-		// Remove from database and eventually from file system
+		// Remove from database and eventually from file system/*?|0000026|Malte|c0|*/
 		if (this.rModel.removeComment(reviewId, author, commentId))
 		{
 			// Last comment of this author in this review has been deleted
 			// -> Remove from file system
 			this.rFileModel.removeXmlDocument(changedFile);
-		}
+		}/*|0000026|Malte|c0|?*/
 	}
 	
 	/**
