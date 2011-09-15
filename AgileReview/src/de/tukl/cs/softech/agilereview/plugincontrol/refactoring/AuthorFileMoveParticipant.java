@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.regex.Pattern;
-
 
 import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.resources.IFile;
@@ -53,10 +51,6 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	 */
 	private RefactoringAccess ra;
 	/**
-	 * Element which will be refactored
-	 */
-	private IResource element;
-	/**
 	 * A set of affected files for the given refactoring issue
 	 */
 	private Collection<IFile> affectedFiles = new HashSet<IFile>();
@@ -77,6 +71,9 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	 * The type of the element to be refactored corresponding to the static fields of @link{IResource}
 	 */
 	private ArrayList<Integer> type = new ArrayList<Integer>();
+	/**
+	 * This list of booleans declares whether the subfolders should be moved also
+	 */
 	private ArrayList<Boolean> moveSubfolders = new ArrayList<Boolean>();
 	
 	/**
@@ -143,21 +140,19 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			return;
 		}
 		
-		boolean newFiles = false;
 		String fSep = System.getProperty("file.separator");
+		IResource resource;
 		
 		if(element instanceof IPackageFragment) {
 			try {
-				this.element = ((IPackageFragment)element).getCorrespondingResource();
+				resource = ((IPackageFragment)element).getCorrespondingResource();
 			} catch (JavaModelException e) {
 				errorWhileInitialization = 3;
 				return;
 			}
 			
-			String oldTmp = this.element.getFullPath().toOSString();
-			oldPath.add(oldTmp);
-			Pattern p = Pattern.compile(Pattern.quote(fSep)+"[^"+Pattern.quote(fSep)+"]+"+Pattern.quote(fSep)+"[^"+Pattern.quote(fSep)+"]+"+Pattern.quote(fSep)+"(.*)");
-			newPath.add(dest.getFullPath().toOSString());
+			oldPath.add(resource.getFullPath().toOSString());
+			newPath.add(dest.getFullPath().toOSString()+fSep+((IPackageFragment)element).getElementName().replaceAll("\\.", "\\"+fSep));
 			System.out.println("src: IPackageFragment");
 			System.out.println("oldPath: "+oldPath);
 			System.out.println("newPath: "+newPath);
@@ -165,18 +160,36 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			moveSubfolders.add(false);
 			
 		} else if(element instanceof IResource) {
-			this.element = (IResource) element;
-			oldPath.add(this.element.getFullPath().toOSString());
-			newPath.add(dest.getFullPath().toOSString()+fSep+this.element.getName());
+			resource = (IResource) element;
+			String oldPathTmp = resource.getFullPath().toOSString();
+			
+			//optimizations to prevent from unnecessary refactoring steps
+			if(oldPath.contains(oldPathTmp)) {
+				//this element was added beforehand (by an IPackageFragment) -> set moveSubfolders to true
+				int i = oldPath.indexOf(oldPathTmp);
+				moveSubfolders.add(i, true);
+				moveSubfolders.remove(i+1);
+				return;
+			} else {
+				//check whether a file of a already captured folder has to be refactored -> ignore it, as it will be moved always
+				for(int i = 0; i < oldPath.size(); i++) {
+					if(oldPathTmp.startsWith(oldPath.get(i))) {
+						return;
+					}
+				}
+			}
+				
+			oldPath.add(oldPathTmp);
+			newPath.add(dest.getFullPath().toOSString()+fSep+resource.getName());
 			System.out.println("src: IResource");
 			System.out.println("oldPath: "+oldPath);
 			System.out.println("newPath: "+newPath);
 			
-			if(this.element instanceof IProject) {
+			if(resource instanceof IProject) {
 				type.add(IResource.PROJECT);
-			} else if(this.element instanceof IFolder) {
+			} else if(resource instanceof IFolder) {
 				type.add(IResource.FOLDER);
-			} else if(this.element instanceof IFile) {
+			} else if(resource instanceof IFile) {
 				type.add(IResource.FILE);
 			} else {
 				errorWhileInitialization = 5;
@@ -186,25 +199,26 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			
 		} else if(element instanceof IPackageFragmentRoot) {
 			try {
-				this.element = ((IPackageFragmentRoot)element).getCorrespondingResource();
+				resource = ((IPackageFragmentRoot)element).getCorrespondingResource();
 			} catch (JavaModelException e) {
 				errorWhileInitialization = 4;
 				return;
 			}
 			
-			oldPath.add(this.element.getFullPath().toOSString());
-			newPath.add(dest.getFullPath().toOSString()+System.getProperty("file.separator")+this.element.getName());
+			oldPath.add(resource.getFullPath().toOSString());
+			newPath.add(dest.getFullPath().toOSString()+System.getProperty("file.separator")+resource.getName());
 			System.out.println("src: IPackageFragmentRoot");
 			System.out.println("oldPath: "+oldPath);
 			System.out.println("newPath: "+newPath);
 			type.add(IResource.FOLDER);
 			moveSubfolders.add(true);
+		} else {
+			errorWhileInitialization = 9;
+			return;
 		}
 		
-		if(newFiles) {
-			affectedFiles.addAll(ra.getAffectedFiles(this.element, type.get(type.size()-1)));
-			prevDocs = ra.getPrevDocuments();
-		}
+		affectedFiles.addAll(ra.getAffectedFiles(resource, type.get(type.size()-1)));
+		prevDocs = ra.getPrevDocuments();
 	}
 	
 	@Override
@@ -266,6 +280,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 		CompositeChange result = new CompositeChange("Refactoring of all affected comment paths");
 	
 		ComputeDiff diffProcessor = new ComputeDiff();
+		
 		for(IFile f : affectedFiles) {
 			
 			TextFileChange change = (TextFileChange) getTextChange(f);
@@ -319,8 +334,22 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 				}
 			}
 			
-			result.add(change);
+			//only add the change if there are edits to be performed
+			if(((MultiTextEdit)change.getEdit()).getChildren().length != 0) {
+				result.add(change);
+			}
 		}
-		return result;
+		
+		/* XXX there is the case that we participate on refactoring without changing anything:
+		 * A package is moved containing no commented files in the next level. However this package contains
+		 * sub folder which contain commented files. Then the affected author files will be listed so far.
+		 * So we have to cope with this by monitoring the changes on a file and remove one if no changes were detected.
+		 * --> In oder to correct this in a more efficient way, rewrite the getAffectedFiles method of RefactoringAccess
+		 */
+		if(result.getChildren().length != 0) {
+			return result;
+		} else {
+			return null;
+		}
 	}
 }

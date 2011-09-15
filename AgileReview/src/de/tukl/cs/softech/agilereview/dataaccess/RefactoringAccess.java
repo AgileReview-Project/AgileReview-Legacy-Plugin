@@ -75,9 +75,8 @@ public class RefactoringAccess {
 			}
 		}
 		
-		this.affectedFilesBuffer.addAll(affectedFiles);
-		
-		return affectedFiles;
+		affectedFilesBuffer.addAll(affectedFiles);
+		return affectedFilesBuffer;
 	}
 	
 	/**
