@@ -14,12 +14,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import de.tukl.cs.softech.agilereview.dataaccess.handler.SaveHandler;
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Abstract class of a Comment or Review representation, which automatically provides IPartListener
@@ -120,16 +120,13 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 		if(part instanceof DetailView) {
 			saveChanges();
 			
-			//fire "save" command for persistent storage
-			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
-			try {
-				handlerService.executeCommand(SaveHandler.SAVE_COMMAND_ID, null);
-			} catch (Exception ex) {
-				PluginLogger.logError(this.getClass().toString(), "partClosedOrDeactivated", "Error occured while triggering save command", ex);
-			}
-			this.backupObject = (E)this.editedObject.copy();
+			// save the change persistently
 			PluginLogger.log(this.getClass().toString(), "partClosedOrDeactivated", "trigger save event");
-			
+			ReviewAccess.getInstance().save(this.editedObject);/*?|0000026|Thilo|c2|*/
+			ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW);/*|0000026|Thilo|c2|?*/
+						
+			this.backupObject = (E)this.editedObject.copy();
+
 			//get SourceProvider for configuration
 			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);

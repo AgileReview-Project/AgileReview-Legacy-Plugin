@@ -430,10 +430,6 @@
       </activeWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.dataaccess.handler.SaveHandler"
-         commandId="de.tukl.cs.softech.agilereview.save">
-   </handler>
-   <handler
          class="de.tukl.cs.softech.agilereview.views.commenttable.handler.DeleteCommentHandler"
          commandId="de.tukl.cs.softech.agilereview.views.commenttable.delete">
       <activeWhen>
@@ -646,12 +642,6 @@
          description="Add new Reply to a Comment in DetailView"
          id="de.tukl.cs.softech.agilereview.views.detail.newReply"
          name="Add New Reply">
-   </command>
-   <command
-         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-         description="SaveCommand for AgileReview Contents"
-         id="de.tukl.cs.softech.agilereview.save"
-         name="SaveCommand for AgileReview Contents">
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"

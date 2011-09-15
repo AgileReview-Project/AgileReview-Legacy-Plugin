@@ -114,14 +114,8 @@ public class CleanupProcess implements IRunnableWithProgress {
 		// delete comments based on users decision
 		if (deleteComments) {
 			monitor.subTask("Deleting comments...");
-			try {
-				PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
-				ra.deleteComments(comments);
-				ra.save();
-			} catch (IOException e) {
-				PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to delete comments.", e);
-				throw new InterruptedException("An IOException occured: "+e);
-			}
+			PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
+			ra.deleteComments(comments);/*?|0000026|Thilo|c4|?*/
 		}
 		
 		monitor.worked(90);

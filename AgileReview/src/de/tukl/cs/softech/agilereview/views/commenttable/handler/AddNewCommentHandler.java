@@ -1,6 +1,5 @@
 package de.tukl.cs.softech.agilereview.views.commenttable.handler;
 
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -41,35 +40,30 @@ public class AddNewCommentHandler extends AbstractHandler {
 		PluginLogger.log(this.getClass().toString(), "execute", "Command \"Add new Comment\" triggered");			
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		if (!activeReview.isEmpty()) {
-			try	{
-				String pathToFile = "";
-				
-				IEditorPart part = HandlerUtil.getActiveEditor(event);
-				if(part != null) {
-					if ( part instanceof IEditorPart ) {
-						IEditorInput input = part.getEditorInput();
-						if (input != null && input instanceof FileEditorInput) {
-							pathToFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
-						}
+			String pathToFile = "";
+			
+			IEditorPart part = HandlerUtil.getActiveEditor(event);
+			if(part != null) {
+				if ( part instanceof IEditorPart ) {
+					IEditorInput input = part.getEditorInput();
+					if (input != null && input instanceof FileEditorInput) {
+						pathToFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
 					}
-					String user = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);
-					Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
-					// TODO Hiervon noch was auslagern (Parser, etc)
-					if(ViewControl.isOpen(CommentTableView.class)) {
-						CommentTableView.getInstance().addComment(newComment);
-					}
-					// Refresh the Review Explorer
-					ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
-					ra.save();
-				} else {
-					// no open editor
-					MessageDialog.openWarning(null, "Warning: No open file", "Please open a file in an editor before adding comments!");
-					PluginLogger.logWarning(this.getClass().toString(), "addNewComment", "No open editor!");
 				}
-			} catch (IOException e) {
-				PluginLogger.logError(this.getClass().toString(), "addNewComment", "IOException occured while creating a new comment in ReviewAccess", e);
+				String user = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);
+				Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
+				// TODO Hiervon noch was auslagern (Parser, etc)
+				if(ViewControl.isOpen(CommentTableView.class)) {
+					CommentTableView.getInstance().addComment(newComment);
+				}
+				// Refresh the Review Explorer
+				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
+				ra.save(newComment);/*?|0000026|Thilo|c1|?*/
+			} else {
+				// no open editor
+				MessageDialog.openWarning(null, "Warning: No open file", "Please open a file in an editor before adding comments!");
+				PluginLogger.logWarning(this.getClass().toString(), "addNewComment", "No open editor!");
 			}
-
 		} else {
 			if (this.ra.getAllReviews().isEmpty()) {
 				MessageDialog.openInformation(null, "No reviews existent", "Please create a review before adding comments!");

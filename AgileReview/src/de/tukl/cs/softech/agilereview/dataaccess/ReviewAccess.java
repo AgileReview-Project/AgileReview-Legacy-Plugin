@@ -601,9 +601,8 @@ public class ReviewAccess {
 	 * @param author author of the comment
 	 * @param path file path of the commented file
 	 * @return empty comment
-	 * @throws IOException 
 	 */
-	public Comment createNewComment(String reviewId, String author, String path) throws IOException 
+	public Comment createNewComment(String reviewId, String author, String path) 
 	{		
 		PluginLogger.log(this.getClass().toString(), "createNewComment", "Comment created for:\n reviewId: "+reviewId+" \n author: "+author+" \n path: "+path);
 		// Check if file for this author in this review does already exist (assumption: database and file system are synch)
@@ -658,9 +657,8 @@ public class ReviewAccess {
 	 * @param reviewId review id of the comment to be deleted
 	 * @param author author of the comment to be deleted
 	 * @param commentId comment id of the comment to be deleted
-	 * @throws IOException 
 	 */
-	public void deleteComment(String reviewId, String author, String commentId) throws IOException
+	public void deleteComment(String reviewId, String author, String commentId)
 	{
 		PluginLogger.log(this.getClass().toString(), "deleteComment", "Following comment deleted:\n reviewId: "+reviewId+" \n author: "+author+" \n commentId: "+commentId);
 		// Find comment in database
@@ -668,14 +666,19 @@ public class ReviewAccess {
 		
 		// Remove xml nodes
 		cleanXmlPath(delCom);
+		IFile changedFile = ReviewAccess.createCommentFile(reviewId, author);/*?|0000026|Thilo|c3|*/
+		try {
+			this.rFileModel.save(changedFile);
+		} catch (IOException e) {
+			PluginLogger.logError(this.getClass().toString(), "deleteComment", "IOException occured while deleting comment: "+reviewId+"|"+author+"|"+commentId, e);
+		}/*|0000026|Thilo|c3|?*/
 		
 		// Remove from database and eventually from file system
 		if (this.rModel.removeComment(reviewId, author, commentId))
 		{
 			// Last comment of this author in this review has been deleted
 			// -> Remove from file system
-			IFile fileToDelete = ReviewAccess.createCommentFile(reviewId, author);
-			this.rFileModel.removeXmlDocument(fileToDelete);
+			this.rFileModel.removeXmlDocument(changedFile);
 		}
 	}
 	
@@ -692,9 +695,8 @@ public class ReviewAccess {
 	/**
 	 * @see ReviewAccess#deleteComment(String, String, String)
 	 * @param comments
-	 * @throws IOException
 	 */
-	public void deleteComments (Collection<Comment> comments) throws IOException {
+	public void deleteComments (Collection<Comment> comments){
 		for(Comment c : comments) {
 			deleteComment(c.getReviewID(), c.getAuthor(), c.getId());
 		}
@@ -833,12 +835,12 @@ public class ReviewAccess {
 		// Create the folder for this review
 		ReviewAccess.createReviewFolder(reviewId);
 		
-		// Create the file
+		// Create the file/*?|0000026|Thilo|c5|*/
 		IFile revFile = ReviewAccess.createReviewFile(reviewId);
 		
 		// save new review file
 		this.rFileModel.addXmlDocument(revDoc, revFile);
-		this.rFileModel.save(revFile);
+		this.rFileModel.save(revFile);/*|0000026|Thilo|c5|?*/
 		
 		return result;
 	}
@@ -974,15 +976,31 @@ public class ReviewAccess {
 		return result;
 	}
 	
-	
 	/**
 	 * Saves the current xmlBeans objects to files (all in model)
-	 * @throws IOException 
+	 * @param obj The object which changed (to determine which file has to be saved). Has to be a comment or a review
 	 */
-	public void save() throws IOException
+	public void save(XmlObject obj)/*?|0000026|Thilo|c0|*/
 	{
-		PluginLogger.log(this.getClass().toString(), "save", "Save all data to disk");
-		rFileModel.saveAll();
-	}
+		// Determine the file of this comment
+		IFile file2save = null;
+		if (obj instanceof Comment) {
+			file2save = createCommentFile(((Comment)obj).getReviewID(), ((Comment)obj).getAuthor());	
+		} else if (obj instanceof Review){
+			file2save = createReviewFile(((Review)obj).getId());
+		}
+		try {
+			if (file2save != null) {
+				PluginLogger.log(this.getClass().toString(), "save", "Save file '"+file2save.getName()+"' in order to save comment "+obj);
+				rFileModel.save(file2save);
+			}
+			else {
+				PluginLogger.logError(this.getClass().toString(), "save", obj+" could not be saved, as it is neither a comment nor a review");
+			}
+		} catch (IOException e) {
+			PluginLogger.logError(this.getClass().toString(), "save", "IOException occured while trying to save to file "+file2save, e);
+		}
+		
+	}/*|0000026|Thilo|c0|?*/
 	
 }
