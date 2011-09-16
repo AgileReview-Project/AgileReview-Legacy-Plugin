@@ -667,11 +667,7 @@ public class ReviewAccess {
 		// Remove xml nodes
 		cleanXmlPath(delCom);
 		IFile changedFile = ReviewAccess.createCommentFile(reviewId, author);/*?|0000026|Thilo|c3|*/
-		try {
-			this.rFileModel.save(changedFile);
-		} catch (IOException e) {
-			PluginLogger.logError(this.getClass().toString(), "deleteComment", "IOException occured while deleting comment: "+reviewId+"|"+author+"|"+commentId, e);
-		}/*|0000026|Thilo|c3|?*/
+		/*|0000026|Thilo|c3|?*/
 		
 		// Remove from database and eventually from file system/*?|0000026|Malte|c0|*/
 		if (this.rModel.removeComment(reviewId, author, commentId))
@@ -679,7 +675,14 @@ public class ReviewAccess {
 			// Last comment of this author in this review has been deleted
 			// -> Remove from file system
 			this.rFileModel.removeXmlDocument(changedFile);
-		}/*|0000026|Malte|c0|?*/
+		} else {/*|0000026|Malte|c0|?*/
+			// Thereare still comments in this file --> save the changes
+			try {
+				this.rFileModel.save(changedFile);
+			} catch (IOException e) {
+				PluginLogger.logError(this.getClass().toString(), "deleteComment", "IOException occured while deleting comment: "+reviewId+"|"+author+"|"+commentId, e);
+			}
+		}
 	}
 	
 	/**

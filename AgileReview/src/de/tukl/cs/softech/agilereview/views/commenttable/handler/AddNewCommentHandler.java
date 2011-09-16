@@ -56,9 +56,9 @@ public class AddNewCommentHandler extends AbstractHandler {
 				if(ViewControl.isOpen(CommentTableView.class)) {
 					CommentTableView.getInstance().addComment(newComment);
 				}
-				// Refresh the Review Explorer
-				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
+				// Save the new comment & Refresh the Review Explorer
 				ra.save(newComment);/*?|0000026|Thilo|c1|?*/
+				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 			} else {
 				// no open editor
 				MessageDialog.openWarning(null, "Warning: No open file", "Please open a file in an editor before adding comments!");
