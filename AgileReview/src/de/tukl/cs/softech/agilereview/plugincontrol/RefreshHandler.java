@@ -11,9 +11,6 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * Handler for the "refresh" (F5) command for our review
@@ -49,15 +46,7 @@ public class RefreshHandler extends AbstractHandler {
 			}
 		}
 		
-		if(ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().clearView();
-		}
-		if(ViewControl.isOpen(ReviewExplorer.class)) {
-			ReviewExplorer.getInstance().refreshInput();
-		}
-		if(ViewControl.isOpen(CommentTableView.class)) {
-			CommentTableView.getInstance().resetComments();
-		}
+		ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
 
 		// Return must be null (see API)
 		return null;

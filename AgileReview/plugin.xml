@@ -633,6 +633,29 @@
             </and>
          </with>
       </activeWhen>
+      <enabledWhen>
+         <with
+               variable="selection">
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <not>
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="%agileReview_active_nature.id">
+                        </test>
+                     </not>
+                  </adapt>
+               </iterate>
+            </and>
+         </with>
+      </enabledWhen>
    </handler>
 </extension>
 <extension
@@ -1006,18 +1029,43 @@
             visible="true">
       </separator>
       <command
-            commandId="de.tukl.cs.softech.agilereview.cleanup"
-            icon="icons/agile_icon.png"
-            label="AgileReview Project CleanUp"
-            style="push"
-            tooltip="Remove AgileReview comments tags from all files of this project">
-      </command>
-      <command
             commandId="de.tukl.cs.softech.agilereview.activateReviewSource"
             icon="icons/agile_icon_activated.png"
             label="Activate AgileReview Source Project"
             style="push"
             tooltip="Activate this AgileReview Source Project">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="selection">
+               <and>
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="%agileReview_nature.id">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </and>
+            </with>
+         </visibleWhen>
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.cleanup"
+            icon="icons/agile_icon.png"
+            label="AgileReview Project CleanUp"
+            style="push"
+            tooltip="Remove AgileReview comments tags from all files of this project">
+         <visibleWhen
+               checkEnabled="true">
+         </visibleWhen>
       </command>
       <separator
             name="AgileReview.PackageExplorer.separator2"

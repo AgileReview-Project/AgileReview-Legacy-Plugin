@@ -13,6 +13,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Handler for activating the currently selected AgileReview Source project.
@@ -30,7 +31,10 @@ public class ActivateSourceProjectHandler extends AbstractHandler {
 				if (o instanceof IProject) {
 						IProject projectSel = (IProject) o;
 						if (projectSel.hasNature(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE))){
+							// Activate the source folder
 							ReviewAccess.getInstance().loadReviewSourceProject(projectSel.getName());
+							// Trigger refresh
+							ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
 						}
 				}
 			}
