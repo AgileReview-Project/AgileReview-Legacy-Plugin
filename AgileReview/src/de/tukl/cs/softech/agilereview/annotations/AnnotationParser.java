@@ -12,13 +12,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -37,9 +40,17 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
 public class AnnotationParser implements IAnnotationParser {
 	
 	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
+	 * Supported files mapping to the corresponding comment tags
+	 */
+	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsMappingTags();
+	/**
 	 * Key separator for tag creation
 	 */
-	private static String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+	private static String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 	/**
 	 * Core Regular Expression to find the core tag structure
 	 */
@@ -52,35 +63,35 @@ public class AnnotationParser implements IAnnotationParser {
 	/**
 	 * Regular Expression used by this instance
 	 */
-	protected String tagRegex;
+	private String tagRegex;
 	/**
 	 * Pattern used by this instance
 	 */
-	protected Pattern tagPattern;
+	private Pattern tagPattern;
 	/**
 	 * This map lists every comment tag found in the document with its {@link Position}
 	 */
-	protected TreeMap<String, Position> idPositionMap = new TreeMap<String, Position>();
+	private TreeMap<String, Position> idPositionMap = new TreeMap<String, Position>();
 	/**
 	 * Position map of all tags
 	 */
-	protected TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
+	private TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
 	/**
 	 * The currently displayed comments
 	 */
-	protected TreeSet<String> displayedComments = new TreeSet<String>();
+	private TreeSet<String> displayedComments = new TreeSet<String>();
 	/**
 	 * Document which provides the contents for this instance
 	 */
-	protected IDocument document;
+	private IDocument document;
 	/**
 	 * The document of this parser
 	 */
-	protected ITextEditor editor;
+	private ITextEditor editor;
 	/**
 	 * Annotation model for this parser
 	 */
-	protected AgileAnnotationController annotationModel;
+	private AgileAnnotationController annotationModel;
 
 	/**
 	 * Creates a new instance of AnnotationParser with the given input
@@ -294,6 +305,23 @@ public class AnnotationParser implements IAnnotationParser {
 			String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 			String commentTag = keySeparator+commentKey+keySeparator;
 			
+			// check if selection needs to be adapted
+			int[] newLines = computeSelectionAdapations(selStartLine, selEndLine);
+			if (newLines[0]!=-1 || newLines[1]!=-1) {
+				PluginLogger.log(this.getClass().toString(), "addTagsInDocument", "Selection for inserting tags needs to be adapted, performing adaptation.");
+				// inform user
+				MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
+				// adapt startline if necessary
+				selStartLine = (newLines[0]==-1) ? selStartLine : newLines[0];
+				// adapt endline if necessary
+				selEndLine = (newLines[1]==-1) ? selEndLine : newLines[1];
+				// compute new selection
+				int offset = document.getLineOffset(selStartLine);
+				int length = document.getLineOffset(selEndLine)-document.getLineOffset(selStartLine)+document.getLineLength(selEndLine);
+				// set new selection
+				editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
+			}
+			
 			if (selStartLine == selEndLine)	{
 				// Only one line is selected
 				String lineDelimiter = document.getLineDelimiter(selStartLine);
@@ -304,11 +332,9 @@ public class AnnotationParser implements IAnnotationParser {
 				
 				int insertOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
 				
-				if (editor.getEditorInput().getName().endsWith(".java")) {
-					document.replace(insertOffset, 0, "/*?"+commentTag+"?*/");
-				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
-					document.replace(insertOffset, 0, "<!--?"+commentTag+"?-->");
-				}
+				// Write tag -> get start+end-tag for current file-ending, insert into file				
+				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+				document.replace(insertOffset, 0, tags[0]+"?"+commentTag+"?"+tags[1]);
 				
 				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
 			} else {
@@ -328,15 +354,11 @@ public class AnnotationParser implements IAnnotationParser {
 				}
 				int insertEndOffset = document.getLineOffset(selEndLine)+document.getLineLength(selEndLine)-lineDelimiterLength;
 				
-				// Write tags
-				if (editor.getEditorInput().getName().endsWith(".java")) {
-					document.replace(insertEndOffset, 0, "/*"+commentTag+"?*/");
-					document.replace(insertStartOffset, 0, "/*?"+commentTag+"*/");
-					
-				} else if (editor.getEditorInput().getName().endsWith(".xml")) {
-					document.replace(insertEndOffset, 0, "<!--"+commentTag+"?-->");
-					document.replace(insertStartOffset, 0, "<!--?"+commentTag+"-->");
-				}
+				// Write tags -> get tags for current file-ending, insert second tag, insert first tag
+				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+				document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
+				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+tags[1]);
+
 				
 				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
 				//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
@@ -347,6 +369,90 @@ public class AnnotationParser implements IAnnotationParser {
 			}
 		}
 		//VARIANT(return Position):return result;
+	}
+	
+	/**
+	 * Checks whether adding an AgileReview comment at the current selection
+	 * would destroy a code comment and computes adapted line numbers to avoid
+	 * destruction of code comments. 
+	 * @param startLine the current startLine of the selection
+	 * @param endLine the current endLine of the selection
+	 * @return and array containing the new start (position 0) and endline (position 1).
+	 * If not nothing is to be changed the content is -1 at position 0/1.
+	 * @throws BadLocationException
+	 */
+	private int[] computeSelectionAdapations(int startLine, int endLine) throws BadLocationException {
+		int[] result = {-1, -1};
+		String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+		
+		int[] startLineAdaptions = checkForCodeComment(startLine, tags);
+		int[] endLineAdaptions = checkForCodeComment(endLine, tags);
+		
+		// check if inserting a AgileReview comment at selected code region destroys a code comment
+		if (startLineAdaptions[0] != -1 && startLineAdaptions[1] != -1 && startLineAdaptions[0] != startLine) {
+			result[0] = startLineAdaptions[0];
+		}
+		if (endLineAdaptions[0] != -1 && endLineAdaptions[1] != -1 && endLineAdaptions[1] != endLine) {
+			result[1] = endLineAdaptions[1];
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Checks whether the given line is within a code comment. If this holds
+	 * the code comments start and endline is returned, else {-1, -1}.
+	 * @param line the line to check
+	 * @param tags the start and endtag of code comments
+	 * @return [-1, -1] if line is not within a code comment, else [startline, endline] of the code comment
+	 * @throws BadLocationException
+	 */
+	private int[] checkForCodeComment(int line, String[] tags) throws BadLocationException {
+		// TODO: optimize the search for tags
+		
+		int openTagLine = -1;
+		int closeTagLine = -1;
+		
+		// check for opening non-AgileReview comment tags before the line
+		for (int i=0; i<=line;i++) {
+			// get a content of current line
+			String lineContent = document.get(document.getLineOffset(i), document.getLineLength(i)).trim();
+			// get rid of possible AgileReview comment tags
+			lineContent = lineContent.replaceAll(Pattern.quote(tags[0])+rawTagRegex+Pattern.quote(tags[1]), "");
+			// if still contains a starting tag for a code comment remember line number
+			if (lineContent.contains(tags[0])) {
+				openTagLine = i;
+			}
+		}
+		
+		// check for according closing non-AgileReview comment tag
+		if (openTagLine>-1) {
+			boolean found = false;
+			int actLine = openTagLine;
+			while (actLine<document.getNumberOfLines() && !found) {
+				// get a content of current line
+				String lineContent = document.get(document.getLineOffset(actLine), document.getLineLength(actLine)).trim();
+				// get rid of possible AgileReview comment tags
+				lineContent = lineContent.replaceAll(Pattern.quote(tags[0])+rawTagRegex+Pattern.quote(tags[1]), "");
+				// if still contains a ending tag for a code comment remember line number
+				if (lineContent.contains(tags[1])) {
+					closeTagLine = actLine;
+					found = true;
+				}
+				actLine++;
+			}
+		}
+		
+		// finally return the results if a comment was found
+		int[] result = {-1, -1};
+		if (openTagLine <= line && line <= closeTagLine) {
+			// TODO: not checked if line right before starting line of code comment contains also a code comment...
+			result[0] = openTagLine-1;
+			if (!(closeTagLine==line)) {
+				result[1] = closeTagLine;	
+			}			
+		}		
+		return result;
 	}
 	
 	/*
@@ -362,7 +468,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentsTags(java.util.Set)
 	 */
 	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {		
-		String separator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String separator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		TreeSet<Position> tagPositions = new TreeSet<Position>();
 		String key;
 		HashSet<String> keyList = new HashSet<String>();

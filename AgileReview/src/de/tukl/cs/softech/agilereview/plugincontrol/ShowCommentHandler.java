@@ -26,7 +26,7 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  * Handler for showing the comment, which is currently selected in the editor, in the DetailView
  */
 public class ShowCommentHandler extends AbstractHandler {
-
+	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "\"Show Comment\" triggered");
@@ -60,7 +60,7 @@ public class ShowCommentHandler extends AbstractHandler {
 					    shell.pack();
 					    shell.open();
 						while (!shell.isDisposed()) {
-							if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
+							if (!Display.getDefault().readAndDispatch()) Display.getDefault().sleep();
 					    }
 						
 						if(dialog.getSaved()) {
@@ -74,7 +74,7 @@ public class ShowCommentHandler extends AbstractHandler {
 					author = tagPart[1];
 					commentId = tagPart[2];
 					
-					// Get the right comment
+					// Get the right comment static PropertiesManager
 					Comment c = ReviewAccess.getInstance().getComment(reviewId, author, commentId);
 					
 					// select it

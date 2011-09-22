@@ -1,8 +1,16 @@
 package de.tukl.cs.softech.agilereview.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
@@ -11,7 +19,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * This class represents a preference page that
@@ -27,14 +37,16 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
  * be accessed directly via the preference store.
  */
 
-public class AgileReviewPreferencePage
-	extends FieldEditorPreferencePage
-	implements IWorkbenchPreferencePage{
+public class AgileReviewPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	
 	/**
 	 * Textfield for author
 	 */
 	private StringFieldEditor strAuthorField;
+	/**
+	 * Combobox for selecting the AgileReview source folder which should be used
+	 */
+	private ComboFieldEditor comboReviewProjectField;
 	/**
 	 * ColorChooser for annotations' color
 	 */
@@ -68,7 +80,8 @@ public class AgileReviewPreferencePage
 	 * restore itself.
 	 */
 	public void createFieldEditors() {
-		//different fields on the page
+	
+		// Field for author
 		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "author:", 
 				getFieldEditorParent())
 		{		
@@ -83,10 +96,28 @@ public class AgileReviewPreferencePage
 		strAuthorField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 		addField(strAuthorField);
 		
-//		addField(new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, 
-//				"agileReviews-folder:", getFieldEditorParent()));
-//		addField(new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, 
-//				"agileReviews-folder:", getFieldEditorParent()));
+		// Field for AgileReview-folder
+		List<String> list = new ArrayList<String>();
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IProject[] projArr = workspaceRoot.getProjects();
+		for (IProject currProj : projArr) {
+			try {
+				if (currProj.hasNature(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE))) {
+					list.add(currProj.getName());
+				}
+			} catch (CoreException e) {
+				// Is thrown, if currProj is closed or  does not exist -> ignore it
+			}
+		}
+		
+		String[][] vals = new String[list.size()][2];
+		for (int i=0;i<list.size();i++){
+			vals[i][0] = list.get(i);
+			vals[i][1] = list.get(i);
+		}
+		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, 
+				"review source project:", vals,getFieldEditorParent());
+		addField(comboReviewProjectField);
 		
 		// colorfieldeditor for annotations-color
 		colorAnnotationField = new ColorFieldEditor (PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "commentcolor:",
@@ -98,28 +129,33 @@ public class AgileReviewPreferencePage
 				getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 		
+		// Directory Browser for export folder
+		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, 
+				"Default XLS export location:", getFieldEditorParent());
+		addField(directoryExportField);
+		
 		// export template file
 		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, 
 				"Default template for XLS export:", getFieldEditorParent());
 		fileExportTemplateField.setFileExtensions(new String[]{"*.xls*"});
 		addField(fileExportTemplateField);
 		
-		// Directory Browser for export folder
-		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, 
-				"Default XLS export location:", getFieldEditorParent());
-		addField(directoryExportField);
+		// link text
+		addField(new LinkField(getFieldEditorParent()));
 	}
 
-	@Override
-	public void performApply(){
-		super.performApply();
-		new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
-	}
+	
+	// performApply() simply calls performOk (by default). As we need no additional behavior, we don't have to override it
 	
 	@Override
 	public boolean performOk(){
 		boolean result = super.performOk();
 		new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
+		if (ReviewAccess.getInstance().updateReviewSourceProject()) {
+			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
+		} else {
+			ViewControl.refreshViews(ViewControl.DETAIL_VIEW);
+		}
 		return result;
 	}
 

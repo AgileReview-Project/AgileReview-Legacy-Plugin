@@ -27,6 +27,15 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
  * Enabled when: Arbitrary number of AbstractMulipleWrappers are selected
  */
 public class DeleteHandler extends AbstractHandler {
+	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private ReviewAccess ra = ReviewAccess.getInstance();
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private PropertiesManager pm = PropertiesManager.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -35,7 +44,7 @@ public class DeleteHandler extends AbstractHandler {
 		ISelection sel1 = HandlerUtil.getCurrentSelection(event);
 		if (sel1 != null){
 			// Check for not empty and if user really wants to deleted the selected reviews
-			if (!sel1.isEmpty() && !MessageDialog.openConfirm(null, "Review Explorer - Delete", "Are you sure you want to delete all comments of this selection?"))
+			if (!sel1.isEmpty() && !MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Review Explorer - Delete", "Are you sure you want to delete all comments of this selection?"))
 			{
 				return null;
 			}		
@@ -49,9 +58,9 @@ public class DeleteHandler extends AbstractHandler {
 						if (wrap instanceof MultipleReviewWrapper)
 						{
 							// if the review is not open, open it, so its comments (and tags) will be deleted
-							if (!ReviewAccess.getInstance().isReviewLoaded(wrap.getReviewId())){
+							if (!ra.isReviewLoaded(wrap.getReviewId())){
 								try {
-									ReviewAccess.getInstance().loadReviewComments(wrap.getReviewId());
+									ra.loadReviewComments(wrap.getReviewId());
 								} catch (XmlException e) {
 									PluginLogger.logError(this.getClass().toString(), "execute", "XmlException while loading comment of closed review "+wrap.getReviewId(), e);
 								} catch (IOException e) {
@@ -60,13 +69,13 @@ public class DeleteHandler extends AbstractHandler {
 							}
 						}
 						// Delete comments of this review from TableView and from database
-						for (Comment c : ReviewAccess.getInstance().getComments(wrap.getReviewId(), wrap.getPath()))
+						for (Comment c : ra.getComments(wrap.getReviewId(), wrap.getPath()))
 						{
 							if (ViewControl.isOpen(CommentTableView.class)){
 								CommentTableView.getInstance().deleteComment(c);
 							}
 							try {
-								ReviewAccess.getInstance().deleteComment(c);
+								ra.deleteComment(c);
 							} catch (IOException e) {
 								PluginLogger.logError(this.getClass().toString(), "execute", "IOEXception while deleting comment "+c, e);
 							}
@@ -79,19 +88,17 @@ public class DeleteHandler extends AbstractHandler {
 							if(ViewControl.isOpen(ReviewExplorer.class)) {
 								ReviewExplorer.getInstance().deleteReview((MultipleReviewWrapper)wrap);
 							}
-							ReviewAccess.getInstance().deleteReview(wrap.getReviewId());
+							ra.deleteReview(wrap.getReviewId());
 							// Check if this was the active review
 							if (PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(wrap.getReviewId()))
 							{
 								PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 							}
 							// Remove this review from the list of open reviews (regardless if it was open or not)
-							PropertiesManager.getInstance().removeFromOpenReviews(wrap.getReviewId());
+							pm.removeFromOpenReviews(wrap.getReviewId());
 						}
 						// Refresh ReviewExplorer
-						if(ViewControl.isOpen(ReviewExplorer.class)) {
-							ReviewExplorer.getInstance().refresh();
-						}
+						ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 					}
 				}
 			}

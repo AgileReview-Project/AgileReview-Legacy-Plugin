@@ -14,14 +14,14 @@ import org.eclipse.swt.widgets.Shell;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
- * The ReplyDialog is a small Wizard to insert new Replys to a document
+ * The CommentChooserDialog is a small Dialog to choose between multiple comments
  */
 public class CommentChooserDialog extends Composite implements Listener {
 	
 	/**
-	 * TextBox to insert the reply text
+	 * Drop down box to choose the right comment
 	 */
-	private Combo replyText;
+	private Combo comboChooseComment;
 	/**
 	 * "ok" Button
 	 */
@@ -39,6 +39,11 @@ public class CommentChooserDialog extends Composite implements Listener {
 	 * Tags from which the user can choose
 	 */
 	private String[] argsArr;
+	
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
 	
 	/**
 	 * Creates a new dialog for entering replies
@@ -60,10 +65,10 @@ public class CommentChooserDialog extends Composite implements Listener {
 		gridLayout.numColumns = 2;
 		this.setLayout(gridLayout);		
 		
-		replyText = new Combo(this, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER | SWT.READ_ONLY);
-		replyText.setItems(this.argsArr);
-		replyText.select(0);
-		replyText.setFocus();
+		comboChooseComment = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
+		comboChooseComment.setItems(this.argsArr);
+		comboChooseComment.select(0);
+		comboChooseComment.setFocus();
 		
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
@@ -71,7 +76,7 @@ public class CommentChooserDialog extends Composite implements Listener {
 	    gridData.horizontalSpan = 2;
 	    gridData.grabExcessVerticalSpace = true;
 	    gridData.grabExcessHorizontalSpace = true;
-	    replyText.setLayoutData(gridData);  
+	    comboChooseComment.setLayoutData(gridData);  
 	    
 	    okButton = new Button(this, SWT.PUSH);
 	    okButton.setText("Ok");
@@ -106,10 +111,10 @@ public class CommentChooserDialog extends Composite implements Listener {
 	@Override
 	public void handleEvent(Event event) {
 		if (event.widget == okButton) {
-			strReplyText = replyText.getText().trim();
+			strReplyText = comboChooseComment.getText().trim();
 			if(strReplyText.equals("")) {
 				MessageDialog.openInformation(this.getShell(), "Information", 
-		        		PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_EMPTY_REPLY_MESSAGE));
+						pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_EMPTY_REPLY_MESSAGE));
 			} else {
 				boolSaved = true;
 				getParent().dispose();
@@ -120,4 +125,3 @@ public class CommentChooserDialog extends Composite implements Listener {
         }        
 	}
 }
-

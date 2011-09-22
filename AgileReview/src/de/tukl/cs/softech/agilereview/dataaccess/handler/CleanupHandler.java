@@ -1,54 +1,45 @@
 package de.tukl.cs.softech.agilereview.dataaccess.handler;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Pattern;
+import java.lang.reflect.InvocationTargetException;
 
-import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import agileReview.softech.tukl.de.CommentDocument.Comment;
-import agileReview.softech.tukl.de.ReviewDocument.Review;
-import de.tukl.cs.softech.agilereview.annotations.TagCleaner;
-import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
-import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
- * 
+ * Handler for the cleanup process
  */
 public class CleanupHandler extends AbstractHandler {
+	
+
+	
+
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-
+		PluginLogger.log(this.getClass().toString(), "execute", "Cleanup triggered in Package-Explorer");
 		// get the element selected in the packageexplorer
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getActiveMenuSelection(event);
 		Object firstElement = selection.getFirstElement();
 		
 		if (firstElement instanceof IAdaptable) {
 			
-			boolean success = true;
+			
 
 			// ask user whether to delete comments and tags or only tags
 			boolean deleteComments = true;
@@ -66,87 +57,25 @@ public class CleanupHandler extends AbstractHandler {
 			
 			// get selected project
 			IProject selProject = (IProject)((IAdaptable)firstElement).getAdapter(IProject.class);
-					
-			// get all reviews (not only open ones)
-			ArrayList<Review> reviews = ReviewAccess.getInstance().getAllReviews();
-			
-			// some helper variables
-			ArrayList<Comment> comments = new ArrayList<Comment>();
-			HashSet<String> paths = new HashSet<String>();
-			String selProjectPath = selProject.getFullPath().toOSString().replaceAll(Pattern.quote(System.getProperty("file.separator")), "");
-			
-			// load all comments for all reviews
 			try {
-				ReviewAccess.getInstance().fillDatabaseCompletely();
-			} catch (XmlException e1) {
-				success = false;
-				PluginLogger.logError(this.getClass().toString(), "execute", "XMLException while trying to fill database.", e1);
-			} catch (IOException e1) {
-				success = false;
-				PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to fill database.", e1);
-			}
-			
-			// save all comments for the given project
-			for (Review r : reviews) {
-				comments.addAll(ReviewAccess.getInstance().getComments(r.getId(), selProjectPath));
-			}
-			
-			// save the paths of all files that are being reviewed (ergo that comments exist for)
-			for (Comment c : comments) {
-				paths.add(ReviewAccess.computePath(c));
-			}
-			
-			// remove tags from files
-			PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from "+paths.toString());
-			for (String path : paths) {
-				if (!success) {
-					IPath actPath = new Path(path);
-					TagCleaner.removeAllTags(actPath);
-				} else {
-					IPath actPath = new Path(path);
-					success = TagCleaner.removeAllTags(actPath);
-				}				
-			}
-			
-			if (ViewControl.isOpen(CommentTableView.class)) {
-				CommentTableView.getInstance().reparseAllEditors();
-			}
-			
-			// delete comments based on users decision
-			if (deleteComments) {
-				try {
-					PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
-					ReviewAccess.getInstance().deleteComments(comments);
-					ReviewAccess.getInstance().save();
-					if (ViewControl.isOpen(CommentTableView.class)) {
-						CommentTableView.getInstance().resetComments();	
-					}
-					if (ViewControl.isOpen(ReviewExplorer.class)) {
-						ReviewExplorer.getInstance().refreshInput();
-					}
-				} catch (IOException e) {
-					PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to delete comments.", e);
-					success = false;
-				}
-			}
-			
-			// unload closed reviews again
-			List<String> openReviews = Arrays.asList(PropertiesManager.getInstance().getOpenReviews());
-			for (Review r : reviews) {				
-				if (!openReviews.contains(r.getId())) {
-					ReviewAccess.getInstance().unloadReviewComments(r.getId());
-				}
-			}
-		
-			// Inform user
-			if (success) {
-				MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "AgileReview Cleanup", "The project " + ((IProject)selProject).getName() + " was successfully cleaned.");
-			} else {
-				MessageDialog.openWarning(HandlerUtil.getActiveShell(event), "AgileReview Cleanup", "The project " + ((IProject)selProject).getName() + " could not be cleaned.");
-			}
-			
+				ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
+				pmd.open();			
+				pmd.run(true, false, new CleanupProcess(selProject, deleteComments));
+				pmd.close();
+			} catch (InvocationTargetException e) {
+				PluginLogger.logError(this.getClass().toString(),"execute", "InvocationTargetException", e);
+				MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup", "An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:1");
+			} catch (InterruptedException e) {
+				PluginLogger.logError(this.getClass().toString(),"execute", "InterruptedException", e);
+				MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup", "An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:2");
+			}			
 		}
 		
+		if (ViewControl.isOpen(CommentTableView.class)) {
+			CommentTableView.getInstance().reparseAllEditors();
+		}
+		ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW | ViewControl.REVIEW_EXPLORER, true);
+
 		return null;
 	}
 

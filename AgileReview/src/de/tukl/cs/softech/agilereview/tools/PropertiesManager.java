@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -11,6 +12,7 @@ import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.preferences.lang.SupportedLanguageEntity;
 
 /**
  * The PropertiesManager manages the internal configurations (in file: "OSGI-INF/l10n/bundle.properties")
@@ -49,7 +51,7 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String COMMENT_STATUS = "comment_status";
 		/**
-		 * Possible values for a review's status
+		 * Possible values for a review's status 
 		 */
 		public static String REVIEW_STATUS = "review_status";
 		/**
@@ -57,21 +59,29 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String DEFAULT_ANNOTATION_COLOR = "annotations.default.color";
 		/**
+		 * Default color of Reviews
+		 */
+		public static String DEFAULT_REVIEW_COLOR = "review.default.color";
+		/**
 		 * Message the display when saving a reply on a comment, without all fields filled out
 		 */
 		public static String COMMENT_EMPTY_REPLY_MESSAGE = "reply_inf_completeness";
 		/**
-		 * File endings supported by the parser
+		 * Filenames which should be omitted during export
 		 */
-		public static String PARSER_FILEENDINGS = "parser_fileendings";
+		public static String EXPORT_OMITTINGS = "export_omittings";
 		/**
-		 * Correlated comment begin tags for every set of file endings representing the same language
+		 * Nature id of the AgileReview source folder
 		 */
-		public static String PARSER_COMMENT_BEGIN_TAG ="parser_comment_begin_tag";
+		public static String AGILEREVIEW_NATURE = "agileReview_nature.id";
 		/**
-		 * Correlated comment end tags for every set of file endings representing the same language
+		 * Nature id of the active AgileReview source folder 
 		 */
-		public static String PARSER_COMMENT_END_TAG = "parser_comment_end_tag";
+		public static String ACTIVE_AGILEREVIEW_NATURE = "agileReview_active_nature.id";
+		/**
+		 * The URL directing to the export templates
+		 */
+		public static String URL_EXAMPLE_EXPORT_TEMPLATES = "url_example_export_templates";
 		
 		/**
 		 * Static subclass: clustering of icon keys
@@ -99,13 +109,17 @@ public class PropertiesManager implements IInputValidator{
 			 */
 			public static String COMMENT_DELETE = "icon_comment_delete";
 			/**
-			 * Icon "ok" for comments
+			 * Icon "ok" for comments 
 			 */
 			public static String COMMENT_OK = "icon_comment_ok";
 			/**
 			 * Icon for "syncronize" buttons
 			 */
 			public static String SYNCED = "icon_synced";
+			/**
+			 * Icon for "repositioning" buttons
+			 */
+			public static String COMMENT_REPOS = "icon_comment_repos";
 		}
 	}
 	
@@ -160,6 +174,18 @@ public class PropertiesManager implements IInputValidator{
 		 * States whether the AgileReview Perspective should automatically be opened on certain events
 		 */
 		public static String AUTO_OPEN_PERSPECTIVE = "autoOpenPerspective";
+		/**
+		 * File endings supported by the parser
+		 */
+		public static String PARSER_FILEENDINGS = "parser_fileendings";
+		/**
+		 * Correlated comment begin tags for every set of file endings representing the same language
+		 */
+		public static String PARSER_COMMENT_BEGIN_TAG ="parser_comment_begin_tag";
+		/**
+		 * Correlated comment end tags for every set of file endings representing the same language
+		 */
+		public static String PARSER_COMMENT_END_TAG = "parser_comment_end_tag";
 		
 	}
 	
@@ -196,7 +222,6 @@ public class PropertiesManager implements IInputValidator{
 	 * Creates a new instance of PropertiesManager
 	 */
 	private PropertiesManager() {		
-		
 		// Internal properties
 		internalProperties = new Properties();
 		// TODO: Is there a better way to access the bundle properties?
@@ -237,10 +262,10 @@ public class PropertiesManager implements IInputValidator{
 	 * Returns the PreferencesStore to store/retrieve the workspace-specific preferences of this plugin
 	 * @return PreferencesStore of this plugin
 	 */
-	public static IPreferenceStore getPreferences()
-	{
+	public static IPreferenceStore getPreferences() {
 		return Activator.getDefault().getPreferenceStore();
 	}
+	
 	/**
 	 * Adds the given review to the list of open reviews in the workspace-specific preferences of this plugin
 	 * @param reviewId Id of the review to be added
@@ -397,19 +422,121 @@ public class PropertiesManager implements IInputValidator{
 	 * Returns a map of all supported file endings with the correlated comment tags (first begin, then end tag)
 	 * @return map of all supported file endings with the correlated comment tags
 	 */
-	public HashMap<String, String[]> getParserFileendingsAndTags() {
+	public HashMap<String, String[]> getParserFileendingsMappingTags() {
 		HashMap<String, String[]> result = new HashMap<String, String[]>();
-		String[] languages = getInternalProperty(INTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
-		String[] beginTags = getInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
-		String[] endTags = getInternalProperty(INTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
+		String[] languages = getInternalProperty(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
+		String[] beginTags = getInternalProperty(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
+		String[] endTags = getInternalProperty(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
 		
 		for(int i = 0; i < languages.length; i++) {
-			String[] endings = languages[i].split("\\s");
-			for(String e : endings) {
-				result.put(e, new String[]{beginTags[i], endTags[i]});
+		 	String[] endings = languages[i].split("\\s");
+		 	for(String e : endings) {
+		 		result.put(e, new String[]{beginTags[i], endTags[i]});
+		 	}
+		}
+		return result;
+	}
+	
+	/**
+	 * Returns an array of entities containing file endings, begin and end tag
+	 * @return an array of entities containing file endings, begin and end tag
+	 */
+	public SupportedLanguageEntity[] getParserFileendingsAndTagsAsEntity() {
+		String[] languages = getPreferences().getString(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
+		String[] beginTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
+		String[] endTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
+		
+		//get max length for result array
+		int[] lengths = new int[]{languages.length, beginTags.length, endTags.length};
+		Arrays.sort(lengths);
+		SupportedLanguageEntity[] result = new SupportedLanguageEntity[lengths[0]];
+		
+		//create result
+		for(int i = 0; i < lengths[0]; i++) {
+			boolean b = false, e = false;
+			if(i < beginTags.length) b = true;
+			if(i < endTags.length) e = true;
+			
+			if(i < languages.length) {
+				String[] endings = languages[i].split("\\s+");
+				
+				
+				result[i] = new SupportedLanguageEntity(endings, b ? beginTags[i] : "", e ? endTags[i] : "");
+			} else {
+				result[i] = new SupportedLanguageEntity(new String[0], b ? beginTags[i] : "", e ? endTags[i] : "");
 			}
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Saves the new configuration for supported languages in the preferences.
+	 * Beforehand all double entities will be removed.
+	 * @param newConfig
+	 */
+	public void setParserFileendingsAndTags(SupportedLanguageEntity[] newConfig) {
+		//clean up input
+		//search for duplicated entities
+		LinkedList<SupportedLanguageEntity> cleaned = new LinkedList<SupportedLanguageEntity>();
+		for(SupportedLanguageEntity e1 : newConfig) {
+			boolean contained = false;
+			SupportedLanguageEntity toAddTo = null;
+			//search for entries having the same begin and end tag
+			for(SupportedLanguageEntity e2 : cleaned) {
+				if(e2.getBeginTag().equals(e1.getBeginTag()) && e2.getEndTag().equals(e1.getEndTag())) {
+					contained = true;
+					toAddTo = e2;
+					break;
+				}
+			}
+			//apply search result
+			if(!contained) {
+				cleaned.add(e1);
+			} else if(toAddTo != null) {
+				toAddTo.addFileendings(e1.getFileendings());
+			}
+		}
+		
+		//create storable strings
+		String fileendings = "";
+		String beginTags = "";
+		String endTags = "";
+		boolean first = true;
+		
+		for(SupportedLanguageEntity e : cleaned) {
+			if(first) {
+				beginTags = e.getBeginTag();
+				endTags = e.getEndTag();
+				first = false; 
+			} else {
+				fileendings += ",";
+				beginTags += "," + e.getBeginTag();
+				endTags += "," + e.getEndTag();
+			}
+			boolean firstSpace = true;
+			for(String s : e.getFileendings()) {
+				if(firstSpace) {
+					fileendings += s;
+					firstSpace = false;
+				} else {
+					fileendings += " " + s;
+				}
+			}
+		}
+		
+		getPreferences().setValue(EXTERNAL_KEYS.PARSER_FILEENDINGS, fileendings);
+		getPreferences().setValue(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG, beginTags);
+		getPreferences().setValue(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG, endTags);
+	}
+	
+	/**
+	 * Sets the template and export path for the export dialog
+	 * @param template
+	 * @param output
+	 */
+	public void setDefaultExportPaths(String template, String output) {
+		getPreferences().setValue(EXTERNAL_KEYS.EXPORT_PATH, output);
+		getPreferences().setValue(EXTERNAL_KEYS.TEMPLATE_PATH, template);
 	}
 }

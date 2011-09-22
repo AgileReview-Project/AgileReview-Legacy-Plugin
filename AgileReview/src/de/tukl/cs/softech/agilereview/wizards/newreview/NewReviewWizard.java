@@ -22,7 +22,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
 	/**
 	 * The first and sole page of the wizard 
 	 */
-	NewReviewWizardPage page1;
+	private NewReviewWizardPage page1;
 	
 	/**
 	 * creates a new wizard
@@ -30,6 +30,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
 	public NewReviewWizard() {
 		super();
 		setNeedsProgressMonitor(true);
+		setWindowTitle("New Review");
 	}
 	
 	/**
@@ -38,10 +39,10 @@ public class NewReviewWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void addPages() {
+		super.addPages();
 		page1 = new NewReviewWizardPage();
 		addPage(page1);
 	}
-
 
 	/**
 	 * Execute the actual wizard command after all information was collected
@@ -84,5 +85,4 @@ public class NewReviewWizard extends Wizard implements INewWizard {
 			ViewControl.getInstance().switchPerspective();
 		}
 	}
-
 }

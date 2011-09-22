@@ -1,19 +1,25 @@
 package de.tukl.cs.softech.agilereview.views.detail;
 
+import java.util.HashSet;
+
 import org.apache.xmlbeans.XmlObject;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import de.tukl.cs.softech.agilereview.dataaccess.SaveHandler;
+import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Abstract class of a Comment or Review representation, which automatically provides IPartListener
@@ -31,15 +37,21 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * backup of the current displayed object
 	 */
 	protected E backupObject;
+	/**
+	 * This set represents all components which should adapt the composite background color
+	 */
+	protected HashSet<Control> bgComponents = new HashSet<Control>();
 
 	/**
 	 * Creates a new AbstractDetail Composite onto the given parent with the specified SWT styles
 	 * @param parent onto the ReviewDetail Composite will be added
 	 * @param style with which this Composite will be styled
+	 * @param bg background color for this view
 	 */
-	protected AbstractDetail(Composite parent, int style) {
+	protected AbstractDetail(Composite parent, int style, Color bg) {
 		super(parent, style);
 		initUI();
+		changeBackgroundColor(bg);
 	}
 
 	/**
@@ -70,6 +82,35 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	protected abstract void fillContents(E input);
 	
 	/**
+	 * Converts all line breaks either \n or \r to \r\n line breaks
+	 * @param in the string which line breaks should be converted
+	 * @return the converted string
+	 */
+	protected String convertLineBreaks(String in) {
+		return in.replaceAll("\r\n|\r|\n", System.getProperty("line.separator"));
+	}
+	
+	/**
+	 * Changes the background color for this AbstractDetail.
+	 * @param bg
+	 */
+	protected void changeBackgroundColor(Color bg) {
+		this.setBackground(bg);
+		String osName = System.getProperty("os.name");
+		for(Control c : bgComponents) {
+			//only paint comboboxes and buttons when the running system is windows
+			//as on linux the background is also set for the components itself
+			if(c instanceof Combo || c instanceof Button) {
+				if(osName.contains("windows")) {
+					c.setBackground(bg);
+				}
+			} else {
+				c.setBackground(bg);
+			}
+		}
+	}
+	
+	/**
 	 * saves every changes made in the current Detail View
 	 * @param part will be forwarded from the {@link DetailView}
 	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
@@ -79,16 +120,13 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 		if(part instanceof DetailView) {
 			saveChanges();
 			
-			//fire "save" command for persistent storage
-			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
-			try {
-				handlerService.executeCommand(SaveHandler.SAVE_COMMAND_ID, null);
-			} catch (Exception ex) {
-				PluginLogger.logError(this.getClass().toString(), "partClosedOrDeactivated", "Error occured while triggering save command", ex);
-			}
-			this.backupObject = (E)this.editedObject.copy();
+			// save the change persistently
 			PluginLogger.log(this.getClass().toString(), "partClosedOrDeactivated", "trigger save event");
-			
+			ReviewAccess.getInstance().save(this.editedObject);
+			ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW);
+						
+			this.backupObject = (E)this.editedObject.copy();
+
 			//get SourceProvider for configuration
 			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);

@@ -18,7 +18,6 @@ import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
@@ -43,7 +42,7 @@ public class ActivateReviewHandler extends AbstractHandler {
 						MultipleReviewWrapper wrap = (MultipleReviewWrapper)o;
 						if (!PropertiesManager.getInstance().isReviewOpen(wrap.getReviewId()))
 						{
-							if (!MessageDialog.openConfirm(null, "Activate", "In order to activate a review, it has to be open. Do you want to open the selected review now?"))
+							if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Activate", "In order to activate a review, it has to be open. Do you want to open the selected review now?"))
 							{
 								// MessageDialog.openWarning(null, "Warning: Could not activate review", "Only open reviews can be activated");
 								PluginLogger.logWarning("ReviewExplorer", "activateSelectedReview", "Could not activate review: closed review is selected");
@@ -65,9 +64,9 @@ public class ActivateReviewHandler extends AbstractHandler {
 						}
 						
 						PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, wrap.getReviewId());
-						if(ViewControl.isOpen(ReviewExplorer.class)) {
-							ReviewExplorer.getInstance().refresh();
-						}
+						ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
+						
+						//update environment variable
 						ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 						SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.IS_ACTIVE_REVIEW);
 						sp.setVariable(SourceProvider.IS_ACTIVE_REVIEW, true);

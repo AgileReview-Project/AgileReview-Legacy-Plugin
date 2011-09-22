@@ -7,9 +7,11 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.xmlbeans.XmlCursor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -31,13 +33,13 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class CommentDetail extends AbstractDetail<Comment> {
 	
 	/**
-	 * Label to show the comment tag of the shown Comment
+	 * Text to show the comment tag of the shown Comment
 	 */
-	private Label tagInstance;
+	private Text tagInstance;
 	/**
-	 * Label to show the author of the shown Comment
+	 * Text to show the author of the shown Comment
 	 */
-	private Label authorInstance;
+	private Text authorInstance;
 	/**
 	 * TextField to represent the recipient in a modifiable way
 	 */
@@ -63,9 +65,10 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * Creates the CommentDetail Composite and creates the initial UI
 	 * @param parent on which this component should be added
 	 * @param style in which this component should be displayed
+	 * @param bg background color for this view
 	 */
-	protected CommentDetail(Composite parent, int style) {
-		super(parent, style);
+	protected CommentDetail(Composite parent, int style, Color bg) {
+		super(parent, style, bg);
 	}
 
 	/*
@@ -80,24 +83,31 @@ public class CommentDetail extends AbstractDetail<Comment> {
 
 		Label tagID = new Label(this, SWT.NONE);
 		tagID.setText("Tag-ID: ");
+		super.bgComponents.add(tagID);
 		
-		tagInstance = new Label(this, SWT.WRAP);
+		tagInstance = new Text(this, SWT.WRAP);
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
+	    tagInstance.setEditable(false);
 	    tagInstance.setLayoutData(gridData);
+	    super.bgComponents.add(tagInstance);
 		
 	    Label author = new Label(this, SWT.PUSH);
 	    author.setText("Author: ");
+	    super.bgComponents.add(author);
 	    
-	    authorInstance = new Label(this, SWT.WRAP);
+	    authorInstance = new Text(this, SWT.WRAP);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
+	    authorInstance.setEditable(false);
 	    authorInstance.setLayoutData(gridData);
+	    super.bgComponents.add(authorInstance);
 	    
 	    Label status = new Label(this, SWT.PUSH);
 	    status.setText("Status: ");
+	    super.bgComponents.add(status);
 	    
 	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
 	    gridData = new GridData();
@@ -106,9 +116,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    statusDropDown.setLayoutData(gridData);
 	    statusDropDown.addFocusListener(this);
 	    statusDropDown.addModifyListener(this);
+	    super.bgComponents.add(statusDropDown);
 	    
 	    Label priority = new Label(this, SWT.PUSH);
 	    priority.setText("Priority: ");
+	    super.bgComponents.add(priority);
 	    
 	    priorityDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
 	    gridData = new GridData();
@@ -117,9 +129,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    priorityDropDown.setLayoutData(gridData);
 	    priorityDropDown.addFocusListener(this);
 	    priorityDropDown.addModifyListener(this);
+	    super.bgComponents.add(priorityDropDown);
 	    	
 	    Label recipient = new Label(this, SWT.PUSH);
 	    recipient.setText("Recipient: ");
+	    super.bgComponents.add(recipient);
 	    
 	    recipientText = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
 	    gridData = new GridData();
@@ -129,7 +143,8 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    recipientText.addFocusListener(this);
 	    recipientText.addModifyListener(this);
 	    
-	    new Sash(this, SWT.PUSH);
+	    Sash sash = new Sash(this, SWT.PUSH);
+	    sash.setVisible(false);
 	    
 	    Label caption = new Label(this, SWT.PUSH);
 	    gridData = new GridData();
@@ -137,6 +152,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.horizontalSpan = numColumns;
 	    caption.setLayoutData(gridData);
 	    caption.setText("Description / Replys:");
+	    super.bgComponents.add(caption);
 	    
 	    SashForm texts = new SashForm(this, SWT.VERTICAL);
 	    gridData = new GridData();
@@ -147,6 +163,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.grabExcessVerticalSpace = true;
 	    gridData.grabExcessHorizontalSpace = true;
 	    texts.setLayoutData(gridData);
+	    super.bgComponents.add(texts);
 	    
 	    txt = new StyledText(texts, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
 	    txt.setVisible(true);
@@ -162,14 +179,6 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    replys.setWordWrap(true);
 	    replys.addFocusListener(this);
 	    replys.addModifyListener(this);
-
-	    Composite g = new Composite(this, SWT.NONE);
-	    GridLayout glayout = new GridLayout(3, false);
-		g.setLayout(glayout);
-	    gridData = new GridData();
-	    gridData.horizontalAlignment = GridData.END;
-	    gridData.horizontalSpan = numColumns-1;
-	    g.setLayoutData(gridData);
 	    
 	    setPropertyConfigurations();
 	}
@@ -224,7 +233,9 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			Reply[] replys = comment.getReplies().getReplyArray();
 			this.replys.setText("");
 			for(int i = 0; i < replys.length; i++) {
-				addReply(replys[i].getAuthor(), replys[i].newCursor().getTextValue().trim());
+				XmlCursor cursor = replys[i].newCursor();
+				addReply(replys[i].getAuthor(), cursor.getTextValue().trim(), replys[i].getCreationDate());
+				cursor.dispose();
 			}
 
 			priorityDropDown.select(comment.getPriority());
@@ -249,15 +260,18 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * adds a reply to the reply list shown in the view
 	 * @param author of the reply
 	 * @param text of the reply
+	 * @param creationDate of the reply
 	 */
-	public void addReply(String author, String text) {
-		
+	void addReply(String author, String text, Calendar creationDate) {
 		String replyText = this.replys.getText();
 		DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-		replyText += (replyText.equals("") ? "" : "\n\n") + "----- "+author+":"
-			+df.format(Calendar.getInstance().getTime())+" -----\n";
+		replyText += (replyText.equals("") ? "" : "\n\n") + "----- "+author+": "
+			+df.format(creationDate.getTime())+" -----\n";
 		replyText += text;
 		this.replys.setText(replyText);
+		
+		//save the current comment in order to save the reply creation time
+		super.partClosedOrDeactivated(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
 	}
 	
 	/**
@@ -268,24 +282,40 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		boolean result = false;
 		
 		//save replies before
-		Pattern p = Pattern.compile("-----([^:]*):([^\\n]*)-----\\n(.*)");
+		Pattern p = Pattern.compile("-----([^:]*):([^\\n]*)-----\\n([^-]*)");
 		Matcher m = p.matcher(this.replys.getText());
 		ArrayList<String[]> shownReplies = new ArrayList<String[]>();
 		while(m.find()) {
 			//trim() to delete non used whitespace
-			shownReplies.add(new String[]{m.group(1).trim(),m.group(2).trim(),m.group(3).trim()});
+			shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
 		}
-		//XXX should be changed if someone can edit saved replies:
+		
+		String newStr = "";
+		//XXX should be changed if someone can delete saved replies:
 		//delete and edit of replies not considered in this implementation
-		int savedReplies = this.editedObject.getReplies().getReplyArray().length;
+		int savedReplies = editedObject.getReplies().getReplyArray().length;
 		if(savedReplies != shownReplies.size()) {
 			result = true;
 			for(int i = savedReplies; i < shownReplies.size(); i++) {
-				Reply newReply = this.editedObject.getReplies().addNewReply();
+				Reply newReply = editedObject.getReplies().addNewReply();
 				newReply.setAuthor(shownReplies.get(i)[0]);
 				newReply.setCreationDate(Calendar.getInstance());
-				newReply.newCursor().setTextValue(shownReplies.get(i)[2]);
+				
+				XmlCursor cursor = newReply.newCursor();
+				cursor.setTextValue(super.convertLineBreaks(shownReplies.get(i)[2]));
+				cursor.dispose();
 			}
+		}
+		
+		//XXX should be changed if someone can delete saved replies:
+		//check for changes within the reply description and to convert line breaks in old replies
+		for(int i = 0; i < savedReplies; i++) {
+			XmlCursor cursor = editedObject.getReplies().getReplyArray(i).newCursor();
+			if(!(newStr = super.convertLineBreaks(shownReplies.get(i)[2])).equals(cursor.getTextValue())) {
+				result = true;
+				cursor.setTextValue(newStr);
+			}
+			cursor.dispose();
 		}
 		
 		if(editedObject.getPriority() != this.priorityDropDown.getSelectionIndex()) {
@@ -295,12 +325,12 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		} else if(editedObject.getStatus() != this.statusDropDown.getSelectionIndex()) {
 			editedObject.setStatus(this.statusDropDown.getSelectionIndex());
 			result = true;
-		} else if(!editedObject.getRecipient().equals(this.recipientText.getText().trim())) {
+		} else if(!(newStr = this.recipientText.getText().trim()).equals(editedObject.getRecipient())) {
 			editedObject.setRecipient(this.recipientText.getText().trim());
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT, recipientText.getText().trim());
 			result = true;
-		} else if(!editedObject.getText().equals(this.txt.getText().trim())) {
-			editedObject.setText(this.txt.getText().trim());
+		} else if(!(newStr = super.convertLineBreaks(this.txt.getText().trim())).equals(editedObject.getText())) {
+			editedObject.setText(newStr);
 			result = true;
 		}
 
@@ -337,4 +367,5 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 		return commentTag;
 	}
+
 }

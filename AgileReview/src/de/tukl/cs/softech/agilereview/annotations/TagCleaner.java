@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -21,9 +22,17 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class TagCleaner {
 
 	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
+	/**
+	 * Supported files mapping to the corresponding comment tags
+	 */
+	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsMappingTags();
+	/**
 	 * Key separator for tag creation
 	 */
-	private static String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+	private static String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 	/**
 	 * Core Regular Expression to find the core tag structure
 	 */
@@ -45,11 +54,19 @@ public class TagCleaner {
 	 * @return whether tags were removed successful
 	 */
 	public static boolean removeTag(IPath path, String identifier, boolean regex) {
-		boolean result = true;
-		
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		if (file.exists()) {
 			try {
+				//check whether this file is supported
+				String beginTag;
+				String endTag;
+				if(supportedFiles.containsKey(file.getFileExtension())) {
+					beginTag = supportedFiles.get(file.getFileExtension())[0];
+					endTag = supportedFiles.get(file.getFileExtension())[1];
+				} else {
+					return false;
+				}
+				
 				// identifier already quoted?
 				if (!regex) {
 					identifier = Pattern.quote(identifier);
@@ -58,19 +75,14 @@ public class TagCleaner {
 				
 				// get input from file
 				InputStream is = file.getContents();
-				BufferedReader br = new BufferedReader(new InputStreamReader(is));			
+				BufferedReader br = new BufferedReader(new InputStreamReader(is));
 				
 				// read file line by line, replace tags
 				String input = "";						
 				String line = br.readLine();
-				while (line != null) {								
-					if (path.getFileExtension().equals("java")) {
-						String javaregex = "/\\*"+identifierRegex+"\\*/";
-						input += line.replaceAll(javaregex, "");	
-					} else if (path.getFileExtension().equals("xml")) {
-						String xmlregex = "<!--"+identifierRegex+"-->";
-						input += line.replaceAll(xmlregex, "");
-					}
+				while (line != null) {
+					String searchRegex = Pattern.quote(beginTag)+identifierRegex+Pattern.quote(endTag);
+					input += line.replaceAll(searchRegex, "");
 					line = br.readLine();
 					// append new line chars if not last line
 					input += line!=null ? System.getProperty("line.separator") : "";
@@ -83,16 +95,14 @@ public class TagCleaner {
 			
 			} catch (CoreException e) {
 				PluginLogger.logError(TagCleaner.class.toString(), "execute", "CoreException while trying to remove tags.", e);
-				result = false;
+				return false;
 			} catch (IOException e) {
 				PluginLogger.logError(TagCleaner.class.toString(), "execute", "IOException while trying to remove tags.", e);
-				result = false;
+				return false;
 			}
 		} else {
-			result = false;
+			return false;
 		}
-		
-		return result;
+		return true;
 	}
-
 }

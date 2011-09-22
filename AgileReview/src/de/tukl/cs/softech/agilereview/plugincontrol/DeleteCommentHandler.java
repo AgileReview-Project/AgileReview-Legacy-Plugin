@@ -23,13 +23,21 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * Delete the comment the editor is currently "in"
  */
 public class DeleteCommentHandler extends AbstractHandler {
-
+	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private ReviewAccess ra = ReviewAccess.getInstance();
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private PropertiesManager pm = PropertiesManager.getInstance();
+	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "\"Delete Comment in Editor\" triggered");
@@ -63,7 +71,7 @@ public class DeleteCommentHandler extends AbstractHandler {
 					    shell.pack();
 					    shell.open();
 						while (!shell.isDisposed()) {
-							if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
+							if (!Display.getDefault().readAndDispatch()) Display.getDefault().sleep();
 					    }
 						
 						if(dialog.getSaved()) {
@@ -72,16 +80,16 @@ public class DeleteCommentHandler extends AbstractHandler {
 							return null;
 						}
 					}
-					String[] tagPart = tag.split(Pattern.quote(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
+					String[] tagPart = tag.split(Pattern.quote(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
 					reviewId = tagPart[0];
 					author = tagPart[1];
 					commentId = tagPart[2];
 					
 					// Get the right comment
-					Comment c = ReviewAccess.getInstance().getComment(reviewId, author, commentId);
+					Comment c = ra.getComment(reviewId, author, commentId);
 					
 					// ask
-					if (!MessageDialog.openConfirm(null, "Editor - Delete", "Are you sure you want to delete comment \""+tag+"\"?"))
+					if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Editor - Delete", "Are you sure you want to delete comment \""+tag+"\"?"))
 					{
 						return null;
 					}
@@ -90,14 +98,12 @@ public class DeleteCommentHandler extends AbstractHandler {
 						CommentTableView.getInstance().deleteComment(c);
 					}
 					try {
-						ReviewAccess.getInstance().deleteComment(c);
+						ra.deleteComment(c);
 					} catch (IOException e) {
 						PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+c, e);
 					}
 					// Refresh the Review Explorer
-					if(ViewControl.isOpen(ReviewExplorer.class)) {
-						ReviewExplorer.getInstance().refresh();
-					}
+					ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 					
 					// XXX Detail view?
 				}

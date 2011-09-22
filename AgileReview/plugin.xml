@@ -62,6 +62,9 @@
             relationship="right"
             relative="org.eclipse.ui.editorss">
       </view>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
+      </newWizardShortcut>
    </perspectiveExtension>
    <perspectiveExtension
          targetID="org.eclipse.jdt.ui.JavaPerspective">
@@ -70,6 +73,9 @@
       </perspectiveShortcut>
       <newWizardShortcut
             id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
       </newWizardShortcut>
    </perspectiveExtension>
    <perspectiveExtension
@@ -80,6 +86,21 @@
       <newWizardShortcut
             id="de.tukl.cs.softech.agilereview.newReviewWizard">
       </newWizardShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
+      </newWizardShortcut>
+   </perspectiveExtension>
+   <perspectiveExtension
+         targetID="org.eclipse.pde.ui.PDEPerspective">
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewWizard">
+      </newWizardShortcut>
+      <newWizardShortcut
+            id="de.tukl.cs.softech.agilereview.newReviewSourceWizard">
+      </newWizardShortcut>
+      <perspectiveShortcut
+            id="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective">
+      </perspectiveShortcut>
    </perspectiveExtension>
 </extension>
    <extension
@@ -215,7 +236,21 @@
          hasPages="true"
          icon="icons/review/review_add_15x15.png"
          id="de.tukl.cs.softech.agilereview.newReviewWizard"
-         name="%wizard.name">
+         name="%wizard.review.name"
+         project="false">
+   </wizard>
+   <wizard
+         canFinishEarly="false"
+         category="AgileReview.AgileReviewCategory"
+         class="de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWizard"
+         descriptionImage="icons/agile_icon.png"
+         finalPerspective="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
+         hasPages="true"
+         icon="icons/agile_icon.png"
+         id="de.tukl.cs.softech.agilereview.newReviewSourceWizard"
+         name="%wizard.reviewSource.name"
+         preferredPerspectives="de.tukl.cs.softech.agilereview.view.AgileReviewPerspective"
+         project="true">
    </wizard>
 </extension>
 <extension
@@ -229,7 +264,7 @@
          class="de.tukl.cs.softech.agilereview.wizards.export.ExportReviewDataWizard"
          icon="icons/agile_icon.png"
          id="AgileReview.exportReviewDataWizard"
-         name="%wizard.name">
+         name="%wizard.export.name">
    </wizard>
 </extension>
 <extension
@@ -238,6 +273,12 @@
          class="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
          id="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
          name="AgileReview">
+   </page>
+   <page
+         category="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         class="de.tukl.cs.softech.agilereview.preferences.LanguageSupportPreferencePage"
+         id="de.tukl.cs.softech.agilereview.preferences.LanguageSupportPreferencePage"
+         name="Language support">
    </page>
 </extension>
 <extension
@@ -254,9 +295,14 @@
       <activeWhen>
          <with
                variable="activePart">
-            <instanceof
-                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
-            </instanceof>
+            <or>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+               </instanceof>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+               </instanceof>
+            </or>
          </with>
       </activeWhen>
    </handler>
@@ -376,16 +422,12 @@
          commandId="de.tukl.cs.softech.agilereview.views.detail.newReply">
       <activeWhen>
          <with
-               variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+               variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
             <equals
                   value="true">
             </equals>
          </with>
       </activeWhen>
-   </handler>
-   <handler
-         class="de.tukl.cs.softech.agilereview.dataaccess.SaveHandler"
-         commandId="de.tukl.cs.softech.agilereview.save">
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.views.commenttable.handler.DeleteCommentHandler"
@@ -456,9 +498,13 @@
             <iterate
                   ifEmpty="false"
                   operator="and">
-               <instanceof
+               
+               <or><instanceof
                      value="org.eclipse.jdt.core.IJavaProject">
                </instanceof>
+                   <instanceof
+                         value="org.eclipse.core.resources.IProject">
+                   </instanceof></or>
             </iterate>
          </with>
       </activeWhen>
@@ -519,6 +565,98 @@
          </with>
       </activeWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.RelocateHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.detail.relocateComment">
+      <activeWhen>
+         <with
+               variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
+            <equals
+                  value="true">
+            </equals>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CollapseHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes">
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ExpandHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes">
+      <enabledWhen>
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper">
+               </instanceof>
+            </iterate>
+         </with>
+      </enabledWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.dataaccess.handler.ActivateSourceProjectHandler"
+         commandId="de.tukl.cs.softech.agilereview.activateReviewSource">
+      <activeWhen>
+         <with
+               variable="selection">
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="%agileReview_nature.id">
+                     </test>
+                  </adapt>
+               </iterate>
+            </and>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <with
+               variable="selection">
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <not>
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="%agileReview_active_nature.id">
+                        </test>
+                     </not>
+                  </adapt>
+               </iterate>
+            </and>
+         </with>
+      </enabledWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -527,12 +665,6 @@
          description="Add new Reply to a Comment in DetailView"
          id="de.tukl.cs.softech.agilereview.views.detail.newReply"
          name="Add New Reply">
-   </command>
-   <command
-         categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
-         description="SaveCommand for AgileReview Contents"
-         id="de.tukl.cs.softech.agilereview.save"
-         name="SaveCommand for AgileReview Contents">
    </command>
    <command
          categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
@@ -620,12 +752,62 @@
             id="de.tukl.cs.softech.agilereview.editor.delete"
             name="Delete comment in Editor">
       </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Relocates the current selected comment"
+            id="de.tukl.cs.softech.agilereview.views.detail.relocateComment"
+            name="Repositioning of a Comment">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            defaultHandler="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.SwitchReviewSourceProjectHandler"
+            description="Switch AgileReview Source Project"
+            id="de.tukl.cs.softech.agilereview.views.reviewexplorer.switchReviewSourceProject"
+            name="Switch AgileReview Source Project in ReviewExplorer">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Expands all sub nodes of a given node in the ReviewExplorer"
+            id="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+            name="Expand all sub nodes">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Collapses all sub nodes of a given node in the ReviewExplorer"
+            id="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+            name="Collapse all sub nodes">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Activates the currently selected AgileReview Source Project"
+            id="de.tukl.cs.softech.agilereview.activateReviewSource"
+            name="Activate AgileReview Source Project">
+      </command>
 </extension>
 <extension
       point="org.eclipse.ui.menus">
    <menuContribution
          allPopups="false"
          locationURI="toolbar:de.tukl.cs.softech.agilereview.view.commentdetailview.view">
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.detail.relocateComment"
+            icon="icons/comment/comment_repos_15x15.png"
+            label="Relocate"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
+      </command>
+      <separator
+            name="AgileReview.detailview.separator2"
+            visible="true">
+      </separator>
       <command
             commandId="de.tukl.cs.softech.agilereview.views.detail.newReply"
             icon="icons/comment/comment_newReply_15x15.png"
@@ -634,7 +816,7 @@
          <visibleWhen
                checkEnabled="false">
             <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible">
+                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
                <equals
                      value="true">
                </equals>
@@ -704,8 +886,31 @@
             style="push"
             tooltip="Open/Close reviews">
       </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+            icon="icons/expandall.gif"
+            label="Expand all sub nodes"
+            style="push">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+            icon="icons/collapseall.gif"
+            label="Collapse all sub nodes"
+            style="push">
+      </command>
       <separator
             name="AgileReview.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.switchReviewSourceProject"
+            icon="icons/switch_source_15x15.png"
+            label="Switch AgileReview Source Project"
+            style="push"
+            tooltip="Switch AgileReview Source Project">
+      </command>
+      <separator
+            name="AgileReview.separator5"
             visible="true">
       </separator>
       <command
@@ -767,8 +972,31 @@
             style="push"
             tooltip="Open/Close reviews">
       </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+            icon="icons/expandall.gif"
+            label="Expand all subnodes"
+            style="push">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+            icon="icons/collapseall.gif"
+            label="Collapse all sub nodes"
+            style="push">
+      </command>
       <separator
             name="AgileReview.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.switchReviewSourceProject"
+            icon="icons/switch_source_15x15.png"
+            label="Switch AgileReview Source Project"
+            style="push"
+            tooltip="Switch AgileReview Source Project">
+      </command>
+      <separator
+            name="AgileReview.separator5"
             visible="true">
       </separator>
       <command
@@ -801,11 +1029,43 @@
             visible="true">
       </separator>
       <command
+            commandId="de.tukl.cs.softech.agilereview.activateReviewSource"
+            icon="icons/agile_icon_activated.png"
+            label="Activate AgileReview Source Project"
+            style="push"
+            tooltip="Activate this AgileReview Source Project">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="selection">
+               <and>
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="%agileReview_nature.id">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </and>
+            </with>
+         </visibleWhen>
+      </command>
+      <command
             commandId="de.tukl.cs.softech.agilereview.cleanup"
             icon="icons/agile_icon.png"
             label="AgileReview Project CleanUp"
             style="push"
             tooltip="Remove AgileReview comments tags from all files of this project">
+         <visibleWhen
+               checkEnabled="true">
+         </visibleWhen>
       </command>
       <separator
             name="AgileReview.PackageExplorer.separator2"
@@ -851,6 +1111,18 @@
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M1+M2+-">
    </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.expandAllSubNodes"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+NUMPAD_MULTIPLY">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.collapseAllSubNodes"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+NUMPAD_DIVIDE">
+   </key>
 </extension>
 <extension
       point="org.eclipse.ui.contexts">
@@ -870,7 +1142,7 @@
             priorityLevel="workbench">
       </variable>
       <variable
-            name="de.tukl.cs.softech.agilereview.views.detail.variables.replyPossible"
+            name="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown"
             priorityLevel="workbench">
       </variable>
       <variable
@@ -896,16 +1168,94 @@
             class="de.tukl.cs.softech.agilereview.plugincontrol.AgileReviewNature">
       </run>
    </runtime>
-   <one-of-nature
-         id="de.tukl.cs.softech.agilereview.naturegroup">
-   </one-of-nature>
+</extension>
+<extension
+      id="de.tukl.cs.softech.agilereview.active_nature"
+      name="Active AgileReview Source Folder"
+      point="org.eclipse.core.resources.natures">
+   <runtime>
+      <run
+            class="de.tukl.cs.softech.agilereview.plugincontrol.AgileReviewNature">
+      </run>
+   </runtime>
 </extension>
 <extension
       point="org.eclipse.ui.ide.projectNatureImages">
    <image
          icon="icons/agile_icon.png"
          id="de.tukl.cs.softech.agilereview.nature.image"
-         natureId="de.tukl.cs.softech.agilereview.nature">
+         natureId="%agileReview_nature.id">
    </image>
+</extension>
+<extension
+      id="de.tukl.cs.softech.agilereview.decorators"
+      name="AgileReview Decorators"
+      point="org.eclipse.ui.decorators">
+   <decorator
+         adaptable="true"
+         icon="icons/agile_active_icon.png"
+         id="de.tukl.cs.softech.agilereview.active_decorator"
+         label="Active AgileReview Source Folder Decorator"
+         lightweight="true"
+         location="BOTTOM_RIGHT"
+         objectClass="org.eclipse.core.resources.IProject"
+         state="true">
+      <description>
+         Adds a small green hook to the current AgileReview Source Folder...
+      </description>
+      <enablement>
+         <objectState
+               name="nature"
+               value="%agileReview_active_nature.id">
+         </objectState>
+      </enablement>
+   </decorator>
+</extension>
+<extension
+      point="org.eclipse.ltk.core.refactoring.renameParticipants">
+   <renameParticipant
+         class="de.tukl.cs.softech.agilereview.plugincontrol.refactoring.AuthorFileRenameParticipant"
+         id="de.tukl.cs.softech.agilereview.refactoring.rename"
+         name="AgileReview Rename Processor">
+      <enablement>
+         <with
+               variable="element">
+            <or>
+               <instanceof
+                     value="org.eclipse.jdt.core.IPackageFragment">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.jdt.core.IPackageFragmentRoot">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </or>
+         </with>
+      </enablement>
+   </renameParticipant>
+</extension>
+<extension
+      point="org.eclipse.ltk.core.refactoring.moveParticipants">
+   <moveParticipant
+         class="de.tukl.cs.softech.agilereview.plugincontrol.refactoring.AuthorFileMoveParticipant"
+         id="de.tukl.cs.softech.agilereview.refactoring.move"
+         name="AgileReview Move Processor">
+      <enablement>
+         <with
+               variable="element">
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.jdt.core.IPackageFragment">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.jdt.core.IPackageFragmentRoot">
+               </instanceof>
+            </or>
+         </with></enablement>
+   </moveParticipant>
 </extension>
 </plugin>

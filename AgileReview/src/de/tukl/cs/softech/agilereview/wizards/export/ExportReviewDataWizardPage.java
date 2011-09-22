@@ -1,12 +1,15 @@
 package de.tukl.cs.softech.agilereview.wizards.export;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -14,18 +17,22 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
@@ -34,8 +41,12 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * The single page of the NewReview Wizard
  */
-public class ExportReviewDataWizardPage extends WizardPage implements SelectionListener, ModifyListener {
+public class ExportReviewDataWizardPage extends WizardPage implements SelectionListener, ModifyListener, Listener {
 
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private ReviewAccess ra = ReviewAccess.getInstance();
 	/**
 	 * indicates whether a path for exporting are valid or not
 	 */
@@ -61,13 +72,13 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 */
 	private Text exportPathText;
 	/**
-	 * Label which displays usage errors
-	 */
-	private Label errorLabel;
-	/**
 	 * TreeViewer of Reviews to be exported
 	 */
 	private CheckboxTreeViewer cbtreeviewer;
+	/**
+	 * Checkbox for "check as default" property
+	 */
+	private Button checkSave;
 	/**
 	 * a map of all reviews that are currently opened and their ids
 	 */
@@ -93,7 +104,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	public void createControl(Composite parent) {
 		
 		//get reviews from ReviewAccess
-		for (Review review : ReviewAccess.getInstance().getAllReviews()) {
+		for (Review review : ra.getAllReviews()) {
 			reviews.put(review.getId(), review);
 		}
 		
@@ -101,7 +112,27 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		container.setLayout(layout);
-		layout.numColumns = 3;
+		layout.numColumns = 4;
+		
+		// ui elements for selecting export path
+		Label pathLabel = new Label(container, SWT.NULL);
+		pathLabel.setText("XLS export location:");
+		
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = layout.numColumns - 2;
+		exportPathText = new Text(container, SWT.BORDER | SWT.SINGLE);
+		exportPathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH));	
+		exportPathText.setEditable(false);
+		exportPathText.addModifyListener(this);
+		exportPathText.setLayoutData(gd);
+		
+		GridData bGD = new GridData(GridData.FILL_HORIZONTAL);
+		bGD.horizontalSpan = 1;
+		Button browseButton = new Button(container, SWT.NULL);
+		browseButton.setText("Browse...");
+		browseButton.setData("path");
+		browseButton.addSelectionListener(this);
+		browseButton.setLayoutData(bGD);
 		
 		// ui elements for template selection
 		Label templateLabel = new Label(container, SWT.NULL);
@@ -110,38 +141,40 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		templatePathText = new Text(container, SWT.BORDER | SWT.SINGLE);
 		templatePathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH));			
 		templatePathText.setEditable(false);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		templatePathText.setLayoutData(gd);
 		templatePathText.addModifyListener(this);
+		templatePathText.setLayoutData(gd);
+		
 		Button browseButtonTemplate = new Button(container, SWT.NULL);
 		browseButtonTemplate.setText("Browse...");
 		browseButtonTemplate.setData("template");
 		browseButtonTemplate.addSelectionListener(this);
+		browseButtonTemplate.setLayoutData(bGD);
 		
-		// ui elements for selecting export path
-		Label pathLabel = new Label(container, SWT.NULL);
-		pathLabel.setText("XLS export location:");
-		
-		exportPathText = new Text(container, SWT.BORDER | SWT.SINGLE);
-		exportPathText.setText(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH));	
-		exportPathText.setEditable(false);
-		exportPathText.setLayoutData(gd);
-		exportPathText.addModifyListener(this);
-		
-		Button browseButton = new Button(container, SWT.NULL);
-		browseButton.setText("Browse...");
-		browseButton.setData("path");
-		browseButton.addSelectionListener(this);
-		
+		//example template link
 		GridData rlGD = new GridData(GridData.FILL_HORIZONTAL);
-		rlGD.horizontalSpan = 3;
-		errorLabel = new Label(container, SWT.NULL);
-		errorLabel.setText("");
-		errorLabel.setAlignment(SWT.CENTER);
-		errorLabel.setForeground(new Color(this.getShell().getDisplay(), 255, 0, 0));
-		errorLabel.setLayoutData(rlGD);
+		rlGD.horizontalSpan = layout.numColumns-1;
+		rlGD.horizontalAlignment = GridData.BEGINNING;
+		
+		Link label = new Link(container, SWT.NONE);
+		label.setText("Follow this <a>link</a> for downloading an example template.");
+		label.setLayoutData(rlGD);
+		label.setData("exampleTemplates");
+		label.addListener(SWT.Selection, this);
+		
+		//check save as default button
+		rlGD = new GridData(GridData.FILL_HORIZONTAL);
+		rlGD.horizontalSpan = 1;
+		rlGD.horizontalAlignment = GridData.END;
+		
+		checkSave = new Button(container, SWT.CHECK);
+		checkSave.setText("save as default");
+		checkSave.setSelection(false);
+		checkSave.setLayoutData(rlGD);
 		
 		// spacer to generate some space between path and review selection
+		rlGD = new GridData(GridData.FILL_HORIZONTAL);
+		rlGD.horizontalSpan = layout.numColumns;
+		
 		Label spacer = new Label(container, SWT.NULL);
 		spacer.setText("");
 		spacer.setLayoutData(rlGD);
@@ -151,39 +184,38 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		reviewLabel.setText("Select AgileReviews to export:");
 		reviewLabel.setLayoutData(rlGD);
 		
+		GridData tvGridData = new GridData(GridData.FILL_BOTH);
+		tvGridData.verticalSpan = 2;
+		tvGridData.horizontalSpan = layout.numColumns / 2;
 		cbtreeviewer = new CheckboxTreeViewer(container);
 		cbtreeviewer.setContentProvider(new ExportTreeViewContentProvider());
 		cbtreeviewer.setLabelProvider(new ExportTreeViewLabelProvider());
+		cbtreeviewer.getTree().addSelectionListener(this);
+		cbtreeviewer.getTree().setLayoutData(tvGridData);
+		
 		Collection<Review> allReviews = reviews.values();
 		ArrayList<Review> openReviews = new ArrayList<Review>();
 		for (Review r : allReviews) {
-			if (ReviewAccess.getInstance().isReviewLoaded(r.getId())) {
+			if (ra.isReviewLoaded(r.getId())) {
 				openReviews.add(r);
 			}
 		}
 		cbtreeviewer.setInput(openReviews);
-		GridData tvGridData = new GridData(GridData.FILL_BOTH);
-		tvGridData.verticalSpan = 2;
-		tvGridData.horizontalSpan = 2;
-		cbtreeviewer.getTree().setLayoutData(tvGridData);
-		cbtreeviewer.getTree().addSelectionListener(this);
 		
-		//select initial reviews
+		//- select initial reviews
 		for(String id : selectedReviewIDs) {
 			cbtreeviewer.setChecked(reviews.get(id), true);
 		}
 
+		//show review data of selected review
 		GridData resGridData = new GridData(GridData.FILL_HORIZONTAL);
-		resGridData.horizontalSpan = 1;
-		
+		resGridData.horizontalSpan = layout.numColumns / 2;
 		responsibility = new Label(container, SWT.NULL);
 		responsibility.setText("Responsibility:");
 		responsibility.setLayoutData(resGridData);
 		
 		GridData descGridData = new GridData(GridData.FILL_BOTH);
-		descGridData.horizontalSpan = 1;
 		description = new Label(container, SWT.WRAP);
-		
 		description.setText("Description:");
 		description.setLayoutData(descGridData);
 		
@@ -289,10 +321,10 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		File templatePath = new File(templatePathText.getText());
 		File exportPath = new File(exportPathText.getText());
 		if (templatePath.exists() && exportPath.exists() && !templatePathText.getText().isEmpty() && !exportPathText.getText().isEmpty()) {
-			this.errorLabel.setText("");
+			this.setErrorMessage(null);
 			return true;
 		} else {
-			this.errorLabel.setText("One or more of the selected paths do not exist.");
+			this.setErrorMessage("One or more of the selected paths do not exist.");
 			return false;
 		}
 	}
@@ -300,28 +332,21 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	/**
 	 * @return the path selected for exporting review data
 	 */
-	public String getExportPath() {
+	String getExportPath() {
 		return exportPathText.getText();
 	}
 	
 	/**
 	 * @return the path selected for export template
 	 */
-	public String getTemplatePath() {
+	String getTemplatePath() {
 		return templatePathText.getText();
-	}
-
-	/**
-	 * @return the ids of the reviews currently selected in the checkboxtreeviewer
-	 */
-	public HashSet<String> getSelectedReviewIDs() {
-		return selectedReviewIDs;
 	}
 	
 	/**
 	 * @return the reviews currently selected in the checkboxtreeviewer
 	 */
-	public ArrayList<Review> getSelectedReviews() {
+	ArrayList<Review> getSelectedReviews() {
 		ArrayList<Review> result = new ArrayList<Review>();
 		for (String id : selectedReviewIDs) {
 			result.add(reviews.get(id));
@@ -333,9 +358,38 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 	 * Sets the reviews to be selected
 	 * @param selectedReviews
 	 */
-	public void setSelectedReviews(Set<String> selectedReviews) {
+	void setSelectedReviews(Set<String> selectedReviews) {
 		this.selectedReviewIDs.clear();
 		this.selectedReviewIDs.addAll(selectedReviews);
 		reviewsSelected = true;
+	}
+	
+	/**
+	 * Returns whether the checkbox for saving the given paths is checked
+	 * @return true, if the paths should be set as default<br>false, otherwise
+	 */
+	boolean isSavePathAsDefault() {
+		return checkSave.getSelection();
+	}
+	
+
+	@Override
+	public void handleEvent(Event event) {
+		if(event.widget.getData().equals("exampleTemplates") && event.text.equals("link")) {
+			try {
+				PlatformUI.getWorkbench().getBrowserSupport().createBrowser(null).openURL(
+						new URL(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
+			} catch (PartInitException e) {
+				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
+						"An Error occured while opening a new browser window (1)\n" +
+						"You can download the template manually on http://sourceforge.net/projects/agilereview/files/raw%20export%20templates/\n" +
+						"In oder to solve this bug, please contact us on agilereview.org");
+			} catch (MalformedURLException e) {
+				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
+						"An Error occured while opening a new browser window (2)\n" +
+						"You can download the template manually on http://sourceforge.net/projects/agilereview/files/raw%20export%20templates/\n" +
+						"In oder to solve this bug, please contact us on agilereview.org");
+			}
+		}
 	}
 }

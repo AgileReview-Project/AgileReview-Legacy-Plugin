@@ -1,25 +1,29 @@
 package de.tukl.cs.softech.agilereview.wizards.export;
 
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
-import net.sf.jxls.exception.ParsePropertyException;
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
+import org.eclipse.ui.PlatformUI;
 
 import de.tukl.cs.softech.agilereview.export.XSLExport;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * Provides a wizard for creating a new Review via the NewWizard
  */
 public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 
+	/**
+	 * Instance of PropertiesManager
+	 */
+	private static PropertiesManager pm = PropertiesManager.getInstance();
 	/**
 	 * The first and sole page of the wizard 
 	 */
@@ -57,19 +61,21 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
-	public boolean performFinish() 
-	{
+	public boolean performFinish() {
 		try {
-			XSLExport.exportReviews(page1.getSelectedReviews(), page1.getTemplatePath(), page1.getExportPath());
-		} catch (ParsePropertyException e) {
-			PluginLogger.logError(this.getClass().toString(),"performFinish", "ParsePropertyException", e);
-			MessageDialog.openError(this.getShell(), "Error while exporting Reviews", "The formulas in the selected template file cannot be evaluated correctly");
-		} catch (InvalidFormatException e) {
-			PluginLogger.logError(this.getClass().toString(),"performFinish", "InvalidFormatException", e);
-			MessageDialog.openError(this.getShell(), "Error while exporting Reviews", "An error occured while exporting the selected Reviews!");
-		} catch (IOException e) {
-			PluginLogger.logError(this.getClass().toString(),"performFinish", "IOException", e);
-			MessageDialog.openError(this.getShell(), "Error while exporting Reviews", "One of the selected files could not be read or written!");
+			ProgressMonitorDialog pmd = new ProgressMonitorDialog(ExportReviewDataWizard.this.getShell());
+			pmd.open();
+			pmd.run(true, false, new XSLExport(page1.getSelectedReviews(), page1.getTemplatePath(), page1.getExportPath()));
+			pmd.close();
+			if(page1.isSavePathAsDefault()) {
+				pm.setDefaultExportPaths(page1.getTemplatePath(), page1.getExportPath());
+			}
+		} catch (InvocationTargetException e) {
+			PluginLogger.logError(this.getClass().toString(),"performFinish", "InvocationTargetException", e);
+			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error while exporting Reviews", "An Eclipse internal error occured!\nRetry and please report the bug when it occurs again.\nCode:1");
+		} catch (InterruptedException e) {
+			PluginLogger.logError(this.getClass().toString(),"performFinish", "InterruptedException", e);
+			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error while exporting Reviews", "An Eclipse internal error occured!\nRetry and please report the bug when it occurs again.\nCode:2");
 		}
 		return true;
 	}

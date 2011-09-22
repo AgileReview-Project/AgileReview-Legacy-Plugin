@@ -11,14 +11,16 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
-import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 
 /**
  * Handler for the "refresh" (F5) command for our review
  */
 public class RefreshHandler extends AbstractHandler {
+	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private  ReviewAccess ra = ReviewAccess.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException 
@@ -26,7 +28,7 @@ public class RefreshHandler extends AbstractHandler {
 		PluginLogger.log(this.getClass().toString(), "execute", "Refresh triggered");
 		// Refill the database
 		try {
-			ReviewAccess.getInstance().fillDatabaseForOpenReviews();
+			ra.fillDatabaseForOpenReviews();
 		} catch (XmlException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "XMLException is thrown", e);
 		} catch (IOException e) {
@@ -35,24 +37,16 @@ public class RefreshHandler extends AbstractHandler {
 		
 		// Test if active review may have vanished
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-		if (!ReviewAccess.getInstance().reviewExists(activeReview))
+		if (!ra.reviewExists(activeReview))
 		{
-			if (!ReviewAccess.getInstance().isReviewLoaded(activeReview))
+			if (!ra.isReviewLoaded(activeReview))
 			{
 				// Active review has vanished --> deactivate it
 				PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 			}
 		}
 		
-		if(ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().changeParent(DetailView.EMPTY);
-		}
-		if(ViewControl.isOpen(ReviewExplorer.class)) {
-			ReviewExplorer.getInstance().refreshInput();
-		}
-		if(ViewControl.isOpen(CommentTableView.class)) {
-			CommentTableView.getInstance().resetComments();
-		}
+		ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
 
 		// Return must be null (see API)
 		return null;

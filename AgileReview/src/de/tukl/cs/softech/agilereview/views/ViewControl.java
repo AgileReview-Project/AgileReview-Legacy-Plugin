@@ -35,6 +35,23 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 public class ViewControl implements ISelectionChangedListener, IPartListener2, IPerspectiveListener3 {
 	
 	/**
+	 * Public static field representing the detail view
+	 */
+	public static final int DETAIL_VIEW = 1;
+	/**
+	 * Public static field representing the comment summary
+	 */
+	public static final int COMMMENT_TABLE_VIEW = 2;
+	/**
+	 * Public static field representing the review explorer
+	 */
+	public static final int REVIEW_EXPLORER = 4;
+	/**
+	 * Public static field representing all existing views of this plugin
+	 */
+	public static final int ALL_VIEWS = 7;
+	
+	/**
 	 * Set of all active Views
 	 */
 	private static HashSet<Class<? extends IWorkbenchPart>> activeViews = new HashSet<Class<? extends IWorkbenchPart>>();
@@ -63,7 +80,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * Creates a new instance of ViewControl
 	 */
 	private ViewControl() {
-		Display.getCurrent().asyncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				//wait until the active page is created, then register all listeners
@@ -126,6 +143,57 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 */
 	public static boolean isPerspectiveOpen() {
 		return perspectiveIsOpen;
+	}
+	
+	/**
+	 * Calls the refreshViews(int, boolean, boolean) function with the given flags, false, false.
+	 * @param flags
+	 */
+	public static void refreshViews(int flags) {
+		refreshViews(flags, false, false);
+	}
+	
+	/**
+	 * Calls the refreshViews(int, boolean, boolean) function with the given flags, false and the given
+	 * value of refreshInputs.
+	 * @param flags
+	 * @param refreshInputs 
+	 */
+	public static void refreshViews(int flags, boolean refreshInputs) {
+		refreshViews(flags, false, refreshInputs);
+	}
+	
+	/**
+	 * This function refreshes the views specified in the flags parameter.
+	 * Therefore use the public fields delivered by this class and combine them with the
+	 * bitwise or operator.<br>
+	 * If the parameter validateExplorerSelection is set to true, the ReviewExplorers selection
+	 * will be validated. For example this is necessary when changing the open status of reviews.
+	 * @param flags views which should be refreshed
+	 * @param validateExplorerSelection if true, the ReviewExplorers selection will be validated
+	 * @param refreshInputs if true, data of ReviewExplorer and CommentTableView will be freshly loaded
+	 */
+	public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {
+		if((flags % 2 == 1) && isOpen(DetailView.class)) {
+			DetailView.getInstance().backgroundChanged();
+		}
+		if(((flags >> 1) % 2 == 1) && isOpen(CommentTableView.class)) {
+			if(refreshInputs) {
+				CommentTableView.getInstance().resetComments();
+			} else {
+				CommentTableView.getInstance().refreshTable();
+			}
+		}
+		if(((flags >> 2) % 2 == 1) && isOpen(ReviewExplorer.class)) {
+			if(validateExplorerSelection) {
+				ReviewExplorer.getInstance().validateExplorerSelection();
+			}
+			if(refreshInputs) {
+				ReviewExplorer.getInstance().refreshInput();
+			} else {
+				ReviewExplorer.getInstance().refresh();
+			}
+		}
 	}
 	
 	/**
