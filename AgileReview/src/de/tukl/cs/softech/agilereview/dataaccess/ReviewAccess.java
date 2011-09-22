@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -262,7 +261,7 @@ public class ReviewAccess {
 	 * @param natures The natures.
 	 * @return <code>true</code> if everything worked, <code>false</code> otherwise
 	 */
-	private static boolean setProjectNatures(IProject p, String[] natures) {
+	static boolean setProjectNatures(IProject p, String[] natures) {
 		try {
 			IProjectDescription projectDesc = p.getDescription();
 			projectDesc.setNatureIds(natures);
@@ -324,10 +323,6 @@ public class ReviewAccess {
 				}
 			}/*?|0000004 + 0000006|Malte|c0|?*/
 		}
-		
-		// Attach a ResourceChangeListener to monitor the AgileReview Source project for close operation
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(new CloseProjectResourceListener(), IResourceChangeEvent.PRE_CLOSE /*?|0000005+0000007|Peter|c3|*/
-				| IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);/*|0000005+0000007|Peter|c3|?*/
 	}
 	
 	
@@ -349,18 +344,18 @@ public class ReviewAccess {
 	IProject unloadCurrentReviewSourceProject(){
 		IProject oldProject = REVIEW_REPO_FOLDER;
 		if(REVIEW_REPO_FOLDER != null) {
-			if(REVIEW_REPO_FOLDER.exists() && REVIEW_REPO_FOLDER.isOpen()) {
-				setProjectNatures(REVIEW_REPO_FOLDER, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
-				// update decorator
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						while(PlatformUI.getWorkbench() == null) {}
-						PlatformUI.getWorkbench().getDecoratorManager().update("de.tukl.cs.softech.agilereview.active_decorator");
-					}
-				});
+//			if(REVIEW_REPO_FOLDER.exists() && REVIEW_REPO_FOLDER.isOpen()) {
+//				setProjectNatures(REVIEW_REPO_FOLDER, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
+//				// update decorator
+//				Display.getDefault().asyncExec(new Runnable() {
+//					@Override
+//					public void run() {
+//						while(PlatformUI.getWorkbench() == null) {}
+//						PlatformUI.getWorkbench().getDecoratorManager().update("de.tukl.cs.softech.agilereview.active_decorator");
+//					}
+//				});
 				REVIEW_REPO_FOLDER = null;
-			}
+//			}
 		}
 		return oldProject;
 	}

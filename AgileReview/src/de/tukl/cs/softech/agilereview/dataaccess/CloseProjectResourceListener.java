@@ -13,8 +13,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizard;
 
 /**
@@ -162,9 +164,29 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 							}
 						}
 					}
-					
 					deletedProjectPath = null;
 				}
+				
+				
+				if(event.getType() == IResourceChangeEvent.POST_BUILD && deletedProjectPath==null && !closedBefore) {
+					for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()){
+						try {
+							if (p.hasNature(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)) && !ra.getCurrentSourceFolder().equals(p)) {
+								ReviewAccess.setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
+								// update decorator
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										while(PlatformUI.getWorkbench() == null) {}
+										PlatformUI.getWorkbench().getDecoratorManager().update("de.tukl.cs.softech.agilereview.active_decorator");
+									}
+								});
+							}
+						} catch (CoreException e) {/* We are not interested in closed or non existent projects*/}
+					}
+				}
+				
+				
 			}
 		});
 	}
