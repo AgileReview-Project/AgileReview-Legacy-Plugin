@@ -8,6 +8,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -29,7 +30,7 @@ public class DeleteCommentHandler extends AbstractHandler {
 			// Check for not empty and if user really wants to deleted the selected reviews	
 			if (sel instanceof IStructuredSelection) {
 				IStructuredSelection structSel = (IStructuredSelection)sel;
-				if (!MessageDialog.openConfirm(null, "Comments Summary - Delete", "Are you sure you want to delete the comments currently selected in the Comment Summary?"))
+				if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Comments Summary - Delete", "Are you sure you want to delete the comments currently selected in the Comment Summary?"))
 				{
 					return null;
 				}

@@ -37,7 +37,7 @@ public class DeleteCommentHandler extends AbstractHandler {
 	 * Instance of PropertiesManager
 	 */
 	private PropertiesManager pm = PropertiesManager.getInstance();
-
+	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "\"Delete Comment in Editor\" triggered");
@@ -89,7 +89,7 @@ public class DeleteCommentHandler extends AbstractHandler {
 					Comment c = ra.getComment(reviewId, author, commentId);
 					
 					// ask
-					if (!MessageDialog.openConfirm(null, "Editor - Delete", "Are you sure you want to delete comment \""+tag+"\"?"))
+					if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Editor - Delete", "Are you sure you want to delete comment \""+tag+"\"?"))
 					{
 						return null;
 					}

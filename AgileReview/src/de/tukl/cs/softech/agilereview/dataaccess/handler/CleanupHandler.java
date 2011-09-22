@@ -65,10 +65,10 @@ public class CleanupHandler extends AbstractHandler {
 				pmd.close();
 			} catch (InvocationTargetException e) {
 				PluginLogger.logError(this.getClass().toString(),"execute", "InvocationTargetException", e);
-				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error while performing cleanup", "An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:1");
+				MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup", "An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:1");
 			} catch (InterruptedException e) {
 				PluginLogger.logError(this.getClass().toString(),"execute", "InterruptedException", e);
-				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error while performing cleanup", "An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:2");
+				MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup", "An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:2");
 			}			
 		}
 		

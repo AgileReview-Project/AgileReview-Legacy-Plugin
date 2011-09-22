@@ -9,6 +9,7 @@ import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
@@ -42,7 +43,7 @@ public class ActivateReviewHandler extends AbstractHandler {
 						MultipleReviewWrapper wrap = (MultipleReviewWrapper)o;
 						if (!PropertiesManager.getInstance().isReviewOpen(wrap.getReviewId()))
 						{
-							if (!MessageDialog.openConfirm(null, "Activate", "In order to activate a review, it has to be open. Do you want to open the selected review now?"))
+							if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Activate", "In order to activate a review, it has to be open. Do you want to open the selected review now?"))
 							{
 								// MessageDialog.openWarning(null, "Warning: Could not activate review", "Only open reviews can be activated");
 								PluginLogger.logWarning("ReviewExplorer", "activateSelectedReview", "Could not activate review: closed review is selected");

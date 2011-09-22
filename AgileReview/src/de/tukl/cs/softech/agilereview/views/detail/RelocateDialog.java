@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
@@ -135,12 +136,12 @@ public class RelocateDialog extends Composite implements Listener {
 								ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER | ViewControl.COMMMENT_TABLE_VIEW, true);
 								ctv.selectComment(newComment);
 							} else {
-								MessageDialog.openError(null, "Comment Detail - Repositioning", "You cannot relocate this comment as the currently opened editor is not yet supported!");
+								MessageDialog.openError(this.getShell(), "Comment Detail - Repositioning", "You cannot relocate this comment as the currently opened editor is not yet supported!");
 							}
 						}
 						
 					} else {
-						MessageDialog.openError(null, "Comment Detail - Repositioning", "You cannot relocate this comment as there is no editor opened at the moment!");
+						MessageDialog.openError(this.getShell(), "Comment Detail - Repositioning", "You cannot relocate this comment as there is no editor opened at the moment!");
 					}
 					
 				} catch (IOException e) {
@@ -148,7 +149,7 @@ public class RelocateDialog extends Composite implements Listener {
 				}
 				
 		} else {
-			MessageDialog.openError(null, "Comment Detail - Repositioning", "In oder to move a comment, the DetailView and the Comment Summary has to be opened!");
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "Comment Detail - Repositioning", "In oder to move a comment, the DetailView and the Comment Summary has to be opened!");
 		}
 	}
 

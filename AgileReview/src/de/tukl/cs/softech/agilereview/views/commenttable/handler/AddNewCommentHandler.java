@@ -7,6 +7,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -61,18 +62,18 @@ public class AddNewCommentHandler extends AbstractHandler {
 				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 			} else {
 				// no open editor
-				MessageDialog.openWarning(null, "Warning: No open file", "Please open a file in an editor before adding comments!");
+				MessageDialog.openWarning(HandlerUtil.getActiveShell(event), "Warning: No open file", "Please open a file in an editor before adding comments!");
 				PluginLogger.logWarning(this.getClass().toString(), "addNewComment", "No open editor!");
 			}
 		} else {
 			if (this.ra.getAllReviews().isEmpty()) {
-				MessageDialog.openInformation(null, "No reviews existent", "Please create a review before adding comments!");
+				MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "No reviews existent", "Please create a review before adding comments!");
 				NewReviewWizard wizard = new NewReviewWizard();
 				WizardDialog wd = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);
 				wd.setTitle(wizard.getWindowTitle());
 				wd.open();
 			} else {
-				MessageDialog.openInformation(null, "No active review", "Please activate a review before adding comments!");
+				MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "No active review", "Please activate a review before adding comments!");
 			}
 			PluginLogger.logWarning(this.getClass().toString(), "addNewComment", "No active review!");
 		}

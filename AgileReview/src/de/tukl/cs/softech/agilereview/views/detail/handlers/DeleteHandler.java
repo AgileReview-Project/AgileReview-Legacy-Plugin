@@ -7,6 +7,8 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
@@ -39,7 +41,7 @@ public class DeleteHandler extends AbstractHandler {
 		if(ViewControl.isOpen(DetailView.class)) {
 			Object o = DetailView.getInstance().getContent();	
 			if(o instanceof Review) {
-				if (!MessageDialog.openConfirm(null, "Review Details - Delete", "Are you sure you want to delete this review?"))
+				if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Review Details - Delete", "Are you sure you want to delete this review?"))
 				{
 					return null;
 				}
@@ -72,7 +74,7 @@ public class DeleteHandler extends AbstractHandler {
 				String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 				String commentTag = c.getReviewID()+keySeparator+c.getAuthor()+keySeparator+c.getId();
 				
-				if (!MessageDialog.openConfirm(null, "Comment Details - Delete", "Are you sure you want to delete comment \""+commentTag+"\"?"))
+				if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Comment Details - Delete", "Are you sure you want to delete comment \""+commentTag+"\"?"))
 				{
 					return null;
 				}
