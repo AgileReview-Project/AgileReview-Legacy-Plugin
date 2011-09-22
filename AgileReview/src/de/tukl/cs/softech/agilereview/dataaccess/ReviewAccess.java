@@ -269,8 +269,7 @@ public class ReviewAccess {
 			p.setDescription(projectDesc, null);// TODO: Use ProgressMonitor
 			return true;
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PluginLogger.logError(ReviewAccess.class.toString(), "createReviewProject", "CoreException while setting project natures", e);
 			return false;
 		}
 	}

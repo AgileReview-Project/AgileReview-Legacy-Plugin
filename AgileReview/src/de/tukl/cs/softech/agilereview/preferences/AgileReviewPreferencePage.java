@@ -147,7 +147,6 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	
 	// performApply() simply calls performOk (by default). As we need no additional behavior, we don't have to override it
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean performOk(){
 		boolean result = super.performOk();
