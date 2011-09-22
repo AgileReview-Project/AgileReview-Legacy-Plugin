@@ -125,4 +125,3 @@ public class CommentChooserDialog extends Composite implements Listener {
         }        
 	}
 }
-

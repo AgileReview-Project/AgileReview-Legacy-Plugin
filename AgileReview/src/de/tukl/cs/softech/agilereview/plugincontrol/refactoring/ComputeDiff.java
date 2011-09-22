@@ -2459,4 +2459,3 @@ public class ComputeDiff {
         .replace("%2C", ",").replace("%23", "#");
   }
 }
-

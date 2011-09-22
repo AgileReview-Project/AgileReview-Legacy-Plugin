@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.detail.handlers;/*?|0000008|Peter|c2|*/
+package de.tukl.cs.softech.agilereview.views.detail.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -19,4 +19,4 @@ public class RelocateHandler extends AbstractHandler {
 		}
 		return null;
 	}
-}/*|0000008|Peter|c2|?*/
+}

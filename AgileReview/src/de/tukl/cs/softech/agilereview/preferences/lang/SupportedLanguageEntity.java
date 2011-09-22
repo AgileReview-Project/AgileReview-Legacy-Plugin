@@ -38,7 +38,7 @@ public class SupportedLanguageEntity {
 	 * @param beginTag
 	 * @param endTag
 	 */
-	public SupportedLanguageEntity(String[] fileendings, String beginTag, String endTag) {/*?|3309698-preferenceslang|reuter|c0|?*/
+	public SupportedLanguageEntity(String[] fileendings, String beginTag, String endTag) {
 		this.fileendings = new TreeSet<String>(Arrays.asList(fileendings));
 		this.beginTag = beginTag;
 		this.endTag = endTag;
@@ -58,7 +58,7 @@ public class SupportedLanguageEntity {
 	 * Adds all passed file endings to this Entity
 	 * @param fileendings
 	 */
-	public void addFileendings(Set<String> fileendings) {/*?|3309698-preferenceslang|reuter|c1|?*/
+	public void addFileendings(Set<String> fileendings) {
 		for(String s : fileendings) {
 			if(!s.isEmpty()) {
 				this.fileendings.add(s);
@@ -70,7 +70,7 @@ public class SupportedLanguageEntity {
 	 * Returns all file endings in a {@link List}
 	 * @return a {@link List} of all file endings of this Entity
 	 */
-	public Set<String> getFileendings() {/*?|3309698-preferenceslang|reuter|c2|?*/
+	public Set<String> getFileendings() {
 		return fileendings;
 	}
 	
@@ -96,7 +96,7 @@ public class SupportedLanguageEntity {
 	 * Sets the file endings as a comma separated list
 	 * @param in a comma separated list of file endings
 	 */
-	void setFileendingsAsString(String in) {/*?|3309698-preferenceslang|reuter|c3|?*/
+	void setFileendingsAsString(String in) {
 		in = in.trim();
 		if(!in.isEmpty()) {
 			String[] endings = in.split(",");
@@ -147,7 +147,7 @@ public class SupportedLanguageEntity {
 	 * @return true, if this representation is empty<br>false, otherwise
 	 */
 	boolean isEmpty() {
-		return fileendings.isEmpty() && beginTag.isEmpty() && endTag.isEmpty();/*?|3309698-preferenceslang|reuter|c6|?*//*?|3309698-preferenceslang|reuter|c4|?*/
+		return fileendings.isEmpty() && beginTag.isEmpty() && endTag.isEmpty();
 	}
 	
 	/**
@@ -156,6 +156,6 @@ public class SupportedLanguageEntity {
 	 */
 	boolean isValid() {
 		return (beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||
-		(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty());/*?|3309698-preferenceslang|reuter|c7|?*//*?|3309698-preferenceslang|reuter|c5|?*/
+		(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty());
 	}
 }

@@ -15,14 +15,14 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-/*?|0000044|Peter|c0|*/
+
 /**
  * Not yet a generic class, which currently displays the following text: 
  * "Follow this link for downloading an example template."<br>The link opens a
  * new internal browser pointing to the download section of SourceForge
  * 
- *//*|0000044|Peter|c0|?*/
-public class LinkField extends FieldEditor implements Listener {/*?|0000044|Malte|c0|?*/
+ */
+public class LinkField extends FieldEditor implements Listener {
 	
 	/**
 	 * Label which contains the text and the link
@@ -80,17 +80,17 @@ public class LinkField extends FieldEditor implements Listener {/*?|0000044|Malt
 			try {
 				PlatformUI.getWorkbench().getBrowserSupport().createBrowser(null).openURL(
 						new URL(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
-			} catch (PartInitException e) {/*?|0000044|Peter|c2|*/
+			} catch (PartInitException e) {
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
 						"An Error occured while opening a new browser window (1)\n" +
 						"You can download the template manually on http://sourceforge.net/projects/agilereview/files/raw%20export%20templates/\n" +
-						"In oder to solve this bug, please contact us on agilereview.org");/*|0000044|Peter|c2|?*/
-			} catch (MalformedURLException e) {/*?|0000044|Peter|c1|*/
+						"In oder to solve this bug, please contact us on agilereview.org");
+			} catch (MalformedURLException e) {
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
 						"An Error occured while opening a new browser window (2)\n" +
 						"You can download the template manually on http://sourceforge.net/projects/agilereview/files/raw%20export%20templates/\n" +
 						"In oder to solve this bug, please contact us on agilereview.org");
-			}/*|0000044|Peter|c1|?*/
+			}
 		}
 	}
 }

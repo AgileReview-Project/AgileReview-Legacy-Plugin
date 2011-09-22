@@ -142,4 +142,3 @@ public class ReplyDialog extends Composite implements Listener {
     	getParent().dispose();
 	}
 }
-

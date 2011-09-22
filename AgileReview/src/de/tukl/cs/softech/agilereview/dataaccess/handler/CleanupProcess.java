@@ -115,7 +115,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 		if (deleteComments) {
 			monitor.subTask("Deleting comments...");
 			PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
-			ra.deleteComments(comments);/*?|0000026|Thilo|c4|?*/
+			ra.deleteComments(comments);
 		}
 		
 		monitor.worked(90);

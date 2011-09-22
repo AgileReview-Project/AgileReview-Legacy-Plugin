@@ -287,14 +287,14 @@ public class ReviewAccess {
 	// default non-static methods //
 	////////////////////////////////
 	
-	/*?|0000005+0000007|Peter|c4|*/
+	
 	/**
 	 * Returns the current active source folder
 	 * @return the current active source folder
 	 */
 	IProject getCurrentSourceFolder() {
 		return REVIEW_REPO_FOLDER;
-	}/*|0000005+0000007|Peter|c4|?*/
+	}
 	
 	
 	////////////////////////////////
@@ -321,7 +321,7 @@ public class ReviewAccess {
 				if (ReviewAccess.createAndOpenReviewProject(chosenProjectName)) {
 					loadReviewSourceProject(chosenProjectName);
 				}
-			}/*?|0000004 + 0000006|Malte|c0|?*/
+			}
 		}
 	}
 	
@@ -379,7 +379,7 @@ public class ReviewAccess {
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, p.getName());
 			// add active nature to new project
 			//TODO This should be when a decoration is available for active source folder 
-			setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});/*?|0000005+0000007|Peter|c2|?*/
+			setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});
 			// update decorator
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
@@ -660,16 +660,16 @@ public class ReviewAccess {
 		
 		// Remove xml nodes
 		cleanXmlPath(delCom);
-		IFile changedFile = ReviewAccess.createCommentFile(reviewId, author);/*?|0000026|Thilo|c3|*/
-		/*|0000026|Thilo|c3|?*/
+		IFile changedFile = ReviewAccess.createCommentFile(reviewId, author);
 		
-		// Remove from database and eventually from file system/*?|0000026|Malte|c0|*/
+		
+		// Remove from database and eventually from file system
 		if (this.rModel.removeComment(reviewId, author, commentId))
 		{
 			// Last comment of this author in this review has been deleted
 			// -> Remove from file system
 			this.rFileModel.removeXmlDocument(changedFile);
-		} else {/*|0000026|Malte|c0|?*/
+		} else {
 			// Thereare still comments in this file --> save the changes
 			try {
 				this.rFileModel.save(changedFile);
@@ -832,12 +832,12 @@ public class ReviewAccess {
 		// Create the folder for this review
 		ReviewAccess.createReviewFolder(reviewId);
 		
-		// Create the file/*?|0000026|Thilo|c5|*/
+		// Create the file
 		IFile revFile = ReviewAccess.createReviewFile(reviewId);
 		
 		// save new review file
 		this.rFileModel.addXmlDocument(revDoc, revFile);
-		this.rFileModel.save(revFile);/*|0000026|Thilo|c5|?*/
+		this.rFileModel.save(revFile);
 		
 		return result;
 	}
@@ -977,7 +977,7 @@ public class ReviewAccess {
 	 * Saves the current xmlBeans objects to files (all in model)
 	 * @param obj The object which changed (to determine which file has to be saved). Has to be a comment or a review
 	 */
-	public void save(XmlObject obj)/*?|0000026|Thilo|c0|*/
+	public void save(XmlObject obj)
 	{
 		// Determine the file of this comment
 		IFile file2save = null;
@@ -998,6 +998,6 @@ public class ReviewAccess {
 			PluginLogger.logError(this.getClass().toString(), "save", "IOException occured while trying to save to file "+file2save, e);
 		}
 		
-	}/*|0000026|Thilo|c0|?*/
+	}
 	
 }

@@ -128,7 +128,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 	@Override
 	protected void doStore() {
 		if(!checkValidity()) {
-			return;/*?|3309698-preferenceslang|reuter|c8|?*/
+			return;
 		}
 		//delete empty entities for saving issues
 		Iterator<SupportedLanguageEntity> it = cp.data.iterator();
@@ -218,7 +218,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 				}
 			}
 			cp.inputChanged(table, null, cp.data);
-			checkValidity();/*?|3309698-preferenceslang|reuter|c9|?*/
+			checkValidity();
 		}
 		parent.layout();
 	}

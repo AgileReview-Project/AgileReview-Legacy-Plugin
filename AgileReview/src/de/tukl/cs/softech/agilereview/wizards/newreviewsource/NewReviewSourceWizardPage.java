@@ -38,7 +38,7 @@ final class NewReviewSourceWizardPage extends WizardPage implements ModifyListen
 	/**
 	 * Specifies whether the user can choose if he wants to use the newly created AgileReview Source folder
 	 */
-	private boolean bFixUseDirectly;/*?|0000004 + 0000006|Malte|c9|?*/
+	private boolean bFixUseDirectly;
 
 	
 	/**
@@ -46,7 +46,7 @@ final class NewReviewSourceWizardPage extends WizardPage implements ModifyListen
 	 * @param useDirectlyInitial specifies whether the useDirectly check-box is initially selected or not
 	 * @param fixUseDirectly specifies whether the user can choose if he wants to use the newly created AgileReview Source folder
 	 */
-	NewReviewSourceWizardPage(boolean useDirectlyInitial, boolean fixUseDirectly) {/*?|0000004 + 0000006|Malte|c8|?*/
+	NewReviewSourceWizardPage(boolean useDirectlyInitial, boolean fixUseDirectly) {
 		super("New AgileReview Source Project");
 		setTitle("New AgileReview Source Project");
 		setDescription("This wizard creates a new AgileReview Source Project.");
@@ -115,7 +115,7 @@ final class NewReviewSourceWizardPage extends WizardPage implements ModifyListen
 
         String projectFieldContents = name.getText();
         if (projectFieldContents.equals("")) { //$NON-NLS-1$
-            setErrorMessage("Name for the new project can not be empty!");/*?|0000004 + 0000006|Malte|c10|?*/
+            setErrorMessage("Name for the new project can not be empty!");
             return false;
         }
 

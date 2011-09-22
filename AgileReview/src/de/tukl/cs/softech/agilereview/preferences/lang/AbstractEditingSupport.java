@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.preferences.lang;/*?|3309698-preferenceslang|reuter|c11|*/
+package de.tukl.cs.softech.agilereview.preferences.lang;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -41,4 +41,4 @@ public abstract class AbstractEditingSupport extends EditingSupport {
 		return true;
 	}
 
-}/*|3309698-preferenceslang|reuter|c11|?*/
+}

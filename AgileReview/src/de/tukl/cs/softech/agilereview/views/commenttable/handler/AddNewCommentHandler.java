@@ -57,7 +57,7 @@ public class AddNewCommentHandler extends AbstractHandler {
 					CommentTableView.getInstance().addComment(newComment);
 				}
 				// Save the new comment & Refresh the Review Explorer
-				ra.save(newComment);/*?|0000026|Thilo|c1|?*/
+				ra.save(newComment);
 				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 			} else {
 				// no open editor

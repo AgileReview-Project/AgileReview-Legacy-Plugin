@@ -86,8 +86,8 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * @param in the string which line breaks should be converted
 	 * @return the converted string
 	 */
-	protected String convertLineBreaks(String in) {/*?|0000035|Peter|c0|*/
-		return in.replaceAll("\r\n|\r|\n", System.getProperty("line.separator"));/*|0000035|Peter|c0|?*/
+	protected String convertLineBreaks(String in) {
+		return in.replaceAll("\r\n|\r|\n", System.getProperty("line.separator"));
 	}
 	
 	/**
@@ -122,8 +122,8 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 			
 			// save the change persistently
 			PluginLogger.log(this.getClass().toString(), "partClosedOrDeactivated", "trigger save event");
-			ReviewAccess.getInstance().save(this.editedObject);/*?|0000026|Thilo|c2|*/
-			ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW);/*|0000026|Thilo|c2|?*/
+			ReviewAccess.getInstance().save(this.editedObject);
+			ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW);
 						
 			this.backupObject = (E)this.editedObject.copy();
 

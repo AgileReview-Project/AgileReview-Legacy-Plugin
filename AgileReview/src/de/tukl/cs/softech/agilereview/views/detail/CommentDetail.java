@@ -109,13 +109,13 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    status.setText("Status: ");
 	    super.bgComponents.add(status);
 	    
-	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);/*?|0000020|smokie88|c0|*/
+	    statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.horizontalSpan = numColumns-1;
 	    statusDropDown.setLayoutData(gridData);
 	    statusDropDown.addFocusListener(this);
-	    statusDropDown.addModifyListener(this);/*|0000020|smokie88|c0|?*/
+	    statusDropDown.addModifyListener(this);
 	    super.bgComponents.add(statusDropDown);
 	    
 	    Label priority = new Label(this, SWT.PUSH);
@@ -144,7 +144,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    recipientText.addModifyListener(this);
 	    
 	    Sash sash = new Sash(this, SWT.PUSH);
-	    sash.setVisible(false);/*?|0000020|smokie88|c1|?*/
+	    sash.setVisible(false);
 	    
 	    Label caption = new Label(this, SWT.PUSH);
 	    gridData = new GridData();
@@ -278,7 +278,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * checks whether changes on the current Comment are made and saves this changes
 	 * @return true, if changes have been made<br> false, if no changes have been made
 	 */
-	private boolean attributesChanged() {/*?|0000035|Peter|c1|*/
+	private boolean attributesChanged() {
 		boolean result = false;
 		
 		//save replies before
@@ -335,7 +335,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		}
 
 		return result;
-	}/*|0000035|Peter|c1|?*/
+	}
 	
 	/**
 	 * Sets the levels for the status and priority configuration of a comment.

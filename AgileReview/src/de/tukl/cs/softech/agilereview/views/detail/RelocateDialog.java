@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.detail;/*?|0000008|Peter|c4|*/
+package de.tukl.cs.softech.agilereview.views.detail;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -163,4 +163,4 @@ public class RelocateDialog extends Composite implements Listener {
 			}
 		}
 	}
-}/*|0000008|Peter|c4|?*/
+}

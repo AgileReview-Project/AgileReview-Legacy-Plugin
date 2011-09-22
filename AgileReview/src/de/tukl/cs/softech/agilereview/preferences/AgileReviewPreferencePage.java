@@ -134,14 +134,14 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				"Default XLS export location:", getFieldEditorParent());
 		addField(directoryExportField);
 		
-		// export template file/*?|0000044|Peter|c3|*/
+		// export template file
 		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, 
 				"Default template for XLS export:", getFieldEditorParent());
 		fileExportTemplateField.setFileExtensions(new String[]{"*.xls*"});
 		addField(fileExportTemplateField);
 		
 		// link text
-		addField(new LinkField(getFieldEditorParent()));/*|0000044|Peter|c3|?*/
+		addField(new LinkField(getFieldEditorParent()));
 	}
 
 	

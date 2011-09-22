@@ -41,7 +41,7 @@ public class DetailView extends ViewPart {
 	/**
 	 * Static Field describing a view displaying the relocate dialog
 	 */
-	private static final int RELOCATE_DIALOG = 3;/*?|0000020|smokie88|c5|?*/
+	private static final int RELOCATE_DIALOG = 3;
 	
 	/**
 	 * The current shown UI (one of the defined static fields)
@@ -115,7 +115,7 @@ public class DetailView extends ViewPart {
 			String prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
 			String[] rgb = prop.split(",");
 			Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
-			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, color);/*?|0000020|smokie88|c6|?*/
+			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, color);
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
 			sp1.setVariable(SourceProvider.COMMENT_SHOWN, true);
@@ -126,7 +126,7 @@ public class DetailView extends ViewPart {
 			prop = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_REVIEW_COLOR);
 			rgb = prop.split(",");
 			color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
-			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, color);/*?|0000020|smokie88|c7|?*/
+			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, color);
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
 			sp1.setVariable(SourceProvider.COMMENT_SHOWN, false);
@@ -216,7 +216,7 @@ public class DetailView extends ViewPart {
 	 * Should only be called if the intended background of the view was changed by the user
 	 */
 	public void backgroundChanged() {
-		/*?|0000020|Thilo|c1|?*/
+		
 		if(currentDisplay == COMMENT_DETAIL) {
 			String prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
 			String[] rgb = prop.split(",");
@@ -278,7 +278,7 @@ public class DetailView extends ViewPart {
 	 * Reaction of selection changes in {@link CommentTableView} or {@link ReviewExplorer}
 	 * @param event will be forwarded from the {@link ViewControl}
 	 */
-	public void selectionChanged(SelectionChangedEvent event) {/*?|0000017|Peter Reuter|c0|*/
+	public void selectionChanged(SelectionChangedEvent event) {
 		if(event.getSelection().isEmpty()) {
 			this.changeParent(DetailView.EMPTY);
 		} else if(event.getSelection() instanceof IStructuredSelection) {
@@ -296,5 +296,5 @@ public class DetailView extends ViewPart {
 				((CommentDetail)this.currentParent).fillContents((Comment)e);
 			}
 		}
-	}/*|0000017|Peter Reuter|c0|?*/
+	}
 }

@@ -162,7 +162,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	public static void refreshViews(int flags, boolean refreshInputs) {
 		refreshViews(flags, false, refreshInputs);
 	}
-	/*?|0000020|Thilo|c0|*/
+	
 	/**
 	 * This function refreshes the views specified in the flags parameter.
 	 * Therefore use the public fields delivered by this class and combine them with the
@@ -172,7 +172,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * @param flags views which should be refreshed
 	 * @param validateExplorerSelection if true, the ReviewExplorers selection will be validated
 	 * @param refreshInputs if true, data of ReviewExplorer and CommentTableView will be freshly loaded
-	 *//*|0000020|Thilo|c0|?*/
+	 */
 	public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {
 		if((flags % 2 == 1) && isOpen(DetailView.class)) {
 			DetailView.getInstance().backgroundChanged();

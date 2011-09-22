@@ -27,7 +27,7 @@ public class Startup implements IStartup {
 		PluginLogger.log(this.getClass().toString(), "earlyStartup", "register executionListener & ResourceChangeListener");
 		((ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class)).addExecutionListener(executionListener);
 		// Attach a ResourceChangeListener to monitor the AgileReview Source project for close operation
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(new CloseProjectResourceListener(), IResourceChangeEvent.PRE_CLOSE /*?|0000005+0000007|Peter|c3|*/
-				| IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);/*|0000005+0000007|Peter|c3|?*/
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(new CloseProjectResourceListener(), IResourceChangeEvent.PRE_CLOSE 
+				| IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);
 	}
 }

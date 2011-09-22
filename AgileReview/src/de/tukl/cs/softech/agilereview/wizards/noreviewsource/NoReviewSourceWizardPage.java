@@ -64,7 +64,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 	/**
 	 * Creates a new page
 	 */
-	NoReviewSourceWizardPage() {/*?|0000004 + 0000006|Malte|c1|?*/
+	NoReviewSourceWizardPage() {
 		super("No Review Source Project");
 		setTitle("No Review Source Project");
 		setDescription("In order to use AgileReview a 'AgileReview Source Project' for storing your reviews is needed.");
@@ -160,22 +160,22 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 			}
 		}
 		
-		comboChooseProject.setItems(listOpenARProjects.toArray(new String[listOpenARProjects.size()]));/*?|0000004 + 0000006|Malte|c2|*/
-		comboClosedProjects.setItems(listClosedARProjects.toArray(new String[listClosedARProjects.size()]));/*|0000004 + 0000006|Malte|c2|?*/
+		comboChooseProject.setItems(listOpenARProjects.toArray(new String[listOpenARProjects.size()]));
+		comboClosedProjects.setItems(listClosedARProjects.toArray(new String[listClosedARProjects.size()]));
 		
 		// Select the preferred Project
 		if (prefProject != null) {
 			String [] items = comboChooseProject.getItems();
 			for (int i=0;i<items.length;i++) {
 				if (items[i].equals(prefProject)) {
-					comboChooseProject.select(i);/*?|0000004 + 0000006|Malte|c3|?*/
+					comboChooseProject.select(i);
 					break;
 				}
 			}
 		}
-//		if (comboChooseProject.getSelectionIndex() == -1) {/*?|0000004 + 0000006|Malte|c4|*/
+//		if (comboChooseProject.getSelectionIndex() == -1) {
 //			comboChooseProject.select(0);
-//		}/*|0000004 + 0000006|Malte|c4|?*/
+//		}
 		
 		comboChooseProject.pack();
 		comboClosedProjects.pack();
@@ -191,7 +191,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
     private boolean validatePage() {
         String projectFieldContents = comboChooseProject.getText();
         if (projectFieldContents.isEmpty()) { //$NON-NLS-1$
-            setErrorMessage("Please select a AgileReview Source Folder to use");/*?|0000004 + 0000006|Malte|c5|?*/
+            setErrorMessage("Please select a AgileReview Source Folder to use");
             return false;
         }
 
@@ -202,12 +202,12 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 	
 	@Override
 	public void handleEvent(Event event) {
-		if (event.widget == btOpenClosed) {/*?|0000004 + 0000006|Malte|c7|?*/
+		if (event.widget == btOpenClosed) {
 			if (comboClosedProjects.getSelectionIndex() != -1){
 				IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 				IProject p = workspaceRoot.getProject(comboClosedProjects.getText());
 				try {
-					// TODO: use ProgressMonitor here/*?|0000004 + 0000006|Malte|c6|?*/
+					// TODO: use ProgressMonitor here
 					p.open(null);
 					while (!p.isOpen()) {}
 					updateComboBoxes(p.getName());

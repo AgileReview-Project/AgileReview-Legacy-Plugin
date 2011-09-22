@@ -134,7 +134,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		browseButton.addSelectionListener(this);
 		browseButton.setLayoutData(bGD);
 		
-		// ui elements for template selection/*?|0000044|Peter|c4|*/
+		// ui elements for template selection
 		Label templateLabel = new Label(container, SWT.NULL);
 		templateLabel.setText("Template for XLS export:");
 		
@@ -159,7 +159,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 		label.setText("Follow this <a>link</a> for downloading an example template.");
 		label.setLayoutData(rlGD);
 		label.setData("exampleTemplates");
-		label.addListener(SWT.Selection, this);/*|0000044|Peter|c4|?*/
+		label.addListener(SWT.Selection, this);
 		
 		//check save as default button
 		rlGD = new GridData(GridData.FILL_HORIZONTAL);
@@ -379,7 +379,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 			try {
 				PlatformUI.getWorkbench().getBrowserSupport().createBrowser(null).openURL(
 						new URL(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
-			} catch (PartInitException e) {/*?|0000044|Peter|c5|*/
+			} catch (PartInitException e) {
 				MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Error occured",
 						"An Error occured while opening a new browser window (1)\n" +
 						"You can download the template manually on http://sourceforge.net/projects/agilereview/files/raw%20export%20templates/\n" +
@@ -389,7 +389,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 						"An Error occured while opening a new browser window (2)\n" +
 						"You can download the template manually on http://sourceforge.net/projects/agilereview/files/raw%20export%20templates/\n" +
 						"In oder to solve this bug, please contact us on agilereview.org");
-			}/*|0000044|Peter|c5|?*/
+			}
 		}
 	}
 }

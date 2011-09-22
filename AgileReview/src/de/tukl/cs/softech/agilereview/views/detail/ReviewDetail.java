@@ -94,21 +94,21 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    refId.setText("External reference: ");
 	    super.bgComponents.add(refId);
 	    
-	    reference = new Text(this, SWT.BORDER | SWT.SINGLE );/*?|0000020|smokie88|c2|*/
+	    reference = new Text(this, SWT.BORDER | SWT.SINGLE );
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.grabExcessHorizontalSpace = true;
 	    gridData.horizontalSpan = numColumns-2;
 	    reference.setLayoutData(gridData);
-	    reference.addFocusListener(this);/*|0000020|smokie88|c2|?*/
+	    reference.addFocusListener(this);
 	    
-	    referenceButton = new Button(this, SWT.PUSH );/*?|0000020|smokie88|c3|*/
+	    referenceButton = new Button(this, SWT.PUSH );
 	    referenceButton.setImage(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons"+System.getProperty("file.separator")+"discovery.gif").createImage());
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.END;
 	    referenceButton.setLayoutData(gridData);
 	    referenceButton.addSelectionListener(this);
-	    referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");/*|0000020|smokie88|c3|?*/
+	    referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");
 	    super.bgComponents.add(referenceButton);
 	    
 	    Label author = new Label(this, SWT.PUSH);
@@ -136,8 +136,8 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    statusDropDown.addModifyListener(this);
 	    super.bgComponents.add(statusDropDown);
 	    
-	    Sash sash = new Sash(this, SWT.PUSH);/*?|0000020|smokie88|c4|*/
-	    sash.setVisible(false);/*|0000020|smokie88|c4|?*/
+	    Sash sash = new Sash(this, SWT.PUSH);
+	    sash.setVisible(false);
 	    
 	    Label caption = new Label(this, SWT.PUSH);
 	    gridData = new GridData();
@@ -184,7 +184,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 			this.editedObject.setStatus(this.statusDropDown.getSelectionIndex());
 			result = true;
 		} else if(!(newStr = this.txt.getText().trim()).equals(this.editedObject.getDescription())) {
-			this.editedObject.setDescription(super.convertLineBreaks(newStr));/*?|0000035|Peter|c2|?*/
+			this.editedObject.setDescription(super.convertLineBreaks(newStr));
 			result = true;
 		}
 		return result;
