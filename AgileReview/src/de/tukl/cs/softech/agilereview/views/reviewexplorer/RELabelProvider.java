@@ -28,7 +28,7 @@ class RELabelProvider extends ColumnLabelProvider {
 	/**
 	 * Standard grey color for displaying not exisitng resources
 	 */
-	private Color grey = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+	private Color grey = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 	
 	/**
 	 * Empty Constructor

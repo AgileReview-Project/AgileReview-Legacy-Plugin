@@ -310,7 +310,7 @@ public class AnnotationParser implements IAnnotationParser {
 			if (newLines[0]!=-1 || newLines[1]!=-1) {
 				PluginLogger.log(this.getClass().toString(), "addTagsInDocument", "Selection for inserting tags needs to be adapted, performing adaptation.");
 				// inform user
-				MessageDialog.openWarning(Display.getCurrent().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
+				MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
 				// adapt startline if necessary
 				selStartLine = (newLines[0]==-1) ? selStartLine : newLines[0];
 				// adapt endline if necessary

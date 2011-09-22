@@ -80,7 +80,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * Creates a new instance of ViewControl
 	 */
 	private ViewControl() {
-		Display.getCurrent().asyncExec(new Runnable() {
+		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				//wait until the active page is created, then register all listeners

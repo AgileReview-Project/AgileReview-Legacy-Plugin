@@ -60,7 +60,7 @@ public class ShowCommentHandler extends AbstractHandler {
 					    shell.pack();
 					    shell.open();
 						while (!shell.isDisposed()) {
-							if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
+							if (!Display.getDefault().readAndDispatch()) Display.getDefault().sleep();
 					    }
 						
 						if(dialog.getSaved()) {

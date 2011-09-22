@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
@@ -59,7 +60,7 @@ class ReviewFileModel {
 		try {
 			delFile.delete(true, null);
 		} catch (CoreException e) {
-			MessageDialog.openWarning(null, "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
+			MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
 			System.out.println("File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
 		}
 	}

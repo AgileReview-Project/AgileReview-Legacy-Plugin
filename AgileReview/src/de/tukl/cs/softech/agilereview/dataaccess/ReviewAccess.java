@@ -353,7 +353,7 @@ public class ReviewAccess {
 			if(REVIEW_REPO_FOLDER.exists() && REVIEW_REPO_FOLDER.isOpen()) {
 				setProjectNatures(REVIEW_REPO_FOLDER, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
 				// update decorator
-				Display.getCurrent().asyncExec(new Runnable() {
+				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
 						while(PlatformUI.getWorkbench() == null) {}
