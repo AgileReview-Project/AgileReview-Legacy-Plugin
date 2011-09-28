@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -80,18 +81,23 @@ public class TagCleaner {
 				// read file line by line, replace tags
 				String input = "";						
 				String line = br.readLine();
+				boolean changedFile = false;
 				while (line != null) {
 					String searchRegex = Pattern.quote(beginTag)+identifierRegex+Pattern.quote(endTag);
+					if (line.matches(".*"+searchRegex+".*")) {
+						changedFile = true;
+					}
 					input += line.replaceAll(searchRegex, "");
 					line = br.readLine();
 					// append new line chars if not last line
 					input += line!=null ? System.getProperty("line.separator") : "";
 				}
-	
-				// write modified content to file
-				byte[] bytes = input.getBytes();
-				InputStream source = new ByteArrayInputStream(bytes);
-				file.setContents(source, false, true, null);
+				if (changedFile) {
+					// write modified content to file
+					byte[] bytes = input.getBytes();
+					InputStream source = new ByteArrayInputStream(bytes);
+					file.setContents(source, false, true, null);
+				}
 			
 			} catch (CoreException e) {
 				PluginLogger.logError(TagCleaner.class.toString(), "execute", "CoreException while trying to remove tags.", e);
