@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
@@ -55,13 +56,19 @@ class ReviewFileModel {
 	 * Deletes the given file
 	 * @param delFile
 	 */
-	private void deleteResource(IResource delFile)
+	private void deleteResource(final IResource delFile)
 	{
 		try {
 			delFile.delete(true, null);
 		} catch (CoreException e) {
-			MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
-			System.out.println("File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
+			Display.getDefault().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
+				}
+			});
+			PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted", e);
 		}
 	}
 	
