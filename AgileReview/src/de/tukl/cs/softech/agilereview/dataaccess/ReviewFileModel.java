@@ -14,10 +14,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
-import de.tukl.cs.softech.agilereview.tools.PluginLogger;
-
 import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.ReviewDocument;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
  * Model which holds the files in which the comments and reviews are stored and provides saving functions
@@ -55,13 +54,19 @@ class ReviewFileModel {
 	 * Deletes the given file
 	 * @param delFile
 	 */
-	private void deleteResource(IResource delFile)
+	private void deleteResource(final IResource delFile)
 	{
 		try {
 			delFile.delete(true, null);
 		} catch (CoreException e) {
-			MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
-			System.out.println("File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
+			Display.getDefault().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
+				}
+			});
+			PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted", e);
 		}
 	}
 	
