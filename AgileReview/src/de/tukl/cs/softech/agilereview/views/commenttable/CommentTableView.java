@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import net.sf.saxon.instruct.Message;
+
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -35,6 +38,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -606,9 +610,18 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		PluginLogger.log(this.getClass().toString(), "openEditor", "Opening editor for the given comment");
 		IPath path = new Path(ReviewAccess.computePath(comment));
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		
+		if(!file.exists()) {
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "File not found!", "The file "+file.getFullPath()+" could not be found!");
+		}
+		
 		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 		try {
-			getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
+			if(desc == null) {
+				getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), "org.eclipse.ui.DefaultTextEditor");
+			} else {
+				getSite().getPage().openEditor((IEditorInput) new FileEditorInput(file), desc.getId());
+			}
 		} catch (PartInitException e) {
 			PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
 		}
