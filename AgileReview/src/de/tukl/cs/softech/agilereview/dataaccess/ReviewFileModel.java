@@ -11,14 +11,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
-import de.tukl.cs.softech.agilereview.tools.PluginLogger;
-
 import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.ReviewDocument;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
  * Model which holds the files in which the comments and reviews are stored and provides saving functions
