@@ -313,16 +313,29 @@ public class AnnotationParser implements IAnnotationParser {
 				// adapt startline if necessary
 				boolean[] significantlyChanged = new boolean[]{false, false};
 				if(newLines[0]!=-1) {
-					if(selStartLine - newLines[0] > 1) {
-						significantlyChanged[0] = true;
+					significantlyChanged[0] = true;
+					int newStartLineOffset = document.getLineOffset(newLines[0]);
+					int newStartLineLength = document.getLineLength(newLines[0]);
+					//insert new line if code is in front of javadoc / multi line comments
+					if(!document.get(newStartLineOffset, newStartLineLength).trim().isEmpty()) {
+						document.replace(newStartLineOffset+newStartLineLength, 0, System.getProperty("line.separator"));
 					}
-					selStartLine = newLines[0];
+					selStartLine = newLines[0]+1;
 				}
 				
 				// adapt endline if necessary
-				if(newLines[1]!=-1) {
-					selEndLine = newLines[1];
-					significantlyChanged[1] = true;
+				if(significantlyChanged[0]) {
+					if(newLines[1]!=-1) {
+						selEndLine = newLines[1]+1;
+						significantlyChanged[1] = true;
+					} else {
+						selEndLine++;
+					}
+				} else {
+					if(newLines[1]!=-1) {
+						selEndLine = newLines[1];
+						significantlyChanged[1] = true;
+					}
 				}
 				
 				if(significantlyChanged[0] || significantlyChanged[1]) {
