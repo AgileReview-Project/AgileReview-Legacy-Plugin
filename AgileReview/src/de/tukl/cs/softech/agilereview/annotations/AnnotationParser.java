@@ -309,12 +309,27 @@ public class AnnotationParser implements IAnnotationParser {
 			int[] newLines = computeSelectionAdapations(selStartLine, selEndLine);
 			if (newLines[0]!=-1 || newLines[1]!=-1) {
 				PluginLogger.log(this.getClass().toString(), "addTagsInDocument", "Selection for inserting tags needs to be adapted, performing adaptation.");
-				// inform user
-				MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
+				
 				// adapt startline if necessary
-				selStartLine = (newLines[0]==-1) ? selStartLine : newLines[0];
+				boolean[] significantlyChanged = new boolean[]{false, false};
+				if(newLines[0]!=-1) {
+					if(selStartLine - newLines[0] > 1) {
+						significantlyChanged[0] = true;
+					}
+					selStartLine = newLines[0];
+				}
+				
 				// adapt endline if necessary
-				selEndLine = (newLines[1]==-1) ? selEndLine : newLines[1];
+				if(newLines[1]!=-1) {
+					selEndLine = newLines[1];
+					significantlyChanged[1] = true;
+				}
+				
+				if(significantlyChanged[0] || significantlyChanged[1]) {
+					// inform user
+					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
+				}
+				
 				// compute new selection
 				int offset = document.getLineOffset(selStartLine);
 				int length = document.getLineOffset(selEndLine)-document.getLineOffset(selStartLine)+document.getLineLength(selEndLine);
