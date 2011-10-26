@@ -40,6 +40,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.RefactoringAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ComputeDiff.Diff;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
  * Refactoring participant for move issues. This participant assures the synchronous refactoring of the comment storage
@@ -89,19 +90,20 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	protected boolean initialize(Object element) {
 		try {
 			ra = new RefactoringAccess();
+			addRefactoringIssue(element, getArguments());
 		} catch (XmlException e) {/*?|r68|Peter Reuter|c0|*/
 			errorWhileInitialization = 1;
+			PluginLogger.logError(getClass().toString(), "initialize", e.getLocalizedMessage(), e);
 			return true;
 		} catch (IOException e) {
+			PluginLogger.logError(getClass().toString(), "initialize", e.getLocalizedMessage(), e);
 			errorWhileInitialization = 2;
 			return true;
 		}/*|r68|Peter Reuter|c0|?*/
 		
-		addRefactoringIssue(element, getArguments());
-		
 		if(errorWhileInitialization != 0) {
 			//participate and display the error as otherwise the agile review files will be corrupted
-			return true;/*?|r68|Peter Reuter|c1|?*/
+			return true;
 		}
 		
 		if(affectedFiles.isEmpty()) {
@@ -226,7 +228,8 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	public RefactoringStatus checkConditions(IProgressMonitor pm, CheckConditionsContext context) throws OperationCanceledException {
 		//when an error occurred during the initialization, abort the refactoring process
 		if(errorWhileInitialization != 0) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+")"));/*?|r68|Peter Reuter|c3|?*/
+			PluginLogger.logWarning(getClass().toString(), "checkConditions", "An error occured during initialization");
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+")  Continuing will corrupt AgileReview Comments!"));/*?|r68|Peter Reuter|c3|?*/
 		}
 		
 		ResourceChangeChecker checker = (ResourceChangeChecker) context.getChecker(ResourceChangeChecker.class);
@@ -240,7 +243,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 						if(!f.isReadOnly() && f.isAccessible()) {
 							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
 						} else {
-							return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, f.getLocation()+" is not accessible."));/*?|r68|Peter Reuter|c4|?*/
+							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));/*?|r68|Peter Reuter|c4|?*/
 						}
 					}
 				});
@@ -257,9 +260,9 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 				postDocs = ra.getPostDocumentsOfRefactoring(oldPath.get(i), newPath.get(i), type.get(i), moveSubfolders.get(i));
 			}
 		} catch (IOException e) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (1)"));
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (XI)  Continuing will corrupt AgileReview Comments!"));
 		} catch (XmlException e) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (2)"));
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (XII)  Continuing will corrupt AgileReview Comments!"));
 		}
 		
 		return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, "AgileReview refactoring conditions valid."));

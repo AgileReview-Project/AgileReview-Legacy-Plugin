@@ -40,6 +40,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.RefactoringAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ComputeDiff.Diff;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
  * Refactoring participant for rename issues. This participant assures the synchronous refactoring of the comment storage
@@ -212,6 +213,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 	public RefactoringStatus checkConditions(IProgressMonitor pm, CheckConditionsContext context) throws OperationCanceledException {
 		//when an error occurred during the initialization, abort the refactoring process
 		if(errorWhileInitialization != 0) {
+			PluginLogger.logWarning(getClass().toString(), "checkConditions", "An error occured during initialization");
 			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+")"));
 		}
 		
@@ -226,7 +228,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 						if(!f.isReadOnly() && f.isAccessible()) {
 							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
 						} else {
-							return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, f.getLocation()+" is not accessible."));
+							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible."));
 						}
 					}
 				});
@@ -241,9 +243,9 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			//do refactoring
 			postDocs = ra.getPostDocumentsOfRefactoring(oldPath, newPath, type, renameSubpackages);
 		} catch (IOException e) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (1)"));
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (1)"));
 		} catch (XmlException e) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (2)"));
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (2)"));
 		}
 		
 		return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, "AgileReview refactoring conditions valid."));
