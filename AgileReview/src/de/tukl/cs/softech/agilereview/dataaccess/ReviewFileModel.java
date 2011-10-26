@@ -63,7 +63,8 @@ class ReviewFileModel {
 				
 				@Override
 				public void run() {
-					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
+					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted.\n" +
+							"This may lead to malfuntioning of AgileReview. Please delete the file manually.");
 				}
 			});
 			PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted", e);
@@ -115,7 +116,7 @@ class ReviewFileModel {
 						this.removeXmlDocument((IFile)f);
 					}
 				} catch (CoreException e) {
-					PluginLogger.logError(ReviewAccess.class.toString(), "removeXmlDocument", "CoreException while removing "+file.getLocation().toOSString()+" from model", e);
+					PluginLogger.logError(this.getClass().toString(), "removeXmlDocument", "CoreException while removing sibling files of "+file.getLocation().toOSString()+" from model", e);
 				}
 
 				// Delete the folder afterwards

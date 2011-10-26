@@ -147,8 +147,9 @@ public class RefactoringAccess {
 				// move all children of old node to new node
 				for (int i=0; i<xPathResultCopy.length;i++) {
 					// copy object to new location
-					xPathResultCopy[i].newCursor().copyXml(newC);
-					
+					XmlCursor x = xPathResultCopy[i].newCursor();
+					x.copyXml(newC);
+					x.dispose();
 					// new node is no longer empty
 					newIsEmpty = false;
 				}

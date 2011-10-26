@@ -670,7 +670,7 @@ public class ReviewAccess {
 			// -> Remove from file system
 			this.rFileModel.removeXmlDocument(changedFile);
 		} else {
-			// Thereare still comments in this file --> save the changes
+			// There are still comments in this file --> save the changes
 			try {
 				this.rFileModel.save(changedFile);
 			} catch (IOException e) {
