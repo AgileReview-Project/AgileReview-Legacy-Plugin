@@ -89,19 +89,19 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	protected boolean initialize(Object element) {
 		try {
 			ra = new RefactoringAccess();
-		} catch (XmlException e) {
+		} catch (XmlException e) {/*?|r68|Peter Reuter|c0|*/
 			errorWhileInitialization = 1;
 			return true;
 		} catch (IOException e) {
 			errorWhileInitialization = 2;
 			return true;
-		}
+		}/*|r68|Peter Reuter|c0|?*/
 		
 		addRefactoringIssue(element, getArguments());
 		
 		if(errorWhileInitialization != 0) {
 			//participate and display the error as otherwise the agile review files will be corrupted
-			return true;
+			return true;/*?|r68|Peter Reuter|c1|?*/
 		}
 		
 		if(affectedFiles.isEmpty()) {
@@ -136,7 +136,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 		} else if(mArguments.getDestination() instanceof IResource) {
 			dest = (IResource) mArguments.getDestination();
 		} else {
-			errorWhileInitialization = 7;
+			errorWhileInitialization = 7;/*?|r68|Peter Reuter|c2|?*/
 			return;
 		}
 		
@@ -226,7 +226,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	public RefactoringStatus checkConditions(IProgressMonitor pm, CheckConditionsContext context) throws OperationCanceledException {
 		//when an error occurred during the initialization, abort the refactoring process
 		if(errorWhileInitialization != 0) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+")"));
+			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+")"));/*?|r68|Peter Reuter|c3|?*/
 		}
 		
 		ResourceChangeChecker checker = (ResourceChangeChecker) context.getChecker(ResourceChangeChecker.class);
@@ -240,7 +240,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 						if(!f.isReadOnly() && f.isAccessible()) {
 							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
 						} else {
-							return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, f.getLocation()+" is not accessible."));
+							return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, f.getLocation()+" is not accessible."));/*?|r68|Peter Reuter|c4|?*/
 						}
 					}
 				});
@@ -278,7 +278,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			
 			if(change != null) {
 				//if there are already changes in this file, do not touch it
-				return null;
+				return null;/*?|r68|Peter Reuter|c5|?*/
 			}
 			
 			change = new TextFileChange(f.getName(), f);
