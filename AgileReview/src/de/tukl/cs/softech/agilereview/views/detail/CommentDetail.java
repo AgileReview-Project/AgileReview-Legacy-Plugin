@@ -26,6 +26,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReplyDocument.Reply;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * The CommentDetail class describes one detail representation of a Comment Object
@@ -245,6 +246,26 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
 		sp.setVariable(SourceProvider.REVERTABLE, false);
+		
+		setBackgroundColor();
+	}
+
+	/**
+	 * Sets this view's background color to the color of the comment
+	 * @return the background color
+	 */
+	Color setBackgroundColor() {
+		Integer authorNumber = ViewControl.getInstance().getAuthorNumber(this.editedObject);
+		String prop;
+		if (authorNumber==null || authorNumber>9) {
+			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
+		} else {
+			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[authorNumber]);
+		}
+		String[] rgb = prop.split(",");
+		Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])); 
+		this.changeBackgroundColor(color);
+		return color;
 	}
 	
 	/*
