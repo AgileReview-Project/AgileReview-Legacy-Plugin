@@ -20,6 +20,8 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.ViewPart;
 
+import agileReview.softech.tukl.de.CommentDocument.Comment;
+
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -429,5 +431,13 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	@Override
 	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
 		// PluginLogger.log(this.getClass().toString(), "perspectiveSavedAs", oldPerspective.getLabel()+"-->"+newPerspective.getLabel());
+	}
+	
+	public Integer getAuthorNumber(Comment c) {
+		Integer authorNumber = null;
+		if(isOpen(CommentTableView.class)) {
+			authorNumber = CommentTableView.getInstance().getAuthorNumber(c);
+		}
+		return authorNumber;
 	}
 }

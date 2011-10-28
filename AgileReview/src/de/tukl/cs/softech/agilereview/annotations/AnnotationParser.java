@@ -59,7 +59,6 @@ public class AnnotationParser implements IAnnotationParser {
 	 * Path of the file this parser represents
 	 */
 	private String path;
-	
 	/**
 	 * Regular Expression used by this instance
 	 */
@@ -92,6 +91,10 @@ public class AnnotationParser implements IAnnotationParser {
 	 * Annotation model for this parser
 	 */
 	private AgileAnnotationController annotationModel;
+	/**
+	 * Authors that commented this file
+	 */
+	private HashMap<String, Integer> authors = new HashMap<String, Integer>();
 
 	/**
 	 * Creates a new instance of AnnotationParser with the given input
@@ -240,7 +243,12 @@ public class AnnotationParser implements IAnnotationParser {
 		HashMap<Position, String> toDisplay = new HashMap<Position, String>();
 		for(String s : idPositionMap.keySet()) {
 			toDisplay.put(idPositionMap.get(s), s);
+			String author = s.split("\\|")[1];
+			if (!this.authors.containsKey(author)) {
+				this.authors.put(author, this.authors.size());				
+			}
 		}
+		this.annotationModel.setAuthors(this.authors);
 
 		// Save the current document to save the tags
 		try {
@@ -554,5 +562,9 @@ public class AnnotationParser implements IAnnotationParser {
 	 */
 	public String[] getCommentsByPosition(Position p) {
 		return this.annotationModel.getCommentsByPosition(p);
+	}
+
+	public HashMap<String, Integer> getAuthors() {
+		return authors;
 	}
 }

@@ -1,5 +1,6 @@
 package de.tukl.cs.softech.agilereview.annotations;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,6 +50,11 @@ public class NullParser implements IAnnotationParser {
 	@Override
 	public String[] getCommentsByPosition(Position p) {
 		return new String[]{};
+	}
+
+	@Override
+	public HashMap<String, Integer> getAuthors() {
+		return null;
 	}
 
 }

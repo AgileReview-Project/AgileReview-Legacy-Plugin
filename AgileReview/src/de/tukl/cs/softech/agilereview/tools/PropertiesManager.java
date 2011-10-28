@@ -55,12 +55,22 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String REVIEW_STATUS = "review_status";
 		/**
-		 * Default color of AgileReview annotations
+		 * Default color of standard AgileReview annotations
 		 */
 		public static String DEFAULT_ANNOTATION_COLOR = "annotations.default.color";
 		/**
-		 * Default color of Reviews
+		 * Default color of AgileReview annotations for author 1
 		 */
+		public static String[] DEFAULT_ANNOTATION_COLORS_AUTHOR = new String[]{"annotations.default.color.author0",
+																			   "annotations.default.color.author1",
+																			   "annotations.default.color.author2",
+																			   "annotations.default.color.author3",
+																			   "annotations.default.color.author4",
+																			   "annotations.default.color.author5",
+																			   "annotations.default.color.author6",
+																			   "annotations.default.color.author7",
+																			   "annotations.default.color.author8",
+																			   "annotations.default.color.author9"};
 		public static String DEFAULT_REVIEW_COLOR = "review.default.color";
 		/**
 		 * Message the display when saving a reply on a comment, without all fields filled out
@@ -162,6 +172,19 @@ public class PropertiesManager implements IInputValidator{
 		 * The color of the annotations
 		 */
 		public static String ANNOTATION_COLOR = "annotationColor";
+		/**
+		 * Default color of AgileReview annotations for author 1
+		 */
+		public static String[] ANNOTATION_COLORS_AUTHOR = new String[]{"annotationColorAuthor0",
+																	   "annotationColorAuthor1",
+																	   "annotationColorAuthor2",
+																	   "annotationColorAuthor3",
+																	   "annotationColorAuthor4",
+																	   "annotationColorAuthor5",
+																	   "annotationColorAuthor6",
+																	   "annotationColorAuthor7",
+																	   "annotationColorAuthor8",
+																	   "annotationColorAuthor9"};
 		/**
 		 * The path for the export template
 		 */

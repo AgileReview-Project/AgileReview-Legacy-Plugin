@@ -35,6 +35,10 @@ public class AgileAnnotationController {
 	 * The annotations added by AgileReview to the editor's annotation model 
 	 */
 	private HashMap<String, Annotation> annotationMap = new HashMap<String, Annotation>();
+	/**
+	 * Authors that commented the underlying resource
+	 */
+	private HashMap<String, Integer> authors;
 	
 	/**
 	 * Creates a new AgileAnnotationModel
@@ -136,9 +140,20 @@ public class AgileAnnotationController {
 	 * @return created annotation
 	 */
 	private Annotation createNewAnnotation(String commentKey) {
+		String author = commentKey.split("\\|")[1];
+		String annotationType;
+		if (this.authors==null || this.authors.get(author)==null || this.authors.get(author)>9) {
+			annotationType = "AgileReview.comment.annotation";
+		} else {
+			annotationType = "AgileReview.comment.annotation.author"+this.authors.get(author);
+		}
 		String[] commentData = commentKey.split(Pattern.quote(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
-		Annotation annotation = new Annotation("AgileReview.comment.annotation", true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);
+		Annotation annotation = new Annotation(annotationType, true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);
 		this.annotationMap.put(commentKey, annotation);
 		return annotation;
+	}
+
+	public void setAuthors(HashMap<String, Integer> authors) {
+		this.authors = authors;
 	}
 }

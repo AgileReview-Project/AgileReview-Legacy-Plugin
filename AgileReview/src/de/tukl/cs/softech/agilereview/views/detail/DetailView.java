@@ -294,6 +294,17 @@ public class DetailView extends ViewPart {
 					this.changeParent(DetailView.COMMENT_DETAIL);
 				}
 				((CommentDetail)this.currentParent).fillContents((Comment)e);
+				Integer authorNumber = ViewControl.getInstance().getAuthorNumber((Comment)e);
+				System.out.println("Autho number: "+authorNumber);
+				String prop;
+				if (authorNumber==null || authorNumber>9) {
+					prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
+				} else {
+					prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[authorNumber]);
+				}
+				String[] rgb = prop.split(",");
+				Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])); 
+				((CommentDetail)this.currentParent).changeBackgroundColor(color);
 			}
 		}
 	}

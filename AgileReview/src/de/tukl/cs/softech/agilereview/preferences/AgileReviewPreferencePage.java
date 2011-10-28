@@ -119,8 +119,14 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				"review source project:", vals,getFieldEditorParent());
 		addField(comboReviewProjectField);
 		
-		// colorfieldeditor for annotations-color
-		colorAnnotationField = new ColorFieldEditor (PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "commentcolor:",
+		// colorfieldeditors for annotations-colors
+		for (int i=0;i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length;i++) {
+			ColorFieldEditor authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i], "Comment color (Author "+(i+1)+"):",
+		            getFieldEditorParent());
+			addField(authorColorAnnotationField);
+		}
+		
+		colorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "Comment color (others):",
 	            getFieldEditorParent());
 		addField(colorAnnotationField);
 		
@@ -151,6 +157,9 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	public boolean performOk(){
 		boolean result = super.performOk();
 		new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
+		for (int i=0; i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length; i++) {
+			new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation_Author"+i, PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i]));			
+		}
 		if (ReviewAccess.getInstance().updateReviewSourceProject()) {
 			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
 		} else {
