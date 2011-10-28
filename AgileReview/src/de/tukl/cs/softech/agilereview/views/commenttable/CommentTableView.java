@@ -931,7 +931,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			IEditorInput input = editor.getEditorInput();
 			IPath filePath = ResourceUtil.getFile(input).getFullPath();
 			if (filePath.toOSString().equals("/"+path)) {
-				System.out.println(this.parserMap.get(editor).getAuthors().get(c.getAuthor()));
 				return this.parserMap.get(editor).getAuthors().get(c.getAuthor());
 			}
 		}

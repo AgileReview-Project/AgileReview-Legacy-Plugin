@@ -295,7 +295,6 @@ public class DetailView extends ViewPart {
 				}
 				((CommentDetail)this.currentParent).fillContents((Comment)e);
 				Integer authorNumber = ViewControl.getInstance().getAuthorNumber((Comment)e);
-				System.out.println("Autho number: "+authorNumber);
 				String prop;
 				if (authorNumber==null || authorNumber>9) {
 					prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
