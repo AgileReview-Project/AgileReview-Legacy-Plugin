@@ -218,7 +218,7 @@ public class DetailView extends ViewPart {
 	public void backgroundChanged() {
 		
 		if(currentDisplay == COMMENT_DETAIL) {
-			((CommentDetail)this.parentParent).setBackgroundColor();
+			((CommentDetail)this.parentParent).setBackgroundColor();/*?|r59|Peter|c7|?*/
 		}
 	}
 	

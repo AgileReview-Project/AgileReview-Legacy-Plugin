@@ -142,18 +142,18 @@ public class AgileAnnotationController {
 	private Annotation createNewAnnotation(String commentKey) {
 		String author = commentKey.split("\\|")[1];
 		String annotationType;
-		if (this.authors==null || this.authors.get(author)==null || this.authors.get(author)>9) {
+		if (this.authors==null || this.authors.get(author)==null || this.authors.get(author)>9) {/*?|r59|Peter|c0|*/
 			annotationType = "AgileReview.comment.annotation";
 		} else {
 			annotationType = "AgileReview.comment.annotation.author"+this.authors.get(author);
-		}
+		}/*|r59|Peter|c0|?*/
 		String[] commentData = commentKey.split(Pattern.quote(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
 		Annotation annotation = new Annotation(annotationType, true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);
 		this.annotationMap.put(commentKey, annotation);
 		return annotation;
 	}
 
-	public void setAuthors(HashMap<String, Integer> authors) {
+	public void setAuthors(HashMap<String, Integer> authors) {/*?|r59|Peter|c1|*/
 		this.authors = authors;
-	}
+	}/*|r59|Peter|c1|?*/
 }

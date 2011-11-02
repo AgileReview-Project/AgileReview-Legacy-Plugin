@@ -247,14 +247,14 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
 		sp.setVariable(SourceProvider.REVERTABLE, false);
 		
-		setBackgroundColor();
+		setBackgroundColor();/*?|r59|Peter|c8|?*/
 	}
 
 	/**
 	 * Sets this view's background color to the color of the comment
 	 * @return the background color
 	 */
-	Color setBackgroundColor() {
+	Color setBackgroundColor() {/*?|r59|Peter|c6|*/
 		Integer authorNumber = ViewControl.getInstance().getAuthorNumber(this.editedObject);
 		String prop;
 		if (authorNumber==null || authorNumber>9) {
@@ -266,7 +266,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])); 
 		this.changeBackgroundColor(color);
 		return color;
-	}
+	}/*|r59|Peter|c6|?*/
 	
 	/*
 	 * (non-Javadoc)

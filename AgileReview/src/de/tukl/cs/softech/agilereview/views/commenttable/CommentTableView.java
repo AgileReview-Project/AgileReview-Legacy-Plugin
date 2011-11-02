@@ -925,7 +925,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		}
 	}
 	
-	public Integer getAuthorNumber(Comment c) {
+	public Integer getAuthorNumber(Comment c) {/*?|r59|Peter|c4|*/
 		String path = ReviewAccess.computePath(c);
 		for (IEditorPart editor : this.parserMap.keySet()) {
 			IEditorInput input = editor.getEditorInput();
@@ -935,6 +935,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		}
 		return null;
-	}
+	}/*|r59|Peter|c4|?*/
 	
 }

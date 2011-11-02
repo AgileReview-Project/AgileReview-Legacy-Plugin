@@ -241,14 +241,14 @@ public class AnnotationParser implements IAnnotationParser {
 		}
 		
 		HashMap<Position, String> toDisplay = new HashMap<Position, String>();
-		for(String s : idPositionMap.keySet()) {
+		for(String s : idPositionMap.keySet()) {/*?|r59|Peter|c2|*/
 			toDisplay.put(idPositionMap.get(s), s);
 			String author = s.split("\\|")[1];
 			if (!this.authors.containsKey(author)) {
 				this.authors.put(author, this.authors.size());				
 			}
 		}
-		this.annotationModel.setAuthors(this.authors);
+		this.annotationModel.setAuthors(this.authors);/*|r59|Peter|c2|?*/
 
 		// Save the current document to save the tags
 		try {
@@ -564,7 +564,7 @@ public class AnnotationParser implements IAnnotationParser {
 		return this.annotationModel.getCommentsByPosition(p);
 	}
 
-	public HashMap<String, Integer> getAuthors() {
+	public HashMap<String, Integer> getAuthors() {/*?|r59|Peter|c3|*/
 		return authors;
-	}
+	}/*|r59|Peter|c3|?*/
 }

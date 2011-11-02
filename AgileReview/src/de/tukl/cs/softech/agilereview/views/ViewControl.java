@@ -433,11 +433,11 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 		// PluginLogger.log(this.getClass().toString(), "perspectiveSavedAs", oldPerspective.getLabel()+"-->"+newPerspective.getLabel());
 	}
 	
-	public Integer getAuthorNumber(Comment c) {
+	public Integer getAuthorNumber(Comment c) {/*?|r59|Peter|c5|*/
 		Integer authorNumber = null;
 		if(isOpen(CommentTableView.class)) {
 			authorNumber = CommentTableView.getInstance().getAuthorNumber(c);
 		}
 		return authorNumber;
-	}
+	}/*|r59|Peter|c5|?*/
 }
