@@ -271,9 +271,9 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
 		
-		if(errorWhileInitialization != 0) {
+		if(errorWhileInitialization != 0) {/*?|r68|Malte|c0|*/
 			return null;
-		}
+		}/*|r68|Malte|c0|?*/
 
 		CompositeChange result = new CompositeChange("Refactoring of all affected comment paths");
 	

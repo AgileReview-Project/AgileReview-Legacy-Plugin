@@ -254,9 +254,9 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
 		
-		if(errorWhileInitialization != 0) {
+		if(errorWhileInitialization != 0) {/*?|r68|Malte|c1|*/
 			return null;
-		}
+		}/*|r68|Malte|c1|?*/
 		
 		CompositeChange result = new CompositeChange("Refactoring of all affected comment paths");
 		
