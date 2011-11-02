@@ -214,7 +214,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 		//when an error occurred during the initialization, abort the refactoring process
 		if(errorWhileInitialization != 0) {
 			PluginLogger.logWarning(getClass().toString(), "checkConditions", "An error occured during initialization");
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+")"));
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+") Continuing will corrupt AgileReview Comments!"));
 		}
 		
 		ResourceChangeChecker checker = (ResourceChangeChecker) context.getChecker(ResourceChangeChecker.class);
@@ -228,7 +228,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 						if(!f.isReadOnly() && f.isAccessible()) {
 							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
 						} else {
-							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible."));
+							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));
 						}
 					}
 				});
@@ -243,9 +243,9 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			//do refactoring
 			postDocs = ra.getPostDocumentsOfRefactoring(oldPath, newPath, type, renameSubpackages);
 		} catch (IOException e) {
-			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (1)"));
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (XI) Continuing will corrupt AgileReview Comments!"));
 		} catch (XmlException e) {
-			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (2)"));
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (XII) Continuing will corrupt AgileReview Comments!"));
 		}
 		
 		return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, "AgileReview refactoring conditions valid."));
@@ -253,6 +253,10 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
+		
+		if(errorWhileInitialization != 0) {
+			return null;
+		}
 		
 		CompositeChange result = new CompositeChange("Refactoring of all affected comment paths");
 		
