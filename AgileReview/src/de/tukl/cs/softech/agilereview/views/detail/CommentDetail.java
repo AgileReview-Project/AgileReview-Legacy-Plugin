@@ -24,9 +24,9 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReplyDocument.Reply;
+import de.tukl.cs.softech.agilereview.annotations.ColorManager;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * The CommentDetail class describes one detail representation of a Comment Object
@@ -66,10 +66,9 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * Creates the CommentDetail Composite and creates the initial UI
 	 * @param parent on which this component should be added
 	 * @param style in which this component should be displayed
-	 * @param bg background color for this view
 	 */
-	protected CommentDetail(Composite parent, int style, Color bg) {
-		super(parent, style, bg);
+	protected CommentDetail(Composite parent, int style) {
+		super(parent, style);
 	}
 
 	/*
@@ -246,27 +245,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 		SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
 		sp.setVariable(SourceProvider.REVERTABLE, false);
-		
-		setBackgroundColor();/*?|r59|Peter|c8|?*/
 	}
-
-	/**
-	 * Sets this view's background color to the color of the comment
-	 * @return the background color
-	 */
-	Color setBackgroundColor() {/*?|r59|Peter|c6|*//*?|r59|Malte|c10|?*/
-		Integer authorNumber = ViewControl.getInstance().getAuthorNumber(this.editedObject);
-		String prop;
-		if (authorNumber==null || authorNumber>9) {/*?|r59|Malte|c9|?*/
-			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
-		} else {
-			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[authorNumber]);
-		}
-		String[] rgb = prop.split(",");
-		Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])); 
-		this.changeBackgroundColor(color);
-		return color;
-	}/*|r59|Peter|c6|?*/
 	
 	/*
 	 * (non-Javadoc)
@@ -388,5 +367,15 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		String commentTag = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 		return commentTag;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.tukl.cs.softech.agilereview.views.detail.AbstractDetail#determineBackgroundColor()
+	 */
+	@Override
+	protected Color determineBackgroundColor() {/*?|r59|Malte|c7|*/
+		//get the backupObject as changes should only have clout on the background when they are saved
+		return ColorManager.getColor(this.backupObject.getAuthor());
+	}/*|r59|Malte|c7|?*/
 
 }

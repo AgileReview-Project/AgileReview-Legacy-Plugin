@@ -46,12 +46,10 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * Creates a new AbstractDetail Composite onto the given parent with the specified SWT styles
 	 * @param parent onto the ReviewDetail Composite will be added
 	 * @param style with which this Composite will be styled
-	 * @param bg background color for this view
 	 */
-	protected AbstractDetail(Composite parent, int style, Color bg) {
+	protected AbstractDetail(Composite parent, int style) {
 		super(parent, style);
 		initUI();
-		changeBackgroundColor(bg);
 	}
 
 	/**
@@ -92,9 +90,9 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	
 	/**
 	 * Changes the background color for this AbstractDetail.
-	 * @param bg
 	 */
-	protected void changeBackgroundColor(Color bg) {
+	protected void refreshBackgroundColor() {/*?|r59|Malte|c6|*/
+		Color bg = determineBackgroundColor();/*|r59|Malte|c6|?*/
 		this.setBackground(bg);
 		String osName = System.getProperty("os.name");
 		for(Control c : bgComponents) {
@@ -109,6 +107,12 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 			}
 		}
 	}
+	
+	/**
+	 * Determines the background color of the view. Will always be asked when new a new input will be displayed at the current view.
+	 * @return Background color for the view
+	 */
+	protected abstract Color determineBackgroundColor();/*?|r59|Malte|c5|?*/
 	
 	/**
 	 * saves every changes made in the current Detail View

@@ -35,16 +35,12 @@ public class AgileAnnotationController {
 	 * The annotations added by AgileReview to the editor's annotation model 
 	 */
 	private HashMap<String, Annotation> annotationMap = new HashMap<String, Annotation>();
-	/**
-	 * Authors that commented the underlying resource
-	 */
-	private HashMap<String, Integer> authors;
 	
 	/**
 	 * Creates a new AgileAnnotationModel
 	 * @param editor The text editor in which the annotations will be displayed
 	 */
-	protected AgileAnnotationController(IEditorPart editor) {
+	AgileAnnotationController(IEditorPart editor) {
 		IEditorInput input = editor.getEditorInput();
 		this.annotationModel = (IAnnotationModelExtension) ((ITextEditor)editor).getDocumentProvider().getAnnotationModel(input);
 	}
@@ -54,7 +50,7 @@ public class AgileAnnotationController {
 	 * not be displayed any more will be removed and not yet drawn annotations will be added to the annotation model.
 	 * @param keyPositionMap a map of Positions which should be annotated and the comment keys correlated to the positions
 	 */
-	protected void displayAnnotations(Map<String, Position> keyPositionMap) {
+	void displayAnnotations(Map<String, Position> keyPositionMap) {
 		PluginLogger.log(this.getClass().toString(), "displayAnnotations", "display: "+keyPositionMap.keySet().toString());
 		//add annotations that are not already displayed
 		Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
@@ -81,7 +77,7 @@ public class AgileAnnotationController {
 	 * Updates the given comment annotations in the provided editor to the given positions
 	 * @param keyPositionMap a map of updated positions and the comment keys correlated to the positions
 	 */
-	protected void updateAnnotations(Map<String, Position> keyPositionMap) {
+	void updateAnnotations(Map<String, Position> keyPositionMap) {
 		PluginLogger.log(this.getClass().toString(), "updateAnnotations", "update: "+keyPositionMap.keySet().toString());
 		for(String key : keyPositionMap.keySet()) {
 			if(annotationMap.get(key) != null) {
@@ -95,7 +91,7 @@ public class AgileAnnotationController {
 	 * @param commentKey The tag key of the comment for which this annotation holds
 	 * @param p The position to add the annotation on.
 	 */
-	protected void addAnnotation(String commentKey, Position p) {
+	void addAnnotation(String commentKey, Position p) {
 		((IAnnotationModel) this.annotationModel).addAnnotation(createNewAnnotation(commentKey), p);
 	}
 	
@@ -104,7 +100,7 @@ public class AgileAnnotationController {
 	 * @param commentKeys unique tag keys of the comment annotations which should
 	 * be deleted
 	 */
-	protected void deleteAnnotations(Set<String> commentKeys) {
+	void deleteAnnotations(Set<String> commentKeys) {
 		HashSet<Annotation> annotationsToRemove = new HashSet<Annotation>();
 		Annotation a;
 		for(String key : commentKeys) {
@@ -122,7 +118,7 @@ public class AgileAnnotationController {
 	 * @param p position
 	 * @return all comments which are overlapping with the given {@link Position}
 	 */
-	protected String[] getCommentsByPosition(Position p) {
+	String[] getCommentsByPosition(Position p) {
 		HashSet<String> commentKeys = new HashSet<String>();
 		Position tmp;
 		for(String key : annotationMap.keySet()) {
@@ -140,20 +136,15 @@ public class AgileAnnotationController {
 	 * @return created annotation
 	 */
 	private Annotation createNewAnnotation(String commentKey) {
-		String author = commentKey.split("\\|")[1];/*?|r59|Malte|c0|?*/
-		String annotationType;
-		if (this.authors==null || this.authors.get(author)==null || this.authors.get(author)>9) {/*?|r59|Peter|c0|*//*?|r59|Malte|c2|?*/
-			annotationType = "AgileReview.comment.annotation";
-		} else {
-			annotationType = "AgileReview.comment.annotation.author"+this.authors.get(author);
-		}/*|r59|Peter|c0|?*/
 		String[] commentData = commentKey.split(Pattern.quote(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
-		Annotation annotation = new Annotation(annotationType, true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);
+		String annotationType;/*?|r59|Malte|c0|*/
+		if (ColorManager.hasCustomizedColor(commentData[1])) {
+			annotationType = "AgileReview.comment.annotation.author"+ColorManager.getIndexOf(commentData[1]);
+		} else {
+			annotationType = "AgileReview.comment.annotation";
+		}
+		Annotation annotation = new Annotation(annotationType, true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);/*|r59|Malte|c0|?*/
 		this.annotationMap.put(commentKey, annotation);
 		return annotation;
 	}
-
-	public void setAuthors(HashMap<String, Integer> authors) {/*?|r59|Peter|c1|*//*?|r59|Malte|c4|?*/
-		this.authors = authors;
-	}/*|r59|Peter|c1|?*/
 }

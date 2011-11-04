@@ -56,7 +56,6 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
@@ -924,17 +923,4 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		}
 	}
-	
-	public Integer getAuthorNumber(Comment c) {/*?|r59|Peter|c4|*//*?|r59|Malte|c5|?*/
-		String path = ReviewAccess.computePath(c);
-		for (IEditorPart editor : this.parserMap.keySet()) {
-			IEditorInput input = editor.getEditorInput();
-			IPath filePath = ResourceUtil.getFile(input).getFullPath();
-			if (filePath.toOSString().equals("/"+path)) {/*?|r59|Malte|c6|?*/
-				return this.parserMap.get(editor).getAuthors().get(c.getAuthor());
-			}
-		}
-		return null;/*?|r59|Malte|c8|?*/
-	}/*|r59|Peter|c4|?*/
-	
 }

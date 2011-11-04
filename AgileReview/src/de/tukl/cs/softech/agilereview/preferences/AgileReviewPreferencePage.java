@@ -19,9 +19,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.annotations.ColorManager;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
 /**
  * This class represents a preference page that
@@ -82,12 +84,9 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	public void createFieldEditors() {
 	
 		// Field for author
-		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "author:", 
-				getFieldEditorParent())
-		{		
+		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "author:", getFieldEditorParent()) {		
 			@Override
-			protected boolean doCheckState()
-			{
+			protected boolean doCheckState() {
 				String isValidReply = PropertiesManager.getInstance().isValid(this.getStringValue());
 				this.setErrorMessage(isValidReply);
 				return (isValidReply == null);
@@ -115,34 +114,32 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 			vals[i][0] = list.get(i);
 			vals[i][1] = list.get(i);
 		}
-		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, 
-				"review source project:", vals,getFieldEditorParent());
+		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, "review source project:", vals,getFieldEditorParent());
 		addField(comboReviewProjectField);
 		
-		// colorfieldeditors for annotations-colors
-		for (int i=0;i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length;i++) {
-			ColorFieldEditor authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i], "Comment color (Author "+(i+1)+"):",
-		            getFieldEditorParent());
-			addField(authorColorAnnotationField);
-		}
+		// colorfieldeditor for annotation color of IDE user/*?|r59|Malte|c3|*/
+		ColorFieldEditor authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[0], "Comment color (IDE User):", getFieldEditorParent());
+		addField(authorColorAnnotationField);
 		
-		colorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "Comment color (others):",
-	            getFieldEditorParent());
+		// colorfieldeditors for other customizable annotations-colors
+		for (int i=1;i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length;i++) {
+			authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i], "Comment color (Author "+(i+1)+"):", getFieldEditorParent());
+			addField(authorColorAnnotationField);
+		}/*|r59|Malte|c3|?*/
+		
+		colorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "Comment color (others):", getFieldEditorParent());
 		addField(colorAnnotationField);
 		
 		// Checkbox for using Smart Suggestion
-		booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, "use smart suggestion",
-				getFieldEditorParent());
+		booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, "use smart suggestion", getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 		
 		// Directory Browser for export folder
-		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, 
-				"Default XLS export location:", getFieldEditorParent());
+		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, "Default XLS export location:", getFieldEditorParent());
 		addField(directoryExportField);
 		
 		// export template file
-		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, 
-				"Default template for XLS export:", getFieldEditorParent());
+		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, "Default template for XLS export:", getFieldEditorParent());
 		fileExportTemplateField.setFileExtensions(new String[]{"*.xls*"});
 		addField(fileExportTemplateField);
 		
@@ -156,15 +153,23 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	@Override
 	public boolean performOk(){
 		boolean result = super.performOk();
+		
+		//change IDE user for color management/*?|r59|Malte|c4|*/
+		ColorManager.changeIDEUser(strAuthorField.getStringValue());/*|r59|Malte|c4|?*/
+		
+		//set changed colors for annotations
 		new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
 		for (int i=0; i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length; i++) {
 			new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation_Author"+i, PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i]));			
 		}
+		
+		//refresh views
 		if (ReviewAccess.getInstance().updateReviewSourceProject()) {
 			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
 		} else {
 			ViewControl.refreshViews(ViewControl.DETAIL_VIEW);
 		}
+		
 		return result;
 	}
 

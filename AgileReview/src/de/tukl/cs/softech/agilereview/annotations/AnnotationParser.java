@@ -91,10 +91,6 @@ public class AnnotationParser implements IAnnotationParser {
 	 * Annotation model for this parser
 	 */
 	private AgileAnnotationController annotationModel;
-	/**
-	 * Authors that commented this file
-	 */
-	private HashMap<String, Integer> authors = new HashMap<String, Integer>();/*?|r59|Malte|c3|?*/
 
 	/**
 	 * Creates a new instance of AnnotationParser with the given input
@@ -103,7 +99,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @param commentEndTag end tag for comments in this document
 	 * @throws NoDocumentFoundException will be thrown, if the file type which this editor represents is not supported
 	 */
-	protected AnnotationParser(ITextEditor editor, String commentBeginTag, String commentEndTag) throws NoDocumentFoundException {
+	AnnotationParser(ITextEditor editor, String commentBeginTag, String commentEndTag) throws NoDocumentFoundException {
 		
 		tagRegex = Pattern.quote(commentBeginTag)+rawTagRegex+Pattern.quote(commentEndTag);
 		tagPattern = Pattern.compile(tagRegex);
@@ -241,14 +237,11 @@ public class AnnotationParser implements IAnnotationParser {
 		}
 		
 		HashMap<Position, String> toDisplay = new HashMap<Position, String>();
-		for(String s : idPositionMap.keySet()) {/*?|r59|Peter|c2|*/
+		for(String s : idPositionMap.keySet()) {
 			toDisplay.put(idPositionMap.get(s), s);
-			String author = s.split("\\|")[1];/*?|r59|Malte|c1|?*/
-			if (!this.authors.containsKey(author)) {
-				this.authors.put(author, this.authors.size());
-			}
+			String author = s.split(Pattern.quote(keySeparator))[1];/*?|r59|Malte|c1|*/
+			ColorManager.addReservation(author);/*|r59|Malte|c1|?*/
 		}
-		this.annotationModel.setAuthors(this.authors);/*|r59|Peter|c2|?*/
 
 		// Save the current document to save the tags
 		try {
@@ -563,8 +556,4 @@ public class AnnotationParser implements IAnnotationParser {
 	public String[] getCommentsByPosition(Position p) {
 		return this.annotationModel.getCommentsByPosition(p);
 	}
-
-	public HashMap<String, Integer> getAuthors() {/*?|r59|Peter|c3|*//*?|r59|Malte|c7|?*/
-		return authors;
-	}/*|r59|Peter|c3|?*/
 }
