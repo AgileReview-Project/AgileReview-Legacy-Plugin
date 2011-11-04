@@ -254,10 +254,10 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * Sets this view's background color to the color of the comment
 	 * @return the background color
 	 */
-	Color setBackgroundColor() {/*?|r59|Peter|c6|*/
+	Color setBackgroundColor() {/*?|r59|Peter|c6|*//*?|r59|Malte|c10|?*/
 		Integer authorNumber = ViewControl.getInstance().getAuthorNumber(this.editedObject);
 		String prop;
-		if (authorNumber==null || authorNumber>9) {
+		if (authorNumber==null || authorNumber>9) {/*?|r59|Malte|c9|?*/
 			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
 		} else {
 			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[authorNumber]);

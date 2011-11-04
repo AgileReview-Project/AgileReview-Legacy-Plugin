@@ -140,9 +140,9 @@ public class AgileAnnotationController {
 	 * @return created annotation
 	 */
 	private Annotation createNewAnnotation(String commentKey) {
-		String author = commentKey.split("\\|")[1];
+		String author = commentKey.split("\\|")[1];/*?|r59|Malte|c0|?*/
 		String annotationType;
-		if (this.authors==null || this.authors.get(author)==null || this.authors.get(author)>9) {/*?|r59|Peter|c0|*/
+		if (this.authors==null || this.authors.get(author)==null || this.authors.get(author)>9) {/*?|r59|Peter|c0|*//*?|r59|Malte|c2|?*/
 			annotationType = "AgileReview.comment.annotation";
 		} else {
 			annotationType = "AgileReview.comment.annotation.author"+this.authors.get(author);
@@ -153,7 +153,7 @@ public class AgileAnnotationController {
 		return annotation;
 	}
 
-	public void setAuthors(HashMap<String, Integer> authors) {/*?|r59|Peter|c1|*/
+	public void setAuthors(HashMap<String, Integer> authors) {/*?|r59|Peter|c1|*//*?|r59|Malte|c4|?*/
 		this.authors = authors;
 	}/*|r59|Peter|c1|?*/
 }

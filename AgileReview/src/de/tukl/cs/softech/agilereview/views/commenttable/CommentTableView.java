@@ -925,16 +925,16 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		}
 	}
 	
-	public Integer getAuthorNumber(Comment c) {/*?|r59|Peter|c4|*/
+	public Integer getAuthorNumber(Comment c) {/*?|r59|Peter|c4|*//*?|r59|Malte|c5|?*/
 		String path = ReviewAccess.computePath(c);
 		for (IEditorPart editor : this.parserMap.keySet()) {
 			IEditorInput input = editor.getEditorInput();
 			IPath filePath = ResourceUtil.getFile(input).getFullPath();
-			if (filePath.toOSString().equals("/"+path)) {
+			if (filePath.toOSString().equals("/"+path)) {/*?|r59|Malte|c6|?*/
 				return this.parserMap.get(editor).getAuthors().get(c.getAuthor());
 			}
 		}
-		return null;
+		return null;/*?|r59|Malte|c8|?*/
 	}/*|r59|Peter|c4|?*/
 	
 }

@@ -94,7 +94,7 @@ public class AnnotationParser implements IAnnotationParser {
 	/**
 	 * Authors that commented this file
 	 */
-	private HashMap<String, Integer> authors = new HashMap<String, Integer>();
+	private HashMap<String, Integer> authors = new HashMap<String, Integer>();/*?|r59|Malte|c3|?*/
 
 	/**
 	 * Creates a new instance of AnnotationParser with the given input
@@ -243,9 +243,9 @@ public class AnnotationParser implements IAnnotationParser {
 		HashMap<Position, String> toDisplay = new HashMap<Position, String>();
 		for(String s : idPositionMap.keySet()) {/*?|r59|Peter|c2|*/
 			toDisplay.put(idPositionMap.get(s), s);
-			String author = s.split("\\|")[1];
+			String author = s.split("\\|")[1];/*?|r59|Malte|c1|?*/
 			if (!this.authors.containsKey(author)) {
-				this.authors.put(author, this.authors.size());				
+				this.authors.put(author, this.authors.size());
 			}
 		}
 		this.annotationModel.setAuthors(this.authors);/*|r59|Peter|c2|?*/
@@ -564,7 +564,7 @@ public class AnnotationParser implements IAnnotationParser {
 		return this.annotationModel.getCommentsByPosition(p);
 	}
 
-	public HashMap<String, Integer> getAuthors() {/*?|r59|Peter|c3|*/
+	public HashMap<String, Integer> getAuthors() {/*?|r59|Peter|c3|*//*?|r59|Malte|c7|?*/
 		return authors;
 	}/*|r59|Peter|c3|?*/
 }
