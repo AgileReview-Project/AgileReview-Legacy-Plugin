@@ -12,6 +12,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -21,6 +22,7 @@ import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.detail.DetailView;
 
 /**
  * Handler for showing the comment, which is currently selected in the editor, in the DetailView
@@ -76,6 +78,11 @@ public class ShowCommentHandler extends AbstractHandler {
 					
 					// Get the right comment static PropertiesManager
 					Comment c = ReviewAccess.getInstance().getComment(reviewId, author, commentId);
+					
+					// bring detail view to top/*?|r48|Malte|c0|*/
+					if(ViewControl.isOpen(DetailView.class)) {
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().bringToTop(DetailView.getInstance());
+					}/*|r48|Malte|c0|?*/
 					
 					// select it
 					if (ViewControl.isOpen(CommentTableView.class)) {
