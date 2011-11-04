@@ -51,4 +51,7 @@ public class NullParser implements IAnnotationParser {
 		return new String[]{};
 	}
 
+	@Override
+	public void relocateComment(Comment comment, boolean display) throws BadLocationException, CoreException {}
+
 }

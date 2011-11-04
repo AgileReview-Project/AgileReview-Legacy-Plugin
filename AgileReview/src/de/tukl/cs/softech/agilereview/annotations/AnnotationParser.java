@@ -297,78 +297,91 @@ public class AnnotationParser implements IAnnotationParser {
 	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {
 		//VARIANT(return Position):Position result = null;
 
-		ISelection selection= editor.getSelectionProvider().getSelection();
-		if (selection instanceof ITextSelection) {
+		ISelection selection = editor.getSelectionProvider().getSelection();
+		if (selection instanceof ITextSelection) {/*?|r76|Malte|c3|*/
 			int selStartLine = ((ITextSelection)selection).getStartLine();
 			int selEndLine = ((ITextSelection)selection).getEndLine();
-			
-			String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
-			String commentTag = keySeparator+commentKey+keySeparator;
-			
-			// check if selection needs to be adapted
-			int[] newLines = computeSelectionAdapations(selStartLine, selEndLine);
-			if (newLines[0]!=-1 || newLines[1]!=-1) {
-				PluginLogger.log(this.getClass().toString(), "addTagsInDocument", "Selection for inserting tags needs to be adapted, performing adaptation.");
-				// inform user
-				MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
-				// adapt startline if necessary
-				selStartLine = (newLines[0]==-1) ? selStartLine : newLines[0];
-				// adapt endline if necessary
-				selEndLine = (newLines[1]==-1) ? selEndLine : newLines[1];
-				// compute new selection
-				int offset = document.getLineOffset(selStartLine);
-				int length = document.getLineOffset(selEndLine)-document.getLineOffset(selStartLine)+document.getLineLength(selEndLine);
-				// set new selection
-				editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
-			}
-			
-			if (selStartLine == selEndLine)	{
-				// Only one line is selected
-				String lineDelimiter = document.getLineDelimiter(selStartLine);
-				int lineDelimiterLength = 0;
-				if (lineDelimiter != null) {
-					lineDelimiterLength = lineDelimiter.length();
-				}
-				
-				int insertOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
-				
-				// Write tag -> get start+end-tag for current file-ending, insert into file				
-				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
-				document.replace(insertOffset, 0, tags[0]+"?"+commentTag+"?"+tags[1]);
-				
-				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
-			} else {
-				// Calculate insert position for start line
-				String lineDelimiter = document.getLineDelimiter(selStartLine);
-				int lineDelimiterLength = 0;
-				if (lineDelimiter != null) {
-					lineDelimiterLength = lineDelimiter.length();
-				}
-				int insertStartOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
-				
-				// Calculate insert position for end line
-				lineDelimiter = document.getLineDelimiter(selEndLine);
-				lineDelimiterLength = 0;
-				if (lineDelimiter != null) {
-					lineDelimiterLength = lineDelimiter.length();
-				}
-				int insertEndOffset = document.getLineOffset(selEndLine)+document.getLineLength(selEndLine)-lineDelimiterLength;
-				
-				// Write tags -> get tags for current file-ending, insert second tag, insert first tag
-				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
-				document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
-				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+tags[1]);
-
-				
-				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
-				//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
-			}
-			parseInput();
-			if(ViewControl.isPerspectiveOpen() && display) {
-				this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
-			}
-		}
+			addTagsInDocument(comment, display, selStartLine, selEndLine);
+		}/*|r76|Malte|c3|?*/
 		//VARIANT(return Position):return result;
+	}
+	
+	/**
+	 * Adds the Comment tags for the given comment in the currently opened file at the currently selected place
+	 * @param comment Comment for which the tags should be inserted
+	 * @param display if true, the new comment will instantly displayed<br>false, otherwise
+	 * @param selStartLine of the position where the comment should be inserted
+	 * @param selEndLine of the position where the comment should be inserted
+	 * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
+	 * @throws CoreException 
+	 */
+	private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException, CoreException {/*?|r76|Malte|c2|?*/
+		
+		String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
+		String commentTag = keySeparator+commentKey+keySeparator;
+		
+		// check if selection needs to be adapted
+		int[] newLines = computeSelectionAdapations(selStartLine, selEndLine);
+		if (newLines[0]!=-1 || newLines[1]!=-1) {
+			PluginLogger.log(this.getClass().toString(), "addTagsInDocument", "Selection for inserting tags needs to be adapted, performing adaptation.");
+			// inform user
+			MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
+			// adapt start line if necessary
+			selStartLine = (newLines[0]==-1) ? selStartLine : newLines[0];
+			// adapt endline if necessary
+			selEndLine = (newLines[1]==-1) ? selEndLine : newLines[1];
+			// compute new selection
+			int offset = document.getLineOffset(selStartLine);
+			int length = document.getLineOffset(selEndLine)-document.getLineOffset(selStartLine)+document.getLineLength(selEndLine);
+			// set new selection
+			editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
+		}
+		
+		if (selStartLine == selEndLine)	{
+			// Only one line is selected
+			String lineDelimiter = document.getLineDelimiter(selStartLine);
+			int lineDelimiterLength = 0;
+			if (lineDelimiter != null) {
+				lineDelimiterLength = lineDelimiter.length();
+			}
+			
+			int insertOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
+			
+			// Write tag -> get start+end-tag for current file-ending, insert into file				
+			String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+			document.replace(insertOffset, 0, tags[0]+"?"+commentTag+"?"+tags[1]);
+			
+			//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), document.getLineLength(selStartLine)-lineDelimiterLength);
+		} else {
+			// Calculate insert position for start line
+			String lineDelimiter = document.getLineDelimiter(selStartLine);
+			int lineDelimiterLength = 0;
+			if (lineDelimiter != null) {
+				lineDelimiterLength = lineDelimiter.length();
+			}
+			int insertStartOffset = document.getLineOffset(selStartLine)+document.getLineLength(selStartLine)-lineDelimiterLength;
+			
+			// Calculate insert position for end line
+			lineDelimiter = document.getLineDelimiter(selEndLine);
+			lineDelimiterLength = 0;
+			if (lineDelimiter != null) {
+				lineDelimiterLength = lineDelimiter.length();
+			}
+			int insertEndOffset = document.getLineOffset(selEndLine)+document.getLineLength(selEndLine)-lineDelimiterLength;
+			
+			// Write tags -> get tags for current file-ending, insert second tag, insert first tag
+			String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
+			document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
+			document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+tags[1]);
+
+			
+			//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
+			//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
+		}
+		parseInput();
+		if(ViewControl.isPerspectiveOpen() && display) {
+			this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
+		}
 	}
 	
 	/**
@@ -527,4 +540,15 @@ public class AnnotationParser implements IAnnotationParser {
 	public String[] getCommentsByPosition(Position p) {
 		return this.annotationModel.getCommentsByPosition(p);
 	}
+
+	@Override
+	public void relocateComment(Comment comment, boolean display) throws BadLocationException, CoreException {/*?|r76|Malte|c1|*/
+		ISelection selection = editor.getSelectionProvider().getSelection();
+		if (selection instanceof ITextSelection) {
+			int selStartLine = ((ITextSelection)selection).getStartLine();
+			int selEndLine = ((ITextSelection)selection).getEndLine();
+			removeCommentTags(comment);
+			addTagsInDocument(comment, display, selStartLine, selEndLine);
+		}
+	}/*|r76|Malte|c1|?*/
 }
