@@ -603,14 +603,16 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Opens an editor for a given comment
 	 * @param comment the comment
+	 * @return boolean flag, indicating if the editor could be opened
 	 */
-	private void openEditor(Comment comment) {
+	private boolean openEditor(Comment comment) {/*?|r77|Thilo|c3|?*/
 		PluginLogger.log(this.getClass().toString(), "openEditor", "Opening editor for the given comment");
 		IPath path = new Path(ReviewAccess.computePath(comment));
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		
 		if(!file.exists()) {
 			MessageDialog.openError(Display.getDefault().getActiveShell(), "File not found!", "The file "+file.getFullPath()+" could not be found!");
+			return false;/*?|r77|Thilo|c1|?*/
 		}
 		
 		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
@@ -623,6 +625,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		} catch (PartInitException e) {
 			PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
 		}
+		return true;/*?|r77|Thilo|c2|?*/
 	}
 	
 	/**
@@ -866,16 +869,17 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
 		Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
-		openEditor(comment);
-		//jump to comment in opened editor
-		try {
-			PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
-			this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
-		} catch (BadLocationException e) {
-			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
-		}
-		if (ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().setFocus();
+		if (openEditor(comment)) {/*?|r77|Thilo|c0|?*/
+			//jump to comment in opened editor
+			try {
+				PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
+				this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
+			} catch (BadLocationException e) {
+				PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
+			}
+			if (ViewControl.isOpen(DetailView.class)) {
+				DetailView.getInstance().setFocus();
+			}
 		}
 	}
 	
