@@ -13,6 +13,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.ResourceUtil;
 
 import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.ReviewDocument;
@@ -54,17 +58,30 @@ class ReviewFileModel {
 	 * Deletes the given file
 	 * @param delFile
 	 */
-	private void deleteResource(final IResource delFile)
-	{
+	private void deleteResource(final IResource delFile) {
 		try {
-			delFile.delete(true, null);
+			if(delFile instanceof IFile) {/*?|r71|Malte|c1|*/
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				IEditorPart editor = ResourceUtil.findEditor(page, (IFile)delFile);
+				if(editor != null) {
+					page.closeEditor(editor, false);
+				}
+				delFile.delete(true, null);
+			} else if(delFile instanceof IFolder){
+				for(IResource r : ((IFolder)delFile).members()) {
+					deleteResource(r);
+				}
+				delFile.delete(true, null);
+			} else {
+				delFile.delete(true, null);
+			}/*|r71|Malte|c1|?*/
 		} catch (CoreException e) {
 			Display.getDefault().asyncExec(new Runnable() {
 				
 				@Override
 				public void run() {
 					MessageDialog.openError(Display.getDefault().getActiveShell(), "Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted.\n" +
-							"This may lead to malfuntioning of AgileReview. Please delete the file manually.");
+							"Please delete the file manually.");
 				}
 			});
 			PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted", e);
