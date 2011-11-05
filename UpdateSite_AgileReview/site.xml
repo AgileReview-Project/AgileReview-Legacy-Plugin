@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/Feature_AgileReview_0.7.0.201109221737.jar" id="Feature_AgileReview" version="0.7.0.201109221737">
+      <category name="agilereview"/>
+   </feature>
+   <feature url="features/Feature_AgileReview_0.7.1.201110021220.jar" id="Feature_AgileReview" version="0.7.1.201110021220">
+      <category name="agilereview"/>
+   </feature>
+   <category-def name="agilereview" label="AgileReview"/>
+</site>
