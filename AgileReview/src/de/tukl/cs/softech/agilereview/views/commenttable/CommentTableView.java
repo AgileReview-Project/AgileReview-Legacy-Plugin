@@ -874,9 +874,13 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
 		}
+		
+		//open Detail View and set Focus/*?|r48|Malte|c2|*/
+		ViewControl.openView(ViewControl.DETAIL_VIEW);
 		if (ViewControl.isOpen(DetailView.class)) {
 			DetailView.getInstance().setFocus();
-		}
+			selectComment(comment); //select comment another time to show the comment if the view was closed before
+		}/*|r48|Malte|c2|?*/
 	}
 	
 	/** not yet used

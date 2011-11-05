@@ -3,6 +3,7 @@ package de.tukl.cs.softech.agilereview.views;
 import java.util.HashSet;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -14,6 +15,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.contexts.IContextActivation;
@@ -230,6 +232,50 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 			PluginLogger.logError(this.getClass().toString(), "partOpened", "WorkbenchException while opening perspective", e);
 		}
 	}
+	
+	/**
+	 * Opens the views specified by the parameter. If the view is already open, the specified views will be brought to top.
+	 * @param views public static fields specifying the views (xor for more than one)
+	 */
+	public static void openView(int views) {/*?|r48|Malte|c1|*/
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if(views % 2 == 1) {
+			if(isOpen(DetailView.class)) {
+				page.bringToTop(DetailView.getInstance());
+			} else {
+				try {
+					page.showView("de.tukl.cs.softech.agilereview.view.commentdetailview.view");
+				} catch (PartInitException e) {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View", "Could not open the Comment Detail View. Error during initialization!");
+					PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
+				}
+			}
+		}
+		if((views >> 1) % 2 == 1) {
+			if(isOpen(CommentTableView.class)) {
+				page.bringToTop(DetailView.getInstance());
+			} else {
+				try {
+					page.showView("de.tukl.cs.softech.agilereview.view.commenttableview.view");
+				} catch (PartInitException e) {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View", "Could not open the Comment Summary View. Error during initialization!");
+					PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
+				}
+			}
+		}
+		if((views >> 2) % 2 == 1) {
+			if(isOpen(ReviewExplorer.class)) {
+				page.bringToTop(DetailView.getInstance());
+			} else {
+				try {
+					page.showView("de.tukl.cs.softech.agilereview.view.reviewnavigator.view");
+				} catch (PartInitException e) {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View", "Could not open the Review Explorer. Error during initialization!");
+					PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
+				}
+			}
+		}
+	}/*|r48|Malte|c1|?*/
 	
 	//****************************************
 	//****** ISelectionChangedListener *******
