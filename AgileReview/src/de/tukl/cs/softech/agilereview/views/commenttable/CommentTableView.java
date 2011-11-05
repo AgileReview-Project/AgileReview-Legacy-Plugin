@@ -611,7 +611,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		
 		if(!file.exists()) {
-			MessageDialog.openError(Display.getDefault().getActiveShell(), "File not found!", "The file "+file.getFullPath()+" could not be found!");
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "File not found!", "The file "+file.getFullPath()+" could not be found!");/*?|r77|Malte|c0|?*/
 			return false;/*?|r77|Thilo|c1|?*/
 		}
 		
