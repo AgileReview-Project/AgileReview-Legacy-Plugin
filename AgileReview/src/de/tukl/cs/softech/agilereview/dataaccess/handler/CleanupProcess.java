@@ -1,6 +1,5 @@
 package de.tukl.cs.softech.agilereview.dataaccess.handler;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -79,15 +77,8 @@ public class CleanupProcess implements IRunnableWithProgress {
 		monitor.worked(10);
 		monitor.subTask("Loading all reviews...");
 		// load all comments for all reviews
-		try {
-			ra.fillDatabaseCompletely();
-		} catch (XmlException e1) {
-			PluginLogger.logError(this.getClass().toString(), "execute", "XMLException while trying to fill database.", e1);
-			throw new InterruptedException("An XmlException occured: "+e1);
-		} catch (IOException e1) {
-			PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to fill database.", e1);
-			throw new InterruptedException("An IOException occured: "+e1);
-		}
+		ra.fillDatabaseCompletely();
+
 		
 		// save all comments for the given project
 		for (Review r : reviews) {

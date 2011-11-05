@@ -63,7 +63,7 @@ class ReviewFileModel {
 				
 				@Override
 				public void run() {
-					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted.\n" +
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted.\n" +
 							"This may lead to malfuntioning of AgileReview. Please delete the file manually.");
 				}
 			});

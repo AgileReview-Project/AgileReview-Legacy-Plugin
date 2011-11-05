@@ -1,8 +1,5 @@
 package de.tukl.cs.softech.agilereview.plugincontrol;
 
-import java.io.IOException;
-
-import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -17,23 +14,14 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
  */
 public class RefreshHandler extends AbstractHandler {
 	
-	/**
-	 * Instance of ReviewAccess
-	 */
-	private  ReviewAccess ra = ReviewAccess.getInstance();
-
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException 
 	{
 		PluginLogger.log(this.getClass().toString(), "execute", "Refresh triggered");
+		ReviewAccess ra = ReviewAccess.getInstance();
 		// Refill the database
-		try {
-			ra.fillDatabaseForOpenReviews();
-		} catch (XmlException e) {
-			PluginLogger.logError(this.getClass().toString(), "execute", "XMLException is thrown", e);
-		} catch (IOException e) {
-			PluginLogger.logError(this.getClass().toString(), "execute", "IOException is thrown", e);
-		}
+		ra.fillDatabaseForOpenReviews();
+
 		
 		// Test if active review may have vanished
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);

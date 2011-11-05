@@ -1,8 +1,5 @@
 package de.tukl.cs.softech.agilereview.plugincontrol.refactoring;
 
-import java.io.IOException;
-
-import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
@@ -57,14 +54,8 @@ public class ExecutionListener implements IExecutionListener {
 			
 			// Refill the database
 			ReviewAccess ra = ReviewAccess.getInstance();
-			try {
-				ra.fillDatabaseForOpenReviews();
-			} catch (XmlException e) {
-				PluginLogger.logError(this.getClass().toString(), "execute", "XMLException is thrown", e);
-			} catch (IOException e) {
-				PluginLogger.logError(this.getClass().toString(), "execute", "IOException is thrown", e);
-			}
-			
+			ra.fillDatabaseForOpenReviews();
+
 			// Test if active review may have vanished
 			String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 			if (!ra.reviewExists(activeReview))

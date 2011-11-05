@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
 import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -57,7 +57,7 @@ public class ReviewAccess {
 	/**
 	 * Private instance for Singleton-Pattern
 	 */
-	private static ReviewAccess RA = new ReviewAccess();
+	private static ReviewAccess RA = null;
 	
 	/**
 	 * Reference to the folder where the review and comments xml files are located.
@@ -277,8 +277,10 @@ public class ReviewAccess {
 	 * Singleton Pattern
 	 * @return Instance of this class
 	 */
-	public static synchronized ReviewAccess getInstance()
-	{
+	public static synchronized ReviewAccess getInstance() {
+		if (RA == null) {
+			RA = new ReviewAccess();
+		}
 		return RA;
 	}
 	
@@ -303,8 +305,7 @@ public class ReviewAccess {
 	/**
 	 * Constructor: Sets the directory where to look for the xml-Files 
 	 */
-	private ReviewAccess()
-	{
+	private ReviewAccess()	{
 		PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
 		// Set the directory where the comments are located
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
@@ -378,7 +379,6 @@ public class ReviewAccess {
 			REVIEW_REPO_FOLDER = p;
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, p.getName());
 			// add active nature to new project
-			//TODO This should be when a decoration is available for active source folder 
 			setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE), PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE)});
 			// update decorator
 			Display.getDefault().asyncExec(new Runnable() {
@@ -390,25 +390,16 @@ public class ReviewAccess {
 			});
 			
 			// Load open reviews initially
-			try {
-				fillDatabaseForOpenReviews();
-			} catch (XmlException e) {
-				PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "XmlException while filling database", e);
-				return false;
-			} catch (IOException e) {
-				PluginLogger.logError(this.getClass().toString(), "loadReviewProject", "IOException while filling database", e);
-				return false;
-			}
+			fillDatabaseForOpenReviews();
+
 			return true;
 		}
 	}
 	
 	/**
 	 * Fills the comment model
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	private void loadAllComment() throws XmlException, IOException
+	private void loadAllComment()
 	{
 		PluginLogger.log(this.getClass().toString(), "loadAllComments", 
 				"All comment files will be loaded from file (including closed reviews). Exception thrown when parsing xml-file");
@@ -416,6 +407,7 @@ public class ReviewAccess {
 		try {
 			IResource[] allFolders = REVIEW_REPO_FOLDER.members();
 			// Iterate all folders
+			LinkedList<IResource> errorFiles = new LinkedList<IResource>();
 			for (IResource currFolder : allFolders) {
 				if (currFolder instanceof IFolder) {
 					IResource[] allFiles = ((IFolder)currFolder).members();
@@ -424,14 +416,28 @@ public class ReviewAccess {
 						if (currFile instanceof IFile) {
 							// Open file and read basic information
 							if (!((IFile)currFile).getName().equals("review.xml")) {
-								CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
-								this.rFileModel.addXmlDocument(doc, (IFile)currFile);
-								readCommentsDocument(doc);
+								try {
+									CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+									this.rFileModel.addXmlDocument(doc, (IFile)currFile);
+									readCommentsDocument(doc);
+								} catch (Exception e) {/*?|r72|Thilo|c2|*/
+									PluginLogger.logError(ReviewAccess.class.toString(), "loadAllReviews", "Could not load file "+currFile, e);
+									errorFiles.add(currFile);
+								}/*|r72|Thilo|c2|?*/
 							}
 						}
 					}
 				}
 			}
+			// Show errors to user/*?|r72|Thilo|c3|*/
+			if (!errorFiles.isEmpty()) {
+				String message = "AgileReview could not load the following files:\n\n";
+				for (IResource file : errorFiles) {
+					message += file.getLocation().toOSString()+"\n";
+				}
+				message += "\nThese files may be corrupted (i.e. empty). Please check them.";
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not load files", message);
+			}/*|r72|Thilo|c3|?*/
 		} catch (CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
 		}
@@ -439,33 +445,45 @@ public class ReviewAccess {
 	
 	/**
 	 * Fills the review model
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	private void loadAllReviews() throws XmlException, IOException
+	private void loadAllReviews()
 	{
 		PluginLogger.log(this.getClass().toString(), "loadAllReviews", "All reviews will be loaded from files");
 		// Get all relevant folders in the review repository
 		try {
 			IResource[] allFolders = REVIEW_REPO_FOLDER.members();
 			// Iterate all folders
+			LinkedList<IResource> errorFiles = new LinkedList<IResource>();
 			for (IResource currFolder : allFolders) {
 				if (currFolder instanceof IFolder) {
 					// Get all relevant files in the review repository (only review files(no "." in author names allowed))
 					IResource[] allFiles = ((IFolder)currFolder).members();
 					// Fill internal database
-					// Iterate all review-files in directory (should only be one)
+					// Iterate all review-files in directory (should only be one) // TODO: performance enhancement: take review file directly
 					for (int i=0;i<allFiles.length;i++) {
 						if (allFiles[i] instanceof IFile && ((IFile)allFiles[i]).getName().equals("review.xml")) {
-							// Open file and store review
-							ReviewDocument doc = ReviewDocument.Factory.parse(((IFile)allFiles[i]).getContents());
-							this.rFileModel.addXmlDocument(doc, (IFile)allFiles[i]);
-							Review currReview = doc.getReview();
-							rModel.addReview(currReview);
+							try {
+								// Open file and store review
+								ReviewDocument doc = ReviewDocument.Factory.parse(((IFile)allFiles[i]).getContents());
+								this.rFileModel.addXmlDocument(doc, (IFile)allFiles[i]);
+								rModel.addReview(doc.getReview());
+							} catch (Exception e) {/*?|r72|Thilo|c0|*/
+								PluginLogger.logError(ReviewAccess.class.toString(), "loadAllReviews", "Could not load file "+allFiles[i], e);
+								errorFiles.add(allFiles[i]);
+							}/*|r72|Thilo|c0|?*/
 						}
 					}
 				}
 			}
+			// Show errors to user/*?|r72|Thilo|c1|*/
+			if (!errorFiles.isEmpty()) {
+				String message = "AgileReview could not load the following review files:\n\n";
+				for (IResource file : errorFiles) {
+					message += file.getLocation().toOSString()+"\n";
+				}
+				message += "\nThese files may be corrupted (i.e. empty). Please check them.\nComments of a review cannot be loaded without working review file.";
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not load files", message);
+			}/*|r72|Thilo|c1|?*/
 		} catch (CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllReviews", "CoreException while filling review model", e);
 		}
@@ -862,10 +880,8 @@ public class ReviewAccess {
 	/**
 	 * Load all comments of the given review into the database
 	 * @param reviewId
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	public void loadReviewComments(String reviewId) throws XmlException, IOException
+	public void loadReviewComments(String reviewId)
 	{
 		PluginLogger.log(this.getClass().toString(), "loadReviewComments", "Load comments of review: "+reviewId);
 		IFolder currFolder = ReviewAccess.createReviewFolder(reviewId);
@@ -874,20 +890,32 @@ public class ReviewAccess {
 			IResource[] allFiles = currFolder.members();
 			
 			this.rModel.createModelEntry(reviewId);
-					
+			LinkedList<IResource> errorFiles = new LinkedList<IResource>();
 			// Iterate all files in the current folder
-			for (IResource currFile : allFiles)
-			{
+			for (IResource currFile : allFiles)	{
 				if (currFile instanceof IFile) {
 					if (!((IFile)currFile).getName().equals("review.xml")) {
 						// Open file and read basic information
-						CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
-						this.rFileModel.addXmlDocument(doc, (IFile)currFile);
-						
-						readCommentsDocument(doc);	
+						try {
+							CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+							this.rFileModel.addXmlDocument(doc, (IFile)currFile);
+							readCommentsDocument(doc);	
+						} catch (Exception e) {/*?|r72|Thilo|c4|*/
+							PluginLogger.logError(ReviewAccess.class.toString(), "loadReviewComments", "Could not load file "+currFile, e);
+							errorFiles.add(currFile);
+						}/*|r72|Thilo|c4|?*/
 					}
 				}
 			}
+			// Show errors to user/*?|r72|Thilo|c5|*/
+			if (!errorFiles.isEmpty()) {
+				String message = "AgileReview could not load the following files:\n\n";
+				for (IResource file : errorFiles) {
+					message += file.getLocation().toOSString()+"\n";
+				}
+				message += "\nThese files may be corrupted (i.e. empty). Please check them.";
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not load files", message);
+			}/*|r72|Thilo|c5|?*/
 		} catch (CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadReviewComments", "CoreException while loading comments of review "+reviewId+" into database", e);
 		}
@@ -907,10 +935,8 @@ public class ReviewAccess {
 	
 	/**
 	 * Fills the CommentModel with all found files
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	public void fillDatabaseCompletely() throws XmlException, IOException
+	public void fillDatabaseCompletely()
 	{
 		PluginLogger.log(this.getClass().toString(), "fillDatabaseCompletely", "Clear all models and reload everything from file (including closed reviews)");
 		// Clear old values
@@ -926,10 +952,8 @@ public class ReviewAccess {
 	 * Fills the comment database for all open reviews. 
 	 * Therefore all review data are read and based 
 	 * on the workspace-specific preferences the open reviews are loaded.
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	public void fillDatabaseForOpenReviews() throws XmlException, IOException
+	public void fillDatabaseForOpenReviews()
 	{
 		// Clear old models
 		this.clearAllModels();

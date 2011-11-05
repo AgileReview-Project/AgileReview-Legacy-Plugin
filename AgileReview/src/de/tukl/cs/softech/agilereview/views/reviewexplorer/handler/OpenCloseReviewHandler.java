@@ -1,8 +1,5 @@
 package de.tukl.cs.softech.agilereview.views.reviewexplorer.handler;
 
-import java.io.IOException;
-
-import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -24,10 +21,6 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
 public class OpenCloseReviewHandler extends AbstractHandler {
 	
 	/**
-	 * Instance of ReviewAccess
-	 */
-	private ReviewAccess ra = ReviewAccess.getInstance();
-	/**
 	 * Instance of PropertiesManager
 	 */
 	private PropertiesManager pm = PropertiesManager.getInstance();
@@ -36,7 +29,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "\"Open/Close in ReviewExplorer selected review\" triggered");
-				
+		ReviewAccess ra = ReviewAccess.getInstance();
 		ISelection sel1 = HandlerUtil.getCurrentSelection(event);
 		if (sel1 != null){
 			if (sel1 instanceof IStructuredSelection)
@@ -71,14 +64,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 							// Review is closed --> open it
 							PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be opened");
 							selectedWrap.setOpen(true);
-							try 
-							{
-								ra.loadReviewComments(reviewId);
-							} catch (XmlException e) {
-								PluginLogger.logError(this.getClass().toString(), "execute", "Review "+selectedWrap.getReviewId()+" could not be opened", e);				
-							} catch (IOException e) {
-								PluginLogger.logError(this.getClass().toString(), "execute", "Review "+selectedWrap.getReviewId()+" could not be opened", e);
-							}
+							ra.loadReviewComments(reviewId);
 							pm.addToOpenReviews(reviewId);
 						}	
 					}

@@ -30,10 +30,6 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 public class DeleteCommentHandler extends AbstractHandler {
 	
 	/**
-	 * Instance of ReviewAccess
-	 */
-	private ReviewAccess ra = ReviewAccess.getInstance();
-	/**
 	 * Instance of PropertiesManager
 	 */
 	private PropertiesManager pm = PropertiesManager.getInstance();
@@ -42,6 +38,7 @@ public class DeleteCommentHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "\"Delete Comment in Editor\" triggered");
 		
+		ReviewAccess ra = ReviewAccess.getInstance();
 		IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
 		if (editorPart instanceof ITextEditor) {
 			ISelection sel = ((ITextEditor)editorPart).getSelectionProvider().getSelection();
