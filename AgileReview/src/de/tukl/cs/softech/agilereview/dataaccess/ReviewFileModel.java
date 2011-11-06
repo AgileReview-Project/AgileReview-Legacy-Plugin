@@ -64,15 +64,15 @@ class ReviewFileModel {
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IEditorPart editor = ResourceUtil.findEditor(page, (IFile)delFile);
 				if(editor != null) {
-					page.closeEditor(editor, false);
+					page.closeEditor(editor, false);/*?|r71|Thilo|c0|?*/
 				}
 				delFile.delete(true, null);
-			} else if(delFile instanceof IFolder){
+			} else if(delFile instanceof IFolder){/*?|r71|Thilo|c1|*/
 				for(IResource r : ((IFolder)delFile).members()) {
 					deleteResource(r);
 				}
 				delFile.delete(true, null);
-			} else {
+			} else {/*|r71|Thilo|c1|?*/
 				delFile.delete(true, null);
 			}/*|r71|Malte|c1|?*/
 		} catch (CoreException e) {
