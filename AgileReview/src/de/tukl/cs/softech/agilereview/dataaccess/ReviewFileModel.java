@@ -75,13 +75,13 @@ class ReviewFileModel {
 			} else {/*|r71|Thilo|c1|?*/
 				delFile.delete(true, null);
 			}/*|r71|Malte|c1|?*/
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			Display.getDefault().asyncExec(new Runnable() {
 				
 				@Override
 				public void run() {
 					MessageDialog.openError(Display.getDefault().getActiveShell(), "Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted.\n" +
-							"Please delete the file manually.");
+							"Please delete the file manually.\n\nReason:\n"+e.getLocalizedMessage());
 				}
 			});
 			PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted", e);
