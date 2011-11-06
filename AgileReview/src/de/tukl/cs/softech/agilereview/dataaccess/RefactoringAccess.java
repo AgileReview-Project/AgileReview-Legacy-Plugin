@@ -242,7 +242,7 @@ public class RefactoringAccess {
 	 * @throws XmlException
 	 * @throws IOException
 	 */
-	private void loadAllComments() throws XmlException, IOException {
+	private void loadAllComments() throws XmlException, IOException { // TODO: Maybe this should be changed, to consider single files. (Currently: breaks when encountering a error)
 		// Get all relevant folders in the review repository
 		try {
 			IResource[] allFolders = ra.getCurrentSourceFolder().members();
@@ -263,7 +263,7 @@ public class RefactoringAccess {
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (CoreException e) { // TODO: Maybe show this to the user (CoreException!)
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
 		}
 	}
