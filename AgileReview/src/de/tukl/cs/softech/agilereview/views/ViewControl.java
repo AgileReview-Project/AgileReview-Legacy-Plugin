@@ -237,8 +237,8 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * Opens the views specified by the parameter. If the view is already open, the specified views will be brought to top.
 	 * @param views public static fields specifying the views (xor for more than one)
 	 */
-	public static void openView(int views) {/*?|r48|Malte|c1|*/
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+	public static void openView(int views) {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();/*?|r48|piet|c0|?*/
 		if(views % 2 == 1) {
 			if(isOpen(DetailView.class)) {
 				page.bringToTop(DetailView.getInstance());
@@ -275,7 +275,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 				}
 			}
 		}
-	}/*|r48|Malte|c1|?*/
+	}
 	
 	//****************************************
 	//****** ISelectionChangedListener *******
