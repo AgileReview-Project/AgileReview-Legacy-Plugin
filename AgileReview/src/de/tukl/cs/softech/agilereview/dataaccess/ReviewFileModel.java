@@ -61,7 +61,7 @@ class ReviewFileModel {
 	private void deleteResource(final IResource delFile) {
 		try {
 			if(delFile instanceof IFile) {/*?|r71|Malte|c1|*/
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();/*?|r71|Peter|c0|?*/
 				IEditorPart editor = ResourceUtil.findEditor(page, (IFile)delFile);
 				if(editor != null) {
 					page.closeEditor(editor, false);/*?|r71|Thilo|c0|?*/
