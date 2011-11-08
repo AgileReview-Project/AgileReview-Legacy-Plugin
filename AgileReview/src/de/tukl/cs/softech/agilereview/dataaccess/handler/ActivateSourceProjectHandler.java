@@ -39,7 +39,7 @@ public class ActivateSourceProjectHandler extends AbstractHandler {
 				}
 			}
 		
-		} catch (CoreException e) {
+		} catch (CoreException e) {/*?|r81|Thilo|c9|?*/
 			throw new ExecutionException("Closed or non-existent project selected", e);
 		}
 		return null;

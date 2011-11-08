@@ -142,7 +142,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 					}					
 				}
 			}
-		} catch (CoreException e) {
+		} catch (CoreException e) {/*?|r81|Thilo|c10|?*/
 			PluginLogger.logError(this.getClass().toString(), "getFilesOfProject", "CoreException while trying to fetch files of project "+project.getName()+".", e);
 		}
 		return paths;

@@ -247,7 +247,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 						}
 					}
 				});
-			} catch (CoreException e) {
+			} catch (CoreException e) {/*?|r81|Thilo|c24|?*/
 				//can be called twice (e.g. when renaming a single package which is represented by an IResource AND an IPackageFragment) 
 			}
 			deltaFactory.change(f);

@@ -263,7 +263,7 @@ public class RefactoringAccess {
 					}
 				}
 			}
-		} catch (CoreException e) { // TODO: Maybe show this to the user (CoreException!)
+		} catch (CoreException e) { // TODO: Maybe show this to the user (CoreException!)/*?|r81|Thilo|c15|?*/
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
 		}
 	}

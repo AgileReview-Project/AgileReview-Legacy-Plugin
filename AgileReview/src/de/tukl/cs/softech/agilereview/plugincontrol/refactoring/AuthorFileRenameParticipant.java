@@ -232,7 +232,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 						}
 					}
 				});
-			} catch (CoreException e) {
+			} catch (CoreException e) {/*?|r81|Thilo|c23|?*/
 				//can be called twice (e.g. when renaming a single package which is represented by an IResource AND an IPackageFragment) 
 			}
 			deltaFactory.change(f);

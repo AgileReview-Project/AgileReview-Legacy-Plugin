@@ -245,7 +245,7 @@ public class AnnotationParser implements IAnnotationParser {
 		// Save the current document to save the tags
 		try {
 			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
-		} catch (CoreException e) {
+		} catch (CoreException e) {/*?|r81|Thilo|c0|?*/
 			PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "+editor.getTitle(), e);
 		}
 		
@@ -294,7 +294,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#addTagsInDocument(agileReview.softech.tukl.de.CommentDocument.Comment)
 	 */
-	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {
+	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {/*?|r81|Thilo|c2|?*/
 		//VARIANT(return Position):Position result = null;
 
 		ISelection selection = editor.getSelectionProvider().getSelection();
@@ -315,7 +315,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
 	 * @throws CoreException 
 	 */
-	private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException, CoreException {/*?|r76|Malte|c2|?*/
+	private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException, CoreException {/*?|r76|Malte|c2|?*//*?|r81|Thilo|c1|?*/
 		
 		String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 		String commentTag = keySeparator+commentKey+keySeparator;
@@ -472,7 +472,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentTags(agileReview.softech.tukl.de.CommentDocument.Comment)
 	 */
-	public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {
+	public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {/*?|r81|Thilo|c4|?*/
 		removeCommentsTags(new HashSet<Comment>(Arrays.asList(new Comment[]{comment})));
 	}
 	
@@ -480,7 +480,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentsTags(java.util.Set)
 	 */
-	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {		
+	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {		/*?|r81|Thilo|c3|?*/
 		String separator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		TreeSet<Position> tagPositions = new TreeSet<Position>();
 		String key;
@@ -542,7 +542,7 @@ public class AnnotationParser implements IAnnotationParser {
 	}
 
 	@Override
-	public void relocateComment(Comment comment, boolean display) throws BadLocationException, CoreException {/*?|r76|Malte|c1|*/
+	public void relocateComment(Comment comment, boolean display) throws BadLocationException, CoreException {/*?|r76|Malte|c1|*//*?|r81|Thilo|c5|?*/
 		ISelection selection = editor.getSelectionProvider().getSelection();
 		if (selection instanceof ITextSelection) {
 			int selStartLine = ((ITextSelection)selection).getStartLine();

@@ -93,7 +93,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 										try {
 											oldSourceProject.open(null); // TODO use progressmonitor?
 											ra.loadReviewSourceProject(oldSourceProject.getName());
-										} catch (CoreException e) {
+										} catch (CoreException e) {/*?|r81|Thilo|c12|?*/
 											PluginLogger.logError(this.getClass().toString(), "resourceChanged", "An exception occured while reopening the closed source project", e);
 										}
 									} else {
@@ -150,7 +150,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 												project.create(description, null); //TODO use progressmontiro here and one line below?
 												project.open(null);
 												ra.loadReviewSourceProject(project.getName());
-											} catch (CoreException e) {
+											} catch (CoreException e) {/*?|r81|Thilo|c13|?*/
 												PluginLogger.logError(this.getClass().toString(), "resourceChanged", "An exception occured while reimporting the closed source project", e);
 											}
 										} else {
@@ -182,7 +182,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 									}
 								});
 							}
-						} catch (CoreException e) {/* We are not interested in closed or non existent projects*/}
+						} catch (CoreException e) {/* We are not interested in closed or non existent projects*/}/*?|r81|Thilo|c14|?*/
 					}
 				}
 				

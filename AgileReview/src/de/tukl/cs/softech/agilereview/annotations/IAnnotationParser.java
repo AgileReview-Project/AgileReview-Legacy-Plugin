@@ -12,7 +12,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 /**
  * Interface for all annotation parsers
  */
-public interface IAnnotationParser {
+public interface IAnnotationParser {/*?|r81|Thilo|c6|?*/
 
 	/**
 	 * Filter annotations and display only the given comments

@@ -12,7 +12,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 /**
  * Parser, which does nothing and returns null whenever a value is requested
  */
-public class NullParser implements IAnnotationParser {
+public class NullParser implements IAnnotationParser {/*?|r81|Thilo|c7|?*/
 	
 	/**
 	 * Protected constructor

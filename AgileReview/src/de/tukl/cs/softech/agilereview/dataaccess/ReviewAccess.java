@@ -91,7 +91,7 @@ public class ReviewAccess {
 			try {
 				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
 				while (!file.exists()) {};
-			} catch (CoreException e) {
+			} catch (CoreException e) {/*?|r81|Thilo|c16|?*/
 				PluginLogger.logError(ReviewAccess.class.toString(), "createCommentFile", "CoreException while creating comment file", e);
 			}
 		}
@@ -110,7 +110,7 @@ public class ReviewAccess {
 			try {
 				folder.create(IResource.NONE, true, null);
 				while (!folder.exists()) {}
-			} catch (CoreException e) {
+			} catch (CoreException e) {/*?|r81|Thilo|c17|?*/
 				PluginLogger.logError(ReviewAccess.class.toString(), "createReviewFolder", "CoreException while creating review folder", e);
 			}
 		} 
@@ -129,7 +129,7 @@ public class ReviewAccess {
 			try {
 				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
 				while (!file.exists()) {}
-			} catch (CoreException e) {
+			} catch (CoreException e) {/*?|r81|Thilo|c18|?*/
 				PluginLogger.logError(ReviewAccess.class.toString(), "createReviewFile", "CoreException while creating review file", e);
 			}
 		}
@@ -247,7 +247,7 @@ public class ReviewAccess {
 			// Set project description
 			setProjectNatures(p, new String[] {PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE)});
 		}
-		catch (CoreException e)
+		catch (CoreException e)/*?|r81|Thilo|c19|?*/
 		{
 			PluginLogger.logError(ReviewAccess.class.toString(), "createReviewProject", "CoreException in ReviewAccess constructor", e);
 			result = false;
@@ -267,7 +267,7 @@ public class ReviewAccess {
 			projectDesc.setNatureIds(natures);
 			p.setDescription(projectDesc, null);// TODO: Use ProgressMonitor
 			return true;
-		} catch (CoreException e) {
+		} catch (CoreException e) {/*?|r81|Thilo|c20|?*/
 			PluginLogger.logError(ReviewAccess.class.toString(), "createReviewProject", "CoreException while setting project natures", e);
 			return false;
 		}

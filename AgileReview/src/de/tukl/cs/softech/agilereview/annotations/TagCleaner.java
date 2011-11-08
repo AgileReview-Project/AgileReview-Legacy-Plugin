@@ -98,7 +98,7 @@ public class TagCleaner {
 					file.setContents(source, false, true, null);
 				}
 			
-			} catch (CoreException e) {
+			} catch (CoreException e) {/*?|r81|Thilo|c8|?*/
 				PluginLogger.logError(TagCleaner.class.toString(), "execute", "CoreException while trying to remove tags.", e);
 				return false;
 			} catch (IOException e) {
