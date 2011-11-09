@@ -311,26 +311,21 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	@Override
-	public void partOpened(IWorkbenchPartReference partRef) {
-	}
+	public void partOpened(IWorkbenchPartReference partRef) {}
 
 	/**
 	 * not yet used
 	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	@Override
-	public void partHidden(IWorkbenchPartReference partRef) {
-		
-	}
+	public void partHidden(IWorkbenchPartReference partRef) {}
 
 	/**
 	 * not yet used
 	 * @see org.eclipse.ui.IPartListener2#partVisible(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	@Override
-	public void partVisible(IWorkbenchPartReference partRef) {
-				
-	}
+	public void partVisible(IWorkbenchPartReference partRef) {}
 
 	/**
 	 * not yet used

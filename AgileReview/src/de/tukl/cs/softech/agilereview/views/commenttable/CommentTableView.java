@@ -129,11 +129,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * indicates whether Eclipse was just started or not
 	 */
-	private boolean startup = true;
-	/**
-	 * indicates whether annotations are displayed or not
-	 */
-	private boolean perspectiveNotActive = false; 
+	private boolean startup = true; 
 	/**
 	 * map of currently opened editors and their annotation parsers
 	 */
@@ -809,6 +805,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void partClosed(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof IEditorPart) {
 			IEditorPart editor = (IEditorPart) partRef.getPart(false);/*?|r83|Malte|c5|?*/
+			if (editor == null) {
+				return;
+			}
 			if (this.parserMap.containsKey(editor)) {
 				this.parserMap.remove(editor);
 			}
@@ -823,7 +822,10 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof IEditorPart) {
 			IEditorPart editor = (IEditorPart) partRef.getPart(false);/*?|r83|Malte|c4|?*/
-			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
+			if (editor == null) {
+				return;
+			}
+			if (!this.parserMap.containsKey(editor) && ViewControl.isPerspectiveOpen()) {
 				this.parserMap.put(editor, ParserFactory.createParser(editor));
 			}
 			if(parserMap.containsKey(editor)) {
@@ -840,7 +842,10 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void partInputChanged(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof IEditorPart) {/*?|r83|Malte|c1|?*/
 			IEditorPart editor = (IEditorPart) partRef.getPart(false);
-			if (this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {/*?|r83|Malte|c2|?*/
+			if (editor == null) {
+				return;
+			}
+			if (this.parserMap.containsKey(editor) && ViewControl.isPerspectiveOpen()) {/*?|r83|Malte|c2|?*/
 				parserMap.get(editor).clearAnnotations();
 				parserMap.put(editor, ParserFactory.createParser(editor));
 				parserMap.get(editor).filter(getFilteredComments());
@@ -862,7 +867,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 			this.parserMap.clear();
 			this.startup = false;
-			this.perspectiveNotActive = true;/*?|r83|Malte|c3|?*/
+			/*?|r83|Malte|c3|?*/
 			System.gc();
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivatedperspectiveActivated", "Clear parser map and run garbage collector");
 		}
@@ -873,7 +878,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 						this.parserMap.put((IEditorPart) getActiveEditor(), ParserFactory.createParser((IEditorPart) getActiveEditor()));
 						this.parserMap.get((IEditorPart) getActiveEditor()).filter(getFilteredComments());
 				}
-				this.perspectiveNotActive = false;
 			}
 		}
 	}
