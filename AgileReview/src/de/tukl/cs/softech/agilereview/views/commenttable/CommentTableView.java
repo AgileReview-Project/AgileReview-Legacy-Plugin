@@ -833,6 +833,22 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	}
 	
 	/**
+	 * Reset the parser of the editor given by partRef
+	 * @param partRef will be forwarded from the {@link ViewControl}
+	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	public void partInputChanged(IWorkbenchPartReference partRef) {/*?|r83|Peter Reuter|c0|*/
+		if (partRef.getPart(false) instanceof IEditorPart) {
+			IEditorPart editor = (IEditorPart) partRef.getPart(false);
+			if (this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
+				parserMap.get(editor).clearAnnotations();
+				parserMap.put(editor, ParserFactory.createParser(editor));
+				parserMap.get(editor).filter(getFilteredComments());
+			}
+		}
+	}/*|r83|Peter Reuter|c0|?*/
+	
+	/**
 	 * Removes all annotations if the AgileReview perspective is closed. The method is invoke by {@link:ViewControl} 
 	 * @param page the workbench page
 	 * @param perspective the activated perspective
