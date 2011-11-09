@@ -336,13 +336,13 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * not yet used
 	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	@Override/*?|r83|Peter Reuter|c1|*/
+	@Override
 	public void partInputChanged(IWorkbenchPartReference partRef) {
-		PluginLogger.log(this.getClass().toString(), "partInputChanged", partRef.getPart(false).getTitle());
+		PluginLogger.log(this.getClass().toString(), "partInputChanged", partRef.getPart(false).getTitle());/*?|r83|Malte|c0|?*/
 		if(isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().partInputChanged(partRef);
 		}
-	}/*|r83|Peter Reuter|c1|?*/
+	}
 	
 	//****************************************
 	//****** IPerspectiveListener3 ***********

@@ -808,7 +808,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	public void partClosed(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof IEditorPart) {
-			IEditorPart editor = (IEditorPart) partRef.getPart(false);
+			IEditorPart editor = (IEditorPart) partRef.getPart(false);/*?|r83|Malte|c5|?*/
 			if (this.parserMap.containsKey(editor)) {
 				this.parserMap.remove(editor);
 			}
@@ -822,7 +822,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof IEditorPart) {
-			IEditorPart editor = (IEditorPart) partRef.getPart(false);
+			IEditorPart editor = (IEditorPart) partRef.getPart(false);/*?|r83|Malte|c4|?*/
 			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
 				this.parserMap.put(editor, ParserFactory.createParser(editor));
 			}
@@ -837,16 +837,16 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param partRef will be forwarded from the {@link ViewControl}
 	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
 	 */
-	public void partInputChanged(IWorkbenchPartReference partRef) {/*?|r83|Peter Reuter|c0|*/
-		if (partRef.getPart(false) instanceof IEditorPart) {
+	public void partInputChanged(IWorkbenchPartReference partRef) {
+		if (partRef.getPart(false) instanceof IEditorPart) {/*?|r83|Malte|c1|?*/
 			IEditorPart editor = (IEditorPart) partRef.getPart(false);
-			if (this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
+			if (this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {/*?|r83|Malte|c2|?*/
 				parserMap.get(editor).clearAnnotations();
 				parserMap.put(editor, ParserFactory.createParser(editor));
 				parserMap.get(editor).filter(getFilteredComments());
 			}
 		}
-	}/*|r83|Peter Reuter|c0|?*/
+	}
 	
 	/**
 	 * Removes all annotations if the AgileReview perspective is closed. The method is invoke by {@link:ViewControl} 
@@ -862,7 +862,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 			this.parserMap.clear();
 			this.startup = false;
-			this.perspectiveNotActive = true;
+			this.perspectiveNotActive = true;/*?|r83|Malte|c3|?*/
 			System.gc();
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivatedperspectiveActivated", "Clear parser map and run garbage collector");
 		}
