@@ -152,8 +152,8 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 				if (currProj.hasNature(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE))) {
 					listOpenARProjects.add(currProj.getName());
 				}
-			} catch (CoreException e) {/*?|r81|Thilo|c26|?*/
-				// Is thrown, if currProj is closed or does not exist
+			} catch (CoreException e) {
+				// Is thrown, if currProj is closed or does not exist --> CoreException actively used here
 				if (currProj.exists()) {
 					listClosedARProjects.add(currProj.getName());	
 				}

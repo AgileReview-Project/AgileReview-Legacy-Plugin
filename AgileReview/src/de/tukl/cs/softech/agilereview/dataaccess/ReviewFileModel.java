@@ -49,8 +49,9 @@ class ReviewFileModel {
 		document.save(filePath.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
 		try {
 			filePath.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {/*?|r81|Thilo|c21|?*/
+		} catch (CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "save", "CoreException while saving "+filePath.getLocation().toOSString(), e);
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could save AgileReview files", e.getLocalizedMessage());
 		}
 	}
 	
@@ -132,8 +133,9 @@ class ReviewFileModel {
 						if (f instanceof IFile)
 						this.removeXmlDocument((IFile)f);
 					}
-				} catch (CoreException e) {/*?|r81|Thilo|c22|?*/
+				} catch (CoreException e) {
 					PluginLogger.logError(this.getClass().toString(), "removeXmlDocument", "CoreException while removing sibling files of "+file.getLocation().toOSString()+" from model", e);
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not delte AgileReview files", e.getLocalizedMessage());
 				}
 
 				// Delete the folder afterwards

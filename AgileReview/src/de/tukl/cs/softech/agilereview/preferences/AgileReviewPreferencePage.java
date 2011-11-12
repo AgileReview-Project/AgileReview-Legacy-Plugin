@@ -105,8 +105,8 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				if (currProj.hasNature(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE))) {
 					list.add(currProj.getName());
 				}
-			} catch (CoreException e) {/*?|r81|Thilo|c25|?*/
-				// Is thrown, if currProj is closed or  does not exist -> ignore it
+			} catch (CoreException e) {
+				// Is thrown, if currProj is closed or does not exist -> this project is not interesting for us
 			}
 		}
 		

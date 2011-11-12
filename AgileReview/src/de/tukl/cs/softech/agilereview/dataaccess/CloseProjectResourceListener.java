@@ -93,8 +93,9 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 										try {
 											oldSourceProject.open(null); // TODO use progressmonitor?
 											ra.loadReviewSourceProject(oldSourceProject.getName());
-										} catch (CoreException e) {/*?|r81|Thilo|c12|?*/
+										} catch (CoreException e) {
 											PluginLogger.logError(this.getClass().toString(), "resourceChanged", "An exception occured while reopening the closed source project", e);
+											MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could open project", e.getLocalizedMessage());
 										}
 									} else {
 										// Show NoAgileReviewSourceProject wizard
@@ -150,8 +151,9 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 												project.create(description, null); //TODO use progressmontiro here and one line below?
 												project.open(null);
 												ra.loadReviewSourceProject(project.getName());
-											} catch (CoreException e) {/*?|r81|Thilo|c13|?*/
+											} catch (CoreException e) {
 												PluginLogger.logError(this.getClass().toString(), "resourceChanged", "An exception occured while reimporting the closed source project", e);
+												MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not import project", e.getLocalizedMessage());
 											}
 										} else {
 											// Show NoAgileReviewSourceProject wizard
@@ -182,7 +184,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 									}
 								});
 							}
-						} catch (CoreException e) {/* We are not interested in closed or non existent projects*/}/*?|r81|Thilo|c14|?*/
+						} catch (CoreException e) {/* We are not interested in closed or non existent projects*/}
 					}
 				}
 				
