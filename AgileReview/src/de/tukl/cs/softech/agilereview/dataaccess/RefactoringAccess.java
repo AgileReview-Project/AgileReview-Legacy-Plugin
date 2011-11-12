@@ -16,6 +16,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.CommentsDocument.Comments;
@@ -263,8 +265,16 @@ public class RefactoringAccess {
 					}
 				}
 			}
-		} catch (CoreException e) { // TODO: Maybe show this to the user (CoreException!)/*?|r81|Thilo|c15|?*/
+		} catch (CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException", "An error occured while reading the files of the AgileReview Source Folder in order to do the refactoring!");
+				}
+				
+			});
 		}
 	}
 	

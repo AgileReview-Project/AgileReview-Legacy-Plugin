@@ -232,7 +232,8 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 						}
 					}
 				});
-			} catch (CoreException e) {/*?|r81|Thilo|c23|?*/
+			} catch (CoreException e) {
+				//do not inform the user as this condition checker can be added twice by different AgileReview Refactoring participants:
 				//can be called twice (e.g. when renaming a single package which is represented by an IResource AND an IPackageFragment) 
 			}
 			deltaFactory.change(f);

@@ -178,8 +178,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "addComment", "BadLocationException when trying to add tags", e);
-		} catch (CoreException e) {/*?|r81|Thilo|c27|?*/
-			PluginLogger.log(this.getClass().toString(), "addComment", "CoreException when trying to add tags", e);
 		}	
 	}
 	
@@ -205,8 +203,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "deleteComment", "BadLocationException when trying to delete comment", e);
-		} catch (CoreException e) {/*?|r81|Thilo|c28|?*/
-			PluginLogger.logError(this.getClass().toString(), "deleteComment", "CoreException when trying to delete comment", e);
 		}
 	}
 
@@ -664,8 +660,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 				parserMap.get(editor).relocateComment(comment, getFilteredComments().contains(comment));
 			} catch (BadLocationException e) {
 				PluginLogger.logError(this.getClass().toString(), "relocateComment", "BadLocationException when trying to add/remove tags", e);
-			} catch (CoreException e) {/*?|r81|Thilo|c29|?*/
-				PluginLogger.log(this.getClass().toString(), "relocateComment", "CoreException when trying to add/remove tags", e);
 			}
 		}
 	}/*|r76|Malte|c0|?*/

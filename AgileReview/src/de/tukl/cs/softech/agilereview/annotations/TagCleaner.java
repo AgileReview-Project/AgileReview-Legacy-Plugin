@@ -12,6 +12,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -54,7 +56,7 @@ public class TagCleaner {
 	 * @return whether tags were removed successful
 	 */
 	public static boolean removeTag(IPath path, String identifier, boolean regex) {
-		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		if (file.exists()) {
 			try {
 				//check whether this file is supported
@@ -98,8 +100,16 @@ public class TagCleaner {
 					file.setContents(source, false, true, null);
 				}
 			
-			} catch (CoreException e) {/*?|r81|Thilo|c8|?*/
+			} catch (final CoreException e) {
 				PluginLogger.logError(TagCleaner.class.toString(), "execute", "CoreException while trying to remove tags.", e);
+				Display.getDefault().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException", "An error occured while reading/saving the file "+file.getFullPath()+"\n");
+					}
+					
+				});
 				return false;
 			} catch (IOException e) {
 				PluginLogger.logError(TagCleaner.class.toString(), "execute", "IOException while trying to remove tags.", e);

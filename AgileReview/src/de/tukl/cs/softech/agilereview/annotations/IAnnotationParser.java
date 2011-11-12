@@ -3,7 +3,6 @@ package de.tukl.cs.softech.agilereview.annotations;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Position;
 
@@ -12,7 +11,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 /**
  * Interface for all annotation parsers
  */
-public interface IAnnotationParser {/*?|r81|Thilo|c6|?*/
+public interface IAnnotationParser {
 
 	/**
 	 * Filter annotations and display only the given comments
@@ -25,9 +24,8 @@ public interface IAnnotationParser {/*?|r81|Thilo|c6|?*/
 	 * @param comment Comment for which the tags should be inserted
 	 * @param display if true, the new comment will instantly displayed<br>false, otherwise
 	 * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
-	 * @throws CoreException 
 	 */
-	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException;
+	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException;
 	
 	/**
 	 * Removes the tags for one comment. Attention: if you want to delete more then one {@link Comment} in a row
@@ -35,17 +33,15 @@ public interface IAnnotationParser {/*?|r81|Thilo|c6|?*/
 	 * will be reparsed
 	 * @param comment which should be deleted
 	 * @throws BadLocationException if the {@link Position} is corrupted (the document should be reparsed then)
-	 * @throws CoreException  if document can not be saved
 	 */
-	public void removeCommentTags(Comment comment) throws BadLocationException, CoreException;
+	public void removeCommentTags(Comment comment) throws BadLocationException;
 	
 	/**
 	 * Removes all tags of the given comments. After this is done the document will be reparsed
 	 * @param comments which should be deleted
 	 * @throws BadLocationException if the {@link Position} is corrupted (the document should be reparsed then)
-	 * @throws CoreException if document can not be saved
 	 */
-	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException;
+	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException;
 	
 	/**
 	 * Jumps to the first line of the given comment
@@ -75,8 +71,7 @@ public interface IAnnotationParser {/*?|r81|Thilo|c6|?*/
 	 * Relocates the comment passed to the current selection within the same file
 	 * @param comment comment which should be relocated
 	 * @param display defines whether the comment should currently be displayed or not
-	 * @throws CoreException if there is a problem of removing or adding tags and saving the document
 	 * @throws BadLocationException if no tags for the given comment exists
 	 */
-	public void relocateComment(Comment comment, boolean display) throws BadLocationException, CoreException;
+	public void relocateComment(Comment comment, boolean display) throws BadLocationException;
 }

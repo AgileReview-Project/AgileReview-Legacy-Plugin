@@ -247,7 +247,8 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 						}
 					}
 				});
-			} catch (CoreException e) {/*?|r81|Thilo|c24|?*/
+			} catch (CoreException e) {
+				//do not inform the user as this condition checker can be added twice by different AgileReview Refactoring participants:
 				//can be called twice (e.g. when renaming a single package which is represented by an IResource AND an IPackageFragment) 
 			}
 			deltaFactory.change(f);
@@ -283,58 +284,56 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			
 			TextFileChange change = (TextFileChange) getTextChange(f);
 			
-			if(change != null) {
-				//if there are already changes in this file, do not touch it
-				return null;/*?|r68|Peter Reuter|c5|?*/
-			}
-			
-			change = new TextFileChange(f.getName(), f);
-			change.setEdit(new MultiTextEdit());
-			
-			//current index of the previous (original) document
-			int oldIndex = 0;
-			//should be != null if a delete edit occurs before a insert edit
-			DeleteEdit dEdit = null;
-			for(Diff d : diffProcessor.diff_main(prevDocs.get(f), postDocs.get(f), false)) {
-				switch(d.operation) {
-				case EQUAL: 
-					if(dEdit != null) {
-						try {
-							change.addEdit(new DeleteEdit(oldIndex, dEdit.getLength()));
-						} catch(MalformedTreeException e) {
-							//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
+			if(change == null) {/*?|r68|Peter Reuter|c5|?*/
+				//only touch this file if there are no changes done so far
+				change = new TextFileChange(f.getName(), f);
+				change.setEdit(new MultiTextEdit());
+				
+				//current index of the previous (original) document
+				int oldIndex = 0;
+				//should be != null if a delete edit occurs before a insert edit
+				DeleteEdit dEdit = null;
+				for(Diff d : diffProcessor.diff_main(prevDocs.get(f), postDocs.get(f), false)) {
+					switch(d.operation) {
+					case EQUAL: 
+						if(dEdit != null) {
+							try {
+								change.addEdit(new DeleteEdit(oldIndex, dEdit.getLength()));
+							} catch(MalformedTreeException e) {
+								//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
+							}
+							oldIndex += dEdit.getLength();
+							dEdit = null;
 						}
-						oldIndex += dEdit.getLength();
-						dEdit = null;
+						oldIndex += d.text.length();
+						break;
+					case DELETE:
+						dEdit = new DeleteEdit(oldIndex, d.text.length());
+						break;
+					case INSERT:
+						if(dEdit != null) {
+							try {
+								change.addEdit(new ReplaceEdit(oldIndex, dEdit.getLength(), d.text));
+							} catch(MalformedTreeException e) {
+								//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
+							}
+							oldIndex += dEdit.getLength();
+							dEdit = null;
+						} else {
+							try {
+								change.addEdit(new InsertEdit(oldIndex, d.text));
+							} catch(MalformedTreeException e) {
+								//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
+							}
+						}
+						break;
 					}
-					oldIndex += d.text.length();
-					break;
-				case DELETE:
-					dEdit = new DeleteEdit(oldIndex, d.text.length());
-					break;
-				case INSERT:
-					if(dEdit != null) {
-						try {
-							change.addEdit(new ReplaceEdit(oldIndex, dEdit.getLength(), d.text));
-						} catch(MalformedTreeException e) {
-							//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
-						}
-						oldIndex += dEdit.getLength();
-						dEdit = null;
-					} else {
-						try {
-							change.addEdit(new InsertEdit(oldIndex, d.text));
-						} catch(MalformedTreeException e) {
-							//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
-						}
-					}
-					break;
 				}
-			}
-			
-			//only add the change if there are edits to be performed
-			if(((MultiTextEdit)change.getEdit()).getChildren().length != 0) {
-				result.add(change);
+				
+				//only add the change if there are edits to be performed
+				if(((MultiTextEdit)change.getEdit()).getChildren().length != 0) {
+					result.add(change);
+				}
 			}
 		}
 		

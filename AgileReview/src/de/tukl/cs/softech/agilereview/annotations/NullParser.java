@@ -12,7 +12,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 /**
  * Parser, which does nothing and returns null whenever a value is requested
  */
-public class NullParser implements IAnnotationParser {/*?|r81|Thilo|c7|?*/
+public class NullParser implements IAnnotationParser {
 	
 	/**
 	 * Protected constructor
@@ -25,13 +25,13 @@ public class NullParser implements IAnnotationParser {/*?|r81|Thilo|c7|?*/
 	public void filter(HashSet<Comment> comments) {}
 
 	@Override
-	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {}
+	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException {}
 
 	@Override
-	public void removeCommentTags(Comment comment) throws BadLocationException,	CoreException {}
+	public void removeCommentTags(Comment comment) throws BadLocationException {}
 
 	@Override
-	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {}
+	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException {}
 
 	@Override
 	public void revealCommentLocation(String commentID)	throws BadLocationException {}
@@ -52,6 +52,6 @@ public class NullParser implements IAnnotationParser {/*?|r81|Thilo|c7|?*/
 	}
 
 	@Override
-	public void relocateComment(Comment comment, boolean display) throws BadLocationException, CoreException {}
+	public void relocateComment(Comment comment, boolean display) throws BadLocationException {}
 
 }
