@@ -16,7 +16,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Display;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
@@ -130,7 +132,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 	 * @param project the project
 	 * @return list of paths of files relatively to the workspace
 	 */
-	private HashSet<String> getFilesOfProject(IProject project) {
+	private HashSet<String> getFilesOfProject(final IProject project) {
 		HashSet<String> paths = new HashSet<String>();
 		try {
 			for (IResource r : project.members()) {
@@ -142,7 +144,16 @@ public class CleanupProcess implements IRunnableWithProgress {
 					}					
 				}
 			}
-		} catch (CoreException e) {/*?|r81|Thilo|c10|?*/
+		} catch (CoreException e) {
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException", "An eclipse internal error occured when performing cleanup!\n" +
+							"The resource "+project.getName()+" does not exist or is closed.");
+				}
+				
+			});
 			PluginLogger.logError(this.getClass().toString(), "getFilesOfProject", "CoreException while trying to fetch files of project "+project.getName()+".", e);
 		}
 		return paths;
@@ -167,5 +178,5 @@ public class CleanupProcess implements IRunnableWithProgress {
 		}		
 		return paths;
 	}
-
+	
 }
