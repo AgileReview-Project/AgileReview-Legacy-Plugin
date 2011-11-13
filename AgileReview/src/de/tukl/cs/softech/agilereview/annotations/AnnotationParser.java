@@ -54,7 +54,7 @@ public class AnnotationParser implements IAnnotationParser {
 	/**
 	 * Core Regular Expression to find the core tag structure
 	 */
-	private static String rawTagRegex = "\\s*(\\??)"+Pattern.quote(keySeparator)+"\\s*([^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^\\?"+Pattern.quote(keySeparator)+"]*)\\s*"+Pattern.quote(keySeparator)+"(\\??)\\s*";
+	private static String rawTagRegex = "\\s*(\\??)"+Pattern.quote(keySeparator)+"\\s*([^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^\\?"+Pattern.quote(keySeparator)+"]*)\\s*"+Pattern.quote(keySeparator)+"(\\??)\\s*(-?)";
 	/**
 	 * Path of the file this parser represents
 	 */
@@ -157,7 +157,14 @@ public class AnnotationParser implements IAnnotationParser {
 							tagDeleted = true;
 						} else {
 							idPositionMap.put(key, new Position(document.getLineOffset(line)));
-							idTagPositions.put(key, new Position[]{new Position(r.getOffset(), r.getLength()), null});
+							if(matcher.group(4).equals("-")) {
+								//set the position such that the line break beforehand will be removed too when replacing this position with the empty string
+								int currLine = document.getLineOfOffset(r.getOffset());
+								int adaptedOffset = document.getLineOffset(currLine-1)+document.getLineLength(currLine-1)-document.getLineDelimiter(currLine-1).length();
+								idTagPositions.put(key, new Position[]{new Position(adaptedOffset, r.getOffset()+r.getLength()-adaptedOffset), null});
+							} else {
+								idTagPositions.put(key, new Position[]{new Position(r.getOffset(), r.getLength()), null});
+							}
 						}
 					}
 					
@@ -302,6 +309,7 @@ public class AnnotationParser implements IAnnotationParser {
 		if (selection instanceof ITextSelection) {
 			int selStartLine = ((ITextSelection)selection).getStartLine();
 			int selEndLine = ((ITextSelection)selection).getEndLine();
+			boolean newLineInserted = false;
 			
 			String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 			String commentTag = keySeparator+commentKey+keySeparator;
@@ -311,21 +319,29 @@ public class AnnotationParser implements IAnnotationParser {
 			if (newLines[0]!=-1 || newLines[1]!=-1) {
 				PluginLogger.log(this.getClass().toString(), "addTagsInDocument", "Selection for inserting tags needs to be adapted, performing adaptation.");
 				
-				// adapt startline if necessary
+				// adapt starting line if necessary
 				boolean[] significantlyChanged = new boolean[]{false, false};
 				if(newLines[0]!=-1) {
-					significantlyChanged[0] = true;
 					int newStartLineOffset = document.getLineOffset(newLines[0]);
 					int newStartLineLength = document.getLineLength(newLines[0]);
+					
 					//insert new line if code is in front of javadoc / multi line comments
 					if(!document.get(newStartLineOffset, newStartLineLength).trim().isEmpty()) {
 						document.replace(newStartLineOffset+newStartLineLength, 0, System.getProperty("line.separator"));
+						selStartLine = newLines[0] + 1;
+						newLineInserted = true;
+					} else {
+						selStartLine = newLines[0];
 					}
-					selStartLine = newLines[0]+1;
+					
+					//only inform the user about these adaptations if he did not select the whole javaDoc
+					if(((ITextSelection)selection).getStartLine()-1 != selStartLine || newLineInserted) {
+						significantlyChanged[0] = true;
+					}
 				}
 				
-				// adapt endline if necessary
-				if(significantlyChanged[0]) {
+				// adapt ending line if necessary
+				if(newLineInserted) {
 					if(newLines[1]!=-1) {
 						selEndLine = newLines[1]+1;
 						significantlyChanged[1] = true;
@@ -341,7 +357,8 @@ public class AnnotationParser implements IAnnotationParser {
 				
 				if(significantlyChanged[0] || significantlyChanged[1]) {
 					// inform user
-					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. AgileReview will adapt the current selection to avoid this.");
+					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. " +
+							"AgileReview will adapt the current selection to avoid this.\nWhen it is necessary a new line will be inserted above the selection which will also be removed on comment deletion.");
 				}
 				
 				// compute new selection
@@ -386,7 +403,7 @@ public class AnnotationParser implements IAnnotationParser {
 				// Write tags -> get tags for current file-ending, insert second tag, insert first tag
 				String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".")+1));
 				document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
-				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+tags[1]);
+				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+(newLineInserted?"-":"")+tags[1]);
 
 				
 				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
