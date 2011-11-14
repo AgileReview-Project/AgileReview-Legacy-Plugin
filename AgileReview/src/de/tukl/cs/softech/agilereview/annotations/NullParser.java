@@ -3,7 +3,6 @@ package de.tukl.cs.softech.agilereview.annotations;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Position;
 

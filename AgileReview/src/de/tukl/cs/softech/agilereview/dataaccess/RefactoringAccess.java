@@ -265,7 +265,7 @@ public class RefactoringAccess {
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (CoreException e) {/*?|r81|Malte|c2|*/
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
 			Display.getDefault().asyncExec(new Runnable() {
 
@@ -275,7 +275,7 @@ public class RefactoringAccess {
 				}
 				
 			});
-		}
+		}/*|r81|Malte|c2|?*/
 	}
 	
 	/**
