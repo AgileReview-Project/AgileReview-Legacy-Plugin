@@ -145,7 +145,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 				}
 			}
 		} catch (CoreException e) {
-			Display.getDefault().asyncExec(new Runnable() {
+			Display.getDefault().asyncExec(new Runnable() {/*?|r81|reuter|c0|*/
 
 				@Override
 				public void run() {
@@ -153,7 +153,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 							"The resource "+project.getName()+" does not exist or is closed.");
 				}
 				
-			});
+			});/*|r81|reuter|c0|?*/
 			PluginLogger.logError(this.getClass().toString(), "getFilesOfProject", "CoreException while trying to fetch files of project "+project.getName()+".", e);
 		}
 		return paths;
