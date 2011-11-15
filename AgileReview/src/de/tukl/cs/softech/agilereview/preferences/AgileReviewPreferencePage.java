@@ -7,9 +7,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -23,7 +21,6 @@ import de.tukl.cs.softech.agilereview.annotations.ColorManager;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
 /**
  * This class represents a preference page that
@@ -49,10 +46,6 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	 * Combobox for selecting the AgileReview source folder which should be used
 	 */
 	private ComboFieldEditor comboReviewProjectField;
-	/**
-	 * ColorChooser for annotations' color
-	 */
-	private ColorFieldEditor colorAnnotationField;
 	/**
 	 * Checkbox for using Smart Suggestions
 	 */
@@ -117,19 +110,6 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, "review source project:", vals,getFieldEditorParent());
 		addField(comboReviewProjectField);
 		
-		// colorfieldeditor for annotation color of IDE user/*?|r59|Malte|c3|*/
-		ColorFieldEditor authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[0], "Comment color (IDE User):", getFieldEditorParent());
-		addField(authorColorAnnotationField);
-		
-		// colorfieldeditors for other customizable annotations-colors
-		for (int i=1;i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length;i++) {
-			authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i], "Comment color (Author "+(i+1)+"):", getFieldEditorParent());
-			addField(authorColorAnnotationField);
-		}/*|r59|Malte|c3|?*/
-		
-		colorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "Comment color (others):", getFieldEditorParent());
-		addField(colorAnnotationField);
-		
 		// Checkbox for using Smart Suggestion
 		booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, "use smart suggestion", getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
@@ -156,12 +136,6 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		
 		//change IDE user for color management/*?|r59|Malte|c4|*/
 		ColorManager.changeIDEUser(strAuthorField.getStringValue());/*|r59|Malte|c4|?*/
-		
-		//set changed colors for annotations
-		new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
-		for (int i=0; i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length; i++) {
-			new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation_Author"+i, PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i]));			
-		}
 		
 		//refresh views
 		if (ReviewAccess.getInstance().updateReviewSourceProject()) {

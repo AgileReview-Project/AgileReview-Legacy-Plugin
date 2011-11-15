@@ -596,6 +596,12 @@
    </page>
    <page
          category="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         class="de.tukl.cs.softech.agilereview.preferences.CommentColorPreferencePage"
+         id="de.tukl.cs.softech.agilereview.preferences.CommentColorsPreferencePage"
+         name="Comment Colors">
+   </page>
+   <page
+         category="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
          class="de.tukl.cs.softech.agilereview.preferences.LanguageSupportPreferencePage"
          id="de.tukl.cs.softech.agilereview.preferences.LanguageSupportPreferencePage"
          name="Language support">

@@ -26,6 +26,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, true);
 		
 		//initial color value and transferation of the color to the other preference
+		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED, true);
+		
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR,
 				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_ANNOTATION_COLOR));
 

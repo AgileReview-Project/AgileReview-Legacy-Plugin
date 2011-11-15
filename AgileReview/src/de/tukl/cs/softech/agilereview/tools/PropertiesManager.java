@@ -171,6 +171,10 @@ public class PropertiesManager implements IInputValidator{
 		/**
 		 * The color of the annotations
 		 */
+		public static String ANNOTATION_COLOR_ENABLED = "enableAnnotationColor";
+		/**
+		 * The color of the annotations
+		 */
 		public static String ANNOTATION_COLOR = "annotationColor";
 		/**
 		 * Default color of AgileReview annotations for author 1
