@@ -66,21 +66,21 @@ class ReviewFileModel {
 	 */
 	private void deleteResource(final IResource delFile) {
 		try {
-			if(delFile instanceof IFile) {/*?|r71|Malte|c1|*/
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();/*?|r71|Peter|c0|?*/
+			if(delFile instanceof IFile) {
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IEditorPart editor = ResourceUtil.findEditor(page, (IFile)delFile);
 				if(editor != null) {
-					page.closeEditor(editor, false);/*?|r71|Thilo|c0|?*/
+					page.closeEditor(editor, false);
 				}
 				delFile.delete(true, null);
-			} else if(delFile instanceof IFolder){/*?|r71|Thilo|c1|*/
+			} else if(delFile instanceof IFolder){
 				for(IResource r : ((IFolder)delFile).members()) {
 					deleteResource(r);
 				}
 				delFile.delete(true, null);
-			} else {/*|r71|Thilo|c1|?*/
+			} else {
 				delFile.delete(true, null);
-			}/*|r71|Malte|c1|?*/
+			}
 		} catch (final CoreException e) {
 			Display.getDefault().syncExec(new Runnable() {
 				@Override

@@ -257,14 +257,14 @@ public class RefactoringAccess {
 						if (currFile instanceof IFile) {
 							// Open file and read basic information
 							if (!((IFile)currFile).getName().equals("review.xml")) {
-								try {
+								try {/*?|r68|Peter Reuter|c1|*/
 									CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
 									rFileModel.addXmlDocument(doc, (IFile)currFile);
 									saveToString(doc, (IFile)currFile, true);
 								} catch (Exception e) {
 									// catch all exceptions as they might influence the refactoring process
 									this.failedFiles.put((IFile) currFile, e);
-								} 
+								} /*|r68|Peter Reuter|c1|?*/
 							}
 						}
 					}
@@ -355,7 +355,7 @@ public class RefactoringAccess {
 	 * Returns all files that could not be parsed
 	 * @return collection of files that could not be parsed
 	 */
-	public HashMap<IFile, Exception> getFailedFiles() {
+	public HashMap<IFile, Exception> getFailedFiles() {/*?|r68|Peter Reuter|c0|*/
 		return this.failedFiles;
-	}
+	}/*|r68|Peter Reuter|c0|?*/
 }

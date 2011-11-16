@@ -92,7 +92,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 
 	@Override
 	protected boolean initialize(Object element) {
-		ra = new RefactoringAccess();
+		ra = new RefactoringAccess();/*?|r68|Peter Reuter|c3|*/
 		HashMap<IFile, Exception> errorFiles = ra.getFailedFiles();
 		if (!errorFiles.isEmpty()) {
 			String message = "AgileReview could not refactor the following files:\n\n";
@@ -105,9 +105,9 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not refactor files", message);
 		}
 		addRefactoringIssue(element, getArguments());
-		/*?|r68|Peter Reuter|c0|?*/
 		
-		// TODO: adapt error handling!!
+		
+		// TODO: adapt error handling!!/*|r68|Peter Reuter|c3|?*/
 		if(errorWhileInitialization != 0) {
 			//participate and display the error as otherwise the agile review files will be corrupted
 			return true;
@@ -145,7 +145,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 		} else if(mArguments.getDestination() instanceof IResource) {
 			dest = (IResource) mArguments.getDestination();
 		} else {
-			errorWhileInitialization = 7;/*?|r68|Peter Reuter|c2|?*/
+			errorWhileInitialization = 7;
 			return;
 		}
 		
@@ -236,7 +236,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 		//when an error occurred during the initialization, abort the refactoring process
 		if(errorWhileInitialization != 0) {
 			PluginLogger.logWarning(getClass().toString(), "checkConditions", "An error occured during initialization");
-			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+") Continuing will corrupt AgileReview Comments!"));/*?|r68|Peter Reuter|c3|?*/
+			return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+") Continuing will corrupt AgileReview Comments!"));
 		}
 		
 		ResourceChangeChecker checker = (ResourceChangeChecker) context.getChecker(ResourceChangeChecker.class);
@@ -250,7 +250,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 						if(!f.isReadOnly() && f.isAccessible()) {
 							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
 						} else {
-							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));/*?|r68|Peter Reuter|c4|?*/
+							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));
 						}
 					}
 				});
@@ -279,9 +279,9 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 	@Override
 	public Change createChange(IProgressMonitor pm) throws OperationCanceledException {
 		
-		if(errorWhileInitialization != 0) {/*?|r68|Malte|c0|*/
+		if(errorWhileInitialization != 0) {
 			return null;
-		}/*|r68|Malte|c0|?*/
+		}
 
 		CompositeChange result = new CompositeChange("Refactoring of all affected comment paths");
 	
@@ -291,7 +291,7 @@ public class AuthorFileMoveParticipant extends MoveParticipant implements IShara
 			
 			TextFileChange change = (TextFileChange) getTextChange(f);
 			
-			if(change == null) {/*?|r68|Peter Reuter|c5|?*/
+			if(change == null) {
 				//only touch this file if there are no changes done so far
 				change = new TextFileChange(f.getName(), f);
 				change.setEdit(new MultiTextEdit());

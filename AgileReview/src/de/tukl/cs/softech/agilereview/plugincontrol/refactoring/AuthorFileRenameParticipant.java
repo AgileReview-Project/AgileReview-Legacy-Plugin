@@ -95,7 +95,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 
 	@Override
 	protected boolean initialize(Object element) {
-		ra = new RefactoringAccess();
+		ra = new RefactoringAccess();/*?|r68|Peter Reuter|c2|*/
 		HashMap<IFile, Exception> errorFiles = ra.getFailedFiles();
 		if (!errorFiles.isEmpty()) {
 			String message = "AgileReview could not refactor the following files:\n\n";
@@ -110,7 +110,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 		
 		addRefactoringIssue(element, getArguments());
 
-		// TODO: adapt error handling!!
+		// TODO: adapt error handling!!/*|r68|Peter Reuter|c2|?*/
 		if(errorWhileInitialization != 0) {
 			//participate and display the error as otherwise the agile review files will be corrupted
 			return true;
@@ -262,9 +262,9 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 	@Override
 	public Change createChange(IProgressMonitor pm) throws OperationCanceledException {
 		
-		if(errorWhileInitialization != 0) {/*?|r68|Malte|c1|*/
+		if(errorWhileInitialization != 0) {
 			return null;
-		}/*|r68|Malte|c1|?*/
+		}
 		
 		CompositeChange result = new CompositeChange("Refactoring of all affected comment paths");
 		
