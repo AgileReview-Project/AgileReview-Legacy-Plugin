@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -35,6 +36,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -234,7 +236,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	}
 	
 	/**
-	 * Filter comments by criteria received from explorer and search field
+	 * Filter comments based on the viewers filter
 	 */
 	private void filterComments() {
 		PluginLogger.log(this.getClass().toString(), "filterComments", "Starting to filter comments");
@@ -338,7 +340,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	}
 	
 	/**
-	 * create the toolbar containing filter and add/delete buttons
+	 * create the toolbar containing filter
 	 * @param parent the toolsbar's parent
 	 * @return the toolbar
 	 */
@@ -388,15 +390,40 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 
 		});
 	    filterText.pack();
-
+	    
+	    // add seperator to toolbar
 	    ToolItem itemSeparator = new ToolItem(toolBar, SWT.SEPARATOR);
 	    itemSeparator.setWidth(filterText.getBounds().width);
 	    itemSeparator.setControl(filterText);	  
-//	    // add seperator to toolbar
-//	    ToolItem itemSeparator = new ToolItem(toolBar, SWT.SEPARATOR);
-//	    itemSeparator.setWidth(text.getBounds().width);
-//	    itemSeparator.setControl(text);	  
+
+  
  
+	    // add show open comments only checkbox/*?|r31|Thilo|c0|*/
+	    final int filterStatusNumber = 0;
+	    final Button onlyOpenCommentsCheckbox = new Button(parent, SWT.CHECK);
+	    String statusStr = pm.getCommentStatusByID(filterStatusNumber);
+	    onlyOpenCommentsCheckbox.setText("Only show "+statusStr+" comments");
+	    onlyOpenCommentsCheckbox.setToolTipText("Show only "+statusStr+" comments");
+	    onlyOpenCommentsCheckbox.addSelectionListener(new SelectionAdapter() {
+	    	
+        	private ViewerFilter openFilter = new ViewerFilter() {
+				@Override
+				public boolean select(Viewer viewer, Object parentElement, Object element) {
+					return ((Comment) element).getStatus() == filterStatusNumber; // XXX Hack
+				}
+	    	};
+	    	
+	    	@Override
+            public void widgetSelected(SelectionEvent e) {
+                if (onlyOpenCommentsCheckbox.getSelection()) {
+                	viewer.addFilter(openFilter);
+                } else {
+                	viewer.removeFilter(openFilter);
+                }
+                filterComments();
+            }
+        });/*|r31|Thilo|c0|?*/
+	    
 	    // add listener to dropdown box to show menu
 	    itemDropDown.addListener(SWT.Selection, new Listener() {
 		      public void handleEvent(Event event) {

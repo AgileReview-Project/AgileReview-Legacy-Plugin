@@ -71,6 +71,9 @@ public class PropertiesManager implements IInputValidator{
 																			   "annotations.default.color.author7",
 																			   "annotations.default.color.author8",
 																			   "annotations.default.color.author9"};
+		/**
+		 * Default color of comments, either if colors are disabled or if too many authors are there
+		 */
 		public static String DEFAULT_REVIEW_COLOR = "review.default.color";
 		/**
 		 * Message the display when saving a reply on a comment, without all fields filled out
