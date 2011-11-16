@@ -335,7 +335,7 @@ public class AnnotationParser implements IAnnotationParser {
 					}
 					
 					//only inform the user about these adaptations if he did not select the whole javaDoc
-					if(((ITextSelection)selection).getStartLine()-1 != selStartLine || newLineInserted) {
+					if(((ITextSelection)selection).getStartLine()-1 != selStartLine || newLineInserted) {/*?|r40+r39|Peter|c0|?*/
 						significantlyChanged[0] = true;
 					}/*|r40+r39|Malte|c3|?*/
 				}
@@ -343,7 +343,7 @@ public class AnnotationParser implements IAnnotationParser {
 				// adapt ending line if necessary
 				if(newLineInserted) {/*?|r40+r39|Malte|c5|*/
 					//add a new line if a line was inserted before
-					if(newLines[1]!=-1) {
+					if(newLines[1]!=-1) {/*?|r40+r39|Peter|c1|*/
 						selEndLine = newLines[1]+1;
 						significantlyChanged[1] = true;
 					} else {
@@ -353,7 +353,7 @@ public class AnnotationParser implements IAnnotationParser {
 					if(newLines[1]!=-1) {
 						selEndLine = newLines[1];
 						significantlyChanged[1] = true;
-					}
+					}/*|r40+r39|Peter|c1|?*/
 				}/*|r40+r39|Malte|c5|?*/
 				
 				if(significantlyChanged[0] || significantlyChanged[1]) {
@@ -363,7 +363,7 @@ public class AnnotationParser implements IAnnotationParser {
 						@Override
 						public void run() {
 							MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. " +/*?|r40+r39|Malte|c4|*/
-									"AgileReview will adapt the current selection to avoid this.\nWhen it is necessary a new line will be inserted above the selection which will also be removed on comment deletion.");/*|r40+r39|Malte|c4|?*/
+									"AgileReview will adapt the current selection to avoid this.\nIf it is necessary a new line will be inserted above the selection which will be removed on comment deletion.");/*|r40+r39|Malte|c4|?*/
 						}
 						
 					});
