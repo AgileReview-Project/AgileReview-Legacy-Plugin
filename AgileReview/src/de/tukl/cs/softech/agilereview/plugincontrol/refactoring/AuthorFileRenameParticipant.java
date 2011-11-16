@@ -2,8 +2,9 @@ package de.tukl.cs.softech.agilereview.plugincontrol.refactoring;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Map.Entry;
 
 import org.apache.xmlbeans.SystemProperties;
 import org.apache.xmlbeans.XmlException;
@@ -20,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -31,6 +33,7 @@ import org.eclipse.ltk.core.refactoring.participants.RefactoringArguments;
 import org.eclipse.ltk.core.refactoring.participants.RenameArguments;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.eclipse.ltk.core.refactoring.participants.ResourceChangeChecker;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MalformedTreeException;
@@ -92,18 +95,22 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 
 	@Override
 	protected boolean initialize(Object element) {
-		try {
-			ra = new RefactoringAccess();
-		} catch (XmlException e) {
-			errorWhileInitialization = 1;
-			return true;
-		} catch (IOException e) {
-			errorWhileInitialization = 2;
-			return true;
+		ra = new RefactoringAccess();
+		HashMap<IFile, Exception> errorFiles = ra.getFailedFiles();
+		if (!errorFiles.isEmpty()) {
+			String message = "AgileReview could not refactor the following files:\n\n";
+			for (Entry<IFile, Exception> entry : errorFiles.entrySet()) {
+				String location = entry.getKey().getLocation().toOSString();
+				message += location+"\n";
+				PluginLogger.logError(this.getClass().toString(), "initialize", "Could not refactor file "+location, entry.getValue());
+			}
+			message += "\nThese files may be corrupted (i.e. empty). Please check them.";
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not refactor files", message);
 		}
 		
 		addRefactoringIssue(element, getArguments());
-		
+
+		// TODO: adapt error handling!!
 		if(errorWhileInitialization != 0) {
 			//participate and display the error as otherwise the agile review files will be corrupted
 			return true;

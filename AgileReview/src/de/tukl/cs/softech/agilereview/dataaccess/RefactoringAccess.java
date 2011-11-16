@@ -52,13 +52,15 @@ public class RefactoringAccess {
 	 * List of files that are affected by the refactoring. 
 	 */
 	private Collection<IFile> affectedFilesBuffer = new HashSet<IFile>();
+	/**
+	 * List of files that could not be parsed 
+	 */
+	private HashMap<IFile, Exception> failedFiles = new HashMap<IFile, Exception>();
 	
 	/**
 	 * Constructor of the RefactoringAccess. Initially loads all comments from the database.
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	public RefactoringAccess() throws XmlException, IOException {
+	public RefactoringAccess() {
 		loadAllComments();
 	}
 	
@@ -241,10 +243,8 @@ public class RefactoringAccess {
 	
 	/**
 	 * Fills the comment model
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	private void loadAllComments() throws XmlException, IOException { // TODO: Maybe this should be changed, to consider single files. (Currently: breaks when encountering a error)
+	private void loadAllComments() {
 		// Get all relevant folders in the review repository
 		try {
 			IResource[] allFolders = ra.getCurrentSourceFolder().members();
@@ -257,9 +257,14 @@ public class RefactoringAccess {
 						if (currFile instanceof IFile) {
 							// Open file and read basic information
 							if (!((IFile)currFile).getName().equals("review.xml")) {
-								CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
-								rFileModel.addXmlDocument(doc, (IFile)currFile);
-								saveToString(doc, (IFile)currFile, true);
+								try {
+									CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+									rFileModel.addXmlDocument(doc, (IFile)currFile);
+									saveToString(doc, (IFile)currFile, true);
+								} catch (Exception e) {
+									// catch all exceptions as they might influence the refactoring process
+									this.failedFiles.put((IFile) currFile, e);
+								} 
 							}
 						}
 					}
@@ -344,5 +349,13 @@ public class RefactoringAccess {
 			c.removeXml();
 		}	
 		c.dispose();
+	}
+	
+	/**
+	 * Returns all files that could not be parsed
+	 * @return collection of files that could not be parsed
+	 */
+	public HashMap<IFile, Exception> getFailedFiles() {
+		return this.failedFiles;
 	}
 }
