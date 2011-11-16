@@ -208,8 +208,8 @@ public class DetailView extends ViewPart {
 	 * Should only be called if the intended background of the view was changed by the user
 	 */
 	public void refreshBackgroundColor() {
-		if(this.currentParent instanceof AbstractDetail<?>) {/*?|r59|Malte|c8|*/
-			((AbstractDetail<?>)this.currentParent).refreshBackgroundColor();
+		if(this.currentParent instanceof CommentDetail) {/*?|r59|Malte|c8|*/
+			((CommentDetail)this.currentParent).refreshBackgroundColor();/*?|r88|Peter|c0|?*/
 		}/*|r59|Malte|c8|?*/
 	}
 	
