@@ -85,7 +85,7 @@ public class ColorManager {/*?|r59|Malte|c2|?*/
 	 */
 	public static Color getColor(String author) {
 		String prop;
-		if(authors.contains(author)) {
+		if (PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED) && authors.contains(author)) {/*?|r73+r87|Peter|c2|?*/
 			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[authors.indexOf(author)]);
 		} else {
 			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
@@ -106,6 +106,14 @@ public class ColorManager {/*?|r59|Malte|c2|?*/
 			return false;
 		}
 	}
+	
+	/**
+	 * Checks whether a single or multiple annotation colors are to be used.
+	 * @return true if multiple colors are to be used<br>false otherwise
+	 */
+	public static boolean isMultiColorEnabled() {/*?|r73+r87|Peter|c3|*/
+		return PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED);
+	}/*|r73+r87|Peter|c3|?*/
 	
 	/**
 	 * Returns the index of the given author. The index represents a unique id which will be incremented with each registered author until

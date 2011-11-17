@@ -5,6 +5,8 @@ import java.util.HashSet;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Display;
@@ -22,6 +24,7 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.ViewPart;
 
+import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -34,7 +37,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
  * this plugin. Furthermore the ViewControl provides and forwards events of the
  * following Listener: {@link ISelectionListener}, {@link IPartListener2}, {@link IPerspectiveListener3}
  */
-public class ViewControl implements ISelectionChangedListener, IPartListener2, IPerspectiveListener3 {
+public class ViewControl implements ISelectionChangedListener, IPartListener2, IPerspectiveListener3, IPropertyChangeListener {
 	
 	/**
 	 * Public static field representing the detail view
@@ -104,6 +107,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 						CommentTableView.getInstance().reparseAllEditors();
 					}
 				}
+				Activator.getDefault().getPreferenceStore().addPropertyChangeListener((IPropertyChangeListener)ViewControl.this);
 			}
 		});
 	}
@@ -488,4 +492,18 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
 		// PluginLogger.log(this.getClass().toString(), "perspectiveSavedAs", oldPerspective.getLabel()+"-->"+newPerspective.getLabel());
 	}
+	
+	//****************************************
+	//****** IPropertyListener ***********
+	//****************************************
+	
+	@Override/*?|r73+r87|Peter|c0|*/
+	public void propertyChange(PropertyChangeEvent event) {
+		if (event.getProperty().equals(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED)) {
+			if(isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().cleanEditorReferences();
+				CommentTableView.getInstance().resetEditorReferences();
+			}
+		}
+	}/*|r73+r87|Peter|c0|?*/
 }
