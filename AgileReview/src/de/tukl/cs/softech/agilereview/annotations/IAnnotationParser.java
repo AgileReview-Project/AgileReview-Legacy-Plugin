@@ -72,4 +72,11 @@ public interface IAnnotationParser {
 	 * @return all comments which are overlapping with the given {@link Position}
 	 */
 	public String[] getCommentsByPosition(Position p);
+	
+	/**
+	 * Computes the next position from the given one on where a comment is located.
+	 * @param current The current position
+	 * @return The next position or<br>null if there is no such position.
+	 */
+	public Position getNextCommentsPosition(Position current);
 }

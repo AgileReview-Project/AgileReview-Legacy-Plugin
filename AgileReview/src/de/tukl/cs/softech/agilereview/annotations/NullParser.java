@@ -50,4 +50,9 @@ public class NullParser implements IAnnotationParser {
 	public String[] getCommentsByPosition(Position p) {
 		return new String[]{};
 	}
+
+	@Override
+	public Position getNextCommentsPosition(Position current) {
+		return null;
+	}
 }

@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.plugincontrol;
+package de.tukl.cs.softech.agilereview.plugincontrol.handler;
 
 import java.io.IOException;
 

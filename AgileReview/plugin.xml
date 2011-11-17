@@ -616,7 +616,7 @@
 <extension
       point="org.eclipse.ui.handlers">
    <handler
-         class="de.tukl.cs.softech.agilereview.plugincontrol.RefreshHandler"
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler"
          commandId="org.eclipse.ui.file.refresh">
       <activeWhen>
          <with
@@ -836,8 +836,32 @@
       </activeWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.plugincontrol.ShowCommentHandler"
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.ShowCommentHandler"
          commandId="de.tukl.cs.softech.agilereview.showComment">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="org.eclipse.ui.IEditorPart">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.NextCommentInDocumentHandler"
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInDocument">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="org.eclipse.ui.IEditorPart">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.NextCommentInListHandler"
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInList">
       <activeWhen>
          <with
                variable="activePart">
@@ -880,7 +904,7 @@
       </enabledWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.plugincontrol.DeleteCommentHandler"
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.DeleteCommentHandler"
          commandId="de.tukl.cs.softech.agilereview.editor.delete">
       <activeWhen>
          <with
@@ -1066,6 +1090,18 @@
             description="Show in Editor selected comment in Detail View"
             id="de.tukl.cs.softech.agilereview.showComment"
             name="Show comment in DetailView">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Show next comment in current document"
+            id="de.tukl.cs.softech.agilereview.showNextCommentInDocument"
+            name="Show next comment in editor">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Show next comment of Comment Table View"
+            id="de.tukl.cs.softech.agilereview.showNextCommentInList"
+            name="Show next comment of Comment Table View">
       </command>
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
@@ -1430,6 +1466,18 @@
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M1+M2+#">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInDocument"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M3+N">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInList"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+N">
    </key>
    <key
          commandId="de.tukl.cs.softech.agilereview.editor.delete"

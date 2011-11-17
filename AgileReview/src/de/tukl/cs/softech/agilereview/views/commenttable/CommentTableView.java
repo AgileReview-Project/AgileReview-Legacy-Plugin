@@ -764,6 +764,22 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		return new String[]{};
 	}
 	
+	/**
+	 * Computes the next position from the given one on where a comment is located.
+	 * @param current The current position
+	 * @return The next position or<br>the current position if there is no such position.
+	 */
+	public Position getNextCommentPosition(Position current) {
+		Position next = null;
+		if(getActiveEditor() != null) {
+			IAnnotationParser parser;
+			if((parser = this.parserMap.get(getActiveEditor())) != null) {
+				next = parser.getNextCommentsPosition(current); 
+			}
+		}
+		return next == null ? current : next;
+	}
+	
 	//###############################################################################
 	//############ implemented and listener triggered functions #####################
 	//###############################################################################
@@ -892,24 +908,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-		Comment comment = (Comment) ((IStructuredSelection)event.getSelection()).getFirstElement();
-		openEditor(comment);
-		//jump to comment in opened editor
-		try {
-			PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
-			this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
-		} catch (BadLocationException e) {
-			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
-		}
-		
-		//open Detail View and set Focus
-		ViewControl.openView(ViewControl.DETAIL_VIEW);
-		if (ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().setFocus();
-			selectComment(comment); //select comment another time to show the comment if the view was closed before
-		}
+		revealComment((Comment) ((IStructuredSelection)event.getSelection()).getFirstElement(), true);/*?|r69|Peter Reuter|c6|?*/
 	}
-	
+
 	/** not yet used
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
@@ -954,4 +955,48 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		}
 	}
+	
+	/**
+	 * Sets the selection to the comment following the last selected one. 
+	 */
+	public void selectNextComment() {/*?|r69|Peter Reuter|c5|*/
+		if (viewer.getSelection() instanceof IStructuredSelection && !viewer.getSelection().isEmpty()) {
+			IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
+			Object c = (Comment) sel.toList().get(sel.toList().size()-1);
+			if (c instanceof Comment) {
+				int index = comments.indexOf(c)+1;
+				if (index < comments.size()) {
+					c = comments.get(index);
+					viewer.setSelection(new StructuredSelection(c));
+					revealComment((Comment) c, false);	
+				}
+			}
+		}
+	}/*|r69|Peter Reuter|c5|?*/
+	
+	/**
+	 * Reveal the comment.
+	 * @param comment The comment to reveal
+	 * @param detailViewSetFocus Indicates whether to set the focus to the detail view or not
+	 */
+	private void revealComment(Comment comment, boolean detailViewSetFocus) {/*?|r69|Peter Reuter|c4|*/
+		openEditor(comment);
+		//jump to comment in opened editor
+		try {
+			PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
+			this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
+		} catch (BadLocationException e) {
+			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
+		}
+		
+		//open Detail View and set Focus
+		ViewControl.openView(ViewControl.DETAIL_VIEW);
+		if (ViewControl.isOpen(DetailView.class)) {
+			if (detailViewSetFocus) {
+				DetailView.getInstance().setFocus();
+			}
+			selectComment(comment); //select comment another time to show the comment if the view was closed before
+		}
+	}/*|r69|Peter Reuter|c4|?*/
+	
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.Position;
@@ -129,6 +130,21 @@ public class AgileAnnotationController {
 		}
 		return commentKeys.toArray(new String[0]);
 	}
+	
+	/**
+	 * Computes the next position from the given one on where a comment is located.
+	 * @param current The current position
+	 * @return The next position or<br>null if there is no such position.
+	 */
+	Position getNextCommentPosition(Position current) {/*?|r69|Peter Reuter|c2|*/
+		Position position;
+		TreeSet<ComparablePosition> positions = new TreeSet<ComparablePosition>();
+		for(String key : annotationMap.keySet()) {
+			position = ((IAnnotationModel) this.annotationModel).getPosition(annotationMap.get(key));
+			positions.add(new ComparablePosition(position));
+		}
+		return positions.higher(new ComparablePosition(current));
+	}/*|r69|Peter Reuter|c2|?*/
 	
 	/**
 	 * Creates a new annotation for a given comment key
