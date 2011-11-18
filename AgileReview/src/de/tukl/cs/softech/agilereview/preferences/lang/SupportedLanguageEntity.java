@@ -82,11 +82,14 @@ public class SupportedLanguageEntity {
 		String result = "";
 		boolean first = true;
 		for(String s : fileendings) {
-			if(first) {
-				result += s;
-				first = false;
-			} else {
-				result += ", " + s;
+			String tmp = s.trim();
+			if(!tmp.isEmpty()) {/*?|r91|Malte|c4|?*/
+				if(first) {
+					result += tmp;
+					first = false;
+				} else {
+					result += ", " + tmp;
+				}
 			}
 		}
 		return result;
@@ -99,12 +102,14 @@ public class SupportedLanguageEntity {
 	void setFileendingsAsString(String in) {
 		in = in.trim();
 		if(!in.isEmpty()) {
+			fileendings.clear();
 			String[] endings = in.split(",");
 			for(String s : endings) {
 				s = s.trim();
+				if(!s.isEmpty()) {/*?|r91|Malte|c5|?*/
+					fileendings.add(s);
+				}
 			}
-			fileendings.clear();
-			fileendings.addAll(Arrays.asList(endings));
 		} else {
 			fileendings.clear();
 		}
@@ -155,7 +160,7 @@ public class SupportedLanguageEntity {
 	 * @return true, if each begin and end tag is set with arbitrary an arbitrary string not equals empty<br>false, otherwise
 	 */
 	boolean isValid() {
-		return (beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||
-		(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty());
+		return !((beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||/*?|r91|Malte|c6|*/
+		(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty()));/*|r91|Malte|c6|?*/
 	}
 }
