@@ -48,8 +48,8 @@ public class ColorManager {
 			String oldAuthor = authors.remove(0);
 			int i = authors.indexOf(author);
 			if(i >= 0) {
-				authors.add(i, oldAuthor);/*?|r59|Thilo|c1|*/
-				authors.remove(author);/*|r59|Thilo|c1|?*/
+				authors.remove(i);/*?|r59|Thilo|c1|*/
+				authors.add(i, oldAuthor);/*|r59|Thilo|c1|?*/
 			}
 			authors.add(0, author);
 		}
@@ -100,11 +100,7 @@ public class ColorManager {
 	 * @return true, if the given author has reserved a customized color<br>false, otherwise
 	 */
 	public static boolean hasCustomizedColor(String author) {
-		if(authors.contains(author)) {/*?|r59|Thilo|c4|*/
-			return true;
-		} else {
-			return false;
-		}/*|r59|Thilo|c4|?*/
+		return authors.contains(author);/*?|r59|Thilo|c4|?*/
 	}
 	
 	/**
@@ -122,10 +118,6 @@ public class ColorManager {
 	 * @return index of the given author if there is a reservation for the author<br> -1, otherwise
 	 */
 	public static int getIndexOf(String author) {
-		if(hasCustomizedColor(author)) {/*?|r59|Thilo|c5|*/
-			return authors.indexOf(author);
-		} else {
-			return -1;
-		}/*|r59|Thilo|c5|?*/
+		return authors.indexOf(author);/*?|r59|Thilo|c5|?*/
 	}
 }

@@ -243,11 +243,8 @@ public class AnnotationParser implements IAnnotationParser {
 			
 		}
 		
-		HashMap<Position, String> toDisplay = new HashMap<Position, String>();/*?|r59|Thilo|c0|*/
 		for(String s : idPositionMap.keySet()) {
-			toDisplay.put(idPositionMap.get(s), s);/*|r59|Thilo|c0|?*/
-			String author = s.split(Pattern.quote(keySeparator))[1];/*?|r59|Malte|c1|*/
-			ColorManager.addReservation(author);/*|r59|Malte|c1|?*/
+			
 		}
 
 		// Save the current document to save the tags
@@ -260,6 +257,7 @@ public class AnnotationParser implements IAnnotationParser {
 		//update annotations in order to recognize moved tags
 		TreeMap<String, Position> annotationsToUpdate = new TreeMap<String, Position>();
 		for(String key : displayedComments) {
+			
 			if(idPositionMap.get(key) != null) {
 				annotationsToUpdate.put(key, idPositionMap.get(key));
 			}
@@ -277,8 +275,8 @@ public class AnnotationParser implements IAnnotationParser {
 		HashMap<String, Position> toDisplay = new HashMap<String, Position>();
 		for(Comment c : comments) {
 			String commentKey = c.getReviewID()+keySeparator+c.getAuthor()+keySeparator+c.getId();
-			
 			if(path.equals(ReviewAccess.computePath(c)) && this.idPositionMap.get(commentKey) != null) {
+				ColorManager.addReservation(c.getAuthor());/*?|r59|Malte|c1|?*/
 				toDisplay.put(commentKey, this.idPositionMap.get(commentKey));
 			}
 		}
