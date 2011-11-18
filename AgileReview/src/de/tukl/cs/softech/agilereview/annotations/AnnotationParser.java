@@ -54,7 +54,7 @@ public class AnnotationParser implements IAnnotationParser {
 	/**
 	 * Core Regular Expression to find the core tag structure
 	 */
-	private static String rawTagRegex = "\\s*(\\??)"+Pattern.quote(keySeparator)+"\\s*([^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^\\?"+Pattern.quote(keySeparator)+"]*)\\s*"+Pattern.quote(keySeparator)+"(\\??)\\s*(-?)";/*?|r40+r39|Malte|c1|?*/
+	private static String rawTagRegex = "\\s*(\\??)"+Pattern.quote(keySeparator)+"\\s*([^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^"+Pattern.quote(keySeparator)+"]+"+Pattern.quote(keySeparator)+"[^\\?"+Pattern.quote(keySeparator)+"]*)\\s*"+Pattern.quote(keySeparator)+"(\\??)\\s*(-?)";
 	/**
 	 * Path of the file this parser represents
 	 */
@@ -158,10 +158,10 @@ public class AnnotationParser implements IAnnotationParser {
 						} else {
 							idPositionMap.put(key, new Position(document.getLineOffset(line)));
 							if(matcher.group(4).equals("-")) {
-								//set the position such that the line break beforehand will be removed too when replacing this position with the empty string/*?|r40+r39|Malte|c0|*/
+								//set the position such that the line break beforehand will be removed too when replacing this position with the empty string
 								int currLine = document.getLineOfOffset(r.getOffset());
 								int adaptedOffset = document.getLineOffset(currLine-1)+document.getLineLength(currLine-1)-document.getLineDelimiter(currLine-1).length();
-								idTagPositions.put(key, new Position[]{new Position(adaptedOffset, r.getOffset()+r.getLength()-adaptedOffset), null});/*|r40+r39|Malte|c0|?*/
+								idTagPositions.put(key, new Position[]{new Position(adaptedOffset, r.getOffset()+r.getLength()-adaptedOffset), null});
 							} else {
 								idTagPositions.put(key, new Position[]{new Position(r.getOffset(), r.getLength()), null});
 							}
@@ -325,7 +325,7 @@ public class AnnotationParser implements IAnnotationParser {
 					int newStartLineOffset = document.getLineOffset(newLines[0]);
 					int newStartLineLength = document.getLineLength(newLines[0]);
 					
-					//insert new line if code is in front of javadoc / multi line comments/*?|r40+r39|Malte|c3|*/
+					//insert new line if code is in front of javadoc / multi line comments
 					if(!document.get(newStartLineOffset, newStartLineLength).trim().isEmpty()) {
 						document.replace(newStartLineOffset+newStartLineLength, 0, System.getProperty("line.separator"));
 						selStartLine = newLines[0] + 1;
@@ -335,26 +335,19 @@ public class AnnotationParser implements IAnnotationParser {
 					}
 					
 					//only inform the user about these adaptations if he did not select the whole javaDoc
-					if(((ITextSelection)selection).getStartLine()-1 != selStartLine || newLineInserted) {/*?|r40+r39|Peter|c0|?*/
+					if(((ITextSelection)selection).getStartLine()-1 != selStartLine) {/*?|r40+r39|Peter|c0|?*/
 						significantlyChanged[0] = true;
-					}/*|r40+r39|Malte|c3|?*/
+					}
 				}
 				
 				// adapt ending line if necessary
-				if(newLineInserted) {/*?|r40+r39|Malte|c5|*/
-					//add a new line if a line was inserted before
-					if(newLines[1]!=-1) {/*?|r40+r39|Peter|c1|*/
-						selEndLine = newLines[1]+1;
-						significantlyChanged[1] = true;
-					} else {
-						selEndLine++;
-					}
+				//add a new line if a line was inserted before
+				if(newLines[1]!=-1) {/*?|r40+r39|Peter|c1|*/
+					selEndLine = newLines[1] + (newLineInserted ? 1 : 0);
+					significantlyChanged[1] = true;
 				} else {
-					if(newLines[1]!=-1) {
-						selEndLine = newLines[1];
-						significantlyChanged[1] = true;
-					}/*|r40+r39|Peter|c1|?*/
-				}/*|r40+r39|Malte|c5|?*/
+					selEndLine += (newLineInserted ? 1 : 0);
+				}/*|r40+r39|Peter|c1|?*/
 				
 				if(significantlyChanged[0] || significantlyChanged[1]) {
 					// inform user
@@ -362,8 +355,8 @@ public class AnnotationParser implements IAnnotationParser {
 
 						@Override
 						public void run() {
-							MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. " +/*?|r40+r39|Malte|c4|*/
-									"AgileReview will adapt the current selection to avoid this.\nIf it is necessary a new line will be inserted above the selection which will be removed on comment deletion.");/*|r40+r39|Malte|c4|?*/
+							MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning!", "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. " +
+									"AgileReview will adapt the current selection to avoid this.\nIf it is necessary a new line will be inserted above the selection which will be removed on comment deletion.");
 						}
 						
 					});
