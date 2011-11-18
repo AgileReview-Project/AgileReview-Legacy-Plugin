@@ -34,7 +34,7 @@ public class CommentColorPreferencePage extends FieldEditorPreferencePage/*?|r73
 		ColorFieldEditor colorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "Default Comment Color:", getFieldEditorParent());
 		addField(colorAnnotationField);
 		
-		EnableContainerFieldEditor containerField = new EnableContainerFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED, "Enable multi-color comments", "Color Settings", getFieldEditorParent());
+		EnableContainerFieldEditor containerField = new EnableContainerFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED, "Enable multi-color comments", "Color Settings", getFieldEditorParent());/*?|r73+r87|Malte|c5|*/
 		// colorfieldeditor for annotation color of IDE user/*?|r59|Malte|c3|*/
 		ColorFieldEditor authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[0], "Comment color (IDE User):", containerField.getContainer());
 		containerField.addField(authorColorAnnotationField);
@@ -43,7 +43,7 @@ public class CommentColorPreferencePage extends FieldEditorPreferencePage/*?|r73
 		for (int i = 1; i < PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length; i++) {
 			authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i], "Comment color (Author "+(i+1)+"):", containerField.getContainer());
 			containerField.addField(authorColorAnnotationField);
-		}/*|r59|Malte|c3|?*/
+		}/*|r59|Malte|c3|?*//*|r73+r87|Malte|c5|?*/
 		
 		addField(containerField);
 	}
