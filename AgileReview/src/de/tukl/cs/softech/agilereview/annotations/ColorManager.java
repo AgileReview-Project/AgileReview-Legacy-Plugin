@@ -15,12 +15,12 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  * default color.
  * @author Malte Brunnlieb (AgileReview Team)
  */
-public class ColorManager {/*?|r59|Malte|c2|?*/
+public class ColorManager {
 	
 	/**
 	 * Map of the first authors having customized colors
 	 */
-	private static ArrayList<String> authors = new ArrayList<String>();
+	private static ArrayList<String> authors = new ArrayList<String>();/*?|r59|Thilo|c2|?*/
 
 	/**
 	 * Resets the current color scheme
@@ -48,22 +48,22 @@ public class ColorManager {/*?|r59|Malte|c2|?*/
 			String oldAuthor = authors.remove(0);
 			int i = authors.indexOf(author);
 			if(i >= 0) {
-				authors.add(i, oldAuthor);
-				authors.remove(author);
+				authors.add(i, oldAuthor);/*?|r59|Thilo|c1|*/
+				authors.remove(author);/*|r59|Thilo|c1|?*/
 			}
 			authors.add(0, author);
 		}
 		
-		if(ViewControl.isOpen(CommentTableView.class)) {
+		if(ViewControl.isOpen(CommentTableView.class)) {/*?|r59|Thilo|c3|*/
 			CommentTableView.getInstance().cleanEditorReferences();
 			CommentTableView.getInstance().resetEditorReferences();
-		}
+		}/*|r59|Thilo|c3|?*/
 	}
 	
 	/**
 	 * Reserves a new color for a given author when some is available and the author has not been registered yet.
 	 * @param author for which a new customized color should be reserved
-	 * @return Color which was reserved<br>default comment color otherwise, otherwise
+	 * @return Color which was reserved<br>default comment color otherwise
 	 */
 	public static Color addReservation(String author) {
 		//add IDE user at first to the list for a constant color usage
@@ -100,11 +100,11 @@ public class ColorManager {/*?|r59|Malte|c2|?*/
 	 * @return true, if the given author has reserved a customized color<br>false, otherwise
 	 */
 	public static boolean hasCustomizedColor(String author) {
-		if(authors.contains(author)) {
+		if(authors.contains(author)) {/*?|r59|Thilo|c4|*/
 			return true;
 		} else {
 			return false;
-		}
+		}/*|r59|Thilo|c4|?*/
 	}
 	
 	/**
@@ -122,10 +122,10 @@ public class ColorManager {/*?|r59|Malte|c2|?*/
 	 * @return index of the given author if there is a reservation for the author<br> -1, otherwise
 	 */
 	public static int getIndexOf(String author) {
-		if(hasCustomizedColor(author)) {
+		if(hasCustomizedColor(author)) {/*?|r59|Thilo|c5|*/
 			return authors.indexOf(author);
 		} else {
 			return -1;
-		}
+		}/*|r59|Thilo|c5|?*/
 	}
 }

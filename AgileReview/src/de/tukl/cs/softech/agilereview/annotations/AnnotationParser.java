@@ -243,9 +243,9 @@ public class AnnotationParser implements IAnnotationParser {
 			
 		}
 		
-		HashMap<Position, String> toDisplay = new HashMap<Position, String>();
+		HashMap<Position, String> toDisplay = new HashMap<Position, String>();/*?|r59|Thilo|c0|*/
 		for(String s : idPositionMap.keySet()) {
-			toDisplay.put(idPositionMap.get(s), s);
+			toDisplay.put(idPositionMap.get(s), s);/*|r59|Thilo|c0|?*/
 			String author = s.split(Pattern.quote(keySeparator))[1];/*?|r59|Malte|c1|*/
 			ColorManager.addReservation(author);/*|r59|Malte|c1|?*/
 		}

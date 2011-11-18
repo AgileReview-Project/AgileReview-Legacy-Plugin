@@ -374,7 +374,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 */
 	@Override
 	protected Color determineBackgroundColor() {/*?|r59|Malte|c7|*/
-		//get the backupObject as changes should only have clout on the background when they are saved
+		//get the backupObject as changes should only have impact on the background when they are saved
 		return ColorManager.getColor(this.backupObject.getAuthor());
 	}/*|r59|Malte|c7|?*/
 

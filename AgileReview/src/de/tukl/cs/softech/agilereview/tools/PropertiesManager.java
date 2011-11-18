@@ -152,7 +152,7 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String ACTIVE_REVIEW = "activeReview";
 		/**
-		 * The currently active review
+		 * The current author
 		 */
 		public static String AUTHOR_NAME = "author";
 		/**

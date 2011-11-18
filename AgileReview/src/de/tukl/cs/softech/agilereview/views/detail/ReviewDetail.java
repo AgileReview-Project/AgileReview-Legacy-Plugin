@@ -272,9 +272,9 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	}
 
 	@Override
-	protected Color determineBackgroundColor() {
+	protected Color determineBackgroundColor() {/*?|r59|Thilo|c6|*/
 		String prop = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_REVIEW_COLOR);
 		String[] rgb = prop.split(",");
 		return new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
-	}
+	}/*|r59|Thilo|c6|?*/
 }
