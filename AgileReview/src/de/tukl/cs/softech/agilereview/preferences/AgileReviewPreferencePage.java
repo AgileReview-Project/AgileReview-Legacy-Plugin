@@ -77,7 +77,7 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	public void createFieldEditors() {
 	
 		// Field for author
-		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "author:", getFieldEditorParent()) {		
+		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "Author:", getFieldEditorParent()) {		
 			@Override
 			protected boolean doCheckState() {
 				String isValidReply = PropertiesManager.getInstance().isValid(this.getStringValue());
@@ -107,11 +107,11 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 			vals[i][0] = list.get(i);
 			vals[i][1] = list.get(i);
 		}
-		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, "review source project:", vals,getFieldEditorParent());
+		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, "Review source project:", vals,getFieldEditorParent());
 		addField(comboReviewProjectField);
 		
 		// Checkbox for using Smart Suggestion
-		booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, "use smart suggestion", getFieldEditorParent());
+		booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, "Use smart suggestion", getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 		
 		// Directory Browser for export folder
