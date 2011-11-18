@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Group;
  * and then add the field editor using <code>addField(FieldEditor fieldEditor)</code>.
  * Currently there is no support for validity checking and advanced layout inside the container.
  */
-public class EnableContainerFieldEditor extends FieldEditor {/*?|r73+r87|Thilo|c1|?*/
+public class EnableContainerFieldEditor extends FieldEditor {
 
 	/**
 	 * Check-Box for enabling the container (also represents a preference value)
@@ -95,14 +95,14 @@ public class EnableContainerFieldEditor extends FieldEditor {/*?|r73+r87|Thilo|c
 	 * What should happen when the check-box is clicked
 	 */
 	private void handleCheckEvent() {
-		setPresentsDefaultValue(false);
+		setPresentsDefaultValue(false);/*?|r73+r87|Malte|c0|?*/
 		setGroupDisabledState();
 	}
 	
 	/**
 	 * Disable the container and all its inhabitants
 	 */
-	private void setGroupDisabledState () {
+	private void setGroupDisabledState() {/*?|r73+r87|Malte|c1|?*/
 		groupPluginEditors.setEnabled(checkboxEnable.getSelection());
 		for (FieldEditor fieldEdit: pluginFieldEditorList) {
 			fieldEdit.setEnabled(checkboxEnable.getSelection(), getContainer());
@@ -111,14 +111,14 @@ public class EnableContainerFieldEditor extends FieldEditor {/*?|r73+r87|Thilo|c
 
 	@Override
 	protected void doLoad() {
-		// Load checkbox
+		// Load checkbox/*?|r73+r87|Malte|c2|*/
 		checkboxEnable.setSelection(getPreferenceStore().getBoolean(getPreferenceName()));
 		groupPluginEditors.setEnabled(checkboxEnable.getSelection());
 		// Load the Field-Editors
 		for (FieldEditor fieldEdit: pluginFieldEditorList) {
 			fieldEdit.load();
 		}
-		setGroupDisabledState();
+		setGroupDisabledState();/*|r73+r87|Malte|c2|?*/
 	}
 
 	@Override

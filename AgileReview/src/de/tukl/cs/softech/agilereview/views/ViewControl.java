@@ -497,7 +497,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	//****** IPropertyListener ***********
 	//****************************************
 	
-	@Override/*?|r73+r87|Peter|c0|*/
+	@Override/*?|r73+r87|Malte|c3|*/
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getProperty().equals(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED)) {
 			if(isOpen(CommentTableView.class)) {
@@ -505,5 +505,5 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 				CommentTableView.getInstance().resetEditorReferences();
 			}
 		}
-	}/*|r73+r87|Peter|c0|?*/
+	}/*|r73+r87|Malte|c3|?*/
 }

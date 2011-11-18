@@ -40,7 +40,7 @@ public class CommentColorPreferencePage extends FieldEditorPreferencePage/*?|r73
 		containerField.addField(authorColorAnnotationField);
 		
 		// colorfieldeditors for other customizable annotations-colors
-		for (int i=1;i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length;i++) {
+		for (int i = 1; i < PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length; i++) {
 			authorColorAnnotationField = new ColorFieldEditor(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i], "Comment color (Author "+(i+1)+"):", containerField.getContainer());
 			containerField.addField(authorColorAnnotationField);
 		}/*|r59|Malte|c3|?*/
@@ -66,7 +66,6 @@ public class CommentColorPreferencePage extends FieldEditorPreferencePage/*?|r73
 		} else {
 			ViewControl.refreshViews(ViewControl.DETAIL_VIEW);
 		}
-		
 		
 		return result;
 	}

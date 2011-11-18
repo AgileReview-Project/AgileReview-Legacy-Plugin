@@ -231,7 +231,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
 		this.comments = ra.getAllComments();
 		this.viewer.setInput(this.comments);
-		filterComments();
+		filterComments();/*?|r73+r87|Malte|c4|?*/
 		this.refreshTable();
 	}
 	
