@@ -12,39 +12,26 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
-import org.eclipse.ltk.core.refactoring.participants.IConditionChecker;
 import org.eclipse.ltk.core.refactoring.participants.ISharableParticipant;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringArguments;
 import org.eclipse.ltk.core.refactoring.participants.RenameArguments;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
-import org.eclipse.ltk.core.refactoring.participants.ResourceChangeChecker;
-import org.eclipse.text.edits.DeleteEdit;
-import org.eclipse.text.edits.InsertEdit;
-import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.text.edits.MultiTextEdit;
-import org.eclipse.text.edits.ReplaceEdit;
 
-import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.RefactoringAccess;
-import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ComputeDiff.Diff;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
  * Refactoring participant for rename issues. This participant assures the synchronous refactoring of the comment storage
+ * @author Malte Brunnlieb - AgileReview
  */
 public class AuthorFileRenameParticipant extends RenameParticipant implements ISharableParticipant {
 	
@@ -96,7 +83,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 		ra = new RefactoringAccess();
 		addRefactoringIssue(element, getArguments());
 
-		if(errorWhileInitialization != 0) {
+		if(!ra.getFailedFiles().isEmpty()) {
 			//participate and display the error as otherwise the agile review files will be corrupted
 			return true;
 		} else {
@@ -237,28 +224,8 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			}
 		}
 		
-		//add context checker which are only there for assuring accessibility for the files to be refactored
-		ResourceChangeChecker checker = (ResourceChangeChecker) context.getChecker(ResourceChangeChecker.class);
-		IResourceChangeDescriptionFactory deltaFactory = checker.getDeltaFactory();
-
-		for(final IFile f : affectedFiles) {
-			try {
-				context.add(new IConditionChecker() {
-					@Override
-					public RefactoringStatus check(IProgressMonitor monitor) throws CoreException {
-						if(!f.isReadOnly() && f.isAccessible()) {
-							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
-						} else {
-							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));
-						}
-					}
-				});
-			} catch (CoreException e) {/*?|r81|Malte|c1|?*/
-				//do not inform the user as this condition checker can be added twice by different AgileReview Refactoring participants:
-				//can be called twice (e.g. when renaming a single package which is represented by an IResource AND an IPackageFragment) 
-			}
-			deltaFactory.change(f);
-		}
+		//add condition checker which are only there for assuring accessibility for the files to be refactored
+		RefactoringKit.addConditionChecker(affectedFiles, context);
 		
 		//simulate changes
 		try {
@@ -281,79 +248,11 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 	@Override
 	public Change createChange(IProgressMonitor pm) throws OperationCanceledException {
 		
+		//no changes to be done if there was an error during initialization
 		if(errorWhileInitialization != 0) {
 			return null;
 		}
 		
-		CompositeChange result = new CompositeChange("Refactoring of all affected comment paths");
-		ComputeDiff diffProcessor = new ComputeDiff();
-		
-		for(IFile f : affectedFiles) {
-			
-			TextFileChange change = (TextFileChange) getTextChange(f);
-			
-			if(change == null) {
-				//only touch this file if there are no changes done so far
-				change = new TextFileChange(f.getName(), f);
-				change.setEdit(new MultiTextEdit());
-				
-				//current index of the previous (original) document
-				int oldIndex = 0;
-				//should be != null if a delete edit occurs before a insert edit
-				DeleteEdit dEdit = null;
-				for(Diff d : diffProcessor.diff_main(prevDocs.get(f), postDocs.get(f), false)) {
-					switch(d.operation) {
-					case EQUAL: 
-						if(dEdit != null) {
-							try {
-								change.addEdit(new DeleteEdit(oldIndex, dEdit.getLength()));
-							} catch(MalformedTreeException e) {
-								//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
-							}
-							oldIndex += dEdit.getLength();
-							dEdit = null;
-						}
-						oldIndex += d.text.length();
-						break;
-					case DELETE:
-						dEdit = new DeleteEdit(oldIndex, d.text.length());
-						break;
-					case INSERT:
-						if(dEdit != null) {
-							try {
-								change.addEdit(new ReplaceEdit(oldIndex, dEdit.getLength(), d.text));
-							} catch(MalformedTreeException e) {
-								//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
-							}
-							oldIndex += dEdit.getLength();
-							dEdit = null;
-						} else {
-							try {
-								change.addEdit(new InsertEdit(oldIndex, d.text));
-							} catch(MalformedTreeException e) {
-								//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
-							}
-						}
-						break;
-					}
-				}
-				//only add the change if there are edits to be performed
-				if(((MultiTextEdit)change.getEdit()).getChildren().length != 0) {
-					result.add(change);
-				}
-			}
-		}
-
-		/* XXX there is the case that we participate on refactoring without changing anything:
-		 * A package is moved containing no commented files in the next level. However this package contains
-		 * sub folder which contain commented files. Then the affected author files will be listed so far.
-		 * So we have to cope with this by monitoring the changes on a file and remove one if no changes were detected.
-		 * --> In oder to correct this in a more efficient way, rewrite the getAffectedFiles method of RefactoringAccess
-		 */
-		if(result.getChildren().length != 0) {
-			return result;
-		} else {
-			return null;
-		}
+		return RefactoringKit.createChange(affectedFiles, prevDocs, postDocs, this);
 	}
 }
