@@ -96,13 +96,13 @@ public class EnableContainerFieldEditor extends FieldEditor {
 	 */
 	private void handleCheckEvent() {
 		setPresentsDefaultValue(false);/*?|r73+r87|Malte|c0|?*/
-		setGroupDisabledState();
+		updateGroupDisabledState();
 	}
 	
 	/**
 	 * Disable the container and all its inhabitants
 	 */
-	private void setGroupDisabledState() {/*?|r73+r87|Malte|c1|?*/
+	private void updateGroupDisabledState() {/*?|r73+r87|Malte|c1|?*/
 		groupPluginEditors.setEnabled(checkboxEnable.getSelection());
 		for (FieldEditor fieldEdit: pluginFieldEditorList) {
 			fieldEdit.setEnabled(checkboxEnable.getSelection(), getContainer());
@@ -113,24 +113,22 @@ public class EnableContainerFieldEditor extends FieldEditor {
 	protected void doLoad() {
 		// Load checkbox/*?|r73+r87|Malte|c2|*/
 		checkboxEnable.setSelection(getPreferenceStore().getBoolean(getPreferenceName()));
-		groupPluginEditors.setEnabled(checkboxEnable.getSelection());
 		// Load the Field-Editors
 		for (FieldEditor fieldEdit: pluginFieldEditorList) {
 			fieldEdit.load();
 		}
-		setGroupDisabledState();/*|r73+r87|Malte|c2|?*/
+		updateGroupDisabledState();/*|r73+r87|Malte|c2|?*/
 	}
 
 	@Override
 	protected void doLoadDefault() {
 		// Load default checkbox
 		checkboxEnable.setSelection(getPreferenceStore().getDefaultBoolean(getPreferenceName()));
-		groupPluginEditors.setEnabled(checkboxEnable.getSelection());
 		// Load the Field-Editors (default)
 		for (FieldEditor fieldEdit: pluginFieldEditorList) {
 			fieldEdit.loadDefault();
 		}
-		setGroupDisabledState();
+		updateGroupDisabledState();
 	}
 
   
