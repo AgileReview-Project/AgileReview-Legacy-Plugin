@@ -29,7 +29,7 @@ import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ComputeDiff.Diff
  * Static class of reusable refactoring functionalities usable by different refactoring participants
  * @author Malte Brunnlieb - AgileReview
  */
-public class RefactoringKit {
+public class RefactoringKit {/*?|r68|Malte|c0|?*/
 	
 	/**
 	 * Adds an {@link IConditionChecker} to every file given in the collection of affected files. If there already is one added to a file, the CoreException will be suppressed

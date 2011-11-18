@@ -355,7 +355,7 @@ public class RefactoringAccess {
 	 * Returns all files that could not be parsed
 	 * @return collection of files that could not be parsed
 	 */
-	public HashMap<IFile, Exception> getFailedFiles() {/*?|r68|Peter Reuter|c0|*/
+	public HashMap<IFile, Exception> getFailedFiles() {
 		return this.failedFiles;
-	}/*|r68|Peter Reuter|c0|?*/
+	}
 }

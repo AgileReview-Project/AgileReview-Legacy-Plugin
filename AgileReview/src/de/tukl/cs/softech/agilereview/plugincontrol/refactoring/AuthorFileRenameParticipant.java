@@ -83,7 +83,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 		ra = new RefactoringAccess();
 		addRefactoringIssue(element, getArguments());
 
-		if(!ra.getFailedFiles().isEmpty()) {
+		if(!ra.getFailedFiles().isEmpty()) {/*?|r68|Malte|c3|?*/
 			//participate and display the error as otherwise the agile review files will be corrupted
 			return true;
 		} else {
@@ -204,7 +204,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm, CheckConditionsContext context) throws OperationCanceledException {
 		
-		RefactoringStatus resultStatus = new RefactoringStatus();
+		RefactoringStatus resultStatus = new RefactoringStatus();/*?|r68|Malte|c1|?*/
 		
 		//when an error occurred during the initialization, abort the refactoring process
 		if(errorWhileInitialization != 0) {
@@ -213,7 +213,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			return resultStatus;
 		}
 		
-		//check if all files could be read by the RefactoringAccess, otherwise report files which are faulty
+		//check if all files could be read by the RefactoringAccess, otherwise report files which are faulty/*?|r68|Malte|c2|*/
 		HashMap<IFile, Exception> errorFiles = ra.getFailedFiles();
 		if (!errorFiles.isEmpty()) {
 			PluginLogger.logError(this.getClass().toString(), "checkConditions", "Loading of files for refactoring lead to failures:\n");
@@ -222,10 +222,10 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 				resultStatus.addWarning("Could not load file "+location+"for Refactoring. Continuing could corrupt AgileReview Comments!");
 				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Could not load file "+location+"for Refactoring", entry.getValue());
 			}
-		}
+		}/*|r68|Malte|c2|?*/
 		
-		//add condition checker which are only there for assuring accessibility for the files to be refactored
-		RefactoringKit.addConditionChecker(affectedFiles, context);
+		//add condition checker which are only there for assuring accessibility for the files to be refactored/*?|r68|Malte|c4|*/
+		RefactoringKit.addConditionChecker(affectedFiles, context);/*|r68|Malte|c4|?*/
 		
 		//simulate changes
 		try {
@@ -238,10 +238,10 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			return resultStatus;
 		}
 		
-		//when no warnings are captured -> add info "everything ok"
+		//when no warnings are captured -> add info "everything ok"/*?|r68|Malte|c5|*/
 		if(resultStatus.getEntries().length == 0) {
 			resultStatus.addInfo("AgileReview refactoring conditions valid.");
-		}
+		}/*|r68|Malte|c5|?*/
 		return resultStatus;
 	}
 
@@ -253,6 +253,6 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			return null;
 		}
 		
-		return RefactoringKit.createChange(affectedFiles, prevDocs, postDocs, this);
+		return RefactoringKit.createChange(affectedFiles, prevDocs, postDocs, this);/*?|r68|Malte|c6|?*/
 	}
 }
