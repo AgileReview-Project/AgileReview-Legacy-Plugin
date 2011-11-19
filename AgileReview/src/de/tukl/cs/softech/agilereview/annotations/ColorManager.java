@@ -99,13 +99,13 @@ public class ColorManager {
 	 * @param i number of the color
 	 * @return author-name of color number
 	 */
-	public static String getAuthorForNumber(int i) {
+	public static String getAuthorForNumber(int i) {/*?|r73|Thilo|c1|*/
 		String result = "";
 		if (i<authors.size()) {
 			result = authors.get(i);
 		}
 		return result;
-	}
+	}/*|r73|Thilo|c1|?*/
 	
 	/**
 	 * Checks whether the given author has reserved his own color in the current scheme.
