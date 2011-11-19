@@ -95,6 +95,19 @@ public class ColorManager {
 	}
 	
 	/**
+	 * Returns the author-name which is currently associated with the colorof the given number
+	 * @param i number of the color
+	 * @return author-name of color number
+	 */
+	public static String getAuthorForNumber(int i) {
+		String result = "";
+		if (i<authors.size()) {
+			result = authors.get(i);
+		}
+		return result;
+	}
+	
+	/**
 	 * Checks whether the given author has reserved his own color in the current scheme.
 	 * @param author which should be checked for a reservation
 	 * @return true, if the given author has reserved a customized color<br>false, otherwise
