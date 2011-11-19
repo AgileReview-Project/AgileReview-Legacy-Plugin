@@ -230,8 +230,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void resetComments() {
 		PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
 		this.comments = ra.getAllComments();
-		this.viewer.setInput(this.comments);
-		filterComments();/*?|r73+r87|Malte|c4|?*/
+		this.viewer.setInput(this.comments);/*?|r73+r87|Malte|c4|?*/
 		this.refreshTable();
 	}
 	
