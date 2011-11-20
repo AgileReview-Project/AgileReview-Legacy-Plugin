@@ -18,7 +18,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
@@ -182,8 +181,14 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    replyScrolledWrapper.setExpandHorizontal(true);
 	    replyScrolledWrapper.setExpandVertical(true);
 	    replyScrolledWrapper.setLayout(new GridLayout(1, true));
+	    gridData = new GridData();
+	    gridData.horizontalAlignment = GridData.FILL;
+	    gridData.verticalAlignment = GridData.FILL;
+	    gridData.grabExcessHorizontalSpace = true;
+	    gridData.grabExcessVerticalSpace = true;
+	    replyScrolledWrapper.setLayoutData(gridData);
 	    
-	    replys = new Composite(replyScrolledWrapper, SWT.V_SCROLL);
+	    replys = new Composite(replyScrolledWrapper, SWT.NONE);
 	    GridLayout replyLayout = new GridLayout();
 	    replyLayout.numColumns = 1;
 	    replys.setLayout(replyLayout);
@@ -192,7 +197,6 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.verticalAlignment = GridData.BEGINNING;
-	    gridData.grabExcessVerticalSpace = true;
 	    gridData.grabExcessHorizontalSpace = true;
 	    replys.setLayoutData(gridData);
 	    
@@ -251,7 +255,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			Reply[] replys = comment.getReplies().getReplyArray();
 			
 		    this.replys.dispose();
-		    this.replys = new Composite(replyScrolledWrapper, SWT.V_SCROLL | SWT.BORDER);
+		    this.replys = new Composite(replyScrolledWrapper, SWT.NONE);
 		    GridLayout replyLayout = new GridLayout();
 		    replyLayout.numColumns = 1;
 		    this.replys.setLayout(replyLayout);
@@ -260,9 +264,8 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		    
 		    GridData gridData = new GridData();
 		    gridData.horizontalAlignment = GridData.FILL;
-		    gridData.verticalAlignment = GridData.FILL;
-		    gridData.grabExcessVerticalSpace = true;
 		    gridData.grabExcessHorizontalSpace = true;
+		    gridData.grabExcessVerticalSpace = true;
 		    this.replys.setLayoutData(gridData);
 		    
 			for(int i = 0; i < replys.length; i++) {
@@ -305,13 +308,13 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		Label newReply = new Label(this.replys, SWT.WRAP | SWT.BORDER);
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
-	    gridData.verticalAlignment = GridData.FILL;
-	    gridData.grabExcessVerticalSpace = true;
+	    gridData.verticalAlignment = GridData.BEGINNING;
+	    gridData.grabExcessVerticalSpace = false;
 	    gridData.grabExcessHorizontalSpace = true;
 	    newReply.setLayoutData(gridData);
 	    
 		DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-		newReply.setText(author+" ("+df.format(creationDate.getTime())+"):\n"+text);
+		newReply.setText(author+" ("+df.format(creationDate.getTime())+"):\n"+text.replaceAll("\r\n|\r|\n", "\n"));
 		newReply.addFocusListener(this);
 		newReply.setVisible(true);
 		this.replys.layout();
@@ -328,7 +331,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		boolean result = false;
 		
 		//extract replies beforehand
-		Pattern p = Pattern.compile("([^\\s]*)\\s*\\(([^\\)]*)\\):\\n(.*)");
+		Pattern p = Pattern.compile("([^\\s]*)\\s*\\(([^\\)]*)\\):\\n(.*)", Pattern.DOTALL);
 		Matcher m;
 		ArrayList<String[]> shownReplies = new ArrayList<String[]>();
 		Control[] replys = this.replys.getChildren();
