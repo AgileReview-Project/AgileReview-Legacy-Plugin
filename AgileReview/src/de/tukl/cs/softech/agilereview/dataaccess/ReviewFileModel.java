@@ -13,6 +13,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.ResourceUtil;
 
 import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.ReviewDocument;
@@ -45,25 +49,44 @@ class ReviewFileModel {
 		document.save(filePath.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
 		try {
 			filePath.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "save", "CoreException while saving "+filePath.getLocation().toOSString(), e);
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could save AgileReview files", e.getLocalizedMessage());
 		}
+			});
+	}
 	}
 	
 	/**
 	 * Deletes the given file
 	 * @param delFile
 	 */
-	private void deleteResource(final IResource delFile)
-	{
+	private void deleteResource(final IResource delFile) {
 		try {
+			if(delFile instanceof IFile) {
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				IEditorPart editor = ResourceUtil.findEditor(page, (IFile)delFile);
+				if(editor != null) {
+					page.closeEditor(editor, false);
+				}
 			delFile.delete(true, null);
-		} catch (CoreException e) {
-			Display.getDefault().asyncExec(new Runnable() {
-				
+			} else if(delFile instanceof IFolder){
+				for(IResource r : ((IFolder)delFile).members()) {
+					deleteResource(r);
+				}
+				delFile.delete(true, null);
+			} else {
+				delFile.delete(true, null);
+			}
+		} catch (final CoreException e) {
+			Display.getDefault().syncExec(new Runnable() {
 				@Override
 				public void run() {
-					MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning: Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted");
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted.\n" +
+							"Please delete the file manually.\n\nReason:\n"+e.getLocalizedMessage());
 				}
 			});
 			PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted", e);
@@ -114,8 +137,14 @@ class ReviewFileModel {
 						if (f instanceof IFile)
 						this.removeXmlDocument((IFile)f);
 					}
-				} catch (CoreException e) {
-					PluginLogger.logError(ReviewAccess.class.toString(), "removeXmlDocument", "CoreException while removing "+file.getLocation().toOSString()+" from model", e);
+				} catch (final CoreException e) {
+					PluginLogger.logError(this.getClass().toString(), "removeXmlDocument", "CoreException while removing sibling files of "+file.getLocation().toOSString()+" from model", e);
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not delete AgileReview files", e.getLocalizedMessage());
+				}
+					});
 				}
 
 				// Delete the folder afterwards

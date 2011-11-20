@@ -10,7 +10,6 @@ import java.util.Iterator;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -131,11 +130,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * indicates whether Eclipse was just started or not
 	 */
-	private boolean startup = true;
-	/**
-	 * indicates whether annotations are displayed or not
-	 */
-	private boolean perspectiveNotActive = false; 
+	private boolean startup = true; 
 	/**
 	 * map of currently opened editors and their annotation parsers
 	 */
@@ -183,8 +178,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "addComment", "BadLocationException when trying to add tags", e);
-		} catch (CoreException e) {
-			PluginLogger.log(this.getClass().toString(), "addComment", "CoreException when trying to add tags", e);
 		}	
 	}
 	
@@ -210,8 +203,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "deleteComment", "BadLocationException when trying to delete comment", e);
-		} catch (CoreException e) {
-			PluginLogger.logError(this.getClass().toString(), "deleteComment", "CoreException when trying to delete comment", e);
 		}
 	}
 
@@ -628,14 +619,16 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Opens an editor for a given comment
 	 * @param comment the comment
+	 * @return boolean flag, indicating if the editor could be opened
 	 */
-	private void openEditor(Comment comment) {
+	private boolean openEditor(Comment comment) {
 		PluginLogger.log(this.getClass().toString(), "openEditor", "Opening editor for the given comment");
 		IPath path = new Path(ReviewAccess.computePath(comment));
 		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 		
 		if(!file.exists()) {
-			MessageDialog.openError(Display.getDefault().getActiveShell(), "File not found!", "The file "+file.getFullPath()+" could not be found!");
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening file", "Could not open file '"+file.getFullPath()+"'!\nFile not existent in workspace or respective project may be closed!");
+			return false;
 		}
 		
 		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
@@ -648,6 +641,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		} catch (PartInitException e) {
 			PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
 		}
+		return true;
 	}
 	
 	/**
@@ -677,7 +671,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	
 	//###############################################################################
 	//######### functions which provide functionality for AnnotationParser ##########
-	//###############################################################################
+	//###################################################################O############
 	
 	/**
 	 * Relocates the comment passed to the current selection within the same file
@@ -687,12 +681,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		IEditorPart editor;
 		if((editor = getActiveEditor()) != null) {
 			try {
-				parserMap.get(editor).removeCommentTags(comment);
-				parserMap.get(editor).addTagsInDocument(comment, getFilteredComments().contains(comment));
+				parserMap.get(editor).relocateComment(comment, getFilteredComments().contains(comment));
 			} catch (BadLocationException e) {
 				PluginLogger.logError(this.getClass().toString(), "relocateComment", "BadLocationException when trying to add/remove tags", e);
-			} catch (CoreException e) {
-				PluginLogger.log(this.getClass().toString(), "relocateComment", "CoreException when trying to add/remove tags", e);
 			}
 		}
 	}
@@ -848,6 +839,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void partClosed(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof IEditorPart) {
 			IEditorPart editor = (IEditorPart) partRef.getPart(false);
+			if (editor == null) {
+				return;
+			}
 			if (this.parserMap.containsKey(editor)) {
 				this.parserMap.remove(editor);
 			}
@@ -862,10 +856,32 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		if (partRef.getPart(false) instanceof IEditorPart) {
 			IEditorPart editor = (IEditorPart) partRef.getPart(false);
-			if (!this.parserMap.containsKey(editor) && !this.perspectiveNotActive) {
+			if (editor == null) {
+				return;
+			}
+			if (!this.parserMap.containsKey(editor) && ViewControl.isPerspectiveOpen()) {
 				this.parserMap.put(editor, ParserFactory.createParser(editor));
 			}
 			if(parserMap.containsKey(editor)) {
+				parserMap.get(editor).filter(getFilteredComments());
+			}
+		}
+	}
+	
+	/**
+	 * Reset the parser of the editor given by partRef
+	 * @param partRef will be forwarded from the {@link ViewControl}
+	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
+	 */
+	public void partInputChanged(IWorkbenchPartReference partRef) {
+		if (partRef.getPart(false) instanceof IEditorPart) {
+			IEditorPart editor = (IEditorPart) partRef.getPart(false);
+			if (editor == null) {
+				return;
+			}
+			if (this.parserMap.containsKey(editor) && ViewControl.isPerspectiveOpen()) {
+				parserMap.get(editor).clearAnnotations();
+				parserMap.put(editor, ParserFactory.createParser(editor));
 				parserMap.get(editor).filter(getFilteredComments());
 			}
 		}
@@ -885,7 +901,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 			this.parserMap.clear();
 			this.startup = false;
-			this.perspectiveNotActive = true;
+			
 			System.gc();
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivatedperspectiveActivated", "Clear parser map and run garbage collector");
 		}
@@ -896,7 +912,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 						this.parserMap.put((IEditorPart) getActiveEditor(), ParserFactory.createParser((IEditorPart) getActiveEditor()));
 						this.parserMap.get((IEditorPart) getActiveEditor()).filter(getFilteredComments());
 				}
-				this.perspectiveNotActive = false;
 			}
 		}
 	}
@@ -979,22 +994,23 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param detailViewSetFocus Indicates whether to set the focus to the detail view or not
 	 */
 	private void revealComment(Comment comment, boolean detailViewSetFocus) {/*?|r69|Peter Reuter|c4|*/
-		openEditor(comment);
-		//jump to comment in opened editor
-		try {
-			PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
-			this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
-		} catch (BadLocationException e) {
-			PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
-		}
-		
-		//open Detail View and set Focus
-		ViewControl.openView(ViewControl.DETAIL_VIEW);
-		if (ViewControl.isOpen(DetailView.class)) {
-			if (detailViewSetFocus) {
-				DetailView.getInstance().setFocus();
+		if(openEditor(comment)) {
+			//jump to comment in opened editor
+			try {
+				PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
+				this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
+			} catch (BadLocationException e) {
+				PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
 			}
-			selectComment(comment); //select comment another time to show the comment if the view was closed before
+		
+			//open Detail View and set Focus
+			ViewControl.openView(ViewControl.DETAIL_VIEW);
+			if (ViewControl.isOpen(DetailView.class)) {
+				if (detailViewSetFocus) {
+					DetailView.getInstance().setFocus();
+				}
+				selectComment(comment); //select comment another time to show the comment if the view was closed before
+			}
 		}
 	}/*|r69|Peter Reuter|c4|?*/
 	

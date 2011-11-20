@@ -3,7 +3,6 @@ package de.tukl.cs.softech.agilereview.annotations;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Position;
 
@@ -25,13 +24,13 @@ public class NullParser implements IAnnotationParser {
 	public void filter(HashSet<Comment> comments) {}
 
 	@Override
-	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {}
+	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException {}
 
 	@Override
-	public void removeCommentTags(Comment comment) throws BadLocationException,	CoreException {}
+	public void removeCommentTags(Comment comment) throws BadLocationException {}
 
 	@Override
-	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {}
+	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException {}
 
 	@Override
 	public void revealCommentLocation(String commentID)	throws BadLocationException {}
@@ -50,6 +49,9 @@ public class NullParser implements IAnnotationParser {
 	public String[] getCommentsByPosition(Position p) {
 		return new String[]{};
 	}
+
+	@Override
+	public void relocateComment(Comment comment, boolean display) throws BadLocationException {}
 
 	@Override
 	public Position getNextCommentsPosition(Position current) {

@@ -24,11 +24,6 @@ import de.tukl.cs.softech.agilereview.wizards.newreview.NewReviewWizard;
  * Handler for adding a new Comment
  */
 public class AddNewCommentHandler extends AbstractHandler {
-	
-	/**
-	 * Instance of ReviewAccess
-	 */
-	private ReviewAccess ra = ReviewAccess.getInstance();
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -37,7 +32,8 @@ public class AddNewCommentHandler extends AbstractHandler {
 				ViewControl.getInstance().switchPerspective();
 			}
 		}
-		PluginLogger.log(this.getClass().toString(), "execute", "Command \"Add new Comment\" triggered");			
+		PluginLogger.log(this.getClass().toString(), "execute", "Command \"Add new Comment\" triggered");
+		ReviewAccess ra = ReviewAccess.getInstance();
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 		if (!activeReview.isEmpty()) {
 			String pathToFile = "";
@@ -65,7 +61,7 @@ public class AddNewCommentHandler extends AbstractHandler {
 				PluginLogger.logWarning(this.getClass().toString(), "addNewComment", "No open editor!");
 			}
 		} else {
-			if (this.ra.getAllReviews().isEmpty()) {
+			if (ra.getAllReviews().isEmpty()) {
 				MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "No reviews existent", "Please create a review before adding comments!");
 				NewReviewWizard wizard = new NewReviewWizard();
 				WizardDialog wd = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);

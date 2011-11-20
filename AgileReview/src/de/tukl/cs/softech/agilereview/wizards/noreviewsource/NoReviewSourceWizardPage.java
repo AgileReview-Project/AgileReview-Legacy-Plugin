@@ -153,7 +153,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 					listOpenARProjects.add(currProj.getName());
 				}
 			} catch (CoreException e) {
-				// Is thrown, if currProj is closed or does not exist
+				// Is thrown, if currProj is closed or does not exist --> CoreException actively used here
 				if (currProj.exists()) {
 					listClosedARProjects.add(currProj.getName());	
 				}

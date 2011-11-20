@@ -2,8 +2,9 @@ package de.tukl.cs.softech.agilereview.plugincontrol.refactoring;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Map.Entry;
 
 import org.apache.xmlbeans.SystemProperties;
 import org.apache.xmlbeans.XmlException;
@@ -11,38 +12,26 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
-import org.eclipse.ltk.core.refactoring.participants.IConditionChecker;
 import org.eclipse.ltk.core.refactoring.participants.ISharableParticipant;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringArguments;
 import org.eclipse.ltk.core.refactoring.participants.RenameArguments;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
-import org.eclipse.ltk.core.refactoring.participants.ResourceChangeChecker;
-import org.eclipse.text.edits.DeleteEdit;
-import org.eclipse.text.edits.InsertEdit;
-import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.text.edits.MultiTextEdit;
-import org.eclipse.text.edits.ReplaceEdit;
 
-import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.RefactoringAccess;
-import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ComputeDiff.Diff;
+import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
  * Refactoring participant for rename issues. This participant assures the synchronous refactoring of the comment storage
+ * @author Malte Brunnlieb - AgileReview
  */
 public class AuthorFileRenameParticipant extends RenameParticipant implements ISharableParticipant {
 	
@@ -91,19 +80,10 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 
 	@Override
 	protected boolean initialize(Object element) {
-		try {
-			ra = new RefactoringAccess();
-		} catch (XmlException e) {
-			errorWhileInitialization = 1;
-			return true;
-		} catch (IOException e) {
-			errorWhileInitialization = 2;
-			return true;
-		}
-		
+		ra = new RefactoringAccess();
 		addRefactoringIssue(element, getArguments());
-		
-		if(errorWhileInitialization != 0) {
+
+		if(!ra.getFailedFiles().isEmpty()) {
 			//participate and display the error as otherwise the agile review files will be corrupted
 			return true;
 		} else {
@@ -124,14 +104,18 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 	 * @param arguments passed by the refactoring event
 	 */
 	private synchronized void addRefactoringIssue(Object element, RefactoringArguments arguments) {
+		
+		//check whether the given arguments are the right ones, otherwise leave this function
 		RenameArguments rArguments;
 		if(arguments instanceof RenameArguments) {
 			rArguments = (RenameArguments)arguments;
 		} else {
-			errorWhileInitialization = 7;
+			errorWhileInitialization = 1;
+			PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR7: Unknown refactoring Arguments: "+arguments.getClass());
 			return;
 		}
 		
+		//determine information about the element to be renamed, such as oldPath, newPath, type(of IResource) and whether the sub folders should also be renamed
 		if(element instanceof IPackageFragment && !renameSubpackages) {
 			try {
 				this.element = ((IPackageFragment)element).getCorrespondingResource();
@@ -150,6 +134,8 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 					} else {
 						//else should not occur (assumption on observation)
 						errorWhileInitialization = 6;
+						PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR6: Not managed situation (excluded by observation):" +
+								"\noldPath="+oldPath+"\noldTmp="+oldTmp+"\nnewPath="+newPath+"\nnewTmp="+newTmp);
 						return;
 					}
 				} else {
@@ -159,6 +145,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 				type = IResource.FOLDER;
 			} catch (JavaModelException e) {
 				errorWhileInitialization = 3;
+				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR3: JavaModelException while accessing: "+((IPackageFragmentRoot)element).getElementName(), e);
 				return;
 			}
 		} else if(element instanceof IResource) {
@@ -180,6 +167,7 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 				type = IResource.FILE;
 			} else {
 				errorWhileInitialization = 5;
+				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR5: Unknown IResource subtype: "+element.getClass());
 				return;
 			}
 		} else if(element instanceof IPackageFragmentRoot && !renameSubpackages) {
@@ -193,8 +181,13 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 				renameSubpackages = true;
 			} catch (JavaModelException e) {
 				errorWhileInitialization = 4;
+				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR4: JavaModelException while accessing: "+((IPackageFragmentRoot)element).getElementName(), e);
 				return;
 			}
+		} else {
+			errorWhileInitialization = 9;
+			PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR9: Unknown type of the element which should be refactored: "+element.getClass());
+			return;
 		}
 	}
 	
@@ -210,105 +203,56 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm, CheckConditionsContext context) throws OperationCanceledException {
+		
+		RefactoringStatus resultStatus = new RefactoringStatus();
+		
 		//when an error occurred during the initialization, abort the refactoring process
 		if(errorWhileInitialization != 0) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occurred while accessing AgileReview files. ("+errorWhileInitialization+")"));
+			PluginLogger.logWarning(getClass().toString(), "checkConditions", "An error occured during initialization (Code: IR"+errorWhileInitialization+").");
+			resultStatus.addWarning("An error occurred while accessing AgileReview files. (Code: IR"+errorWhileInitialization+") Continuing could corrupt AgileReview Comments!");
+			return resultStatus;
 		}
 		
-		ResourceChangeChecker checker = (ResourceChangeChecker) context.getChecker(ResourceChangeChecker.class);
-		IResourceChangeDescriptionFactory deltaFactory = checker.getDeltaFactory();
-
-		for(final IFile f : affectedFiles) {
-			try {
-				context.add(new IConditionChecker() {
-					@Override
-					public RefactoringStatus check(IProgressMonitor monitor) throws CoreException {
-						if(!f.isReadOnly() && f.isAccessible()) {
-							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
-						} else {
-							return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, f.getLocation()+" is not accessible."));
-						}
-					}
-				});
-			} catch (CoreException e) {
-				//can be called twice (e.g. when renaming a single package which is represented by an IResource AND an IPackageFragment) 
+		//check if all files could be read by the RefactoringAccess, otherwise report files which are faulty
+		HashMap<IFile, Exception> errorFiles = ra.getFailedFiles();
+		if (!errorFiles.isEmpty()) {
+			PluginLogger.logError(this.getClass().toString(), "checkConditions", "Loading of files for refactoring lead to failures:\n");
+			for (Entry<IFile, Exception> entry : errorFiles.entrySet()) {
+				String location = entry.getKey().getLocation().toOSString();
+				resultStatus.addWarning("Could not load file "+location+"for Refactoring. Continuing could corrupt AgileReview Comments!");
+				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Could not load file "+location+"for Refactoring", entry.getValue());
 			}
-			deltaFactory.change(f);
 		}
+		
+		//add condition checker which are only there for assuring accessibility for the files to be refactored
+		RefactoringKit.addConditionChecker(affectedFiles, context);
 		
 		//simulate changes
 		try {
-			//do refactoring
 			postDocs = ra.getPostDocumentsOfRefactoring(oldPath, newPath, type, renameSubpackages);
 		} catch (IOException e) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (1)"));
+			resultStatus.addWarning("An error occured while accessing AgileReview data in order to simulate refactoring changes. (Code IR10) Continuing will corrupt AgileReview Comments!");
+			return resultStatus;
 		} catch (XmlException e) {
-			return RefactoringStatus.create(new Status(Status.ERROR, Activator.PLUGIN_ID, "An error occured while accessing AgileReview data in order to simulate refactoring changes. (2)"));
+			resultStatus.addWarning("An error occured while accessing AgileReview data in order to simulate refactoring changes. (Code IR11) Continuing will corrupt AgileReview Comments!");
+			return resultStatus;
 		}
 		
-		return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, "AgileReview refactoring conditions valid."));
+		//when no warnings are captured -> add info "everything ok"
+		if(resultStatus.getEntries().length == 0) {
+			resultStatus.addInfo("AgileReview refactoring conditions valid.");
+		}
+		return resultStatus;
 	}
 
 	@Override
-	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
+	public Change createChange(IProgressMonitor pm) throws OperationCanceledException {
 		
-		CompositeChange result = new CompositeChange("Refactoring of all affected comment paths");
-		
-		ComputeDiff diffProcessor = new ComputeDiff();
-		for(IFile f : affectedFiles) {
-			
-			TextFileChange change = (TextFileChange) getTextChange(f);
-			
-			if(change != null) {
-				//if there are already changes in this file, do not touch it
-				return null;
-			}
-			
-			change = new TextFileChange(f.getName(), f);
-			change.setEdit(new MultiTextEdit());
-			
-			//current index of the previous (original) document
-			int oldIndex = 0;
-			//should be != null if a delete edit occurs before a insert edit
-			DeleteEdit dEdit = null;
-			for(Diff d : diffProcessor.diff_main(prevDocs.get(f), postDocs.get(f), false)) {
-				switch(d.operation) {
-				case EQUAL: 
-					if(dEdit != null) {
-						try {
-							change.addEdit(new DeleteEdit(oldIndex, dEdit.getLength()));
-						} catch(MalformedTreeException e) {
-							//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
-						}
-						oldIndex += dEdit.getLength();
-						dEdit = null;
-					}
-					oldIndex += d.text.length();
-					break;
-				case DELETE:
-					dEdit = new DeleteEdit(oldIndex, d.text.length());
-					break;
-				case INSERT:
-					if(dEdit != null) {
-						try {
-							change.addEdit(new ReplaceEdit(oldIndex, dEdit.getLength(), d.text));
-						} catch(MalformedTreeException e) {
-							//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
-						}
-						oldIndex += dEdit.getLength();
-						dEdit = null;
-					} else {
-						try {
-							change.addEdit(new InsertEdit(oldIndex, d.text));
-						} catch(MalformedTreeException e) {
-							//only catch this as it is possible to have duplicated edits (e.g. IResource && IPackageFragment)
-						}
-					}
-					break;
-				}
-			}
-			result.add(change);
+		//no changes to be done if there was an error during initialization
+		if(errorWhileInitialization != 0) {
+			return null;
 		}
-		return result;
+		
+		return RefactoringKit.createChange(affectedFiles, prevDocs, postDocs, this);
 	}
 }

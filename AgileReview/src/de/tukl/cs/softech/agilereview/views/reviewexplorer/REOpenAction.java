@@ -86,7 +86,7 @@ class REOpenAction extends Action {
 					MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening file", "An error occured while initializing the editor!");
 				}
 			} else {
-				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening file", "Could not open file!\nFile not existent in workspace!");
+				MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening file", "Could not open file '"+file.getFullPath()+"'!\nFile not existent in workspace or respective project may be closed!");
 			}
 		}
 	}

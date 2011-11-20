@@ -98,7 +98,7 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 					list.add(currProj.getName());
 				}
 			} catch (CoreException e) {
-				// Is thrown, if currProj is closed or  does not exist -> ignore it
+				// Is thrown, if currProj is closed or does not exist -> this project is not interesting for us
 			}
 		}
 		

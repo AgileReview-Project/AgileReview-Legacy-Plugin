@@ -1,6 +1,5 @@
 package de.tukl.cs.softech.agilereview.preferences.lang;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,9 +38,11 @@ public class SupportedLanguageEntity {
 	 * @param endTag
 	 */
 	public SupportedLanguageEntity(String[] fileendings, String beginTag, String endTag) {
-		this.fileendings = new TreeSet<String>(Arrays.asList(fileendings));
-		this.beginTag = beginTag;
-		this.endTag = endTag;
+		for(String s : fileendings) {
+			addFileending(s);
+		}
+		this.beginTag = beginTag.trim();
+		this.endTag = endTag.trim();
 	}
 	
 	/**
@@ -49,8 +50,8 @@ public class SupportedLanguageEntity {
 	 * @param fileending
 	 */
 	void addFileending(String fileending) {
-		if(!fileending.isEmpty()) {
-			fileendings.add(fileending);
+		if(!fileending.trim().isEmpty()) {
+			fileendings.add(fileending.trim());
 		}
 	}
 	
@@ -60,8 +61,9 @@ public class SupportedLanguageEntity {
 	 */
 	public void addFileendings(Set<String> fileendings) {
 		for(String s : fileendings) {
-			if(!s.isEmpty()) {
-				this.fileendings.add(s);
+			String tmp = s.trim();
+			if(!tmp.isEmpty()) {
+				this.fileendings.add(tmp);
 			}
 		}
 	}
@@ -82,11 +84,14 @@ public class SupportedLanguageEntity {
 		String result = "";
 		boolean first = true;
 		for(String s : fileendings) {
-			if(first) {
-				result += s;
-				first = false;
-			} else {
-				result += ", " + s;
+			String tmp = s.trim();
+			if(!tmp.isEmpty()) {
+				if(first) {
+					result += tmp;
+					first = false;
+				} else {
+					result += ", " + tmp;
+				}
 			}
 		}
 		return result;
@@ -99,12 +104,14 @@ public class SupportedLanguageEntity {
 	void setFileendingsAsString(String in) {
 		in = in.trim();
 		if(!in.isEmpty()) {
+			fileendings.clear();
 			String[] endings = in.split(",");
 			for(String s : endings) {
 				s = s.trim();
+				if(!s.isEmpty()) {
+					fileendings.add(s);
+				}
 			}
-			fileendings.clear();
-			fileendings.addAll(Arrays.asList(endings));
 		} else {
 			fileendings.clear();
 		}
@@ -123,7 +130,7 @@ public class SupportedLanguageEntity {
 	 * @param beginTag
 	 */
 	void setBeginTag(String beginTag) {
-		this.beginTag = beginTag;
+		this.beginTag = beginTag.trim();
 	}
 
 	/**
@@ -139,7 +146,7 @@ public class SupportedLanguageEntity {
 	 * @param endTag
 	 */
 	void setEndTag(String endTag) {
-		this.endTag = endTag;
+		this.endTag = endTag.trim();
 	}
 	
 	/**
@@ -155,7 +162,6 @@ public class SupportedLanguageEntity {
 	 * @return true, if each begin and end tag is set with arbitrary an arbitrary string not equals empty<br>false, otherwise
 	 */
 	boolean isValid() {
-		return (beginTag.isEmpty() && !endTag.isEmpty()) || (!beginTag.isEmpty() && endTag.isEmpty()) ||
-		(beginTag.isEmpty() && endTag.isEmpty() && !fileendings.isEmpty());
+		return (!beginTag.isEmpty() && !endTag.isEmpty()) || (beginTag.isEmpty() && endTag.isEmpty() && fileendings.isEmpty());
 	}
 }

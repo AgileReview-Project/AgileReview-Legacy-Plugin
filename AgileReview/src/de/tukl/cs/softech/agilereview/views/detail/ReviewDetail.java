@@ -259,7 +259,9 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 		try {
 			URI uri = new URI(this.reference.getText());
 			if (Desktop.isDesktopSupported()) {
-				Desktop.getDesktop().browse(uri);
+				if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+					Desktop.getDesktop().browse(uri);	
+				}				
 			} else {
 				PluginLogger.logWarning(this.getClass().toString(), "widgetSelected", "\"java.awt.Desktop\" not supported by OS");
 			}

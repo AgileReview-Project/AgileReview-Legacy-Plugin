@@ -242,16 +242,21 @@ public class AnnotationParser implements IAnnotationParser {
 			}
 			
 		}
-		
-		for(String s : idPositionMap.keySet()) {
-			
-		}
 
 		// Save the current document to save the tags
 		try {
 			editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
 		} catch (CoreException e) {
 			PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "+editor.getTitle(), e);
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException", "An eclipse internal error occured when saving the current document!\n" +
+							"Please try to do this by hand in order to save the inserted comment tags.");
+				}
+				
+			});
 		}
 		
 		//update annotations in order to recognize moved tags
@@ -300,15 +305,29 @@ public class AnnotationParser implements IAnnotationParser {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#addTagsInDocument(agileReview.softech.tukl.de.CommentDocument.Comment)
 	 */
-	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {
+	public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException {
 		//VARIANT(return Position):Position result = null;
 
-		ISelection selection= editor.getSelectionProvider().getSelection();
+		ISelection selection = editor.getSelectionProvider().getSelection();
 		if (selection instanceof ITextSelection) {
 			int selStartLine = ((ITextSelection)selection).getStartLine();
 			int selEndLine = ((ITextSelection)selection).getEndLine();
+			addTagsInDocument(comment, display, selStartLine, selEndLine);
+		}
+		//VARIANT(return Position):return result;
+	}
+	
+	/**
+	 * Adds the Comment tags for the given comment in the currently opened file at the currently selected place
+	 * @param comment Comment for which the tags should be inserted
+	 * @param display if true, the new comment will instantly displayed<br>false, otherwise
+	 * @param selStartLine of the position where the comment should be inserted
+	 * @param selEndLine of the position where the comment should be inserted
+	 * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
+	 */
+	private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException {
 			boolean newLineInserted = false;
-			
+			int origSelStartLine = selStartLine;
 			String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 			String commentTag = keySeparator+commentKey+keySeparator;
 			
@@ -333,7 +352,7 @@ public class AnnotationParser implements IAnnotationParser {
 					}
 					
 					//only inform the user about these adaptations if he did not select the whole javaDoc
-					if(((ITextSelection)selection).getStartLine()-1 != selStartLine) {/*?|r40+r39|Peter|c0|?*/
+					if(origSelStartLine-1 != selStartLine) {/*?|r40+r39|Peter|c0|?*/
 						significantlyChanged[0] = true;
 					}
 				}
@@ -367,6 +386,7 @@ public class AnnotationParser implements IAnnotationParser {
 				// set new selection
 				editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
 			}
+			
 			
 			if (selStartLine == selEndLine)	{
 				// Only one line is selected
@@ -405,16 +425,14 @@ public class AnnotationParser implements IAnnotationParser {
 				document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
 				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+(newLineInserted?"-":"")+tags[1]);
 
-				
-				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
-				//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
-			}
-			parseInput();
-			if(ViewControl.isPerspectiveOpen() && display) {
-				this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
-			}
+			
+			//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
+			//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
 		}
-		//VARIANT(return Position):return result;
+		parseInput();
+		if(ViewControl.isPerspectiveOpen() && display) {
+			this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
+		}
 	}
 	
 	/**
@@ -505,7 +523,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentTags(agileReview.softech.tukl.de.CommentDocument.Comment)
 	 */
-	public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {
+	public void removeCommentTags(Comment comment) throws BadLocationException {
 		removeCommentsTags(new HashSet<Comment>(Arrays.asList(new Comment[]{comment})));
 	}
 	
@@ -513,7 +531,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * (non-Javadoc)
 	 * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentsTags(java.util.Set)
 	 */
-	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {		
+	public void removeCommentsTags(Set<Comment> comments) throws BadLocationException {		
 		String separator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
 		TreeSet<Position> tagPositions = new TreeSet<Position>();
 		String key;
@@ -573,7 +591,6 @@ public class AnnotationParser implements IAnnotationParser {
 	public String[] getCommentsByPosition(Position p) {
 		return this.annotationModel.getCommentsByPosition(p);
 	}
-	
 	/**
 	 * Computes the next position from the given one on where a comment is located.
 	 * @param current The current position
@@ -582,4 +599,14 @@ public class AnnotationParser implements IAnnotationParser {
 	public Position getNextCommentsPosition(Position current) {/*?|r69|Peter Reuter|c3|*/
 		return this.annotationModel.getNextCommentPosition(current);
 	}/*|r69|Peter Reuter|c3|?*/
+	@Override
+	public void relocateComment(Comment comment, boolean display) throws BadLocationException {
+		ISelection selection = editor.getSelectionProvider().getSelection();
+		if (selection instanceof ITextSelection) {
+			int selStartLine = ((ITextSelection)selection).getStartLine();
+			int selEndLine = ((ITextSelection)selection).getEndLine();
+			removeCommentTags(comment);
+			addTagsInDocument(comment, display, selStartLine, selEndLine);
+		}
+	}
 }

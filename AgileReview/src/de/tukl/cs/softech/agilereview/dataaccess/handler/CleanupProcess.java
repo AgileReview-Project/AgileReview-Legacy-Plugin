@@ -1,6 +1,5 @@
 package de.tukl.cs.softech.agilereview.dataaccess.handler;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.xmlbeans.XmlException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -18,7 +16,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Display;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
@@ -79,15 +79,8 @@ public class CleanupProcess implements IRunnableWithProgress {
 		monitor.worked(10);
 		monitor.subTask("Loading all reviews...");
 		// load all comments for all reviews
-		try {
-			ra.fillDatabaseCompletely();
-		} catch (XmlException e1) {
-			PluginLogger.logError(this.getClass().toString(), "execute", "XMLException while trying to fill database.", e1);
-			throw new InterruptedException("An XmlException occured: "+e1);
-		} catch (IOException e1) {
-			PluginLogger.logError(this.getClass().toString(), "execute", "IOException while trying to fill database.", e1);
-			throw new InterruptedException("An IOException occured: "+e1);
-		}
+		ra.fillDatabaseCompletely();
+
 		
 		// save all comments for the given project
 		for (Review r : reviews) {
@@ -139,7 +132,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 	 * @param project the project
 	 * @return list of paths of files relatively to the workspace
 	 */
-	private HashSet<String> getFilesOfProject(IProject project) {
+	private HashSet<String> getFilesOfProject(final IProject project) {
 		HashSet<String> paths = new HashSet<String>();
 		try {
 			for (IResource r : project.members()) {
@@ -152,6 +145,15 @@ public class CleanupProcess implements IRunnableWithProgress {
 				}
 			}
 		} catch (CoreException e) {
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException", "An eclipse internal error occured when performing cleanup!\n" +
+							"The resource "+project.getName()+" does not exist or is closed.");
+				}
+				
+			});
 			PluginLogger.logError(this.getClass().toString(), "getFilesOfProject", "CoreException while trying to fetch files of project "+project.getName()+".", e);
 		}
 		return paths;
@@ -176,5 +178,5 @@ public class CleanupProcess implements IRunnableWithProgress {
 		}		
 		return paths;
 	}
-
+	
 }
