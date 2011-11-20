@@ -50,7 +50,7 @@ public class RefactoringKit {/*?|r68|Malte|c0|?*/
 						if(!f.isReadOnly() && f.isAccessible()) {
 							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
 						} else {
-							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));
+							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));/*?|r68|Thilo|c0|?*/
 						}
 					}
 				});
