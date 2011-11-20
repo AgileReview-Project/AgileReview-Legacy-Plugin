@@ -217,7 +217,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	private void refreshReplies() {/*?|r93|Malte|c5|?*/
 		replies.layout();
 	    replyScrolledWrapper.setContent(replies);
-	    replyScrolledWrapper.setMinSize(replies.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	    //replyScrolledWrapper.setMinSize(replies.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	    replyScrolledWrapper.layout();
 	}
 	
