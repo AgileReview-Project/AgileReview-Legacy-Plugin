@@ -33,7 +33,7 @@ public class AuthorColorFieldEditor extends ColorFieldEditor {/*?|r73|Thilo|c0|?
 		this.authorNumber = authorNumber;
 		// (1) Needed, as you can not be sure which is called first ((1) or (2))
 		if (authorLabel != null) {
-			authorLabel.setText(ColorManager.getAuthorForNumber(authorNumber));
+			authorLabel.setText(ColorManager.getAuthorName(authorNumber));
 		}
 	}
 
@@ -44,7 +44,7 @@ public class AuthorColorFieldEditor extends ColorFieldEditor {/*?|r73|Thilo|c0|?
 		authorLabel = new Label(parent, SWT.NONE);
 		// (2) Needed, as you can not be sure which is called first ((1) or (2))
 		if (authorNumber != -1) {
-			authorLabel.setText(ColorManager.getAuthorForNumber(authorNumber));
+			authorLabel.setText(ColorManager.getAuthorName(authorNumber));
 		}
 	}
 
