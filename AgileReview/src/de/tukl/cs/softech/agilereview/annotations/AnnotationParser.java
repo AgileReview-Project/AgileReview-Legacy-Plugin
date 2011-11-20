@@ -307,11 +307,11 @@ public class AnnotationParser implements IAnnotationParser {
 		//VARIANT(return Position):Position result = null;
 
 		ISelection selection = editor.getSelectionProvider().getSelection();
-		if (selection instanceof ITextSelection) {/*?|r76|Malte|c3|*/
+		if (selection instanceof ITextSelection) {
 			int selStartLine = ((ITextSelection)selection).getStartLine();
 			int selEndLine = ((ITextSelection)selection).getEndLine();
 			addTagsInDocument(comment, display, selStartLine, selEndLine);
-		}/*|r76|Malte|c3|?*/
+		}
 		//VARIANT(return Position):return result;
 	}
 	
@@ -323,7 +323,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @param selEndLine of the position where the comment should be inserted
 	 * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
 	 */
-	private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException {/*?|r76|Malte|c2|?*/
+	private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException {
 		
 		String commentKey = comment.getReviewID()+keySeparator+comment.getAuthor()+keySeparator+comment.getId();
 		String commentTag = keySeparator+commentKey+keySeparator;
@@ -550,7 +550,7 @@ public class AnnotationParser implements IAnnotationParser {
 	}
 
 	@Override
-	public void relocateComment(Comment comment, boolean display) throws BadLocationException {/*?|r76|Malte|c1|*/
+	public void relocateComment(Comment comment, boolean display) throws BadLocationException {
 		ISelection selection = editor.getSelectionProvider().getSelection();
 		if (selection instanceof ITextSelection) {
 			int selStartLine = ((ITextSelection)selection).getStartLine();
@@ -558,5 +558,5 @@ public class AnnotationParser implements IAnnotationParser {
 			removeCommentTags(comment);
 			addTagsInDocument(comment, display, selStartLine, selEndLine);
 		}
-	}/*|r76|Malte|c1|?*/
+	}
 }

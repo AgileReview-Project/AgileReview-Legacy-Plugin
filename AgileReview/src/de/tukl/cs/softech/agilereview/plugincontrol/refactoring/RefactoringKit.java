@@ -29,7 +29,7 @@ import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ComputeDiff.Diff
  * Static class of reusable refactoring functionalities usable by different refactoring participants
  * @author Malte Brunnlieb - AgileReview
  */
-public class RefactoringKit {/*?|r68|Malte|c0|?*/
+public class RefactoringKit {
 	
 	/**
 	 * Adds an {@link IConditionChecker} to every file given in the collection of affected files. If there already is one added to a file, the CoreException will be suppressed
@@ -50,7 +50,7 @@ public class RefactoringKit {/*?|r68|Malte|c0|?*/
 						if(!f.isReadOnly() && f.isAccessible()) {
 							return RefactoringStatus.create(new Status(Status.OK, Activator.PLUGIN_ID, f.getLocation()+" ready to be changed."));
 						} else {
-							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));/*?|r68|Thilo|c0|?*/
+							return RefactoringStatus.create(new Status(Status.WARNING, Activator.PLUGIN_ID, f.getLocation()+" is not accessible. Continuing will corrupt AgileReview Comments!"));
 						}
 					}
 				});

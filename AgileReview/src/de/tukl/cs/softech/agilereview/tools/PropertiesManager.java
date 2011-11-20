@@ -424,9 +424,9 @@ public class PropertiesManager implements IInputValidator{
 	 */
 	public HashMap<String, String[]> getParserFileendingsMappingTags() {
 		HashMap<String, String[]> result = new HashMap<String, String[]>();
-		String[] languages = getPreferences().getString(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");/*?|r91|Malte|c0|*/
+		String[] languages = getPreferences().getString(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
 		String[] beginTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
-		String[] endTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");/*|r91|Malte|c0|?*/
+		String[] endTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
 		
 		for(int i = 0; i < languages.length; i++) {
 		 	String[] endings = languages[i].split("\\s");

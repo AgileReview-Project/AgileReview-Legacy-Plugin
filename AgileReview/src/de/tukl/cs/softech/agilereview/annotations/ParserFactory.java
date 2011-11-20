@@ -26,16 +26,16 @@ public class ParserFactory implements IPropertyChangeListener {
 	 */
 	private static HashMap<String, String[]> supportedFiles = PropertiesManager.getInstance().getParserFileendingsMappingTags();
 	
-	static {/*?|r91|Malte|c1|*/
+	static {
 		new ParserFactory();
-	}/*|r91|Malte|c1|?*/
+	}
 	
 	/**
 	 * Creates a new ParserFactory in order to add itself as PropertyChangeListener to the {@link PreferenceStore}
 	 */
-	private ParserFactory() {/*?|r91|Malte|c2|*/
+	private ParserFactory() {
 		Activator.getDefault().getPreferenceStore().addPropertyChangeListener((IPropertyChangeListener) this);
-	}/*|r91|Malte|c2|?*/
+	}
 	
 	/**
 	 * Parser Factory in order to create an {@link IAnnotationParser} fitting to the given {@link ITextEditor}
@@ -65,7 +65,7 @@ public class ParserFactory implements IPropertyChangeListener {
 		
 	}
 
-	@Override/*?|r91|Malte|c3|*/
+	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getProperty().equals(PropertiesManager.EXTERNAL_KEYS.PARSER_FILEENDINGS)) {
 			//get supported files list anew as something might has changed
@@ -77,5 +77,5 @@ public class ParserFactory implements IPropertyChangeListener {
 				CommentTableView.getInstance().resetEditorReferences();
 			}
 		}
-	}/*|r91|Malte|c3|?*/
+	}
 }

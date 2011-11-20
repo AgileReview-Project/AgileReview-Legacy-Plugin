@@ -457,7 +457,7 @@ public class ReviewAccess {
 											MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not open files", e.getLocalizedMessage());
 										}
 									});
-								} catch (Exception e) {/*?|r72|Malte|c2|?*/
+								} catch (Exception e) {
 									PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "Could not load file "+currFile, e);
 									errorFiles.add(currFile);
 								}
@@ -475,7 +475,7 @@ public class ReviewAccess {
 				message += "\nThese files may be corrupted (i.e. empty). Please check them.";
 				MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not load files", message);
 			}
-		} catch (final CoreException e) {/*?|r72|Malte|c3|*/
+		} catch (final CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
@@ -483,7 +483,7 @@ public class ReviewAccess {
 					MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not open files", e.getLocalizedMessage());
 				}
 			});
-		}/*|r72|Malte|c3|?*/
+		}
 	}
 	
 	/**
@@ -518,7 +518,7 @@ public class ReviewAccess {
 										MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not open files", e.getLocalizedMessage());
 									}
 								});
-							} catch (Exception e) {/*?|r72|Malte|c1|?*/
+							} catch (Exception e) {
 								PluginLogger.logError(ReviewAccess.class.toString(), "loadAllReviews", "Could not load file "+allFiles[i], e);
 								errorFiles.add(allFiles[i]);
 							}
@@ -535,7 +535,7 @@ public class ReviewAccess {
 				message += "\nThese files may be corrupted (i.e. empty). Please check them.\nComments of a review cannot be loaded without working review file.";
 				MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not load files", message);
 			}
-		} catch (final CoreException e) {/*?|r72|Malte|c0|*/
+		} catch (final CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllReviews", "CoreException while filling review model", e);
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
@@ -543,7 +543,7 @@ public class ReviewAccess {
 					MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not open files", e.getLocalizedMessage());
 				}
 			});
-		}/*|r72|Malte|c0|?*/
+		}
 	}
 
 	/**
@@ -938,7 +938,7 @@ public class ReviewAccess {
 	 * Load all comments of the given review into the database
 	 * @param reviewId
 	 */
-	public void loadReviewComments(String reviewId)/*?|r72|Malte|c5|?*/
+	public void loadReviewComments(String reviewId)
 	{
 		PluginLogger.log(this.getClass().toString(), "loadReviewComments", "Load comments of review: "+reviewId);
 		IFolder currFolder = ReviewAccess.createReviewFolder(reviewId);
@@ -965,7 +965,7 @@ public class ReviewAccess {
 									MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not open files", e.getLocalizedMessage());
 								}
 							});
-						} catch (Exception e) {/*?|r72|Malte|c4|?*/
+						} catch (Exception e) {
 							PluginLogger.logError(ReviewAccess.class.toString(), "loadReviewComments", "Could not load file "+currFile, e);
 							errorFiles.add(currFile);
 						}
