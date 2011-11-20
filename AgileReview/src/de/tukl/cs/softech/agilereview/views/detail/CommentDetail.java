@@ -11,6 +11,7 @@ import org.apache.xmlbeans.XmlCursor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
@@ -18,6 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
@@ -60,11 +62,13 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 */
 	private Combo statusDropDown;
 	/**
-	 * TextBox to represent the Replys of a Comment
+	 * Composite to wrap all reply components
 	 */
-	private Composite replys;
+	private Composite replies;
+	/**
+	 * ScrolledComposite to wrap the replies wrapper component with a scroll bar
+	 */
 	private ScrolledComposite replyScrolledWrapper;
-	private Composite sashArea;
 
 	/**
 	 * Creates the CommentDetail Composite and creates the initial UI
@@ -158,7 +162,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    caption.setText("Description / Replys:");
 	    super.bgComponents.add(caption);
 	    
-	    sashArea = new SashForm(this, SWT.VERTICAL);
+	    SashForm sashArea = new SashForm(this, SWT.VERTICAL);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.verticalAlignment = GridData.FILL;
@@ -177,7 +181,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    txt.addFocusListener(this);
 	    txt.addModifyListener(this);
 	    
-	    replyScrolledWrapper = new ScrolledComposite(sashArea, SWT.V_SCROLL);
+	    replyScrolledWrapper = new ScrolledComposite(sashArea, SWT.V_SCROLL);/*?|r93|Malte|c6|*/
 	    replyScrolledWrapper.setExpandHorizontal(true);
 	    replyScrolledWrapper.setExpandVertical(true);
 	    replyScrolledWrapper.setLayout(new GridLayout(1, true));
@@ -188,21 +192,33 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.grabExcessVerticalSpace = true;
 	    replyScrolledWrapper.setLayoutData(gridData);
 	    
-	    replys = new Composite(replyScrolledWrapper, SWT.NONE);
-	    GridLayout replyLayout = new GridLayout();
-	    replyLayout.numColumns = 1;
-	    replys.setLayout(replyLayout);
-	    replys.setVisible(true);
-	    replys.addFocusListener(this);
-	    gridData = new GridData();
-	    gridData.horizontalAlignment = GridData.FILL;
-	    gridData.verticalAlignment = GridData.BEGINNING;
-	    gridData.grabExcessHorizontalSpace = true;
-	    replys.setLayoutData(gridData);
-	    
-	    replyScrolledWrapper.setContent(replys);
+	    replies = new Composite(replyScrolledWrapper, SWT.NONE);
+	    replyScrolledWrapper.setContent(replies);/*|r93|Malte|c6|?*/
 	    
 	    setPropertyConfigurations();
+	}
+	
+	/**
+	 * Recreates the replies component
+	 */
+	private void resetReplies() {/*?|r93|Malte|c4|?*/
+		replies.dispose();
+	    replies = new Composite(replyScrolledWrapper, SWT.NONE);
+	    GridLayout replyLayout = new GridLayout();
+	    replyLayout.numColumns = 1;
+	    replies.setLayout(replyLayout);
+	    replies.addFocusListener(this);
+		replies.setVisible(true);
+	}
+	
+	/**
+	 * Refreshes the reply components and recalculates the scroll bars
+	 */
+	private void refreshReplies() {/*?|r93|Malte|c5|?*/
+		replies.layout();
+	    replyScrolledWrapper.setContent(replies);
+	    replyScrolledWrapper.setMinSize(replies.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	    replyScrolledWrapper.layout();
 	}
 	
 	/*
@@ -252,33 +268,16 @@ public class CommentDetail extends AbstractDetail<Comment> {
 				this.txt.setText("");
 			}
 			
-			Reply[] replys = comment.getReplies().getReplyArray();
+			resetReplies();/*?|r93|Malte|c2|?*/
 			
-		    this.replys.dispose();
-		    this.replys = new Composite(replyScrolledWrapper, SWT.NONE);
-		    GridLayout replyLayout = new GridLayout();
-		    replyLayout.numColumns = 1;
-		    this.replys.setLayout(replyLayout);
-		    this.replys.setVisible(true);
-		    this.replys.addFocusListener(this);
-		    
-		    GridData gridData = new GridData();
-		    gridData.horizontalAlignment = GridData.FILL;
-		    gridData.grabExcessHorizontalSpace = true;
-		    gridData.grabExcessVerticalSpace = true;
-		    this.replys.setLayoutData(gridData);
-		    
-			for(int i = 0; i < replys.length; i++) {
-				XmlCursor cursor = replys[i].newCursor();
-				addReply(replys[i].getAuthor(), cursor.getTextValue().trim(), replys[i].getCreationDate());
+			Reply[] replies = comment.getReplies().getReplyArray();		    
+			for(int i = 0; i < replies.length; i++) {
+				XmlCursor cursor = replies[i].newCursor();
+				addReply(replies[i].getAuthor(), cursor.getTextValue().trim(), replies[i].getCreationDate());
 				cursor.dispose();
 			}
 			
-			this.replys.setVisible(true);
-		    this.replys.addFocusListener(this);
-		    this.replys.layout();
-		    this.replyScrolledWrapper.setContent(this.replys);
-		    this.replyScrolledWrapper.layout();
+		    refreshReplies();/*?|r93|Malte|c3|?*/
 
 			priorityDropDown.select(comment.getPriority());
 			statusDropDown.select(comment.getStatus());
@@ -304,23 +303,28 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @param text of the reply
 	 * @param creationDate of the reply
 	 */
-	void addReply(String author, String text, Calendar creationDate) {
-		Label newReply = new Label(this.replys, SWT.WRAP | SWT.BORDER);
+	void addReply(String author, String text, Calendar creationDate) {/*?|r93|Malte|c1|?*/
+		StyledText newReply = new StyledText(this.replies, SWT.WRAP | SWT.BORDER);
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.verticalAlignment = GridData.BEGINNING;
-	    gridData.grabExcessVerticalSpace = false;
 	    gridData.grabExcessHorizontalSpace = true;
 	    newReply.setLayoutData(gridData);
+	    newReply.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 	    
 		DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-		newReply.setText(author+" ("+df.format(creationDate.getTime())+"):\n"+text.replaceAll("\r\n|\r|\n", "\n"));
+		String header = author+" ("+df.format(creationDate.getTime())+"):\n";
+		newReply.setText(header+text);
 		newReply.addFocusListener(this);
 		newReply.setVisible(true);
-		this.replys.layout();
-
-		//save the current comment in order to save the reply creation time
-		super.partClosedOrDeactivated(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
+		
+		StyleRange style = new StyleRange();
+	    style.start = 0;
+	    style.length = header.length();
+	    style.fontStyle = SWT.BOLD;
+	    newReply.setStyleRange(style);
+	    
+	    refreshReplies();
 	}
 	
 	/**
@@ -331,18 +335,18 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		boolean result = false;
 		
 		//extract replies beforehand
-		Pattern p = Pattern.compile("([^\\s]*)\\s*\\(([^\\)]*)\\):\\n(.*)", Pattern.DOTALL);
+		Pattern p = Pattern.compile("([^\\s]*)\\s*\\(([^\\)]*)\\):\\n(.*)", Pattern.DOTALL);/*?|r93|Malte|c0|*/
 		Matcher m;
 		ArrayList<String[]> shownReplies = new ArrayList<String[]>();
-		Control[] replys = this.replys.getChildren();
+		Control[] replys = this.replies.getChildren();
 		for(Control l : replys) {
-			if(l instanceof Label) {
-				m = p.matcher(((Label)l).getText());
+			if(l instanceof StyledText) {
+				m = p.matcher(((StyledText)l).getText());
 				if(m.find()) {
 					shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
 				}
 			}
-		}
+		}/*|r93|Malte|c0|?*/
 		
 		String newStr = "";
 		//XXX should be changed if someone can delete saved replies:
@@ -361,30 +365,21 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			}
 		}
 		
-		//XXX should be changed if someone can delete saved replies:
-		//check for changes within the reply description and to convert line breaks in old replies
-		//(not necessary any more as there is a line break converter and all new data will be saved correctly
-//		for(int i = 0; i < savedReplies; i++) {
-//			XmlCursor cursor = editedObject.getReplies().getReplyArray(i).newCursor();
-//			if(!(newStr = super.convertLineBreaks(shownReplies.get(i)[2])).equals(cursor.getTextValue())) {
-//				result = true;
-//				cursor.setTextValue(newStr);
-//			}
-//			cursor.dispose();
-//		}
-		
 		if(editedObject.getPriority() != this.priorityDropDown.getSelectionIndex()) {
 			editedObject.setPriority(this.priorityDropDown.getSelectionIndex());
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LAST_PRIORITY, String.valueOf(this.priorityDropDown.getSelectionIndex()));
 			result = true;
-		} else if(editedObject.getStatus() != this.statusDropDown.getSelectionIndex()) {
+		}
+		if(editedObject.getStatus() != this.statusDropDown.getSelectionIndex()) {
 			editedObject.setStatus(this.statusDropDown.getSelectionIndex());
 			result = true;
-		} else if(!(newStr = this.recipientText.getText().trim()).equals(editedObject.getRecipient())) {
+		} 
+		if(!(newStr = this.recipientText.getText().trim()).equals(editedObject.getRecipient())) {
 			editedObject.setRecipient(this.recipientText.getText().trim());
 			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT, recipientText.getText().trim());
 			result = true;
-		} else if(!(newStr = super.convertLineBreaks(this.txt.getText().trim())).equals(editedObject.getText())) {
+		} 
+		if(!(newStr = super.convertLineBreaks(this.txt.getText().trim())).equals(editedObject.getText())) {
 			editedObject.setText(newStr);
 			result = true;
 		}
