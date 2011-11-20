@@ -877,7 +877,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param perspective the activated perspective
 	 */
 	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// XXX: The whole method should be treated somerwhere else in my opinion
+		// XXX: The whole method should be treated somewhere else in my opinion
 		if (!perspective.getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
 			PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Hiding annotations since current perspective is not 'AgileReview'");
 			for (IAnnotationParser parser: this.parserMap.values()) {

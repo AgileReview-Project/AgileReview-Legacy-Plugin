@@ -10,12 +10,15 @@ import java.util.regex.Pattern;
 import org.apache.xmlbeans.XmlCursor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
@@ -60,7 +63,9 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	/**
 	 * TextBox to represent the Replys of a Comment
 	 */
-	private StyledText replys;
+	private Composite replys;
+	private ScrolledComposite replyScrolledWrapper;
+	private Composite sashArea;
 
 	/**
 	 * Creates the CommentDetail Composite and creates the initial UI
@@ -154,7 +159,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    caption.setText("Description / Replys:");
 	    super.bgComponents.add(caption);
 	    
-	    SashForm texts = new SashForm(this, SWT.VERTICAL);
+	    sashArea = new SashForm(this, SWT.VERTICAL);
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.verticalAlignment = GridData.FILL;
@@ -162,10 +167,10 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    gridData.horizontalSpan = numColumns;
 	    gridData.grabExcessVerticalSpace = true;
 	    gridData.grabExcessHorizontalSpace = true;
-	    texts.setLayoutData(gridData);
-	    super.bgComponents.add(texts);
+	    sashArea.setLayoutData(gridData);
+	    super.bgComponents.add(sashArea);
 	    
-	    txt = new StyledText(texts, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
+	    txt = new StyledText(sashArea, SWT.V_SCROLL | SWT.BORDER);
 	    txt.setVisible(true);
 		txt.setWordWrap(true);
 		txt.setEditable(true);
@@ -173,12 +178,25 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    txt.addFocusListener(this);
 	    txt.addModifyListener(this);
 	    
-	    replys = new StyledText(texts, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
+	    replyScrolledWrapper = new ScrolledComposite(sashArea, SWT.V_SCROLL);
+	    replyScrolledWrapper.setExpandHorizontal(true);
+	    replyScrolledWrapper.setExpandVertical(true);
+	    replyScrolledWrapper.setLayout(new GridLayout(1, true));
+	    
+	    replys = new Composite(replyScrolledWrapper, SWT.V_SCROLL);
+	    GridLayout replyLayout = new GridLayout();
+	    replyLayout.numColumns = 1;
+	    replys.setLayout(replyLayout);
 	    replys.setVisible(true);
-	    replys.setEditable(false);
-	    replys.setWordWrap(true);
 	    replys.addFocusListener(this);
-	    replys.addModifyListener(this);
+	    gridData = new GridData();
+	    gridData.horizontalAlignment = GridData.FILL;
+	    gridData.verticalAlignment = GridData.BEGINNING;
+	    gridData.grabExcessVerticalSpace = true;
+	    gridData.grabExcessHorizontalSpace = true;
+	    replys.setLayoutData(gridData);
+	    
+	    replyScrolledWrapper.setContent(replys);
 	    
 	    setPropertyConfigurations();
 	}
@@ -231,12 +249,33 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			}
 			
 			Reply[] replys = comment.getReplies().getReplyArray();
-			this.replys.setText("");
+			
+		    this.replys.dispose();
+		    this.replys = new Composite(replyScrolledWrapper, SWT.V_SCROLL | SWT.BORDER);
+		    GridLayout replyLayout = new GridLayout();
+		    replyLayout.numColumns = 1;
+		    this.replys.setLayout(replyLayout);
+		    this.replys.setVisible(true);
+		    this.replys.addFocusListener(this);
+		    
+		    GridData gridData = new GridData();
+		    gridData.horizontalAlignment = GridData.FILL;
+		    gridData.verticalAlignment = GridData.FILL;
+		    gridData.grabExcessVerticalSpace = true;
+		    gridData.grabExcessHorizontalSpace = true;
+		    this.replys.setLayoutData(gridData);
+		    
 			for(int i = 0; i < replys.length; i++) {
 				XmlCursor cursor = replys[i].newCursor();
 				addReply(replys[i].getAuthor(), cursor.getTextValue().trim(), replys[i].getCreationDate());
 				cursor.dispose();
 			}
+			
+			this.replys.setVisible(true);
+		    this.replys.addFocusListener(this);
+		    this.replys.layout();
+		    this.replyScrolledWrapper.setContent(this.replys);
+		    this.replyScrolledWrapper.layout();
 
 			priorityDropDown.select(comment.getPriority());
 			statusDropDown.select(comment.getStatus());
@@ -263,13 +302,20 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @param creationDate of the reply
 	 */
 	void addReply(String author, String text, Calendar creationDate) {
-		String replyText = this.replys.getText();
+		Label newReply = new Label(this.replys, SWT.WRAP | SWT.BORDER);
+		GridData gridData = new GridData();
+	    gridData.horizontalAlignment = GridData.FILL;
+	    gridData.verticalAlignment = GridData.FILL;
+	    gridData.grabExcessVerticalSpace = true;
+	    gridData.grabExcessHorizontalSpace = true;
+	    newReply.setLayoutData(gridData);
+	    
 		DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-		replyText += (replyText.equals("") ? "" : "\n\n") + "----- "+author+": "
-			+df.format(creationDate.getTime())+" -----\n";
-		replyText += text;
-		this.replys.setText(replyText);
-		
+		newReply.setText(author+" ("+df.format(creationDate.getTime())+"):\n"+text);
+		newReply.addFocusListener(this);
+		newReply.setVisible(true);
+		this.replys.layout();
+
 		//save the current comment in order to save the reply creation time
 		super.partClosedOrDeactivated(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
 	}
@@ -281,13 +327,18 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	private boolean attributesChanged() {
 		boolean result = false;
 		
-		//save replies before
-		Pattern p = Pattern.compile("-----([^:]*):([^\\n]*)-----\\n([^-]*)");
-		Matcher m = p.matcher(this.replys.getText());
+		//extract replies beforehand
+		Pattern p = Pattern.compile("([^\\s]*)\\s*\\(([^\\)]*)\\):\\n(.*)");
+		Matcher m;
 		ArrayList<String[]> shownReplies = new ArrayList<String[]>();
-		while(m.find()) {
-			//trim() to delete non used whitespace
-			shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
+		Control[] replys = this.replys.getChildren();
+		for(Control l : replys) {
+			if(l instanceof Label) {
+				m = p.matcher(((Label)l).getText());
+				if(m.find()) {
+					shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
+				}
+			}
 		}
 		
 		String newStr = "";
@@ -309,14 +360,15 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		
 		//XXX should be changed if someone can delete saved replies:
 		//check for changes within the reply description and to convert line breaks in old replies
-		for(int i = 0; i < savedReplies; i++) {
-			XmlCursor cursor = editedObject.getReplies().getReplyArray(i).newCursor();
-			if(!(newStr = super.convertLineBreaks(shownReplies.get(i)[2])).equals(cursor.getTextValue())) {
-				result = true;
-				cursor.setTextValue(newStr);
-			}
-			cursor.dispose();
-		}
+		//(not necessary any more as there is a line break converter and all new data will be saved correctly
+//		for(int i = 0; i < savedReplies; i++) {
+//			XmlCursor cursor = editedObject.getReplies().getReplyArray(i).newCursor();
+//			if(!(newStr = super.convertLineBreaks(shownReplies.get(i)[2])).equals(cursor.getTextValue())) {
+//				result = true;
+//				cursor.setTextValue(newStr);
+//			}
+//			cursor.dispose();
+//		}
 		
 		if(editedObject.getPriority() != this.priorityDropDown.getSelectionIndex()) {
 			editedObject.setPriority(this.priorityDropDown.getSelectionIndex());
