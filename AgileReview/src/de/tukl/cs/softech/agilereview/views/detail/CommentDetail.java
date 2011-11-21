@@ -13,6 +13,8 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -185,6 +187,17 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    replyScrolledWrapper.setExpandHorizontal(true);
 	    replyScrolledWrapper.setExpandVertical(true);
 	    replyScrolledWrapper.setLayout(new GridLayout(1, true));
+	    replyScrolledWrapper.addControlListener(new ControlListener() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				refreshReplies();
+			}
+			
+			@Override
+			public void controlMoved(ControlEvent e) {
+				refreshReplies();
+			}
+		});
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
 	    gridData.verticalAlignment = GridData.FILL;

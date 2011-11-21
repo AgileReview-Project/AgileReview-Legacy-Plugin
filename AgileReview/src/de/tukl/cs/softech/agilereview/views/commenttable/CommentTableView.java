@@ -334,7 +334,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * @param parent the toolsbar's parent
 	 * @return the toolbar
 	 */
-	private ToolBar createToolBar(Composite parent) {
+	private ToolBar createToolBar(final Composite parent) {
 		// create toolbar
 		final ToolBar toolBar = new ToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
 		
@@ -352,6 +352,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	    		viewer.addFilter(commentFilter);
 		    	itemDropDown.setText("Search for "+item.getText());
 		    	toolBar.pack();
+		    	parent.layout();
 		    }
 		};
 		
