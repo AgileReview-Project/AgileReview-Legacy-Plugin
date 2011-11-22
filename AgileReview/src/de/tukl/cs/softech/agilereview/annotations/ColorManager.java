@@ -85,7 +85,7 @@ public class ColorManager {
 	 */
 	public static Color getColor(String author) {
 		String prop;
-		if (PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED) && authors.contains(author)) {/*?|r73+r87|Peter|c2|?*/
+		if (isMultiColorEnabled() && authors.contains(author)) {/*?|r73+r87|Peter|c2|?*/
 			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[authors.indexOf(author)]);
 		} else {
 			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
