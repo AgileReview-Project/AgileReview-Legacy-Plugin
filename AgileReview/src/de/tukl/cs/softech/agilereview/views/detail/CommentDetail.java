@@ -184,8 +184,8 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    txt.addModifyListener(this);
 	    
 	    replyScrolledWrapper = new ScrolledComposite(sashArea, SWT.V_SCROLL);/*?|r93|Malte|c6|*/
-	    replyScrolledWrapper.setExpandHorizontal(true);
-	    replyScrolledWrapper.setExpandVertical(true);
+	    replyScrolledWrapper.setExpandHorizontal(true);/*?|r93|Peter|c2|*/
+	    replyScrolledWrapper.setExpandVertical(true);/*|r93|Peter|c2|?*/
 	    replyScrolledWrapper.setLayout(new GridLayout(1, true));
 	    replyScrolledWrapper.addControlListener(new ControlListener() {
 			@Override
@@ -369,7 +369,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		String newStr = "";
 		//XXX should be changed if someone can delete saved replies:
 		//delete and edit of replies not considered in this implementation
-		int savedReplies = editedObject.getReplies().getReplyArray().length;
+		int savedReplies = editedObject.getReplies().getReplyArray().length;/*?|r93|Peter|c0|?*/
 		if(savedReplies != shownReplies.size()) {
 			result = true;
 			for(int i = savedReplies; i < shownReplies.size(); i++) {
@@ -378,7 +378,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 				newReply.setCreationDate(Calendar.getInstance());
 				
 				XmlCursor cursor = newReply.newCursor();
-				cursor.setTextValue(super.convertLineBreaks(shownReplies.get(i)[2]));
+				cursor.setTextValue(super.convertLineBreaks(shownReplies.get(i)[2]));/*?|r93|Peter|c1|?*/
 				cursor.dispose();
 			}
 		}
