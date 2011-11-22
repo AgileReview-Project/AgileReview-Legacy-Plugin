@@ -257,6 +257,11 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#fillContents(java.lang.Object)
 	 */
 	public void fillContents(Comment comment) {
+		// XXX @May-Bee: can we do this here? -> need to save one next comment shortcut
+		if (editedObject!=null && backupObject!=null) {
+			saveChanges();
+		}
+			
 		if(comment != null) {
 			this.backupObject = (Comment)comment.copy();
 			this.editedObject = comment;

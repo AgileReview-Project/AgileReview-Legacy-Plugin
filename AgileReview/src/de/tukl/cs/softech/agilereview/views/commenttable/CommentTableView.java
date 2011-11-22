@@ -975,16 +975,24 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 * Sets the selection to the comment following the last selected one. 
 	 */
 	public void selectNextComment() {/*?|r69|Peter Reuter|c5|*/
-		if (viewer.getSelection() instanceof IStructuredSelection && !viewer.getSelection().isEmpty()) {
-			IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
-			Object c = (Comment) sel.toList().get(sel.toList().size()-1);
-			if (c instanceof Comment) {
-				int index = comments.indexOf(c)+1;
-				if (index < comments.size()) {
-					c = comments.get(index);
-					viewer.setSelection(new StructuredSelection(c));
-					revealComment((Comment) c, false);	
+		if (viewer.getSelection() instanceof IStructuredSelection) {
+			if (viewer.getSelection().isEmpty()) {
+				if (comments.isEmpty()) {
+					return;
 				}
+				viewer.setSelection(new StructuredSelection(comments.get(comments.size()-1)));
+			}
+			IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
+			Object comment = sel.toList().get(sel.toList().size()-1);
+			if (comment instanceof Comment) {
+				int index = comments.indexOf(comment)+1;
+				if (index < comments.size()) {
+					comment = comments.get(index);
+				} else if (comments.size()>0){
+					comment = comments.get(0);
+				}
+				viewer.setSelection(new StructuredSelection(comment));
+				revealComment((Comment) comment, true);
 			}
 		}
 	}/*|r69|Peter Reuter|c5|?*/
