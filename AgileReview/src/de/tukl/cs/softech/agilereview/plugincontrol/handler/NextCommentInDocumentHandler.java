@@ -22,7 +22,7 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 /**
  * Compute and reveal the next visible comment in the document
  */
-public class NextCommentInDocumentHandler extends AbstractHandler {/*?|r69|Peter Reuter|c1|?*/
+public class NextCommentInDocumentHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -39,6 +39,7 @@ public class NextCommentInDocumentHandler extends AbstractHandler {/*?|r69|Peter
 					nextComment = CommentTableView.getInstance().getNextCommentPosition(p);
 				}
 				
+				//TODO inform user that he has reached the bottom and ask for starting anew at the first comment
 				if (nextComment!=null) {
 					((ITextEditor) editorPart).selectAndReveal(nextComment.getOffset(), 0);
 				}
@@ -47,7 +48,11 @@ public class NextCommentInDocumentHandler extends AbstractHandler {/*?|r69|Peter
 				IHandlerService handlerService = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
 				try {
 					// the "showComment" can be executed, as we are required to be in the handler
-					handlerService.executeCommand(command, null);
+					if (handlerService != null) {
+						handlerService.executeCommand(command, null);/*?|r69|Peter Reuter|c7|?*/	
+					} else {
+						PluginLogger.logError(this.getClass().toString(), "execute", "Unexpected error: handlerserivce is \"null\"");
+					}
 				} catch (ExecutionException e) {
 					PluginLogger.logError(this.getClass().toString(), "execute", "Problems occured executing command \""+command+"\"", e);
 					// if "showComment" throws an ExecutionException it will be forwarded

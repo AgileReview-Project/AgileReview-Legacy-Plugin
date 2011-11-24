@@ -66,10 +66,6 @@ public class ColorManager {
 	 * @return Color which was reserved<br>default comment color otherwise
 	 */
 	public static Color addReservation(String author) {
-		//add IDE user at first to the list for a constant color usage
-		if(authors.isEmpty()) {
-			authors.add(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME));
-		}
 		//add the author which was intended to be added
 		if(!authors.contains(author) && authors.size() < 10) {
 			authors.add(author);
@@ -101,7 +97,7 @@ public class ColorManager {
 	 */
 	public static String getAuthorName(int colorNumber) {/*?|r73|Thilo|c1|*/
 		String result = "";
-		if (colorNumber<authors.size()) {
+		if (colorNumber < authors.size()) {
 			result = authors.get(colorNumber);
 		}
 		return result;

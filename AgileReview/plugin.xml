@@ -852,7 +852,33 @@
          commandId="de.tukl.cs.softech.agilereview.showNextCommentInDocument">
       <activeWhen>
          <with
-               variable="activePart">art">
+               variable="activePart">
+            <instanceof
+                  value="org.eclipse.ui.IEditorPart">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.NextCommentInListHandler"
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInList">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <or>
+               <instanceof
+                     value="org.eclipse.ui.IEditorPart">
+               </instanceof>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.detail.DetailView">
+               </instanceof>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+               </instanceof>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+               </instanceof>
+            </or>
          </with>
       </activeWhen>
    </handler>

@@ -11,7 +11,7 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 /**
  * Compute and reveal the next visible comment in the document
  */
-public class NextCommentInListHandler extends AbstractHandler {/*?|r69|Peter Reuter|c0|?*/
+public class NextCommentInListHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {

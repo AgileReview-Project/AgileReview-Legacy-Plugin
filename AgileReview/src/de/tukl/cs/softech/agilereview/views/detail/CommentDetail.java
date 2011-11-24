@@ -353,7 +353,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		boolean result = false;
 		
 		//extract replies beforehand
-		Pattern p = Pattern.compile("([^\\s]*)\\s*\\(([^\\)]*)\\):\\n(.*)", Pattern.DOTALL);/*?|r93|Malte|c0|*/
+		Pattern p = Pattern.compile("([^\\)]*)\\(([^\\)]*)\\):\\n(.*)", Pattern.DOTALL);/*?|r93|Malte|c0|*/
 		Matcher m;
 		ArrayList<String[]> shownReplies = new ArrayList<String[]>();
 		Control[] replys = this.replies.getChildren();
@@ -369,16 +369,16 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		String newStr = "";
 		//XXX should be changed if someone can delete saved replies:
 		//delete and edit of replies not considered in this implementation
-		int savedReplies = editedObject.getReplies().getReplyArray().length;/*?|r93|Peter|c0|?*/
-		if(savedReplies != shownReplies.size()) {
+		int savedRepliesSize = editedObject.getReplies().getReplyArray().length;/*?|r93|Peter|c0|?*/
+		if(savedRepliesSize != shownReplies.size()) {
 			result = true;
-			for(int i = savedReplies; i < shownReplies.size(); i++) {
+			for(int i = savedRepliesSize; i < shownReplies.size(); i++) {
 				Reply newReply = editedObject.getReplies().addNewReply();
 				newReply.setAuthor(shownReplies.get(i)[0]);
 				newReply.setCreationDate(Calendar.getInstance());
 				
 				XmlCursor cursor = newReply.newCursor();
-				cursor.setTextValue(super.convertLineBreaks(shownReplies.get(i)[2]));/*?|r93|Peter|c1|?*/
+				cursor.setTextValue(shownReplies.get(i)[2]);/*?|r93|Peter|c1|?*/
 				cursor.dispose();
 			}
 		}

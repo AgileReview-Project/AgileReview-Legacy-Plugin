@@ -166,9 +166,6 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 		viewer.setInput(this.comments);
 		
-		// set selection (to display comment in detail view)
-		// getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
-		this.selectComment(comment);
 		// TODO: Das hier vlt auslagern -> macht CTV dümmer, außerdem liegen z.B. Editor und Selection im Handler vor 
 		try {
 			IEditorPart editor;
@@ -178,7 +175,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "addComment", "BadLocationException when trying to add tags", e);
-		}	
+		}
+		
+		// set selection (to display comment in detail view)
+		// getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
+		this.selectComment(comment);
 	}
 	
 	/**
@@ -923,7 +924,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-		revealComment((Comment) ((IStructuredSelection)event.getSelection()).getFirstElement(), true);/*?|r69|Peter Reuter|c6|?*/
+		revealComment((Comment) ((IStructuredSelection)event.getSelection()).getFirstElement());/*?|r69|Peter Reuter|c6|?*/
 	}
 
 	/** not yet used
@@ -974,35 +975,36 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Sets the selection to the comment following the last selected one. 
 	 */
-	public void selectNextComment() {/*?|r69|Peter Reuter|c5|*/
+	public void selectNextComment() {
 		if (viewer.getSelection() instanceof IStructuredSelection) {
+			int index = 0;
+			Object comment;
 			if (viewer.getSelection().isEmpty()) {
 				if (comments.isEmpty()) {
 					return;
 				}
-				viewer.setSelection(new StructuredSelection(comments.get(comments.size()-1)));
-			}
-			IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
-			Object comment = sel.toList().get(sel.toList().size()-1);
-			if (comment instanceof Comment) {
-				int index = comments.indexOf(comment)+1;
-				if (index < comments.size()) {
-					comment = comments.get(index);
-				} else if (comments.size()>0){
-					comment = comments.get(0);
+			} else {
+				IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
+				comment = sel.toList().get(sel.size()-1);
+				if (comment instanceof Comment) {
+					index = comments.indexOf(comment)+1;
 				}
-				viewer.setSelection(new StructuredSelection(comment));
-				revealComment((Comment) comment, true);
 			}
+			if (index < comments.size()) {
+				comment = comments.get(index);
+			} else {/*?|r69|Peter Reuter|c9|*/
+				comment = comments.get(0);/*|r69|Peter Reuter|c9|?*/
+			}
+			viewer.setSelection(new StructuredSelection(comment));
+			revealComment((Comment) comment);/*?|r69|Peter Reuter|c10|?*/
 		}
-	}/*|r69|Peter Reuter|c5|?*/
+	}
 	
 	/**
 	 * Reveal the comment.
 	 * @param comment The comment to reveal
-	 * @param detailViewSetFocus Indicates whether to set the focus to the detail view or not
 	 */
-	private void revealComment(Comment comment, boolean detailViewSetFocus) {/*?|r69|Peter Reuter|c4|*/
+	private void revealComment(Comment comment) {
 		if(openEditor(comment)) {
 			//jump to comment in opened editor
 			try {
@@ -1014,13 +1016,10 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 			//open Detail View and set Focus
 			ViewControl.openView(ViewControl.DETAIL_VIEW);
-			if (ViewControl.isOpen(DetailView.class)) {
-				if (detailViewSetFocus) {
-					DetailView.getInstance().setFocus();
-				}
+			if (ViewControl.isOpen(DetailView.class)) {/*?|r69|Peter Reuter|c8|?*/
 				selectComment(comment); //select comment another time to show the comment if the view was closed before
 			}
 		}
-	}/*|r69|Peter Reuter|c4|?*/
+	}
 	
 }

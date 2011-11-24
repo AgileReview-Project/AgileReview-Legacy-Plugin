@@ -160,7 +160,7 @@ public class DetailView extends ViewPart {
 		if(currentDisplay == COMMENT_DETAIL) {
 			((CommentDetail) currentParent).addReply(author, text, creationDate);
 			//save the current comment in order to save the reply creation time
-			((CommentDetail) currentParent).partClosedOrDeactivated(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());/*?|r93|Malte|c7|?*/
+			((CommentDetail) currentParent).partClosedOrDeactivated(this);/*?|r93|Malte|c7|?*/
 		}
 	}
 

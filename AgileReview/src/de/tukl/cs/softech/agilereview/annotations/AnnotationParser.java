@@ -281,8 +281,8 @@ public class AnnotationParser implements IAnnotationParser {
 		for(Comment c : comments) {
 			String commentKey = c.getReviewID()+keySeparator+c.getAuthor()+keySeparator+c.getId();
 			if(path.equals(ReviewAccess.computePath(c)) && this.idPositionMap.get(commentKey) != null) {
-				ColorManager.addReservation(c.getAuthor());/*?|r59|Malte|c1|?*/
 				toDisplay.put(commentKey, this.idPositionMap.get(commentKey));
+				ColorManager.addReservation(c.getAuthor());
 			}
 		}
 		
@@ -431,6 +431,7 @@ public class AnnotationParser implements IAnnotationParser {
 		}
 		parseInput();
 		if(ViewControl.isPerspectiveOpen() && display) {
+			ColorManager.addReservation(comment.getAuthor());
 			this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
 		}
 	}
@@ -597,8 +598,15 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @return The next position or<br>null if there is no such position.
 	 */
 	public Position getNextCommentsPosition(Position current) {/*?|r69|Peter Reuter|c3|*/
-		return this.annotationModel.getNextCommentPosition(current);
+		Position position;
+		TreeSet<ComparablePosition> positions = new TreeSet<ComparablePosition>();
+		for(String key : displayedComments) {
+			position = idPositionMap.get(key);
+			positions.add(new ComparablePosition(position));
+		}
+		return positions.higher(new ComparablePosition(current));
 	}/*|r69|Peter Reuter|c3|?*/
+	
 	@Override
 	public void relocateComment(Comment comment, boolean display) throws BadLocationException {
 		ISelection selection = editor.getSelectionProvider().getSelection();
