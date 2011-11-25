@@ -43,12 +43,6 @@
             relative="org.eclipse.ui.editorss">
       </view>
       <view
-            id="org.eclipse.jdt.ui.PackageExplorer"
-            minimized="false"
-            relationship="stack"
-            relative="de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
-      </view>
-      <view
             id="de.tukl.cs.softech.agilereview.view.commenttableview.view"
             minimized="false"
             ratio="0.7f"
