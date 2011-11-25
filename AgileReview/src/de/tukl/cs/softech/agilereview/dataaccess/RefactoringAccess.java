@@ -16,6 +16,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.CommentsDocument.Comments;
@@ -50,13 +52,15 @@ public class RefactoringAccess {
 	 * List of files that are affected by the refactoring. 
 	 */
 	private Collection<IFile> affectedFilesBuffer = new HashSet<IFile>();
+	/**
+	 * List of files that could not be parsed 
+	 */
+	private HashMap<IFile, Exception> failedFiles = new HashMap<IFile, Exception>();
 	
 	/**
 	 * Constructor of the RefactoringAccess. Initially loads all comments from the database.
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	public RefactoringAccess() throws XmlException, IOException {
+	public RefactoringAccess() {
 		loadAllComments();
 	}
 	
@@ -147,8 +151,9 @@ public class RefactoringAccess {
 				// move all children of old node to new node
 				for (int i=0; i<xPathResultCopy.length;i++) {
 					// copy object to new location
-					xPathResultCopy[i].newCursor().copyXml(newC);
-					
+					XmlCursor x = xPathResultCopy[i].newCursor();
+					x.copyXml(newC);
+					x.dispose();
 					// new node is no longer empty
 					newIsEmpty = false;
 				}
@@ -238,10 +243,8 @@ public class RefactoringAccess {
 	
 	/**
 	 * Fills the comment model
-	 * @throws XmlException
-	 * @throws IOException
 	 */
-	private void loadAllComments() throws XmlException, IOException {
+	private void loadAllComments() {
 		// Get all relevant folders in the review repository
 		try {
 			IResource[] allFolders = ra.getCurrentSourceFolder().members();
@@ -254,9 +257,14 @@ public class RefactoringAccess {
 						if (currFile instanceof IFile) {
 							// Open file and read basic information
 							if (!((IFile)currFile).getName().equals("review.xml")) {
-								CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
-								rFileModel.addXmlDocument(doc, (IFile)currFile);
-								saveToString(doc, (IFile)currFile, true);
+								try {
+									CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+									rFileModel.addXmlDocument(doc, (IFile)currFile);
+									saveToString(doc, (IFile)currFile, true);
+								} catch (Exception e) {
+									// catch all exceptions as they might influence the refactoring process
+									failedFiles.put((IFile) currFile, e);
+								} 
 							}
 						}
 					}
@@ -264,6 +272,14 @@ public class RefactoringAccess {
 			}
 		} catch (CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException", "An error occured while reading the files of the AgileReview Source Folder in order to do the refactoring!");
+				}
+				
+			});
 		}
 	}
 	
@@ -333,5 +349,13 @@ public class RefactoringAccess {
 			c.removeXml();
 		}	
 		c.dispose();
+	}
+	
+	/**
+	 * Returns all files that could not be parsed
+	 * @return collection of files that could not be parsed
+	 */
+	public HashMap<IFile, Exception> getFailedFiles() {
+		return this.failedFiles;
 	}
 }

@@ -93,8 +93,14 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 										try {
 											oldSourceProject.open(null); // TODO use progressmonitor?
 											ra.loadReviewSourceProject(oldSourceProject.getName());
-										} catch (CoreException e) {
+										} catch (final CoreException e) {
 											PluginLogger.logError(this.getClass().toString(), "resourceChanged", "An exception occured while reopening the closed source project", e);
+											Display.getDefault().syncExec(new Runnable() {
+												@Override
+												public void run() {
+													MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could open project", e.getLocalizedMessage());
+												}
+											});
 										}
 									} else {
 										// Show NoAgileReviewSourceProject wizard
@@ -150,8 +156,14 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 												project.create(description, null); //TODO use progressmontiro here and one line below?
 												project.open(null);
 												ra.loadReviewSourceProject(project.getName());
-											} catch (CoreException e) {
+											} catch (final CoreException e) {
 												PluginLogger.logError(this.getClass().toString(), "resourceChanged", "An exception occured while reimporting the closed source project", e);
+												Display.getDefault().syncExec(new Runnable() {
+													@Override
+													public void run() {
+														MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not import project", e.getLocalizedMessage());
+													}
+												});
 											}
 										} else {
 											// Show NoAgileReviewSourceProject wizard

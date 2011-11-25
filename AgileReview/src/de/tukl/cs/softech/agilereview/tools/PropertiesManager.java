@@ -55,11 +55,28 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String REVIEW_STATUS = "review_status";
 		/**
-		 * Default color of AgileReview annotations
+		 * Default color of standard AgileReview annotations
 		 */
 		public static String DEFAULT_ANNOTATION_COLOR = "annotations.default.color";
 		/**
-		 * Default color of Reviews
+		 * Default color of AgileReview annotations for author 1
+		 */
+		public static String[] DEFAULT_ANNOTATION_COLORS_AUTHOR = new String[]{"annotations.default.color.author0",
+																			   "annotations.default.color.author1",
+																			   "annotations.default.color.author2",
+																			   "annotations.default.color.author3",
+																			   "annotations.default.color.author4",
+																			   "annotations.default.color.author5",
+																			   "annotations.default.color.author6",
+																			   "annotations.default.color.author7",
+																			   "annotations.default.color.author8",
+																			   "annotations.default.color.author9"};
+		/**
+		 * @see PropertiesManager.EXTERNAL_KEYS#ANNOTATION_COLOR_ENABLED 
+		 */
+		public static String ANNOTATION_COLOR_ENABLED = EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED;
+		/**
+		 * Default color of comments, either if colors are disabled or if too many authors are there
 		 */
 		public static String DEFAULT_REVIEW_COLOR = "review.default.color";
 		/**
@@ -139,7 +156,7 @@ public class PropertiesManager implements IInputValidator{
 		 */
 		public static String ACTIVE_REVIEW = "activeReview";
 		/**
-		 * The currently active review
+		 * The current author
 		 */
 		public static String AUTHOR_NAME = "author";
 		/**
@@ -161,7 +178,24 @@ public class PropertiesManager implements IInputValidator{
 		/**
 		 * The color of the annotations
 		 */
+		public static String ANNOTATION_COLOR_ENABLED = "enableAnnotationColor";
+		/**
+		 * The color of the annotations
+		 */
 		public static String ANNOTATION_COLOR = "annotationColor";
+		/**
+		 * Default color of AgileReview annotations for author 1
+		 */
+		public static String[] ANNOTATION_COLORS_AUTHOR = new String[]{"annotationColorAuthor0",
+																	   "annotationColorAuthor1",
+																	   "annotationColorAuthor2",
+																	   "annotationColorAuthor3",
+																	   "annotationColorAuthor4",
+																	   "annotationColorAuthor5",
+																	   "annotationColorAuthor6",
+																	   "annotationColorAuthor7",
+																	   "annotationColorAuthor8",
+																	   "annotationColorAuthor9"};
 		/**
 		 * The path for the export template
 		 */
@@ -424,9 +458,9 @@ public class PropertiesManager implements IInputValidator{
 	 */
 	public HashMap<String, String[]> getParserFileendingsMappingTags() {
 		HashMap<String, String[]> result = new HashMap<String, String[]>();
-		String[] languages = getInternalProperty(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
-		String[] beginTags = getInternalProperty(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
-		String[] endTags = getInternalProperty(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
+		String[] languages = getPreferences().getString(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
+		String[] beginTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
+		String[] endTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
 		
 		for(int i = 0; i < languages.length; i++) {
 		 	String[] endings = languages[i].split("\\s");

@@ -7,9 +7,11 @@ import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 
+import de.tukl.cs.softech.agilereview.annotations.ColorManager;
 import de.tukl.cs.softech.agilereview.dataaccess.CloseProjectResourceListener;
 import de.tukl.cs.softech.agilereview.plugincontrol.refactoring.ExecutionListener;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * Startup class in order to start this plug-in on eclipse startup
@@ -29,5 +31,7 @@ public class Startup implements IStartup {
 		// Attach a ResourceChangeListener to monitor the AgileReview Source project for close operation
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(new CloseProjectResourceListener(), IResourceChangeEvent.PRE_CLOSE 
 				| IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_BUILD);
+		// add color reservation for the IDE user
+		ColorManager.addReservation(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME));
 	}
 }

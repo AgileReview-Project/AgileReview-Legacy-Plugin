@@ -4,7 +4,6 @@ import java.util.Calendar;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -15,7 +14,6 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
-import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
@@ -112,10 +110,7 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to EMPTY");
 			break;
 		case COMMENT_DETAIL:
-			String prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
-			String[] rgb = prop.split(",");
-			Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
-			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle, color);
+			this.currentParent = new CommentDetail(this.parentParent, this.parentStyle);
 			this.setPartName("Comment Details");
 			this.currentDisplay = COMMENT_DETAIL;
 			sp1.setVariable(SourceProvider.COMMENT_SHOWN, true);
@@ -123,10 +118,7 @@ public class DetailView extends ViewPart {
 			PluginLogger.log(this.getClass().toString(), "changeParent", "to COMMENT_DETAIL");
 			break;
 		case REVIEW_DETAIL:
-			prop = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_REVIEW_COLOR);
-			rgb = prop.split(",");
-			color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
-			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle, color);
+			this.currentParent = new ReviewDetail(this.parentParent, this.parentStyle);
 			this.setPartName("Review Details");
 			this.currentDisplay = REVIEW_DETAIL;
 			sp1.setVariable(SourceProvider.COMMENT_SHOWN, false);
@@ -166,8 +158,9 @@ public class DetailView extends ViewPart {
 	 */
 	public void addReply(String author, String text, Calendar creationDate) {
 		if(currentDisplay == COMMENT_DETAIL) {
-			((CommentDetail) currentParent).saveChanges();
 			((CommentDetail) currentParent).addReply(author, text, creationDate);
+			//save the current comment in order to save the reply creation time
+			((CommentDetail) currentParent).partClosedOrDeactivated(this);/*?|r93|Malte|c7|?*/
 		}
 	}
 
@@ -215,15 +208,11 @@ public class DetailView extends ViewPart {
 	/**
 	 * Should only be called if the intended background of the view was changed by the user
 	 */
-	public void backgroundChanged() {
-		
-		if(currentDisplay == COMMENT_DETAIL) {
-			String prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
-			String[] rgb = prop.split(",");
-			Color color = new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
-			((AbstractDetail<?>)currentParent).changeBackgroundColor(color);
+	public void refreshBackgroundColor() {
+		if(this.currentParent instanceof CommentDetail) {/*?|r59|Malte|c8|*/
+			((CommentDetail)this.currentParent).refreshBackgroundColor();/*?|r88|Peter|c0|?*/
+		}/*|r59|Malte|c8|?*/
 		}
-	}
 	
 	/*
 	 * (non-Javadoc)
@@ -295,6 +284,7 @@ public class DetailView extends ViewPart {
 				}
 				((CommentDetail)this.currentParent).fillContents((Comment)e);
 			}
+			refreshBackgroundColor();/*?|r59|Malte|c9|?*/
 		}
 	}
 }

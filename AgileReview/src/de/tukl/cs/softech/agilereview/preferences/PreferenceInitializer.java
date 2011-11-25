@@ -26,8 +26,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, true);
 		
 		//initial color value and transferation of the color to the other preference
+		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED,
+				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ANNOTATION_COLOR_ENABLED));
+		
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR,
 				PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_ANNOTATION_COLOR));
+
+		for (int i=0; i<PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length; i++) {
+			store.setDefault(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i],
+					PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_ANNOTATION_COLORS_AUTHOR[i]));	
+		}
 		
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, "");
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, "");

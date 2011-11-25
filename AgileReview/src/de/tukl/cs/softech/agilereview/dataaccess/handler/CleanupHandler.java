@@ -23,10 +23,6 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  */
 public class CleanupHandler extends AbstractHandler {
 	
-
-	
-
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */

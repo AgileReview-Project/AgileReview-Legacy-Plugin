@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.plugincontrol;
+package de.tukl.cs.softech.agilereview.plugincontrol.handler;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -19,6 +19,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.CommentChooserDialog;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;

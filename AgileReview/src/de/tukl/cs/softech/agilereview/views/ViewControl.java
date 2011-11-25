@@ -3,7 +3,10 @@ package de.tukl.cs.softech.agilereview.views;
 import java.util.HashSet;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Display;
@@ -14,12 +17,14 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.ViewPart;
 
+import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -32,7 +37,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
  * this plugin. Furthermore the ViewControl provides and forwards events of the
  * following Listener: {@link ISelectionListener}, {@link IPartListener2}, {@link IPerspectiveListener3}
  */
-public class ViewControl implements ISelectionChangedListener, IPartListener2, IPerspectiveListener3 {
+public class ViewControl implements ISelectionChangedListener, IPartListener2, IPerspectiveListener3, IPropertyChangeListener {
 	
 	/**
 	 * Public static field representing the detail view
@@ -102,6 +107,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 						CommentTableView.getInstance().reparseAllEditors();
 					}
 				}
+				Activator.getDefault().getPreferenceStore().addPropertyChangeListener((IPropertyChangeListener)ViewControl.this);
 			}
 		});
 	}
@@ -175,7 +181,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 */
 	public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {
 		if((flags % 2 == 1) && isOpen(DetailView.class)) {
-			DetailView.getInstance().backgroundChanged();
+			DetailView.getInstance().refreshBackgroundColor();
 		}
 		if(((flags >> 1) % 2 == 1) && isOpen(CommentTableView.class)) {
 			if(refreshInputs) {
@@ -202,9 +208,6 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 */
 	public boolean shouldSwitchPerspective() {
 		boolean answer = false;
-		while (PlatformUI.getWorkbench()==null) {}
-		while (PlatformUI.getWorkbench().getDisplay()==null) {}
-		while (PlatformUI.getWorkbench().getDisplay().getActiveShell()==null) {}
 		if (!isPerspectiveOpen()) {
 			String switchPerspective = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTO_OPEN_PERSPECTIVE); 
 			if (MessageDialogWithToggle.ALWAYS.equals(switchPerspective)) {
@@ -212,7 +215,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 			} else if (MessageDialogWithToggle.NEVER.equals(switchPerspective)) {
 				return false;
 			}
-			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(PlatformUI.getWorkbench().getDisplay().getActiveShell(), "AgileReview", "This command belongs to the AgileReview Perspective. Do you want to switch to this perspective to fully enable the AgileReview Plugin?", null, false, PropertiesManager.getPreferences(), "autoOpenPerspective");
+			MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(Display.getDefault().getActiveShell(), "AgileReview", "This command belongs to the AgileReview Perspective. Do you want to switch to this perspective to fully enable the AgileReview Plugin?", null, false, PropertiesManager.getPreferences(), "autoOpenPerspective");
 			answer = (dialog.getReturnCode() == IDialogConstants.YES_ID);
 		}
 		return answer;
@@ -222,6 +225,10 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * Switches the perspective to the AgileReview perspective
 	 */
 	public void switchPerspective() {
+		Display.getDefault().asyncExec(new Runnable() {
+			
+			@Override
+			public void run() {
 		while (PlatformUI.getWorkbench()==null) {}
 		while (PlatformUI.getWorkbench().getActiveWorkbenchWindow()==null) {}
 		try {
@@ -229,6 +236,61 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 		} catch (WorkbenchException e) {
 			PluginLogger.logError(this.getClass().toString(), "partOpened", "WorkbenchException while opening perspective", e);
 		}
+	}
+		});
+	}
+	
+	/**
+	 * Opens the views specified by the parameter. If the view is already open, the specified views will be brought to top.
+	 * @param views public static fields specifying the views (xor for more than one)
+	 */
+	public static void openView(final int views) {
+		Display.getDefault().asyncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null){}
+				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null){}
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();/*?|r48|piet|c0|?*/
+				
+				if(views % 2 == 1) {
+					if(isOpen(DetailView.class)) {
+						page.bringToTop(DetailView.getInstance());
+					} else {
+						try {
+							page.showView("de.tukl.cs.softech.agilereview.view.commentdetailview.view");
+						} catch (PartInitException e) {
+							MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View", "Could not open the Comment Detail View. Error during initialization!");
+							PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
+						}
+					}
+				}
+				if((views >> 1) % 2 == 1) {
+					if(isOpen(CommentTableView.class)) {
+						page.bringToTop(DetailView.getInstance());
+					} else {
+						try {
+							page.showView("de.tukl.cs.softech.agilereview.view.commenttableview.view");
+						} catch (PartInitException e) {
+							MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View", "Could not open the Comment Summary View. Error during initialization!");
+							PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
+						}
+					}
+				}
+				if((views >> 2) % 2 == 1) {
+					if(isOpen(ReviewExplorer.class)) {
+						page.bringToTop(DetailView.getInstance());
+					} else {
+						try {
+							page.showView("de.tukl.cs.softech.agilereview.view.reviewnavigator.view");
+						} catch (PartInitException e) {
+							MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View", "Could not open the Review Explorer. Error during initialization!");
+							PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
+						}
+					}
+				}
+			}
+		});
 	}
 	
 	//****************************************
@@ -311,26 +373,21 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	@Override
-	public void partOpened(IWorkbenchPartReference partRef) {
-	}
+	public void partOpened(IWorkbenchPartReference partRef) {}
 
 	/**
 	 * not yet used
 	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	@Override
-	public void partHidden(IWorkbenchPartReference partRef) {
-		
-	}
+	public void partHidden(IWorkbenchPartReference partRef) {}
 
 	/**
 	 * not yet used
 	 * @see org.eclipse.ui.IPartListener2#partVisible(org.eclipse.ui.IWorkbenchPartReference)
 	 */
 	@Override
-	public void partVisible(IWorkbenchPartReference partRef) {
-				
-	}
+	public void partVisible(IWorkbenchPartReference partRef) {}
 
 	/**
 	 * not yet used
@@ -338,7 +395,10 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	 */
 	@Override
 	public void partInputChanged(IWorkbenchPartReference partRef) {
-				
+		PluginLogger.log(this.getClass().toString(), "partInputChanged", partRef.getPart(false).getTitle());
+		if(isOpen(CommentTableView.class)) {
+			CommentTableView.getInstance().partInputChanged(partRef);
+	}
 	}
 	
 	//****************************************
@@ -430,4 +490,18 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	public void perspectiveSavedAs(IWorkbenchPage page,	IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
 		// PluginLogger.log(this.getClass().toString(), "perspectiveSavedAs", oldPerspective.getLabel()+"-->"+newPerspective.getLabel());
 	}
+	
+	//****************************************
+	//****** IPropertyListener ***********
+	//****************************************
+	
+	@Override/*?|r73+r87|Malte|c3|*/
+	public void propertyChange(PropertyChangeEvent event) {
+		if (event.getProperty().equals(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED)) {
+			if(isOpen(CommentTableView.class)) {
+				CommentTableView.getInstance().cleanEditorReferences();
+				CommentTableView.getInstance().resetEditorReferences();
+			}
+		}
+	}/*|r73+r87|Malte|c3|?*/
 }

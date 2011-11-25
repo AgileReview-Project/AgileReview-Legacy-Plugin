@@ -43,12 +43,6 @@
             relative="org.eclipse.ui.editorss">
       </view>
       <view
-            id="org.eclipse.jdt.ui.PackageExplorer"
-            minimized="false"
-            relationship="stack"
-            relative="de.tukl.cs.softech.agilereview.view.reviewnavigator.view">
-      </view>
-      <view
             id="de.tukl.cs.softech.agilereview.view.commenttableview.view"
             minimized="false"
             ratio="0.7f"
@@ -164,9 +158,289 @@
              verticalRulerPreferenceKey="Comment_Annotation_Vertical"
              verticalRulerPreferenceValue="true">
        </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author0"
+             colorPreferenceKey="Comment_Annotation_Author0"
+             colorPreferenceValue="%annotations.default.color.author0"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author0"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label0"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author0"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author0"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author0"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author1"
+             colorPreferenceKey="Comment_Annotation_Author1"
+             colorPreferenceValue="%annotations.default.color.author1"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author1"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label1"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author1"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author1"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author1"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author2"
+             colorPreferenceKey="Comment_Annotation_Author2"
+             colorPreferenceValue="%annotations.default.color.author2"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author2"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label2"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author2"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author2"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author2"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author3"
+             colorPreferenceKey="Comment_Annotation_Author3"
+             colorPreferenceValue="%annotations.default.color.author3"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author3"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label3"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author3"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author3"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author3"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author4"
+             colorPreferenceKey="Comment_Annotation_Author4"
+             colorPreferenceValue="%annotations.default.color.author4"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author4"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label4"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author4"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author4"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author4"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author5"
+             colorPreferenceKey="Comment_Annotation_Author5"
+             colorPreferenceValue="%annotations.default.color.author5"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author5"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label5"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author5"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author5"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author5"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author6"
+             colorPreferenceKey="Comment_Annotation_Author6"
+             colorPreferenceValue="%annotations.default.color.author6"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author6"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label6"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author6"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author6"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author6"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author7"
+             colorPreferenceKey="Comment_Annotation_Author7"
+             colorPreferenceValue="%annotations.default.color.author7"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author7"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label7"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author7"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author7"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author7"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author8"
+             colorPreferenceKey="Comment_Annotation_Author8"
+             colorPreferenceValue="%annotations.default.color.author8"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author8"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label8"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author8"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author8"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author8"
+             verticalRulerPreferenceValue="true">
+       </specification>
+       <specification
+             annotationType="AgileReview.comment.annotation.author9"
+             colorPreferenceKey="Comment_Annotation_Author9"
+             colorPreferenceValue="%annotations.default.color.author9"
+             contributesToHeader="false"
+             highlightPreferenceKey="Comment_Author9"
+             highlightPreferenceValue="true"
+             icon="%agileReview.icon"
+             includeOnPreferencePage="true"
+             isGoToPreviousNavigationTarget="false"
+             label="%specification.label9"
+             overviewRulerPreferenceKey="Comment_Annotation_Overview_Author9"
+             overviewRulerPreferenceValue="true"
+             showInNextPrevDropdownToolbarAction="false"
+             symbolicIcon="info"
+             textPreferenceKey="Comment_Annotation_Text_Author9"
+             textPreferenceValue="true"
+             verticalRulerPreferenceKey="Comment_Annotation_Vertical_Author9"
+             verticalRulerPreferenceValue="true">
+       </specification>
     </extension>
     <extension
           id="AgileReview.ResourceMarker"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker0"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker1"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker2"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker3"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker4"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker5"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker6"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker7"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker8"
+          name="%extension.name"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.marker">
+       </super>
+    </extension>
+    <extension
+          id="AgileReview.ResourceMarker9"
           name="%extension.name"
           point="org.eclipse.core.resources.markers">
        <super
@@ -179,6 +453,46 @@
        <type
              markerType="AgileReview.ResourceMarker"
              name="AgileReview.comment.annotation">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker0"
+             name="AgileReview.comment.annotation.author0">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker1"
+             name="AgileReview.comment.annotation.author1">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker2"
+             name="AgileReview.comment.annotation.author2">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker3"
+             name="AgileReview.comment.annotation.author3">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker4"
+             name="AgileReview.comment.annotation.author4">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker5"
+             name="AgileReview.comment.annotation.author5">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker6"
+             name="AgileReview.comment.annotation.author6">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker7"
+             name="AgileReview.comment.annotation.author7">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker8"
+             name="AgileReview.comment.annotation.author8">
+       </type>
+       <type
+             markerType="AgileReview.ResourceMarker9"
+             name="AgileReview.comment.annotation.author9">
        </type>
     </extension>
     <extension point="org.eclipse.help.contexts">
@@ -276,6 +590,12 @@
    </page>
    <page
          category="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
+         class="de.tukl.cs.softech.agilereview.preferences.CommentColorPreferencePage"
+         id="de.tukl.cs.softech.agilereview.preferences.CommentColorsPreferencePage"
+         name="Comment Colors">
+   </page>
+   <page
+         category="de.tukl.cs.softech.agilereview.preferences.AgileReviewPreferencePage"
          class="de.tukl.cs.softech.agilereview.preferences.LanguageSupportPreferencePage"
          id="de.tukl.cs.softech.agilereview.preferences.LanguageSupportPreferencePage"
          name="Language support">
@@ -290,7 +610,7 @@
 <extension
       point="org.eclipse.ui.handlers">
    <handler
-         class="de.tukl.cs.softech.agilereview.plugincontrol.RefreshHandler"
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler"
          commandId="org.eclipse.ui.file.refresh">
       <activeWhen>
          <with
@@ -510,7 +830,7 @@
       </activeWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.plugincontrol.ShowCommentHandler"
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.ShowCommentHandler"
          commandId="de.tukl.cs.softech.agilereview.showComment">
       <activeWhen>
          <with
@@ -518,6 +838,41 @@
             <instanceof
                   value="org.eclipse.ui.IEditorPart">
             </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.NextCommentInDocumentHandler"
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInDocument">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <instanceof
+                  value="org.eclipse.ui.IEditorPart">
+            </instanceof>
+         </with>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.NextCommentInListHandler"
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInList">
+      <activeWhen>
+         <with
+               variable="activePart">
+            <or>
+               <instanceof
+                     value="org.eclipse.ui.IEditorPart">
+               </instanceof>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.detail.DetailView">
+               </instanceof>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+               </instanceof>
+               <instanceof
+                     value="de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView">
+               </instanceof>
+            </or>
          </with>
       </activeWhen>
    </handler>
@@ -554,7 +909,7 @@
       </enabledWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.plugincontrol.DeleteCommentHandler"
+         class="de.tukl.cs.softech.agilereview.plugincontrol.handler.DeleteCommentHandler"
          commandId="de.tukl.cs.softech.agilereview.editor.delete">
       <activeWhen>
          <with
@@ -740,6 +1095,18 @@
             description="Show in Editor selected comment in Detail View"
             id="de.tukl.cs.softech.agilereview.showComment"
             name="Show comment in DetailView">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Show next comment in current document"
+            id="de.tukl.cs.softech.agilereview.showNextCommentInDocument"
+            name="Show next comment in editor">
+      </command>
+      <command
+            categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
+            description="Show next comment of Comment Table View"
+            id="de.tukl.cs.softech.agilereview.showNextCommentInList"
+            name="Show next comment of Comment Table View">
       </command>
       <command
             categoryId="de.tukl.cs.softech.agilereview.commands.AgileReview"
@@ -1104,6 +1471,18 @@
          contextId="de.tukl.cs.softech.agilereview.perspective.open"
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="M1+M2+#">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInDocument"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+M3+N">
+   </key>
+   <key
+         commandId="de.tukl.cs.softech.agilereview.showNextCommentInList"
+         contextId="de.tukl.cs.softech.agilereview.perspective.open"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+N">
    </key>
    <key
          commandId="de.tukl.cs.softech.agilereview.editor.delete"
