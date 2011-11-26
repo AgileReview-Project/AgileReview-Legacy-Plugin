@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: de.tukl.cs.softech.agilereview;singleton:=true
-Bundle-Version: 0.8.0.qualifier
+Bundle-Version: 0.8.0
 Bundle-Activator: de.tukl.cs.softech.agilereview.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.views;bundle-version="3.3.0",
