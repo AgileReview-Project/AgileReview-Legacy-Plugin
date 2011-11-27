@@ -160,12 +160,20 @@ public class AnnotationParser implements IAnnotationParser {
 							if(matcher.group(4).equals("-")) {
 								//set the position such that the line break beforehand will be removed too when replacing this position with the empty string
 								int currLine = document.getLineOfOffset(r.getOffset());
-								int adaptedOffset = document.getLineOffset(currLine-1)+document.getLineLength(currLine-1)-document.getLineDelimiter(currLine-1).length();
-								idTagPositions.put(key, new Position[]{new Position(adaptedOffset, r.getOffset()+r.getLength()-adaptedOffset), null});
+								String lineToDelete = document.get(document.getLineOffset(currLine), document.getLineLength(currLine)-document.getLineDelimiter(currLine).length());
+								
+								//if there is at least one tag which is not alone in this line, do not delete the whole line! 
+								Matcher lineMatcher = Pattern.compile("(.*)"+tagRegex+"(.*)").matcher(lineToDelete);
+								if(lineMatcher.matches() && lineMatcher.group(1).trim().isEmpty() && lineMatcher.group(5).trim().isEmpty()) {
+									int adaptedOffset = document.getLineOffset(currLine-1)+document.getLineLength(currLine-1)-document.getLineDelimiter(currLine-1).length();
+									idTagPositions.put(key, new Position[]{new Position(adaptedOffset, r.getOffset()+r.getLength()-adaptedOffset), null});
+								} else {
+									idTagPositions.put(key, new Position[]{new Position(r.getOffset(), r.getLength()), null});
+								}
 							} else {
-							idTagPositions.put(key, new Position[]{new Position(r.getOffset(), r.getLength()), null});
+								idTagPositions.put(key, new Position[]{new Position(r.getOffset(), r.getLength()), null});
+							}
 						}
-					}
 					}
 					
 					if(matcher.group(3).equals("?") && !tagDeleted) {
