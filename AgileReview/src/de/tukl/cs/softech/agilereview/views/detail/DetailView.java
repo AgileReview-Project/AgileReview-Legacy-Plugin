@@ -160,7 +160,7 @@ public class DetailView extends ViewPart {
 		if(currentDisplay == COMMENT_DETAIL) {
 			((CommentDetail) currentParent).addReply(author, text, creationDate);
 			//save the current comment in order to save the reply creation time
-			((CommentDetail) currentParent).partClosedOrDeactivated(this);/*?|r93|Malte|c7|?*/
+			((CommentDetail) currentParent).partClosedOrDeactivated(this);
 		}
 	}
 
@@ -209,9 +209,9 @@ public class DetailView extends ViewPart {
 	 * Should only be called if the intended background of the view was changed by the user
 	 */
 	public void refreshBackgroundColor() {
-		if(this.currentParent instanceof CommentDetail) {/*?|r59|Malte|c8|*/
-			((CommentDetail)this.currentParent).refreshBackgroundColor();/*?|r88|Peter|c0|?*/
-		}/*|r59|Malte|c8|?*/
+		if(this.currentParent instanceof CommentDetail) {
+			((CommentDetail)this.currentParent).refreshBackgroundColor();
+		}
 		}
 	
 	/*
@@ -284,7 +284,7 @@ public class DetailView extends ViewPart {
 				}
 				((CommentDetail)this.currentParent).fillContents((Comment)e);
 			}
-			refreshBackgroundColor();/*?|r59|Malte|c9|?*/
+			refreshBackgroundColor();
 		}
 	}
 }

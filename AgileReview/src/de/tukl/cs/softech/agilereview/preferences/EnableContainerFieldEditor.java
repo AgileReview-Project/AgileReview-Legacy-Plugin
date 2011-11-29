@@ -95,14 +95,14 @@ public class EnableContainerFieldEditor extends FieldEditor {
 	 * What should happen when the check-box is clicked
 	 */
 	private void handleCheckEvent() {
-		setPresentsDefaultValue(false);/*?|r73+r87|Malte|c0|?*/
+		setPresentsDefaultValue(false);
 		updateGroupDisabledState();
 	}
 	
 	/**
 	 * Disable the container and all its inhabitants
 	 */
-	private void updateGroupDisabledState() {/*?|r73+r87|Malte|c1|?*/
+	private void updateGroupDisabledState() {
 		groupPluginEditors.setEnabled(checkboxEnable.getSelection());
 		for (FieldEditor fieldEdit: pluginFieldEditorList) {
 			fieldEdit.setEnabled(checkboxEnable.getSelection(), getContainer());
@@ -111,13 +111,13 @@ public class EnableContainerFieldEditor extends FieldEditor {
 
 	@Override
 	protected void doLoad() {
-		// Load checkbox/*?|r73+r87|Malte|c2|*/
+		// Load checkbox
 		checkboxEnable.setSelection(getPreferenceStore().getBoolean(getPreferenceName()));
 		// Load the Field-Editors
 		for (FieldEditor fieldEdit: pluginFieldEditorList) {
 			fieldEdit.load();
 		}
-		updateGroupDisabledState();/*|r73+r87|Malte|c2|?*/
+		updateGroupDisabledState();
 	}
 
 	@Override

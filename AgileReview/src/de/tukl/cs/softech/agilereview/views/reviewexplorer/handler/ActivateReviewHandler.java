@@ -71,7 +71,7 @@ public class ActivateReviewHandler extends AbstractHandler {
 						ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 						SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.IS_ACTIVE_REVIEW);
 						sp.setVariable(SourceProvider.IS_ACTIVE_REVIEW, true);
-						ColorManager.resetColorScheme();/*?|r59|Malte|c10|?*/
+						ColorManager.resetColorScheme();
 					}
 				}
 			}

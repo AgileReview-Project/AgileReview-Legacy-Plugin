@@ -134,8 +134,8 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	public boolean performOk(){
 		boolean result = super.performOk();
 		
-		//change IDE user for color management/*?|r59|Malte|c4|*/
-		ColorManager.changeIDEUser(strAuthorField.getStringValue());/*|r59|Malte|c4|?*/
+		//change IDE user for color management
+		ColorManager.changeIDEUser(strAuthorField.getStringValue());
 		
 		//refresh views
 		if (ReviewAccess.getInstance().updateReviewSourceProject()) {

@@ -49,7 +49,7 @@ public class NextCommentInDocumentHandler extends AbstractHandler {
 				try {
 					// the "showComment" can be executed, as we are required to be in the handler
 					if (handlerService != null) {
-						handlerService.executeCommand(command, null);/*?|r69|Peter Reuter|c7|?*/	
+						handlerService.executeCommand(command, null);	
 					} else {
 						PluginLogger.logError(this.getClass().toString(), "execute", "Unexpected error: handlerserivce is \"null\"");
 					}

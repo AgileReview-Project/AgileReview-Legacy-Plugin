@@ -10,7 +10,7 @@ import de.tukl.cs.softech.agilereview.annotations.ColorManager;
 /**
  * Extension of a ColorFieldEditor, so the author corresponding to that color is shown behind the color
  */
-public class AuthorColorFieldEditor extends ColorFieldEditor {/*?|r73|Thilo|c0|?*/
+public class AuthorColorFieldEditor extends ColorFieldEditor {
 	
 	/**
 	 * Number of the color this FieldEditor represents

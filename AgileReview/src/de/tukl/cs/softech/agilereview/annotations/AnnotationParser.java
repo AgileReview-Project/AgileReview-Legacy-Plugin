@@ -360,19 +360,19 @@ public class AnnotationParser implements IAnnotationParser {
 					}
 					
 					//only inform the user about these adaptations if he did not select the whole javaDoc
-					if(origSelStartLine-1 != selStartLine) {/*?|r40+r39|Peter|c0|?*/
+					if(origSelStartLine-1 != selStartLine) {
 						significantlyChanged[0] = true;
 					}
 				}
 				
 				// adapt ending line if necessary
 				//add a new line if a line was inserted before
-				if(newLines[1]!=-1) {/*?|r40+r39|Peter|c1|*/
+				if(newLines[1]!=-1) {
 					selEndLine = newLines[1] + (newLineInserted ? 1 : 0);
 					significantlyChanged[1] = true;
 				} else {
 					selEndLine += (newLineInserted ? 1 : 0);
-				}/*|r40+r39|Peter|c1|?*/
+				}
 				
 				if(significantlyChanged[0] || significantlyChanged[1]) {
 				// inform user
@@ -605,7 +605,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @param current The current position
 	 * @return The next position or<br>null if there is no such position.
 	 */
-	public Position getNextCommentsPosition(Position current) {/*?|r69|Peter Reuter|c3|*/
+	public Position getNextCommentsPosition(Position current) {
 		Position position;
 		TreeSet<ComparablePosition> positions = new TreeSet<ComparablePosition>();
 		for(String key : displayedComments) {
@@ -613,7 +613,7 @@ public class AnnotationParser implements IAnnotationParser {
 			positions.add(new ComparablePosition(position));
 		}
 		return positions.higher(new ComparablePosition(current));
-	}/*|r69|Peter Reuter|c3|?*/
+	}
 	
 	@Override
 	public void relocateComment(Comment comment, boolean display) throws BadLocationException {

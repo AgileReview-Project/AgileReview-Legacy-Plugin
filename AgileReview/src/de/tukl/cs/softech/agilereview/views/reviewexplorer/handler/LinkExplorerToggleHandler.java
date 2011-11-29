@@ -22,7 +22,7 @@ public class LinkExplorerToggleHandler extends ToggleHandler {
 			} else {
 				CommentTableView.getInstance().addSelectionFilter();
 			}
-			ColorManager.resetColorScheme();/*?|r59|Malte|c11|?*/
+			ColorManager.resetColorScheme();
 		}
 	}
 
