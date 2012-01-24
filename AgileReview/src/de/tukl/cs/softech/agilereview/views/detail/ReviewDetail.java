@@ -61,10 +61,9 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	 * Creates a new ReviewDetail Composite onto the given parent with the specified SWT styles
 	 * @param parent onto the ReviewDetail Composite will be added
 	 * @param style with which this Composite will be styled
-	 * @param bg background color for this view
 	 */
-	protected ReviewDetail(Composite parent, int style, Color bg) {
-		super(parent, style, bg);
+	protected ReviewDetail(Composite parent, int style) {
+		super(parent, style);
 	}
 
 	/*
@@ -177,13 +176,16 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 		if(!(newStr = this.authorInstance.getText().trim()).equals(this.editedObject.getPersonInCharge().getName())) {
 			this.editedObject.getPersonInCharge().setName(newStr);
 			result = true;
-		} if(!(newStr = this.reference.getText().trim()).equals(this.editedObject.getReferenceId())) {
+		}
+		if(!(newStr = this.reference.getText().trim()).equals(this.editedObject.getReferenceId())) {
 			this.editedObject.setReferenceId(newStr);
 			result = true;
-		} else if(this.statusDropDown.getSelectionIndex() != this.editedObject.getStatus()) {
+		}
+		if(this.statusDropDown.getSelectionIndex() != this.editedObject.getStatus()) {
 			this.editedObject.setStatus(this.statusDropDown.getSelectionIndex());
 			result = true;
-		} else if(!(newStr = this.txt.getText().trim()).equals(this.editedObject.getDescription())) {
+		}
+		if(!(newStr = this.txt.getText().trim()).equals(this.editedObject.getDescription())) {
 			this.editedObject.setDescription(super.convertLineBreaks(newStr));
 			result = true;
 		}
@@ -254,8 +256,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		try 
-		{
+		try {
 			URI uri = new URI(this.reference.getText());
 			if (Desktop.isDesktopSupported()) {
 				if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
@@ -274,5 +275,11 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	public void widgetDefaultSelected(SelectionEvent e) {
 		widgetSelected(e);		
 	}
-;
+
+	@Override
+	protected Color determineBackgroundColor() {
+		String prop = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.DEFAULT_REVIEW_COLOR);
+		String[] rgb = prop.split(",");
+		return new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
+	}
 }

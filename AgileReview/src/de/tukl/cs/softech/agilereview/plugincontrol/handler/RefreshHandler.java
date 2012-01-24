@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.plugincontrol;
+package de.tukl.cs.softech.agilereview.plugincontrol.handler;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -14,21 +14,21 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
  */
 public class RefreshHandler extends AbstractHandler {
 	
+	/**
+	 * Instance of ReviewAccess
+	 */
+	private  ReviewAccess ra = ReviewAccess.getInstance();
+
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException 
-	{
+	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "Refresh triggered");
-		ReviewAccess ra = ReviewAccess.getInstance();
 		// Refill the database
 		ra.fillDatabaseForOpenReviews();
-
 		
 		// Test if active review may have vanished
 		String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-		if (!ra.reviewExists(activeReview))
-		{
-			if (!ra.isReviewLoaded(activeReview))
-			{
+		if (!ra.reviewExists(activeReview))	{
+			if (!ra.isReviewLoaded(activeReview)) {
 				// Active review has vanished --> deactivate it
 				PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 			}

@@ -54,9 +54,9 @@ public class DeleteHandler extends AbstractHandler {
 						{
 							// if the review is not open, open it, so its comments (and tags) will be deleted
 							if (!ra.isReviewLoaded(wrap.getReviewId())){
-								ra.loadReviewComments(wrap.getReviewId());
+									ra.loadReviewComments(wrap.getReviewId());
+								}
 							}
-						}
 						// Delete comments of this review from TableView and from database
 						for (Comment c : ra.getComments(wrap.getReviewId(), wrap.getPath()))
 						{

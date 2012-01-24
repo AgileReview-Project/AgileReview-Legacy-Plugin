@@ -70,7 +70,7 @@ public class ParserFactory implements IPropertyChangeListener {
 		if (event.getProperty().equals(PropertiesManager.EXTERNAL_KEYS.PARSER_FILEENDINGS)) {
 			//get supported files list anew as something might has changed
 			supportedFiles = PropertiesManager.getInstance().getParserFileendingsMappingTags();
-			
+	
 			//create all parser anew in order to react on changed supported files list
 			if(ViewControl.isOpen(CommentTableView.class)) {
 				CommentTableView.getInstance().cleanEditorReferences();

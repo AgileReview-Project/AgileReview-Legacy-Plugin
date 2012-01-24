@@ -53,4 +53,8 @@ public class NullParser implements IAnnotationParser {
 	@Override
 	public void relocateComment(Comment comment, boolean display) throws BadLocationException {}
 
+	@Override
+	public Position getNextCommentsPosition(Position current) {
+		return null;
+	}
 }

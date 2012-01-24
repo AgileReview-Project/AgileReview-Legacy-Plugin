@@ -54,7 +54,7 @@ public class ExecutionListener implements IExecutionListener {
 			
 			// Refill the database
 			ReviewAccess ra = ReviewAccess.getInstance();
-			ra.fillDatabaseForOpenReviews();
+				ra.fillDatabaseForOpenReviews();
 
 			// Test if active review may have vanished
 			String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);

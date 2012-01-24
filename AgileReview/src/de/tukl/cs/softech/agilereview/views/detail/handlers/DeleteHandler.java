@@ -42,8 +42,8 @@ public class DeleteHandler extends AbstractHandler {
 				Review r = (Review)o;
 				// If necessary load review before deleting stuff (so comments and tags will be deleted)
 				if (!ra.isReviewLoaded(r.getId())){
-					ra.loadReviewComments(r.getId());
-				}
+						ra.loadReviewComments(r.getId());
+					}
 				
 				// Delete the selected review from ReviewExplorer
 				if(ViewControl.isOpen(ReviewExplorer.class)) {

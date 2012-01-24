@@ -64,7 +64,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 							// Review is closed --> open it
 							PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be opened");
 							selectedWrap.setOpen(true);
-							ra.loadReviewComments(reviewId);
+								ra.loadReviewComments(reviewId);
 							pm.addToOpenReviews(reviewId);
 						}	
 					}

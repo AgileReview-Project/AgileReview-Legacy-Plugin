@@ -74,4 +74,11 @@ public interface IAnnotationParser {
 	 * @throws BadLocationException if no tags for the given comment exists
 	 */
 	public void relocateComment(Comment comment, boolean display) throws BadLocationException;
+	
+	/**
+	 * Computes the next position from the given one on where a comment is located.
+	 * @param current The current position
+	 * @return The next position or<br>null if there is no such position.
+	 */
+	public Position getNextCommentsPosition(Position current);
 }

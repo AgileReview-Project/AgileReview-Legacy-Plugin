@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.views.reviewexplorer.handler;
 
 import org.eclipse.core.commands.ExecutionEvent;
 
+import de.tukl.cs.softech.agilereview.annotations.ColorManager;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -21,6 +22,7 @@ public class LinkExplorerToggleHandler extends ToggleHandler {
 			} else {
 				CommentTableView.getInstance().addSelectionFilter();
 			}
+			ColorManager.resetColorScheme();
 		}
 	}
 

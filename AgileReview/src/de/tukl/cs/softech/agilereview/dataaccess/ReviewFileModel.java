@@ -55,9 +55,9 @@ class ReviewFileModel {
 				@Override
 				public void run() {
 					MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could save AgileReview files", e.getLocalizedMessage());
-				}
-			});
 		}
+			});
+	}
 	}
 	
 	/**
@@ -72,7 +72,7 @@ class ReviewFileModel {
 				if(editor != null) {
 					page.closeEditor(editor, false);
 				}
-				delFile.delete(true, null);
+			delFile.delete(true, null);
 			} else if(delFile instanceof IFolder){
 				for(IResource r : ((IFolder)delFile).members()) {
 					deleteResource(r);
@@ -143,7 +143,7 @@ class ReviewFileModel {
 						@Override
 						public void run() {
 							MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not delete AgileReview files", e.getLocalizedMessage());
-						}
+				}
 					});
 				}
 

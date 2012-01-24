@@ -7,9 +7,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -19,6 +17,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.annotations.ColorManager;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
@@ -47,10 +46,6 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	 * Combobox for selecting the AgileReview source folder which should be used
 	 */
 	private ComboFieldEditor comboReviewProjectField;
-	/**
-	 * ColorChooser for annotations' color
-	 */
-	private ColorFieldEditor colorAnnotationField;
 	/**
 	 * Checkbox for using Smart Suggestions
 	 */
@@ -82,12 +77,9 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	public void createFieldEditors() {
 	
 		// Field for author
-		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "author:", 
-				getFieldEditorParent())
-		{		
+		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "Author:", getFieldEditorParent()) {		
 			@Override
-			protected boolean doCheckState()
-			{
+			protected boolean doCheckState() {
 				String isValidReply = PropertiesManager.getInstance().isValid(this.getStringValue());
 				this.setErrorMessage(isValidReply);
 				return (isValidReply == null);
@@ -115,28 +107,19 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 			vals[i][0] = list.get(i);
 			vals[i][1] = list.get(i);
 		}
-		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, 
-				"review source project:", vals,getFieldEditorParent());
+		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, "Review source project:", vals,getFieldEditorParent());
 		addField(comboReviewProjectField);
 		
-		// colorfieldeditor for annotations-color
-		colorAnnotationField = new ColorFieldEditor (PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR, "commentcolor:",
-	            getFieldEditorParent());
-		addField(colorAnnotationField);
-		
 		// Checkbox for using Smart Suggestion
-		booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, "use smart suggestion",
-				getFieldEditorParent());
+		booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, "Use smart suggestion", getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 		
 		// Directory Browser for export folder
-		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, 
-				"Default XLS export location:", getFieldEditorParent());
+		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, "Default XLS export location:", getFieldEditorParent());
 		addField(directoryExportField);
 		
 		// export template file
-		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, 
-				"Default template for XLS export:", getFieldEditorParent());
+		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, "Default template for XLS export:", getFieldEditorParent());
 		fileExportTemplateField.setFileExtensions(new String[]{"*.xls*"});
 		addField(fileExportTemplateField);
 		
@@ -150,12 +133,17 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	@Override
 	public boolean performOk(){
 		boolean result = super.performOk();
-		new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
+		
+		//change IDE user for color management
+		ColorManager.changeIDEUser(strAuthorField.getStringValue());
+		
+		//refresh views
 		if (ReviewAccess.getInstance().updateReviewSourceProject()) {
 			ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
 		} else {
 			ViewControl.refreshViews(ViewControl.DETAIL_VIEW);
 		}
+		
 		return result;
 	}
 
