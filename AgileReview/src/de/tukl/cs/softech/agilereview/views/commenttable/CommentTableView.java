@@ -175,8 +175,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 		} catch (BadLocationException e) {
 			PluginLogger.logError(this.getClass().toString(), "addComment", "BadLocationException when trying to add tags", e);
-		}
-		
+	}
+	
 		// set selection (to display comment in detail view)
 		// getSite().getSelectionProvider().setSelection(new StructuredSelection(comment));
 		this.selectComment(comment);
@@ -222,7 +222,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	public void resetComments() {
 		PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
 		this.comments = ra.getAllComments();
-		this.viewer.setInput(this.comments);/*?|r73+r87|Malte|c4|?*/
+		this.viewer.setInput(this.comments);
 		this.refreshTable();
 	}
 	
@@ -388,9 +388,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	    itemSeparator.setWidth(filterText.getBounds().width);
 	    itemSeparator.setControl(filterText);	  
 
-  
  
-	    // add show open comments only checkbox/*?|r31|Thilo|c0|*/
+ 
+	    // add show open comments only checkbox
 	    final int filterStatusNumber = 0;
 	    final Button onlyOpenCommentsCheckbox = new Button(parent, SWT.CHECK);
 	    String statusStr = pm.getCommentStatusByID(filterStatusNumber);
@@ -414,7 +414,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
                 }
                 filterComments();
             }
-        });/*|r31|Thilo|c0|?*/
+        });
 	    
 	    // add listener to dropdown box to show menu
 	    itemDropDown.addListener(SWT.Selection, new Listener() {
@@ -924,8 +924,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-		revealComment((Comment) ((IStructuredSelection)event.getSelection()).getFirstElement());/*?|r69|Peter Reuter|c6|?*/
-	}
+		revealComment((Comment) ((IStructuredSelection)event.getSelection()).getFirstElement());
+		}
 
 	/** not yet used
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
@@ -992,11 +992,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 			}
 			if (index < comments.size()) {
 				comment = comments.get(index);
-			} else {/*?|r69|Peter Reuter|c9|*/
-				comment = comments.get(0);/*|r69|Peter Reuter|c9|?*/
+			} else {
+				comment = comments.get(0);
 			}
 			viewer.setSelection(new StructuredSelection(comment));
-			revealComment((Comment) comment);/*?|r69|Peter Reuter|c10|?*/
+			revealComment((Comment) comment);
 		}
 	}
 	
@@ -1016,7 +1016,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		
 			//open Detail View and set Focus
 			ViewControl.openView(ViewControl.DETAIL_VIEW);
-			if (ViewControl.isOpen(DetailView.class)) {/*?|r69|Peter Reuter|c8|?*/
+			if (ViewControl.isOpen(DetailView.class)) {
 				selectComment(comment); //select comment another time to show the comment if the view was closed before
 			}
 		}

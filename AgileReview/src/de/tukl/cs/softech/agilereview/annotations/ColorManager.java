@@ -20,7 +20,7 @@ public class ColorManager {
 	/**
 	 * Map of the first authors having customized colors
 	 */
-	private static ArrayList<String> authors = new ArrayList<String>();/*?|r59|Thilo|c2|?*/
+	private static ArrayList<String> authors = new ArrayList<String>();
 
 	/**
 	 * Resets the current color scheme
@@ -48,16 +48,16 @@ public class ColorManager {
 			String oldAuthor = authors.remove(0);
 			int i = authors.indexOf(author);
 			if(i >= 0) {
-				authors.remove(i);/*?|r59|Thilo|c1|*/
-				authors.add(i, oldAuthor);/*|r59|Thilo|c1|?*/
+				authors.remove(i);
+				authors.add(i, oldAuthor);
 			}
 			authors.add(0, author);
 		}
 		
-		if(ViewControl.isOpen(CommentTableView.class)) {/*?|r59|Thilo|c3|*/
+		if(ViewControl.isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().cleanEditorReferences();
 			CommentTableView.getInstance().resetEditorReferences();
-		}/*|r59|Thilo|c3|?*/
+		}
 	}
 	
 	/**
@@ -81,7 +81,7 @@ public class ColorManager {
 	 */
 	public static Color getColor(String author) {
 		String prop;
-		if (isMultiColorEnabled() && authors.contains(author)) {/*?|r73+r87|Peter|c2|?*/
+		if (isMultiColorEnabled() && authors.contains(author)) {
 			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[authors.indexOf(author)]);
 		} else {
 			prop = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR);
@@ -95,13 +95,13 @@ public class ColorManager {
 	 * @param colorNumber number of the color
 	 * @return author-name of color number
 	 */
-	public static String getAuthorName(int colorNumber) {/*?|r73|Thilo|c1|*/
+	public static String getAuthorName(int colorNumber) {
 		String result = "";
 		if (colorNumber < authors.size()) {
 			result = authors.get(colorNumber);
 		}
 		return result;
-	}/*|r73|Thilo|c1|?*/
+	}
 	
 	/**
 	 * Checks whether the given author has reserved his own color in the current scheme.
@@ -109,16 +109,16 @@ public class ColorManager {
 	 * @return true, if the given author has reserved a customized color<br>false, otherwise
 	 */
 	public static boolean hasCustomizedColor(String author) {
-		return authors.contains(author);/*?|r59|Thilo|c4|?*/
+		return authors.contains(author);
 	}
 	
 	/**
 	 * Checks whether a single or multiple annotation colors are to be used.
 	 * @return true if multiple colors are to be used<br>false otherwise
 	 */
-	public static boolean isMultiColorEnabled() {/*?|r73+r87|Peter|c3|*/
+	public static boolean isMultiColorEnabled() {
 		return PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED);
-	}/*|r73+r87|Peter|c3|?*/
+	}
 	
 	/**
 	 * Returns the index of the given author. The index represents a unique id which will be incremented with each registered author until
@@ -127,6 +127,6 @@ public class ColorManager {
 	 * @return index of the given author if there is a reservation for the author<br> -1, otherwise
 	 */
 	public static int getIndexOf(String author) {
-		return authors.indexOf(author);/*?|r59|Thilo|c5|?*/
+		return authors.indexOf(author);
 	}
 }

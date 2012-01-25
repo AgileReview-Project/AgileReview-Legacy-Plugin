@@ -137,13 +137,13 @@ public class AgileAnnotationController {
 	 */
 	private Annotation createNewAnnotation(String commentKey) {
 		String[] commentData = commentKey.split(Pattern.quote(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
-		String annotationType;/*?|r59|Malte|c0|*/
-		if (ColorManager.isMultiColorEnabled() && ColorManager.hasCustomizedColor(commentData[1])) {/*?|r73+r87|Peter|c1|?*/
+		String annotationType;
+		if (ColorManager.isMultiColorEnabled() && ColorManager.hasCustomizedColor(commentData[1])) {
 			annotationType = "AgileReview.comment.annotation.author"+ColorManager.getIndexOf(commentData[1]);
 		} else {
 			annotationType = "AgileReview.comment.annotation";
 		}
-		Annotation annotation = new Annotation(annotationType, true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);/*|r59|Malte|c0|?*/
+		Annotation annotation = new Annotation(annotationType, true, "Review: "+commentData[0]+", Author: "+commentData[1]+", Comment-ID: "+commentData[2]);
 		this.annotationMap.put(commentKey, annotation);
 		return annotation;
 	}

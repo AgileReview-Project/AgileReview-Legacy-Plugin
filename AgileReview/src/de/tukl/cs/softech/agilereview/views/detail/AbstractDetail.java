@@ -91,8 +91,8 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	/**
 	 * Changes the background color for this AbstractDetail.
 	 */
-	protected void refreshBackgroundColor() {/*?|r59|Malte|c6|*/
-		Color bg = determineBackgroundColor();/*|r59|Malte|c6|?*/
+	protected void refreshBackgroundColor() {
+		Color bg = determineBackgroundColor();
 		this.setBackground(bg);
 		String osName = System.getProperty("os.name");
 		for(Control c : bgComponents) {
@@ -112,7 +112,7 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 	 * Determines the background color of the view. Will always be asked when new a new input will be displayed at the current view.
 	 * @return Background color for the view
 	 */
-	protected abstract Color determineBackgroundColor();/*?|r59|Malte|c5|?*/
+	protected abstract Color determineBackgroundColor();
 	
 	/**
 	 * saves every changes made in the current Detail View

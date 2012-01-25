@@ -229,14 +229,14 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 			
 			@Override
 			public void run() {
-				while (PlatformUI.getWorkbench()==null) {}
-				while (PlatformUI.getWorkbench().getActiveWorkbenchWindow()==null) {}
-				try {
-					PlatformUI.getWorkbench().showPerspective("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective", PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-				} catch (WorkbenchException e) {
-					PluginLogger.logError(this.getClass().toString(), "partOpened", "WorkbenchException while opening perspective", e);
-				}
-			}
+		while (PlatformUI.getWorkbench()==null) {}
+		while (PlatformUI.getWorkbench().getActiveWorkbenchWindow()==null) {}
+		try {
+			PlatformUI.getWorkbench().showPerspective("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective", PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+		} catch (WorkbenchException e) {
+			PluginLogger.logError(this.getClass().toString(), "partOpened", "WorkbenchException while opening perspective", e);
+		}
+	}
 		});
 	}
 	
@@ -251,7 +251,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 			public void run() {
 				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null){}
 				while(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null){}
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();/*?|r48|piet|c0|?*/
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				
 				if(views % 2 == 1) {
 					if(isOpen(DetailView.class)) {
@@ -495,7 +495,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 	//****** IPropertyListener ***********
 	//****************************************
 	
-	@Override/*?|r73+r87|Malte|c3|*/
+	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getProperty().equals(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR_ENABLED)) {
 			if(isOpen(CommentTableView.class)) {
@@ -503,5 +503,5 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
 				CommentTableView.getInstance().resetEditorReferences();
 			}
 		}
-	}/*|r73+r87|Malte|c3|?*/
+	}
 }

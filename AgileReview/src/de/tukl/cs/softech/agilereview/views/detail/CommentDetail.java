@@ -183,16 +183,16 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    txt.addFocusListener(this);
 	    txt.addModifyListener(this);
 	    
-	    replyScrolledWrapper = new ScrolledComposite(sashArea, SWT.V_SCROLL);/*?|r93|Malte|c6|*/
-	    replyScrolledWrapper.setExpandHorizontal(true);/*?|r93|Peter|c2|*/
-	    replyScrolledWrapper.setExpandVertical(true);/*|r93|Peter|c2|?*/
+	    replyScrolledWrapper = new ScrolledComposite(sashArea, SWT.V_SCROLL);
+	    replyScrolledWrapper.setExpandHorizontal(true);
+	    replyScrolledWrapper.setExpandVertical(true);
 	    replyScrolledWrapper.setLayout(new GridLayout(1, true));
 	    replyScrolledWrapper.addControlListener(new ControlListener() {
 			@Override
 			public void controlResized(ControlEvent e) {
 				refreshReplies();
 			}
-			
+	    
 			@Override
 			public void controlMoved(ControlEvent e) {
 				refreshReplies();
@@ -206,7 +206,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	    replyScrolledWrapper.setLayoutData(gridData);
 	    
 	    replies = new Composite(replyScrolledWrapper, SWT.NONE);
-	    replyScrolledWrapper.setContent(replies);/*|r93|Malte|c6|?*/
+	    replyScrolledWrapper.setContent(replies);
 	    
 	    setPropertyConfigurations();
 	}
@@ -214,7 +214,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	/**
 	 * Recreates the replies component
 	 */
-	private void resetReplies() {/*?|r93|Malte|c4|?*/
+	private void resetReplies() {
 		replies.dispose();
 	    replies = new Composite(replyScrolledWrapper, SWT.NONE);
 	    GridLayout replyLayout = new GridLayout();
@@ -227,7 +227,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	/**
 	 * Refreshes the reply components and recalculates the scroll bars
 	 */
-	private void refreshReplies() {/*?|r93|Malte|c5|?*/
+	private void refreshReplies() {
 		replies.layout();
 	    replyScrolledWrapper.setContent(replies);
 	    replyScrolledWrapper.setMinSize(replies.computeSize(replyScrolledWrapper.getSize().x-15, SWT.DEFAULT));
@@ -286,7 +286,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 				this.txt.setText("");
 			}
 			
-			resetReplies();/*?|r93|Malte|c2|?*/
+			resetReplies();
 			
 			Reply[] replies = comment.getReplies().getReplyArray();		    
 			for(int i = 0; i < replies.length; i++) {
@@ -295,7 +295,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 				cursor.dispose();
 			}
 			
-		    refreshReplies();/*?|r93|Malte|c3|?*/
+		    refreshReplies();
 
 			priorityDropDown.select(comment.getPriority());
 			statusDropDown.select(comment.getStatus());
@@ -321,7 +321,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @param text of the reply
 	 * @param creationDate of the reply
 	 */
-	void addReply(String author, String text, Calendar creationDate) {/*?|r93|Malte|c1|?*/
+	void addReply(String author, String text, Calendar creationDate) {
 		StyledText newReply = new StyledText(this.replies, SWT.WRAP | SWT.BORDER);
 		GridData gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.FILL;
@@ -353,7 +353,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 		boolean result = false;
 		
 		//extract replies beforehand
-		Pattern p = Pattern.compile("([^\\)]*)\\(([^\\)]*)\\):\\n(.*)", Pattern.DOTALL);/*?|r93|Malte|c0|*/
+		Pattern p = Pattern.compile("([^\\)]*)\\(([^\\)]*)\\):\\n(.*)", Pattern.DOTALL);
 		Matcher m;
 		ArrayList<String[]> shownReplies = new ArrayList<String[]>();
 		Control[] replys = this.replies.getChildren();
@@ -361,15 +361,15 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			if(l instanceof StyledText) {
 				m = p.matcher(((StyledText)l).getText());
 				if(m.find()) {
-					shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
-				}
+			shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
+		}
 			}
-		}/*|r93|Malte|c0|?*/
+		}
 		
 		String newStr = "";
 		//XXX should be changed if someone can delete saved replies:
 		//delete and edit of replies not considered in this implementation
-		int savedRepliesSize = editedObject.getReplies().getReplyArray().length;/*?|r93|Peter|c0|?*/
+		int savedRepliesSize = editedObject.getReplies().getReplyArray().length;
 		if(savedRepliesSize != shownReplies.size()) {
 			result = true;
 			for(int i = savedRepliesSize; i < shownReplies.size(); i++) {
@@ -378,7 +378,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
 				newReply.setCreationDate(Calendar.getInstance());
 				
 				XmlCursor cursor = newReply.newCursor();
-				cursor.setTextValue(shownReplies.get(i)[2]);/*?|r93|Peter|c1|?*/
+				cursor.setTextValue(shownReplies.get(i)[2]);
 				cursor.dispose();
 			}
 		}
@@ -441,9 +441,9 @@ public class CommentDetail extends AbstractDetail<Comment> {
 	 * @see de.tukl.cs.softech.agilereview.views.detail.AbstractDetail#determineBackgroundColor()
 	 */
 	@Override
-	protected Color determineBackgroundColor() {/*?|r59|Malte|c7|*/
+	protected Color determineBackgroundColor() {
 		//get the backupObject as changes should only have impact on the background when they are saved
 		return ColorManager.getColor(this.backupObject.getAuthor());
-	}/*|r59|Malte|c7|?*/
+	}
 
 }

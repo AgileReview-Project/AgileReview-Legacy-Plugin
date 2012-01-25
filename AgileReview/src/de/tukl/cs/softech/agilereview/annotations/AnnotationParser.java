@@ -160,8 +160,16 @@ public class AnnotationParser implements IAnnotationParser {
 							if(matcher.group(4).equals("-")) {
 								//set the position such that the line break beforehand will be removed too when replacing this position with the empty string
 								int currLine = document.getLineOfOffset(r.getOffset());
-								int adaptedOffset = document.getLineOffset(currLine-1)+document.getLineLength(currLine-1)-document.getLineDelimiter(currLine-1).length();
-								idTagPositions.put(key, new Position[]{new Position(adaptedOffset, r.getOffset()+r.getLength()-adaptedOffset), null});
+								String lineToDelete = document.get(document.getLineOffset(currLine), document.getLineLength(currLine)-document.getLineDelimiter(currLine).length());
+								
+								//if there is at least one tag which is not alone in this line, do not delete the whole line! 
+								Matcher lineMatcher = Pattern.compile("(.*)"+tagRegex+"(.*)").matcher(lineToDelete);
+								if(lineMatcher.matches() && lineMatcher.group(1).trim().isEmpty() && lineMatcher.group(5).trim().isEmpty()) {
+									int adaptedOffset = document.getLineOffset(currLine-1)+document.getLineLength(currLine-1)-document.getLineDelimiter(currLine-1).length();
+									idTagPositions.put(key, new Position[]{new Position(adaptedOffset, r.getOffset()+r.getLength()-adaptedOffset), null});
+								} else {
+									idTagPositions.put(key, new Position[]{new Position(r.getOffset(), r.getLength()), null});
+								}
 							} else {
 								idTagPositions.put(key, new Position[]{new Position(r.getOffset(), r.getLength()), null});
 							}
@@ -254,8 +262,8 @@ public class AnnotationParser implements IAnnotationParser {
 				public void run() {
 					MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException", "An eclipse internal error occured when saving the current document!\n" +
 							"Please try to do this by hand in order to save the inserted comment tags.");
-				}
-				
+		}
+		
 			});
 		}
 		
@@ -316,7 +324,7 @@ public class AnnotationParser implements IAnnotationParser {
 		}
 		//VARIANT(return Position):return result;
 	}
-	
+			
 	/**
 	 * Adds the Comment tags for the given comment in the currently opened file at the currently selected place
 	 * @param comment Comment for which the tags should be inserted
@@ -352,22 +360,22 @@ public class AnnotationParser implements IAnnotationParser {
 					}
 					
 					//only inform the user about these adaptations if he did not select the whole javaDoc
-					if(origSelStartLine-1 != selStartLine) {/*?|r40+r39|Peter|c0|?*/
+					if(origSelStartLine-1 != selStartLine) {
 						significantlyChanged[0] = true;
 					}
 				}
 				
 				// adapt ending line if necessary
 				//add a new line if a line was inserted before
-				if(newLines[1]!=-1) {/*?|r40+r39|Peter|c1|*/
+				if(newLines[1]!=-1) {
 					selEndLine = newLines[1] + (newLineInserted ? 1 : 0);
 					significantlyChanged[1] = true;
 				} else {
 					selEndLine += (newLineInserted ? 1 : 0);
-				}/*|r40+r39|Peter|c1|?*/
+				}
 				
 				if(significantlyChanged[0] || significantlyChanged[1]) {
-					// inform user
+				// inform user
 					Display.getDefault().asyncExec(new Runnable() {
 
 						@Override
@@ -425,16 +433,16 @@ public class AnnotationParser implements IAnnotationParser {
 				document.replace(insertEndOffset, 0, tags[0]+commentTag+"?"+tags[1]);
 				document.replace(insertStartOffset, 0, tags[0]+"?"+commentTag+(newLineInserted?"-":"")+tags[1]);
 
-			
-			//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
-			//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
-		}
-		parseInput();
-		if(ViewControl.isPerspectiveOpen() && display) {
+				
+				//VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine), 
+				//VARIANT(return Position):		document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine)-lineDelimiterLength);
+			}
+			parseInput();
+			if(ViewControl.isPerspectiveOpen() && display) {
 			ColorManager.addReservation(comment.getAuthor());
-			this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
+				this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
+			}
 		}
-	}
 	
 	/**
 	 * Checks whether adding an AgileReview comment at the current selection
@@ -597,7 +605,7 @@ public class AnnotationParser implements IAnnotationParser {
 	 * @param current The current position
 	 * @return The next position or<br>null if there is no such position.
 	 */
-	public Position getNextCommentsPosition(Position current) {/*?|r69|Peter Reuter|c3|*/
+	public Position getNextCommentsPosition(Position current) {
 		Position position;
 		TreeSet<ComparablePosition> positions = new TreeSet<ComparablePosition>();
 		for(String key : displayedComments) {
@@ -605,7 +613,7 @@ public class AnnotationParser implements IAnnotationParser {
 			positions.add(new ComparablePosition(position));
 		}
 		return positions.higher(new ComparablePosition(current));
-	}/*|r69|Peter Reuter|c3|?*/
+	}
 	
 	@Override
 	public void relocateComment(Comment comment, boolean display) throws BadLocationException {
