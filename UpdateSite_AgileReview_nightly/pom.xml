@@ -5,11 +5,11 @@
   <parent>
     <artifactId>next_Release</artifactId>
     <groupId>de.tukl.cs.softech.agilereview</groupId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>${branch.version}</version>
   </parent>
   <groupId>de.tukl.cs.softech.agilereview</groupId>
   <artifactId>UpdateSite_AgileReview_nightly</artifactId>
-  <version>0.8.0-SNAPSHOT</version>
+  <version>${branch.version}</version>
   <packaging>eclipse-update-site</packaging>
   <build>
     <plugins>

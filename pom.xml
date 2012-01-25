@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.tukl.cs.softech.agilereview</groupId>
   <artifactId>next_Release</artifactId>
-  <version>0.8.0-SNAPSHOT</version>
+  <version>${branch.version}</version>
   <packaging>pom</packaging>
   <modules>
     <module>AgileReview</module>
@@ -31,9 +31,12 @@
   </build>
   <repositories>
     <repository>
-      <id>ganymede</id>
+      <id>galileo</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/ganymede/</url>
+      <url>http://download.eclipse.org/releases/galileo/</url>
     </repository>
   </repositories>
+  <properties>
+    <branch.version>0.8.1-SNAPSHOT</branch.version>
+  </properties>
 </project>

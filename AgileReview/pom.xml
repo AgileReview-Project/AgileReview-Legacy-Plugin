@@ -3,12 +3,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>trunk</artifactId>
+    <artifactId>next_Release</artifactId>
     <groupId>de.tukl.cs.softech.agilereview</groupId>
-    <version>${trunk.version}</version>
+    <version>${branch.version}</version>
   </parent>
   <groupId>de.tukl.cs.softech.agilereview</groupId>
   <artifactId>de.tukl.cs.softech.agilereview</artifactId>
-  <version>${trunk.version}</version>
+  <version>${branch.version}</version>
   <packaging>eclipse-plugin</packaging>
 </project>
