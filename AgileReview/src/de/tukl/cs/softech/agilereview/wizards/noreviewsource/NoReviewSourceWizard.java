@@ -1,10 +1,12 @@
 package de.tukl.cs.softech.agilereview.wizards.noreviewsource;
 
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
 
+import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
@@ -70,7 +72,8 @@ public class NoReviewSourceWizard extends Wizard implements IWizard {
 	
 	@Override
 	public boolean performCancel() {
-		return MessageDialog.openConfirm(getShell(), "Cancel", "Are you sure you want to cancel? Agilereview will not work until you create and choose an AgileReview Source Folder.");
+		MessageDialogWithToggle md = MessageDialogWithToggle.openOkCancelConfirm(getShell(), "Cancel", "Are you sure you want to cancel? Agilereview will not work until you create and choose an AgileReview Source Folder.", "Do not ask me on Ecilpse startup.", Activator.getDefault().getPreferenceStore().getString(PropertiesManager.EXTERNAL_KEYS.ASK_FOR_REVIEW_FOLDER).equals(MessageDialogWithToggle.ALWAYS), Activator.getDefault().getPreferenceStore(), PropertiesManager.EXTERNAL_KEYS.ASK_FOR_REVIEW_FOLDER);/*?|r108|Peter Reuter|c3|*/
+		return md.getReturnCode()==MessageDialogWithToggle.OK ? true : false;/*|r108|Peter Reuter|c3|?*/
 	}
 	
 	/**

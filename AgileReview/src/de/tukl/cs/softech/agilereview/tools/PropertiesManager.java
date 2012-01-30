@@ -220,6 +220,10 @@ public class PropertiesManager implements IInputValidator{
 		 * Correlated comment end tags for every set of file endings representing the same language
 		 */
 		public static String PARSER_COMMENT_END_TAG = "parser_comment_end_tag";
+		/**
+		 * Indicates whether the user should be asked to create a review folder if none exists. 
+		 */
+		public static String ASK_FOR_REVIEW_FOLDER = "ask_for_review_folder";/*?|r108|Peter Reuter|c2|?*/
 		
 	}
 	

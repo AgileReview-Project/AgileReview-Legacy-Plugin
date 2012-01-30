@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.widgets.Display;
 
 import agileReview.softech.tukl.de.CommentsDocument;
@@ -26,6 +27,7 @@ import agileReview.softech.tukl.de.FilesDocument.Files;
 import agileReview.softech.tukl.de.FolderDocument.Folder;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * Class for accessing the review and comment data (xml and internal model).  
@@ -247,28 +249,30 @@ public class RefactoringAccess {
 	private void loadAllComments() {
 		// Get all relevant folders in the review repository
 		try {
-			IResource[] allFolders = ra.getCurrentSourceFolder().members();
-			// Iterate all folders
-			for (IResource currFolder : allFolders) {
-				if (currFolder instanceof IFolder) {
-					IResource[] allFiles = ((IFolder)currFolder).members();
-					// Iterate all files in the current folder
-					for (IResource currFile : allFiles) {
-						if (currFile instanceof IFile) {
-							// Open file and read basic information
-							if (!((IFile)currFile).getName().equals("review.xml")) {
-								try {
-									CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
-									rFileModel.addXmlDocument(doc, (IFile)currFile);
-									saveToString(doc, (IFile)currFile, true);
-								} catch (Exception e) {
-									// catch all exceptions as they might influence the refactoring process
-									failedFiles.put((IFile) currFile, e);
-								} 
+			if (!PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ASK_FOR_REVIEW_FOLDER).equals(MessageDialogWithToggle.ALWAYS)) {/*?|r108|Peter Reuter|c1|?*/
+				IResource[] allFolders = ra.getCurrentSourceFolder().members();
+				// Iterate all folders
+				for (IResource currFolder : allFolders) {
+					if (currFolder instanceof IFolder) {
+						IResource[] allFiles = ((IFolder)currFolder).members();
+						// Iterate all files in the current folder
+						for (IResource currFile : allFiles) {
+							if (currFile instanceof IFile) {
+								// Open file and read basic information
+								if (!((IFile)currFile).getName().equals("review.xml")) {
+									try {
+										CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
+										rFileModel.addXmlDocument(doc, (IFile)currFile);
+										saveToString(doc, (IFile)currFile, true);
+									} catch (Exception e) {
+										// catch all exceptions as they might influence the refactoring process
+										failedFiles.put((IFile) currFile, e);
+									} 
+								}
 							}
 						}
 					}
-				}
+				}	
 			}
 		} catch (CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
