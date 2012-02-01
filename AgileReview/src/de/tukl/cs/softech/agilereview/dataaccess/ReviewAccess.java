@@ -26,7 +26,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -46,7 +45,7 @@ import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizar
 /**
  * Class for accessing the review and comment data (xml and internal model).  
  */
-public class ReviewAccess {
+public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	
 	////////////////
 	// attributes //

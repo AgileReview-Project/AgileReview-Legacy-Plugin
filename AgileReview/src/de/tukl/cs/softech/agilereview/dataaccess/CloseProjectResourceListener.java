@@ -40,7 +40,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 	/**
 	 * Displays the NoAgileReviewSourceProject wizard
 	 */
-	private void showNoSourceProjectWizard() {
+	private void showNoSourceProjectWizard() {/*?|r108|Malte|c0|?*/
 		// Has to be done in new thread, as the resourceChanged method blocks the building of the workspace
 		Display.getDefault().asyncExec(new Runnable() {								
 			@Override
@@ -153,7 +153,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 												IProjectDescription description = ResourcesPlugin.getWorkspace().loadProjectDescription(
 														new Path(deletedProjectPath+"/.project"));
 												IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(description.getName());
-												project.create(description, null); //TODO use progressmontiro here and one line below?
+												project.create(description, null); //TODO use progress monitor here and one line below?
 												project.open(null);
 												ra.loadReviewSourceProject(project.getName());
 											} catch (final CoreException e) {
@@ -179,7 +179,9 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 					deletedProjectPath = null;
 				}
 				
-				
+				////////////////
+				// POST_BUILD //
+				////////////////
 				if(event.getType() == IResourceChangeEvent.POST_BUILD && deletedProjectPath==null && !closedBefore) {
 					for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()){
 						try {
@@ -197,8 +199,6 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 						} catch (CoreException e) {/* We are not interested in closed or non existent projects*/}
 					}
 				}
-				
-				
 			}
 		});
 	}
