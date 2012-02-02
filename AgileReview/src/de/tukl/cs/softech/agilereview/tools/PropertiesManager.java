@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.graphics.Image;
 
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.preferences.lang.SupportedLanguageEntity;
@@ -99,6 +100,10 @@ public class PropertiesManager implements IInputValidator{
 		 * The URL directing to the export templates
 		 */
 		public static String URL_EXAMPLE_EXPORT_TEMPLATES = "url_example_export_templates";
+		/**
+		 * The URL directing to the donations site
+		 */
+		public static String URL_DONATIONS = "url_donations";
 		
 		/**
 		 * Static subclass: clustering of icon keys
@@ -117,6 +122,10 @@ public class PropertiesManager implements IInputValidator{
 			 * Icon for activating a review
 			 */
 			public static String REVIEW_OK = "icon_review_ok";
+			/**
+			 * Icon for a 'browse' button
+			 */
+			public static String BROWSE = "icon_browse";
 			/**
 			 * Icon for adding a comment
 			 */
@@ -137,6 +146,10 @@ public class PropertiesManager implements IInputValidator{
 			 * Icon for "repositioning" buttons
 			 */
 			public static String COMMENT_REPOS = "icon_comment_repos";
+			/**
+			 * Icon for the donate button
+			 */
+			public static String DONATE = "icon_donate";
 		}
 	}
 	
@@ -460,7 +473,7 @@ public class PropertiesManager implements IInputValidator{
 	 * Returns a map of all supported file endings with the correlated comment tags (first begin, then end tag)
 	 * @return map of all supported file endings with the correlated comment tags
 	 */
-	public HashMap<String, String[]> getParserFileendingsMappingTags() {
+	public static HashMap<String, String[]> getParserFileendingsMappingTags() {
 		HashMap<String, String[]> result = new HashMap<String, String[]>();
 		String[] languages = getPreferences().getString(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
 		String[] beginTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
@@ -479,7 +492,7 @@ public class PropertiesManager implements IInputValidator{
 	 * Returns an array of entities containing file endings, begin and end tag
 	 * @return an array of entities containing file endings, begin and end tag
 	 */
-	public SupportedLanguageEntity[] getParserFileendingsAndTagsAsEntity() {
+	public static SupportedLanguageEntity[] getParserFileendingsAndTagsAsEntity() {
 		String[] languages = getPreferences().getString(EXTERNAL_KEYS.PARSER_FILEENDINGS).split(",");
 		String[] beginTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_BEGIN_TAG).split(",");
 		String[] endTags = getPreferences().getString(EXTERNAL_KEYS.PARSER_COMMENT_END_TAG).split(",");
@@ -513,7 +526,7 @@ public class PropertiesManager implements IInputValidator{
 	 * Beforehand all double entities will be removed.
 	 * @param newConfig
 	 */
-	public void setParserFileendingsAndTags(SupportedLanguageEntity[] newConfig) {
+	public static void setParserFileendingsAndTags(SupportedLanguageEntity[] newConfig) {
 		//clean up input
 		//search for duplicated entities
 		LinkedList<SupportedLanguageEntity> cleaned = new LinkedList<SupportedLanguageEntity>();
@@ -573,8 +586,17 @@ public class PropertiesManager implements IInputValidator{
 	 * @param template
 	 * @param output
 	 */
-	public void setDefaultExportPaths(String template, String output) {
+	public static void setDefaultExportPaths(String template, String output) {
 		getPreferences().setValue(EXTERNAL_KEYS.EXPORT_PATH, output);
 		getPreferences().setValue(EXTERNAL_KEYS.TEMPLATE_PATH, template);
 	}
+	
+	/**
+	 * Returns an image representing the icon of the key
+	 * @param key a static field of {@link PropertiesManager.INTERNAL_KEYS.ICONS}
+	 * @return an image displaying the icon represented by the key or null if there no image could be loaded
+	 */
+	public Image getIcon(String key) {/*?|r110|Malte|c3|*/
+		return Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, getInternalProperty(key)).createImage();
+	}/*|r110|Malte|c3|?*/
 }

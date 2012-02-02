@@ -8,14 +8,15 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.preferences.fieldEditors.AuthorColorFieldEditor;
+import de.tukl.cs.softech.agilereview.preferences.fieldEditors.EnableContainerFieldEditor;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Preference page for controlling the color management of comments
  */
-public class CommentColorPreferencePage extends FieldEditorPreferencePage
-		implements IWorkbenchPreferencePage {
+public class CommentColorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {/*?|r110|Malte|c8|?*/
 
 	/**
 	 * Creates the preferences page for the comment color settings.

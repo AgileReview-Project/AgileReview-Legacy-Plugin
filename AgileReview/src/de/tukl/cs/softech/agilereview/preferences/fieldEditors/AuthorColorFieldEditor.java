@@ -1,7 +1,8 @@
-package de.tukl.cs.softech.agilereview.preferences;
+package de.tukl.cs.softech.agilereview.preferences.fieldEditors;
 
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
@@ -46,6 +47,10 @@ public class AuthorColorFieldEditor extends ColorFieldEditor {
 		if (authorNumber != -1) {
 			authorLabel.setText(ColorManager.getAuthorName(authorNumber));
 		}
+		GridData gd = new GridData();
+		gd.horizontalAlignment = GridData.FILL_HORIZONTAL;
+		gd.grabExcessHorizontalSpace = true;
+		authorLabel.setLayoutData(gd);
 	}
 
 	@Override
