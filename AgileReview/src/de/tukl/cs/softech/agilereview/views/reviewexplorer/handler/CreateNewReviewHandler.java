@@ -24,7 +24,7 @@ public class CreateNewReviewHandler extends AbstractHandler {
 		PluginLogger.log(this.getClass().toString(), "execute", "New Review Handler triggered");
 		
 		// If no valid source exists, give the user the chance to get a valid one
-		boolean valid = ReviewAccess.getInstance().isCurrentSourceValid();
+		boolean valid = ReviewAccess.getInstance().isCurrentSourceValid();/*?|r108|Peter Reuter|c5|*/
 		if (!valid) {
 			String msg = "In order to create a review, a valid 'AgileReview Source Project' is needed.\n" +
 					"You can now choose (or create) an 'AgileReview Source Project'.";
@@ -37,7 +37,7 @@ public class CreateNewReviewHandler extends AbstractHandler {
 		if (valid) {
 			WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), new NewReviewWizard());
 			dialog.open();
-		}
+		}/*|r108|Peter Reuter|c5|?*/
 		
 		return null;
 	}
