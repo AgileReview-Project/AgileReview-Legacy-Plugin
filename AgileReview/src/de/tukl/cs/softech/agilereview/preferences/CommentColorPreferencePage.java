@@ -50,6 +50,7 @@ public class CommentColorPreferencePage extends FieldEditorPreferencePage implem
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean performOk(){
 		boolean result = super.performOk();

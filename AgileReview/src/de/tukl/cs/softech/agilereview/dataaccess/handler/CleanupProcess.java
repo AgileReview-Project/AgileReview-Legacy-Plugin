@@ -33,13 +33,9 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class CleanupProcess implements IRunnableWithProgress {
 	
 	/**
-	 * Instance of PropertiesManager
-	 */
-	private static PropertiesManager pm = PropertiesManager.getInstance();
-	/**
 	 * Supported files mapping to the corresponding comment tags
 	 */
-	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsMappingTags();
+	private static final HashMap<String, String[]> supportedFiles = PropertiesManager.getParserFileendingsMappingTags();
 	/**
 	 * Instance of ReviewAccess
 	 */

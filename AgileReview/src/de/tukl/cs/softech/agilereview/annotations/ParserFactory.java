@@ -24,7 +24,7 @@ public class ParserFactory implements IPropertyChangeListener {
 	/**
 	 * Supported files mapping to the corresponding comment tags
 	 */
-	private static HashMap<String, String[]> supportedFiles = PropertiesManager.getInstance().getParserFileendingsMappingTags();
+	private static HashMap<String, String[]> supportedFiles = PropertiesManager.getParserFileendingsMappingTags();
 	
 	static {
 		new ParserFactory();
@@ -69,7 +69,7 @@ public class ParserFactory implements IPropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getProperty().equals(PropertiesManager.EXTERNAL_KEYS.PARSER_FILEENDINGS)) {
 			//get supported files list anew as something might has changed
-			supportedFiles = PropertiesManager.getInstance().getParserFileendingsMappingTags();
+			supportedFiles = PropertiesManager.getParserFileendingsMappingTags();
 	
 			//create all parser anew in order to react on changed supported files list
 			if(ViewControl.isOpen(CommentTableView.class)) {

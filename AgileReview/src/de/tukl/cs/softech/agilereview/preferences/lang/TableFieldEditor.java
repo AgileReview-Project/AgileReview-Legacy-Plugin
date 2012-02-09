@@ -26,10 +26,6 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class TableFieldEditor extends FieldEditor implements Listener {
 	
 	/**
-	 * Instance of PropertiesManager
-	 */
-	private static PropertiesManager pm = PropertiesManager.getInstance();
-	/**
 	 * Content provider for the TableViewer
 	 */
 	private FileendingContentProvider cp;
@@ -117,12 +113,12 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 
 	@Override
 	protected void doLoad() {
-		table.setInput(pm.getParserFileendingsAndTagsAsEntity());
+		table.setInput(PropertiesManager.getParserFileendingsAndTagsAsEntity());
 	}
 
 	@Override
 	protected void doLoadDefault() {
-		table.setInput(pm.getParserFileendingsAndTagsAsEntity());
+		table.setInput(PropertiesManager.getParserFileendingsAndTagsAsEntity());
 	}
 
 	@Override
@@ -139,7 +135,7 @@ public class TableFieldEditor extends FieldEditor implements Listener {
 			}
 		}
 		//save
-		pm.setParserFileendingsAndTags(cp.data.toArray(new SupportedLanguageEntity[0]));
+		PropertiesManager.setParserFileendingsAndTags(cp.data.toArray(new SupportedLanguageEntity[0]));
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 			pmd.run(true, false, new XSLExport(page1.getSelectedReviews(), page1.getTemplatePath(), page1.getExportPath()));
 			pmd.close();
 			if(page1.isSavePathAsDefault()) {
-				pm.setDefaultExportPaths(page1.getTemplatePath(), page1.getExportPath());
+				PropertiesManager.setDefaultExportPaths(page1.getTemplatePath(), page1.getExportPath());
 			}
 		} catch (InvocationTargetException e) {
 			PluginLogger.logError(this.getClass().toString(),"performFinish", "InvocationTargetException", e);
