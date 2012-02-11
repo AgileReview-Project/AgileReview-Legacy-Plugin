@@ -10,6 +10,8 @@ import org.eclipse.ui.IWorkbench;
 import agileReview.softech.tukl.de.PersonInChargeDocument.PersonInCharge;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
@@ -49,11 +51,9 @@ public class NewReviewWizard extends Wizard implements INewWizard {
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	@Override
-	public boolean performFinish() 
-	{
+	public boolean performFinish() {
 		boolean result = false;
-		try 
-		{
+		try {
 			Review newRev = ReviewAccess.getInstance().createNewReview(this.page1.getReviewID());
 			if (newRev!=null) {
 				newRev.setReferenceId(this.page1.getReviewReference());
@@ -67,9 +67,10 @@ public class NewReviewWizard extends Wizard implements INewWizard {
 				}
 				result = true;
 			}
-		} catch (IOException e) 
-		{
+		} catch (IOException e) {
 			PluginLogger.logError(this.getClass().toString(), "performFinish", "Exception thrown while created a new Review", e);
+		} catch (NoReviewSourceFolderException e) {
+			ExceptionHandler.handleNoReviewSourceFolderException();
 		}
 		
 		return result;

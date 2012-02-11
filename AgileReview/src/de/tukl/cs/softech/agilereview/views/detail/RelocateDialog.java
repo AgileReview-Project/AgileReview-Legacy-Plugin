@@ -21,6 +21,8 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -113,28 +115,32 @@ public class RelocateDialog extends Composite implements Listener {
 							if (input != null && input instanceof FileEditorInput) {
 								ReviewAccess ra = ReviewAccess.getInstance();
 								
-								//create new comment in new file
-								String pathToNewFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
-								Comment newComment = ra.createNewComment(oldComment.getReviewID() , oldComment.getAuthor(), pathToNewFile);
-								
-								//fill contents
-								newComment.setCreationDate(oldComment.getCreationDate());
-								newComment.setLastModified(Calendar.getInstance());
-								newComment.setPriority(oldComment.getPriority());
-								newComment.setRecipient(oldComment.getRecipient());
-								newComment.setStatus(oldComment.getStatus());
-								newComment.setRevision(oldComment.getRevision());
-								newComment.setReplies(oldComment.getReplies());
-								newComment.setText(oldComment.getText());
-								ctv.addComment(newComment);
-								
-								//delete old comment
-								ctv.deleteComment(oldComment);
-								ra.deleteComment(oldComment);
-								
-								//refresh views
-								ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER | ViewControl.COMMMENT_TABLE_VIEW, true);
-								ctv.selectComment(newComment);
+								try {
+									//create new comment in new file
+									String pathToNewFile = ((FileEditorInput)input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
+									Comment newComment = ra.createNewComment(oldComment.getReviewID() , oldComment.getAuthor(), pathToNewFile);
+									
+									//fill contents
+									newComment.setCreationDate(oldComment.getCreationDate());
+									newComment.setLastModified(Calendar.getInstance());
+									newComment.setPriority(oldComment.getPriority());
+									newComment.setRecipient(oldComment.getRecipient());
+									newComment.setStatus(oldComment.getStatus());
+									newComment.setRevision(oldComment.getRevision());
+									newComment.setReplies(oldComment.getReplies());
+									newComment.setText(oldComment.getText());
+									ctv.addComment(newComment);
+									
+									//delete old comment
+									ra.deleteComment(oldComment);/*?|r108|Malte|c19|*/
+									ctv.deleteComment(oldComment);/*|r108|Malte|c19|?*/
+									
+									//refresh views
+									ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER | ViewControl.COMMMENT_TABLE_VIEW, true);
+									ctv.selectComment(newComment);
+								} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c20|*/
+									ExceptionHandler.handleNoReviewSourceFolderException();
+								}/*|r108|Malte|c20|?*/
 							} else {
 								MessageDialog.openError(this.getShell(), "Comment Detail - Repositioning", "You cannot relocate this comment as the currently opened editor is not yet supported!");
 							}

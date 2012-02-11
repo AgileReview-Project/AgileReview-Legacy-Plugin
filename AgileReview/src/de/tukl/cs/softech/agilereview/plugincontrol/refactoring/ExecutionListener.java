@@ -6,6 +6,8 @@ import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
@@ -54,29 +56,29 @@ public class ExecutionListener implements IExecutionListener {
 			
 			// Refill the database
 			ReviewAccess ra = ReviewAccess.getInstance();
+			try {
 				ra.fillDatabaseForOpenReviews();
 
-			// Test if active review may have vanished
-			String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-			if (!ra.reviewExists(activeReview))
-			{
-				if (!ra.isReviewLoaded(activeReview))
-				{
+				// Test if active review may have vanished
+				String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+				if (!ra.reviewExists(activeReview) && !ra.isReviewLoaded(activeReview))	{
 					// Active review has vanished --> deactivate it
 					PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 				}
-			}
-			
-			if(ViewControl.isOpen(DetailView.class)) {
-				DetailView.getInstance().clearView();
-			}
-			if(ViewControl.isOpen(ReviewExplorer.class)) {
-				ReviewExplorer.getInstance().refreshInput();
-			}
-			if(ViewControl.isOpen(CommentTableView.class)) {
-				CommentTableView.getInstance().resetComments();
-				CommentTableView.getInstance().resetEditorReferences();
-			}
+				
+				if(ViewControl.isOpen(DetailView.class)) {
+					DetailView.getInstance().clearView();
+				}
+				if(ViewControl.isOpen(ReviewExplorer.class)) {
+					ReviewExplorer.getInstance().refreshInput();
+				}
+				if(ViewControl.isOpen(CommentTableView.class)) {
+					CommentTableView.getInstance().resetComments();
+					CommentTableView.getInstance().resetEditorReferences();
+				}
+			} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c13|*/
+				ExceptionHandler.handleNoReviewSourceFolderException();
+			}/*|r108|Malte|c13|?*/
 		}
 	}
 

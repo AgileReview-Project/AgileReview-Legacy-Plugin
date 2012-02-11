@@ -21,10 +21,6 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 
 	/**
-	 * Instance of PropertiesManager
-	 */
-	private static PropertiesManager pm = PropertiesManager.getInstance();
-	/**
 	 * The first and sole page of the wizard 
 	 */
 	private ExportReviewDataWizardPage page1 = new ExportReviewDataWizardPage();

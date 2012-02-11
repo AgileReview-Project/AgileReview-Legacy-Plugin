@@ -22,9 +22,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
@@ -38,9 +35,9 @@ import agileReview.softech.tukl.de.PersonInChargeDocument.PersonInCharge;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
 import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizard;
 
 /**
  * Class for accessing the review and comment data (xml and internal model).  
@@ -57,13 +54,13 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	/**
 	 * Private instance for Singleton-Pattern
 	 */
-	private static ReviewAccess RA = null;
+	private static ReviewAccess RA = new ReviewAccess();/*?|r108|Malte|c6|?*/
 	
 	/**
 	 * Reference to the folder where the review and comments xml files are located.
 	 * This must never be null (after creation of ReviewAccess)
 	 */
-	private static IProject REVIEW_REPO_FOLDER;
+	private static IProject REVIEW_REPO_FOLDER = null;
 	
 	/**
 	 * Instance of the comment model
@@ -83,9 +80,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * @param reviewId 
 	 * @param author
 	 * @return File for the given parameter pair
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	private static IFile createCommentFile(String reviewId, String author)
-	{
+	private static IFile createCommentFile(String reviewId, String author) throws NoReviewSourceFolderException	{
 		IFile file = ReviewAccess.createReviewFolder(reviewId).getFile("author_"+author+".xml");
 		if (!file.exists()) {
 			try {
@@ -108,9 +105,10 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * Creates a File object which represents the folder of the given review
 	 * @param reviewId
 	 * @return Folder for this review
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	private static IFolder createReviewFolder(String reviewId)
-	{
+	private static IFolder createReviewFolder(String reviewId) throws NoReviewSourceFolderException {/*?|r108|Malte|c4|*/
+		if(REVIEW_REPO_FOLDER == null) throw new NoReviewSourceFolderException();/*|r108|Malte|c4|?*/
 		IFolder folder = REVIEW_REPO_FOLDER.getFolder("review."+reviewId);
 		if (!folder.exists()) {
 			try {
@@ -133,9 +131,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * Creates a File object which represents the the review-file of the given review
 	 * @param reviewId
 	 * @return review file for this review
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	private static IFile createReviewFile(String reviewId)
-	{
+	private static IFile createReviewFile(String reviewId) throws NoReviewSourceFolderException {
 		IFile file = ReviewAccess.createReviewFolder(reviewId).getFile("review.xml");
 		if (!file.exists()) {
 			try {
@@ -334,25 +332,16 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	/**
 	 * Constructor: Sets the directory where to look for the xml-Files 
 	 */
-	private ReviewAccess()	{
+	private ReviewAccess() {
 		PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
-		// Set the directory where the comments are located
-		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
-		if (!loadReviewSourceProject(projectName) && !PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ASK_FOR_REVIEW_FOLDER).equals(MessageDialogWithToggle.ALWAYS)) {/*?|r108|Peter Reuter|c0|*/
-//			Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-//			String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
-//					"Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
-//			MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);/*|r108|Peter Reuter|c0|?*/
-			NoReviewSourceWizard dialog = new NoReviewSourceWizard(false);
-			WizardDialog wDialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), dialog);
-			wDialog.setBlockOnOpen(true);
-			if (wDialog.open() == Window.OK) {
-				String chosenProjectName = dialog.getChosenProjectName();
-				if (ReviewAccess.createAndOpenReviewProject(chosenProjectName)) {
-					loadReviewSourceProject(chosenProjectName);
-				}
-			}
-		}
+		// Set the directory where the comments are located/*?|r108|Malte|c7|*/
+//		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
+//		if (!loadReviewSourceProject(projectName) && !PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ASK_FOR_REVIEW_FOLDER).equals(MessageDialogWithToggle.ALWAYS)) {/*?|r108|Peter Reuter|c0|*/
+////			Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+////			String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
+////					"Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
+////			MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);/*|r108|Peter Reuter|c0|?*/
+//		}/*|r108|Malte|c7|?*/
 	}
 	
 	
@@ -371,7 +360,7 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * Removes the "active" nature from the current AgileReview Source Project
 	 * @return the old project, which was unloaded
 	 */
-	IProject unloadCurrentReviewSourceProject(){
+	IProject unloadCurrentReviewSourceProject() {
 		IProject oldProject = REVIEW_REPO_FOLDER;
 		if(REVIEW_REPO_FOLDER != null) {
 //			if(REVIEW_REPO_FOLDER.exists() && REVIEW_REPO_FOLDER.isOpen()) {
@@ -395,7 +384,7 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * @param projectName project name
 	 * @return <i>true</i> if everything works, <i>false</i> otherwise (e.g. when the project does not exist)
 	 */
-	public boolean loadReviewSourceProject(String projectName){
+	public boolean loadReviewSourceProject(String projectName) {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject p = workspaceRoot.getProject(projectName);
 		if(!p.exists() || !p.isOpen()) {
@@ -419,7 +408,11 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 			});
 			
 			// Load open reviews initially
+			try {
 				fillDatabaseForOpenReviews();
+			} catch (NoReviewSourceFolderException e) {
+				// does not occur as REVIEW_REPO_FOLDER is set beforehand
+			}
 
 			return true;
 		}
@@ -427,9 +420,10 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	
 	/**
 	 * Fills the comment model
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	private void loadAllComment()
-	{
+	private void loadAllComment() throws NoReviewSourceFolderException {/*?|r108|Malte|c2|*/
+		if(REVIEW_REPO_FOLDER == null) throw new NoReviewSourceFolderException();/*|r108|Malte|c2|?*/
 		PluginLogger.log(this.getClass().toString(), "loadAllComments", 
 				"All comment files will be loaded from file (including closed reviews). Exception thrown when parsing xml-file");
 		// Get all relevant folders in the review repository
@@ -488,9 +482,10 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	
 	/**
 	 * Fills the review model
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	private void loadAllReviews()
-	{
+	private void loadAllReviews() throws NoReviewSourceFolderException {/*?|r108|Malte|c3|*/
+		if(REVIEW_REPO_FOLDER == null) throw new NoReviewSourceFolderException();/*|r108|Malte|c3|?*/
 		PluginLogger.log(this.getClass().toString(), "loadAllReviews", "All reviews will be loaded from files");
 		// Get all relevant folders in the review repository
 		try {
@@ -670,8 +665,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * @param author author of the comment
 	 * @param path file path of the commented file
 	 * @return empty comment
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public Comment createNewComment(String reviewId, String author, String path) 
+	public Comment createNewComment(String reviewId, String author, String path) throws NoReviewSourceFolderException 
 	{		
 		PluginLogger.log(this.getClass().toString(), "createNewComment", "Comment created for:\n reviewId: "+reviewId+" \n author: "+author+" \n path: "+path);
 		// Check if file for this author in this review does already exist (assumption: database and file system are synch)
@@ -726,9 +722,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * @param reviewId review id of the comment to be deleted
 	 * @param author author of the comment to be deleted
 	 * @param commentId comment id of the comment to be deleted
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public void deleteComment(String reviewId, String author, String commentId)
-	{
+	public void deleteComment(String reviewId, String author, String commentId) throws NoReviewSourceFolderException {
 		PluginLogger.log(this.getClass().toString(), "deleteComment", "Following comment deleted:\n reviewId: "+reviewId+" \n author: "+author+" \n commentId: "+commentId);
 		// Find comment in database
 		Comment delCom = this.rModel.getComment(reviewId, author, commentId);
@@ -758,17 +754,18 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * @see ReviewAccess#deleteComment(String, String, String)
 	 * @param comment
 	 * @throws IOException
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public void deleteComment (Comment comment) throws IOException
-	{
+	public void deleteComment (Comment comment) throws IOException, NoReviewSourceFolderException	{
 		deleteComment(comment.getReviewID(), comment.getAuthor(), comment.getId());
 	}
 	
 	/**
 	 * @see ReviewAccess#deleteComment(String, String, String)
 	 * @param comments
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public void deleteComments (Collection<Comment> comments){
+	public void deleteComments (Collection<Comment> comments) throws NoReviewSourceFolderException{
 		for(Comment c : comments) {
 			deleteComment(c.getReviewID(), c.getAuthor(), c.getId());
 		}
@@ -881,9 +878,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * @param reviewId
 	 * @return empty Review (except for review id) or null if reviewid is already in use
 	 * @throws IOException 
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public Review createNewReview(String reviewId) throws IOException
-	{
+	public Review createNewReview(String reviewId) throws IOException, NoReviewSourceFolderException {
 		PluginLogger.log(this.getClass().toString(), "createNewReview", "Create new review: "+reviewId);
 		// Create the new review
 		ReviewDocument revDoc = ReviewDocument.Factory.newInstance();
@@ -920,9 +917,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	/**
 	 * Deletes a review and all comments specified by this review
 	 * @param reviewId
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public void deleteReview(String reviewId) 
-	{	
+	public void deleteReview(String reviewId) throws NoReviewSourceFolderException {	
 		PluginLogger.log(this.getClass().toString(), "deleteReview", "Delete review: "+reviewId);
 		IFile delFile = ReviewAccess.createReviewFile(reviewId);
 		
@@ -937,9 +934,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	/**
 	 * Load all comments of the given review into the database
 	 * @param reviewId
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public void loadReviewComments(String reviewId)
-	{
+	public void loadReviewComments(String reviewId) throws NoReviewSourceFolderException {
 		PluginLogger.log(this.getClass().toString(), "loadReviewComments", "Load comments of review: "+reviewId);
 		IFolder currFolder = ReviewAccess.createReviewFolder(reviewId);
 		
@@ -1006,9 +1003,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	
 	/**
 	 * Fills the CommentModel with all found files
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public void fillDatabaseCompletely()
-	{
+	public void fillDatabaseCompletely() throws NoReviewSourceFolderException {
 		PluginLogger.log(this.getClass().toString(), "fillDatabaseCompletely", "Clear all models and reload everything from file (including closed reviews)");
 		// Clear old values
 		this.clearAllModels();
@@ -1023,9 +1020,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 * Fills the comment database for all open reviews. 
 	 * Therefore all review data are read and based 
 	 * on the workspace-specific preferences the open reviews are loaded.
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public void fillDatabaseForOpenReviews()
-	{
+	public void fillDatabaseForOpenReviews() throws NoReviewSourceFolderException {
 		// Clear old models
 		this.clearAllModels();
 		
@@ -1071,9 +1068,9 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	/**
 	 * Saves the current xmlBeans objects to files (all in model)
 	 * @param obj The object which changed (to determine which file has to be saved). Has to be a comment or a review
+	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	public void save(XmlObject obj)
-	{
+	public void save(XmlObject obj) throws NoReviewSourceFolderException {
 		// Determine the file of this comment
 		IFile file2save = null;
 		if (obj instanceof Comment) {

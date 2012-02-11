@@ -14,6 +14,8 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
@@ -47,13 +49,17 @@ public class AddNewCommentHandler extends AbstractHandler {
 					}
 				}
 				String user = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);
-				Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
-				// TODO Hiervon noch was auslagern (Parser, etc)
-				if(ViewControl.isOpen(CommentTableView.class)) {
-					CommentTableView.getInstance().addComment(newComment);
-				}
-				// Save the new comment & Refresh the Review Explorer
-				ra.save(newComment);
+				try {
+					Comment newComment = ra.createNewComment(activeReview , user, pathToFile);
+					// TODO Hiervon noch was auslagern (Parser, etc)
+					if(ViewControl.isOpen(CommentTableView.class)) {
+						CommentTableView.getInstance().addComment(newComment);
+					}
+					// Save the new comment & Refresh the Review Explorer
+					ra.save(newComment);
+				} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c11|*/
+					ExceptionHandler.handleNoReviewSourceFolderException();
+				}/*|r108|Malte|c11|?*/
 				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 			} else {
 				// no open editor
