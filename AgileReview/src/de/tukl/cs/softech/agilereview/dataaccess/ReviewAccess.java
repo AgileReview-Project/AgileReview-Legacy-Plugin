@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
@@ -35,6 +36,7 @@ import agileReview.softech.tukl.de.PersonInChargeDocument.PersonInCharge;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
 import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
 import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -54,7 +56,7 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	/**
 	 * Private instance for Singleton-Pattern
 	 */
-	private static ReviewAccess RA = new ReviewAccess();/*?|r108|Malte|c6|?*/
+	private static ReviewAccess RA;
 	
 	/**
 	 * Reference to the folder where the review and comments xml files are located.
@@ -334,14 +336,16 @@ public class ReviewAccess {/*?|r108|Malte|c1|?*/
 	 */
 	private ReviewAccess() {
 		PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
-		// Set the directory where the comments are located/*?|r108|Malte|c7|*/
-//		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
-//		if (!loadReviewSourceProject(projectName) && !PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ASK_FOR_REVIEW_FOLDER).equals(MessageDialogWithToggle.ALWAYS)) {/*?|r108|Peter Reuter|c0|*/
-////			Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-////			String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
-////					"Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
-////			MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);/*|r108|Peter Reuter|c0|?*/
-//		}/*|r108|Malte|c7|?*/
+		// Set the directory where the comments are located
+		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
+		if (!loadReviewSourceProject(projectName) && !PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ASK_FOR_REVIEW_FOLDER)/*?|r108|Peter Reuter|c0|*/
+				.equals(MessageDialogWithToggle.ALWAYS)) {
+//			Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+//			String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
+//					"Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
+//			MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);/*|r108|Peter Reuter|c0|?*/
+			ExceptionHandler.handleNoReviewSourceFolderException();/*?|r108|Malte|c23|?*/
+		}
 	}
 	
 	
