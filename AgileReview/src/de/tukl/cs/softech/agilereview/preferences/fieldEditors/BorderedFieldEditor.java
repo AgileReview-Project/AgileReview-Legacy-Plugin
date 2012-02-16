@@ -112,7 +112,7 @@ public class BorderedFieldEditor extends FieldEditor {/*?|r110|Malte|c6|?*/
 		super.setPreferenceStore(store);
 		
 		for (FieldEditor fieldEdit: pluginFieldEditorList) {
-			fieldEdit.setPreferenceStore(store);
+			fieldEdit.setPreferenceStore(store);/*?|r110|Peter Reuter|c0|?*/
 		}
 	}
 	
