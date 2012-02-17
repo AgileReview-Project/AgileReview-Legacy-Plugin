@@ -1,7 +1,7 @@
 package de.tukl.cs.softech.agilereview.dataaccess;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -179,13 +179,14 @@ public class RefactoringAccess {
 	 * @throws IOException
 	 */
 	private void saveToString(XmlTokenSource document, IFile file, boolean pre) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		StringWriter sw = new StringWriter();/*?|r111|Malte|c0|*/
+		document.save(sw, new XmlOptions().setSavePrettyPrint());
+		String str = new String(sw.getBuffer());/*|r111|Malte|c0|?*/
 		
-		document.save(baos, new XmlOptions().setSavePrettyPrint());
 		if(pre) {
-			prevDocuments.put(file, baos.toString().replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
+			prevDocuments.put(file, str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 		} else {
-			postDocuments.put(file, baos.toString().replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
+			postDocuments.put(file, str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 		}
 	}
 	
