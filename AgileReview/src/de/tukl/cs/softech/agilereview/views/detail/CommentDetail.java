@@ -361,8 +361,8 @@ public class CommentDetail extends AbstractDetail<Comment> {
 			if(l instanceof StyledText) {
 				m = p.matcher(((StyledText)l).getText());
 				if(m.find()) {
-			shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
-		}
+					shownReplies.add(new String[]{m.group(1).trim(), m.group(2).trim(), super.convertLineBreaks(m.group(3).trim())});
+				}
 			}
 		}
 		
