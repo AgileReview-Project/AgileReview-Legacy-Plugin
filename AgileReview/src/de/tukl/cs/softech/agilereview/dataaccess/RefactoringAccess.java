@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.widgets.Display;
 
 import agileReview.softech.tukl.de.CommentsDocument;
@@ -27,7 +26,6 @@ import agileReview.softech.tukl.de.FilesDocument.Files;
 import agileReview.softech.tukl.de.FolderDocument.Folder;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
-import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
 /**
  * Class for accessing the review and comment data (xml and internal model).  
@@ -250,7 +248,7 @@ public class RefactoringAccess {
 	private void loadAllComments() {
 		// Get all relevant folders in the review repository
 		try {
-			if (!PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ASK_FOR_REVIEW_FOLDER).equals(MessageDialogWithToggle.ALWAYS)) {/*?|r108|Peter Reuter|c1|?*/
+			if (ra.isCurrentSourceValid()) {/*?|r108|Peter Reuter|c1|?*/
 				IResource[] allFolders = ra.getCurrentSourceFolder().members();
 				// Iterate all folders
 				for (IResource currFolder : allFolders) {

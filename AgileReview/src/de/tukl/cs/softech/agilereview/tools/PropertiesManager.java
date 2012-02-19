@@ -236,7 +236,7 @@ public class PropertiesManager implements IInputValidator{
 		/**
 		 * Indicates whether the user should be asked to create a review folder if none exists. 
 		 */
-		public static String ASK_FOR_REVIEW_FOLDER = "ask_for_review_folder";/*?|r108|Peter Reuter|c2|?*/
+		public static String DO_NOT_ASK_FOR_REVIEW_FOLDER = "do_not_ask_for_review_folder";/*?|r108|Peter Reuter|c2|?*/
 		
 	}
 	
