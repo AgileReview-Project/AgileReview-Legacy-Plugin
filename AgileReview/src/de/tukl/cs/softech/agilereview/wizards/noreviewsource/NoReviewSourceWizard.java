@@ -72,8 +72,8 @@ public class NoReviewSourceWizard extends Wizard implements IWizard {
 
     @Override
     public boolean performCancel() {
-	MessageDialogWithToggle md = MessageDialogWithToggle.openYesNoQuestion(getShell(), "Cancel Review Source folder selection",
-		"Are you sure you want to cancel? Agilereview will not work until you create and choose an AgileReview Source Folder.",
+	MessageDialogWithToggle md = MessageDialogWithToggle.openYesNoQuestion(getShell(), "Cancel Review Source Project selection",
+		"Are you sure you want to cancel? Agilereview will not work until you create and choose an AgileReview Source Project.",
 		"Do not ask me on Eclipse startup.",
 		PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER), null, null);/*?|r108|Peter Reuter|c3|*/
 	/*?|r108|Peter Reuter|c8|*/

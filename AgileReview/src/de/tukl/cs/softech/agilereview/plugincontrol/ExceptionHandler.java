@@ -24,9 +24,9 @@ public class ExceptionHandler {/* ?|r108|Malte|c22|? */
 	    MessageDialogWithToggle md = MessageDialogWithToggle
 		    .openYesNoQuestion(
 			    Display.getDefault().getActiveShell(),
-			    "No ReviewSourceFolder selected",
-			    "In order to use AgileReview you need a persistent storage for review and comment data, a so called Review Source Folder. "
-				    + "Currently there is no active Review Source Folder.\nDo you want to activate or create one in order to use AgileReview?",
+			    "No Review Source Project selected",
+			    "In order to use AgileReview you need a persistent storage for review and comment data, a so called Review Source Project. "
+				    + "Currently there is no active Review Source Project.\nDo you want to activate or create one in order to use AgileReview?",
 			    "Do not ask me on Eclipse startup.",
 			    PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER), null, null);
 	    PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER, md.getToggleState());

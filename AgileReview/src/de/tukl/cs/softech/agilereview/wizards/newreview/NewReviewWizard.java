@@ -21,69 +21,69 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
  */
 public class NewReviewWizard extends Wizard implements INewWizard {
 
-    /**
-     * The first and sole page of the wizard
-     */
-    private NewReviewWizardPage page1;
+	/**
+	 * The first and sole page of the wizard
+	 */
+	private NewReviewWizardPage page1;
 
-    /**
-     * creates a new wizard
-     */
-    public NewReviewWizard() {
-	super();
-	setNeedsProgressMonitor(true);
-	setWindowTitle("New Review");
-    }
+	/**
+	 * creates a new wizard
+	 */
+	public NewReviewWizard() {
+		super();
+		setNeedsProgressMonitor(true);
+		setWindowTitle("New Review");
+	}
 
-    /**
-     * adds all needed pages to the wizard
-     * @see org.eclipse.jface.wizard.Wizard#addPages()
-     */
-    @Override
-    public void addPages() {
-	super.addPages();
-	page1 = new NewReviewWizardPage();
-	addPage(page1);
-    }
+	/**
+	 * adds all needed pages to the wizard
+	 * @see org.eclipse.jface.wizard.Wizard#addPages()
+	 */
+	@Override
+	public void addPages() {
+		super.addPages();
+		page1 = new NewReviewWizardPage();
+		addPage(page1);
+	}
 
-    /**
-     * Execute the actual wizard command after all information was collected
-     * @see org.eclipse.jface.wizard.Wizard#performFinish()
-     */
-    @Override
-    public boolean performFinish() {
-	boolean result = false;
-	try {
-	    Review newRev = ReviewAccess.getInstance().createNewReview(this.page1.getReviewID());
-	    if (newRev != null) {
-		newRev.setReferenceId(this.page1.getReviewReference());
-		newRev.setDescription(this.page1.getReviewDescription());
-		PersonInCharge piC = PersonInCharge.Factory.newInstance();
-		piC.setName(this.page1.getReviewResponsibility());
-		newRev.setPersonInCharge(piC);
+	/**
+	 * Execute the actual wizard command after all information was collected
+	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
+	 */
+	@Override
+	public boolean performFinish() {
+		boolean result = false;
+		try {
+			Review newRev = ReviewAccess.getInstance().createNewReview(this.page1.getReviewID());
+			if (newRev != null) {
+				newRev.setReferenceId(this.page1.getReviewReference());
+				newRev.setDescription(this.page1.getReviewDescription());
+				PersonInCharge piC = PersonInCharge.Factory.newInstance();
+				piC.setName(this.page1.getReviewResponsibility());
+				newRev.setPersonInCharge(piC);
 
-		if (ViewControl.isOpen(ReviewExplorer.class)) {
-		    ReviewExplorer.getInstance().addReview(newRev);
+				if (ViewControl.isOpen(ReviewExplorer.class)) {
+					ReviewExplorer.getInstance().addReview(newRev);
+				}
+				result = true;
+			}
+		} catch (IOException e) {
+			PluginLogger.logError(this.getClass().toString(), "performFinish", "Exception thrown while created a new Review", e);
+		} catch (NoReviewSourceFolderException e) {
+			ExceptionHandler.handleNoReviewSourceFolderException();
 		}
-		result = true;
-	    }
-	} catch (IOException e) {
-	    PluginLogger.logError(this.getClass().toString(), "performFinish", "Exception thrown while created a new Review", e);
-	} catch (NoReviewSourceFolderException e) {
-	    ExceptionHandler.handleNoReviewSourceFolderException();
+
+		return result;
 	}
 
-	return result;
-    }
-
-    /**
-     * not needed
-     * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
-     */
-    @Override
-    public void init(IWorkbench workbench, IStructuredSelection selection) {
-	if (ViewControl.getInstance().shouldSwitchPerspective()) {
-	    ViewControl.getInstance().switchPerspective();
+	/**
+	 * not needed
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+	 */
+	@Override
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		if (ViewControl.getInstance().shouldSwitchPerspective()) {
+			ViewControl.getInstance().switchPerspective();
+		}
 	}
-    }
 }
