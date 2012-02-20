@@ -331,10 +331,7 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 		// Set the directory where the comments are located
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
 		if (!loadReviewSourceProject(projectName)
-				&& !PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER)) {/*
-				 * ?|r108|Peter
-				 * Reuter|c0|
-				 */
+				&& !PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER)) {/*?|r108|Peter Reuter|c0|?*/
 			// Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			// String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
 			// "Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
