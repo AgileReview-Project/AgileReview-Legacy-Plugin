@@ -336,7 +336,7 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 			// String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
 			// "Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
 			// MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);
-			ExceptionHandler.handleNoReviewSourceFolderException();/* ?|r108|Malte|c23|? */
+			ExceptionHandler.handleNoReviewSourceFolderExceptionOnStartUp();/* ?|r108|Malte|c23|? *//*?|r108|Thilo|c4|?*/
 		}
 	}
 
