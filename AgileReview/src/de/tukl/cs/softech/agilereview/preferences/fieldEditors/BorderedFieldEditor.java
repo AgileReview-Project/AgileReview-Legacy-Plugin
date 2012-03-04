@@ -116,7 +116,7 @@ public class BorderedFieldEditor extends FieldEditor {/* ?|r110|Malte|c6|? */
 	super.setPreferenceStore(store);
 
 	for (FieldEditor fieldEdit : pluginFieldEditorList) {
-	    if (fieldEdit.getPreferenceStore() != null) {
+	    if (fieldEdit.getPreferenceStore() == null) {
 		fieldEdit.setPreferenceStore(store);/* ?|r110|Peter Reuter|c0|? */
 	    }
 	}
