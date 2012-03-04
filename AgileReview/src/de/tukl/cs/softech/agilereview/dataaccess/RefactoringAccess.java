@@ -28,34 +28,34 @@ import agileReview.softech.tukl.de.ProjectDocument.Project;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
- * Class for accessing the review and comment data (xml and internal model).  
+ * Class for accessing the review and comment data (xml and internal model).
  */
 public class RefactoringAccess {
 	
 	/**
-	 * Local instance of the ReviewAccess. 
+	 * Local instance of the ReviewAccess.
 	 */
-	private ReviewAccess ra = ReviewAccess.getInstance();
+	private final ReviewAccess ra = ReviewAccess.getInstance();
 	/**
 	 * Instance of the review file model
 	 */
-	private ReviewFileModel rFileModel = new ReviewFileModel();
+	private final ReviewFileModel rFileModel = new ReviewFileModel();
 	/**
-	 * String representations of documents before they are refactored. 
+	 * String representations of documents before they are refactored.
 	 */
-	private HashMap<IFile, String> prevDocuments = new HashMap<IFile, String>();
+	private final HashMap<IFile, String> prevDocuments = new HashMap<IFile, String>();
 	/**
 	 * String representations of documents after they were refactored.
 	 */
-	private HashMap<IFile, String> postDocuments = new HashMap<IFile, String>();
+	private final HashMap<IFile, String> postDocuments = new HashMap<IFile, String>();
 	/**
-	 * List of files that are affected by the refactoring. 
+	 * List of files that are affected by the refactoring.
 	 */
-	private Collection<IFile> affectedFilesBuffer = new HashSet<IFile>();
+	private final Collection<IFile> affectedFilesBuffer = new HashSet<IFile>();
 	/**
-	 * List of files that could not be parsed 
+	 * List of files that could not be parsed
 	 */
-	private HashMap<IFile, Exception> failedFiles = new HashMap<IFile, Exception>();
+	private final HashMap<IFile, Exception> failedFiles = new HashMap<IFile, Exception>();
 	
 	/**
 	 * Constructor of the RefactoringAccess. Initially loads all comments from the database.
@@ -74,7 +74,8 @@ public class RefactoringAccess {
 		
 		Collection<IFile> affectedFiles = new HashSet<IFile>();
 		for (IFile f : rFileModel.getAllCommentFiles()) {
-			if(findXmlPath(rFileModel.getCommentsDoc(f), refactoringTarget.getFullPath().toOSString(), type, false) != null && !affectedFiles.contains(f)) {
+			if (findXmlPath(rFileModel.getCommentsDoc(f), refactoringTarget.getFullPath().toOSString(), type, false) != null
+					&& !affectedFiles.contains(f)) {
 				affectedFiles.add(f);
 			}
 		}
@@ -90,7 +91,7 @@ public class RefactoringAccess {
 	public HashMap<IFile, String> getPrevDocuments() {
 		return prevDocuments;
 	}
-
+	
 	/**
 	 * Returns a string representation of all documents after they were refactored
 	 * @param oldPath old path of the refactored item
@@ -100,25 +101,28 @@ public class RefactoringAccess {
 	 * @return String representation of documents after they were refactored
 	 * @throws IOException
 	 * @throws XmlException
+	 * @throws CoreException
 	 */
-	public HashMap<IFile, String> getPostDocumentsOfRefactoring(String oldPath, String newPath, int type, boolean moveAllChilds) throws IOException, XmlException {
-		simulateRefactoring(oldPath, newPath, type, moveAllChilds);		
+	public HashMap<IFile, String> getPostDocumentsOfRefactoring(String oldPath, String newPath, int type, boolean moveAllChilds) throws IOException,
+			XmlException, CoreException {
+		simulateRefactoring(oldPath, newPath, type, moveAllChilds);
 		return postDocuments;
 	}
-
+	
 	/**
 	 * Refactors the whole database according to the given parameters and saves it automatically
 	 * @param oldPath old path of the refactored item
 	 * @param newPath new path of the refactored item
 	 * @param type type of the refactored item (see static fields PROJECT, FOLDER, FILE in {@link IResource})
 	 * @param moveAllChilds indicates whether all children of oldPath should be moved to newPath
-	 * @throws IOException 
+	 * @throws IOException
+	 * @throws CoreException
 	 */
-	private void simulateRefactoring(String oldPath, String newPath, int type, boolean moveAllChilds) throws IOException {
+	private void simulateRefactoring(String oldPath, String newPath, int type, boolean moveAllChilds) throws IOException, CoreException {
 		
 		// do the refactoring on the internal structure
 		//XXX assumption: getAffectedFiles was called beforehand
-		for(IFile f : affectedFilesBuffer) {
+		for (IFile f : affectedFilesBuffer) {
 			// Find old path
 			XmlObject oldObject = findXmlPath(rFileModel.getCommentsDoc(f), oldPath, type, false);
 			// If not found in document, then no refactoring has to be done
@@ -134,7 +138,7 @@ public class RefactoringAccess {
 				XmlObject[] xPathResultCopy = oldObject.copy().selectPath(xPath);
 				// now that we have a copy, remove the old originals directly
 				XmlObject[] xPathResult = oldObject.selectPath(xPath);
-				for (int i=0; i<xPathResult.length;i++) {
+				for (int i = 0; i < xPathResult.length; i++) {
 					cleanXmlPath(xPathResult[i]);
 				}
 				
@@ -149,7 +153,7 @@ public class RefactoringAccess {
 				boolean newIsEmpty = true;
 				
 				// move all children of old node to new node
-				for (int i=0; i<xPathResultCopy.length;i++) {
+				for (int i = 0; i < xPathResultCopy.length; i++) {
 					// copy object to new location
 					XmlCursor x = xPathResultCopy[i].newCursor();
 					x.copyXml(newC);
@@ -163,27 +167,33 @@ public class RefactoringAccess {
 				if (newIsEmpty) {
 					cleanXmlPath(newObject);
 				}
-				 
+				
 			}
 			saveToString(rFileModel.getCommentsDoc(f), f, false);
 		}
 	}
 	
 	/**
-	 * Saving method for a given XML document / File pair 
+	 * Saving method for a given XML document / File pair
 	 * @param document
 	 * @param file
 	 * @param pre should be set to true, if the file document is the original before the refactoring step
 	 * @throws IOException
+	 * @throws CoreException
 	 */
-	private void saveToString(XmlTokenSource document, IFile file, boolean pre) throws IOException {
+	private void saveToString(XmlTokenSource document, IFile file, boolean pre) throws IOException, CoreException {
 		StringWriter sw = new StringWriter();/*?|r111|Malte|c0|*/
 		document.save(sw, new XmlOptions().setSavePrettyPrint());
 		String str = new String(sw.getBuffer());/*|r111|Malte|c0|?*/
 		
-		if(pre) {
+		//add xml declaration manually as this is not provided by document.save()
+		str = "<?xml version=\"1.0\" encoding=\"" + file.getCharset() + "\"?>" + System.getProperty("line.separator") + str;
+		
+		if (pre) {
+			System.out.println(str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 			prevDocuments.put(file, str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 		} else {
+			System.out.println(str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 			postDocuments.put(file, str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 		}
 	}
@@ -193,8 +203,8 @@ public class RefactoringAccess {
 	///////////////////////////////////////////
 	
 	/**
-	 * Finds the given path in the given CommentsDocument, whereas the last element is of the given type.
-	 * In case of createPath being true, the path is created if not there.
+	 * Finds the given path in the given CommentsDocument, whereas the last element is of the given type. In case of createPath being true, the path
+	 * is created if not there.
 	 * @param currCommentsDoc CommentsDocument where the path should be created
 	 * @param path path that should be found/created
 	 * @param type type of the last element of the path
@@ -212,7 +222,7 @@ public class RefactoringAccess {
 		// Iterate path and stop one position before end
 		String[] pathArray = path.split(Pattern.quote(System.getProperty("file.separator")));
 		for (int i = 0; i < pathArray.length; i++) {
-			String xPathQuery = "declare namespace s='http://de.tukl.softech.agileReview'; $this/s:*[@name=\""+pathArray[i]+"\"]";
+			String xPathQuery = "declare namespace s='http://de.tukl.softech.agileReview'; $this/s:*[@name=\"" + pathArray[i] + "\"]";
 			XmlObject[] xPathResult = currObject.selectPath(xPathQuery);
 			
 			// if no result is found, the corresponding object has to be created
@@ -223,12 +233,18 @@ public class RefactoringAccess {
 				} else if (i == 0) {
 					// First element: Create a project
 					currObject = createXmlProject(currObject, pathArray[i]);
-				} else if (i == pathArray.length-1) {
+				} else if (i == pathArray.length - 1) {
 					// Last element: Create the given type
 					switch (type) {
-						case IResource.PROJECT: currObject = createXmlProject(currObject, pathArray[i]); break;
-						case IResource.FOLDER:	currObject = createXmlFolder(currObject, pathArray[i]); break;
-						case IResource.FILE:	currObject = createXmlFile(currObject,  pathArray[i]); break;
+					case IResource.PROJECT:
+						currObject = createXmlProject(currObject, pathArray[i]);
+						break;
+					case IResource.FOLDER:
+						currObject = createXmlFolder(currObject, pathArray[i]);
+						break;
+					case IResource.FILE:
+						currObject = createXmlFile(currObject, pathArray[i]);
+						break;
 					}
 				} else {
 					// As we do neither consider the last element nor the first, we always create a folder
@@ -253,33 +269,34 @@ public class RefactoringAccess {
 				// Iterate all folders
 				for (IResource currFolder : allFolders) {
 					if (currFolder instanceof IFolder) {
-						IResource[] allFiles = ((IFolder)currFolder).members();
+						IResource[] allFiles = ((IFolder) currFolder).members();
 						// Iterate all files in the current folder
 						for (IResource currFile : allFiles) {
 							if (currFile instanceof IFile) {
 								// Open file and read basic information
-								if (!((IFile)currFile).getName().equals("review.xml")) {
+								if (!((IFile) currFile).getName().equals("review.xml")) {
 									try {
-										CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)currFile).getContents());
-										rFileModel.addXmlDocument(doc, (IFile)currFile);
-										saveToString(doc, (IFile)currFile, true);
+										CommentsDocument doc = CommentsDocument.Factory.parse(((IFile) currFile).getContents());
+										rFileModel.addXmlDocument(doc, (IFile) currFile);
+										saveToString(doc, (IFile) currFile, true);
 									} catch (Exception e) {
 										// catch all exceptions as they might influence the refactoring process
 										failedFiles.put((IFile) currFile, e);
-									} 
+									}
 								}
 							}
 						}
 					}
-				}	
+				}
 			}
 		} catch (CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
 			Display.getDefault().asyncExec(new Runnable() {
-
+				
 				@Override
 				public void run() {
-					MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException", "An error occured while reading the files of the AgileReview Source Folder in order to do the refactoring!");
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException",
+							"An error occured while reading the files of the AgileReview Source Folder in order to do the refactoring!");
 				}
 				
 			});
@@ -292,13 +309,13 @@ public class RefactoringAccess {
 	 * @param name name of the file
 	 * @return The newly created project or null if the given parent does not support project children
 	 */
-	private static Project createXmlProject (XmlObject parent, String name) {
+	private static Project createXmlProject(XmlObject parent, String name) {
 		Project p = null;
 		if (parent instanceof Files) {
-			p = ((Files)parent).addNewProject();
+			p = ((Files) parent).addNewProject();
 			p.setName(name);
 		}
-	
+		
 		return p;
 	}
 	
@@ -311,10 +328,10 @@ public class RefactoringAccess {
 	private static Folder createXmlFolder(XmlObject parent, String name) {
 		Folder f = null;
 		if (parent instanceof Project) {
-			f = ((Project)parent).addNewFolder();
+			f = ((Project) parent).addNewFolder();
 			f.setName(name);
 		} else {
-			f = ((Folder)parent).addNewFolder();
+			f = ((Folder) parent).addNewFolder();
 			f.setName(name);
 		}
 		return f;
@@ -329,10 +346,10 @@ public class RefactoringAccess {
 	private static File createXmlFile(XmlObject parent, String name) {
 		agileReview.softech.tukl.de.FileDocument.File f = null;
 		if (parent instanceof Project) {
-			f = ((Project)parent).addNewFile();
+			f = ((Project) parent).addNewFile();
 			f.setName(name);
 		} else {
-			f = ((Folder)parent).addNewFile();
+			f = ((Folder) parent).addNewFile();
 			f.setName(name);
 		}
 		return f;
@@ -350,7 +367,7 @@ public class RefactoringAccess {
 		// Recursively check parents
 		while (c.toParent() && !c.toFirstChild() && !(c.getObject() instanceof Files)) {
 			c.removeXml();
-		}	
+		}
 		c.dispose();
 	}
 	
