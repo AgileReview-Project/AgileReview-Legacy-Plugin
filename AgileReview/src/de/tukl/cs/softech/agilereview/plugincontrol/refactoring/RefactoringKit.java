@@ -92,7 +92,6 @@ public class RefactoringKit {
 				//should be != null if a delete edit occurs before a insert edit
 				DeleteEdit dEdit = null;
 				for (Diff d : diffProcessor.diff_main(prevDocs.get(f), postDocs.get(f), false)) {
-					System.out.println(d);
 					switch (d.operation) {
 					case EQUAL:
 						if (dEdit != null) {

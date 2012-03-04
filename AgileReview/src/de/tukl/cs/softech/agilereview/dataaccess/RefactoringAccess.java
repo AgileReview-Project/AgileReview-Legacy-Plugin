@@ -190,10 +190,8 @@ public class RefactoringAccess {
 		str = "<?xml version=\"1.0\" encoding=\"" + file.getCharset() + "\"?>" + System.getProperty("line.separator") + str;
 		
 		if (pre) {
-			System.out.println(str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 			prevDocuments.put(file, str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 		} else {
-			System.out.println(str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 			postDocuments.put(file, str.replaceAll("\r\n|\r|\n", System.getProperty("line.separator")));
 		}
 	}
