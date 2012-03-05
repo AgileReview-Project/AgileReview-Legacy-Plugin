@@ -48,7 +48,7 @@ public class ExceptionHandler {/* ?|r108|Malte|c22|? */
 				    "Do not ask me on Eclipse startup.",
 				    PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER), 
 				    null, null);
-		 PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER, md.getToggleState());
+		PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER, md.getToggleState());
 	    // Eventually show the NewSourceFolderDialog
 	    if ((md.getReturnCode() == IDialogConstants.YES_ID)) {
 	    	openNewSourceFolderDialog();

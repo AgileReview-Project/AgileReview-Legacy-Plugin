@@ -16,14 +16,10 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
  */
 public class RefreshHandler extends AbstractHandler {
 	
-	/**
-	 * Instance of ReviewAccess
-	 */
-	private  ReviewAccess ra = ReviewAccess.getInstance();
-
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "Refresh triggered");
+		ReviewAccess ra = ReviewAccess.getInstance();
 		// Refill the database
 		try {
 			ra.fillDatabaseForOpenReviews();
