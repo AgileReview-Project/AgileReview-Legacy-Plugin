@@ -40,19 +40,21 @@ public class ExceptionHandler {/* ?|r108|Malte|c22|? */
      * Handles {@link NoReviewSourceFolderException} for Eclipse startup
      */
     public static void handleNoReviewSourceFolderExceptionOnStartUp() {/*?|r108|Thilo|c0|*/
-		MessageDialogWithToggle md = MessageDialogWithToggle
-			    .openYesNoQuestion(
-				    Display.getDefault().getActiveShell(),
-				    title,
-				    message,
-				    "Do not ask me on Eclipse startup.",
-				    PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER), 
-				    null, null);
-		PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER, md.getToggleState());
-	    // Eventually show the NewSourceFolderDialog
-	    if ((md.getReturnCode() == IDialogConstants.YES_ID)) {
-	    	openNewSourceFolderDialog();
-	    }
+		if (!PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER)) {
+	    	MessageDialogWithToggle md = MessageDialogWithToggle
+				    .openYesNoQuestion(
+					    Display.getDefault().getActiveShell(),
+					    title,
+					    message,
+					    "Do not ask again. (Except when I explicitly try to use AgileReview functionality)",
+					    PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER), 
+					    null, null);
+			PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER, md.getToggleState());
+		    // Eventually show the NewSourceFolderDialog
+		    if ((md.getReturnCode() == IDialogConstants.YES_ID)) {
+		    	openNewSourceFolderDialog();
+		    }
+		}
     }/*|r108|Thilo|c0|?*/
     
     /**
