@@ -107,6 +107,14 @@ public class LinkField extends FieldEditor implements Listener {/*?|r110|Malte|c
 	@Override
 	protected void doStore() {
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#store()
+	 * @author Peter Reuter (05.03.2012)
+	 */
+	public void store() {
+		// do nothing, nothing needs to be stored
+	}
 
 	@Override
 	public int getNumberOfControls() {

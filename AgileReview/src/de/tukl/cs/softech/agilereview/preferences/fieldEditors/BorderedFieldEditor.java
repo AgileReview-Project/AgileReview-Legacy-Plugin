@@ -83,21 +83,15 @@ public class BorderedFieldEditor extends FieldEditor {/* ?|r110|Malte|c6|? */
 	 */
 	@Override
 	public void store() {
-		super.store();
-		// If checkbox was defaulted
-		if (presentsDefaultValue()) {
-			for (FieldEditor fieldEdit : pluginFieldEditorList) {
-				fieldEdit.store();
-			}
+		// Store the Field-Editors values
+		for (FieldEditor fieldEdit : pluginFieldEditorList) {
+			fieldEdit.store();
 		}
 	}
 	
 	@Override
 	protected void doStore() {
-		// Load the Field-Editors (default)
-		for (FieldEditor fieldEdit : pluginFieldEditorList) {
-			fieldEdit.store();
-		}
+		// nothing needs to be done here...
 	}
 	
 	@Override
