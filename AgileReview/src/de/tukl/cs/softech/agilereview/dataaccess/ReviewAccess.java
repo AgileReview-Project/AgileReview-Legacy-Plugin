@@ -861,7 +861,6 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 		PluginLogger.log(this.getClass().toString(), "createNewReview", "Create new review: " + reviewId);
 
 		// Create the folder and file for this review/*?|r113|Malte|c1|*/
-		ReviewAccess.createReviewFolder(reviewId);/*?|r113|Thilo|c0|?*/
 		IFile revFile = ReviewAccess.createReviewFile(reviewId);/*|r113|Malte|c1|?*/
 
 		// Create the new review
