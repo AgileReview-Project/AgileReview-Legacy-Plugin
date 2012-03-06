@@ -890,10 +890,10 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	if (perspective.getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
 	    PluginLogger.log(this.getClass().toString(), "perspectiveActivated",
 		    "Adding annotations since AgileReview perspective has been activated");
-	    if (getActiveEditor() instanceof IEditorPart) {/*?|r112|Malte|c1|*/
+	    if (getActiveEditor() instanceof IEditorPart) {
 		this.parserMap.put(getActiveEditor(), ParserFactory.createParser(getActiveEditor()));
 		this.parserMap.get(getActiveEditor()).filter(getFilteredComments());
-	    }/*|r112|Malte|c1|?*/
+	    }
 	} else {
 	    PluginLogger.log(this.getClass().toString(), "perspectiveActivated", "Hiding annotations since current perspective is not 'AgileReview'");
 	    for (IAnnotationParser parser : this.parserMap.values()) {

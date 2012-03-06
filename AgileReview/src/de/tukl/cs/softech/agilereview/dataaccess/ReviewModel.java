@@ -117,7 +117,7 @@ class ReviewModel {
 	 */
 	protected boolean addReview(Review r) {
 		boolean result = false;
-		if (!containsCaseInsensitive(rModel.keySet(), r.getId())) {/*?|r114|Malte|c2|?*/
+		if (!containsCaseInsensitive(rModel.keySet(), r.getId())) {
 			this.rModel.put(r.getId(), r);
 			result = true;
 		}
@@ -235,11 +235,11 @@ class ReviewModel {
 	 * @return <i>true</i> if the model contains such a reviewId, <i>false</i> otherwise.
 	 */
 	protected boolean containsReview(String reviewId, boolean checkLoaded) {
-		boolean result = containsCaseInsensitive(this.rModel.keySet(), reviewId);/*?|r114|Malte|c1|*/
+		boolean result = containsCaseInsensitive(this.rModel.keySet(), reviewId);
 		
 		if (checkLoaded) {
 			result = result && containsCaseInsensitive(this.commentDB.keySet(), reviewId);
-		}/*|r114|Malte|c1|?*/
+		}
 		
 		return result;
 	}
@@ -261,7 +261,7 @@ class ReviewModel {
 	 * @return true, if the search string could be found<br>false, otherwise
 	 * @author Malte Brunnlieb (19.02.2012)
 	 */
-	private boolean containsCaseInsensitive(Set<String> set, String searchStr) {/*?|r114|Malte|c0|*/
+	private boolean containsCaseInsensitive(Set<String> set, String searchStr) {
 		boolean result = set.contains(searchStr);
 		if (!result) {
 			for (String key : set) {
@@ -272,5 +272,5 @@ class ReviewModel {
 			}
 		}
 		return result;
-	}/*|r114|Malte|c0|?*/
+	}
 }

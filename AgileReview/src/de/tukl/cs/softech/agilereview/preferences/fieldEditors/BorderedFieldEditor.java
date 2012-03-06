@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Group;
  * The BorderedFieldEditor is a wrapper field editor which manages a list of field editors and displays a border around them as a group
  * @author Malte Brunnlieb
  */
-public class BorderedFieldEditor extends FieldEditor {/* ?|r110|Malte|c6|? */
+public class BorderedFieldEditor extends FieldEditor {
 	
 	/**
 	 * Group title
@@ -111,7 +111,7 @@ public class BorderedFieldEditor extends FieldEditor {/* ?|r110|Malte|c6|? */
 		
 		for (FieldEditor fieldEdit : pluginFieldEditorList) {
 			if (fieldEdit.getPreferenceStore() == null) {
-				fieldEdit.setPreferenceStore(store);/* ?|r110|Peter Reuter|c0|? */
+				fieldEdit.setPreferenceStore(store);
 			}
 		}
 	}

@@ -16,7 +16,7 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
 /**
  * Preference page for controlling the color management of comments
  */
-public class CommentColorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {/*?|r110|Malte|c8|?*/
+public class CommentColorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	/**
 	 * Creates the preferences page for the comment color settings.

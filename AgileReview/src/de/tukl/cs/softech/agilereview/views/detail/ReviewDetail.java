@@ -101,7 +101,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    reference.addFocusListener(this);
 	    
 	    referenceButton = new Button(this, SWT.PUSH );
-	    referenceButton.setImage(PropertiesManager.getInstance().getIcon(PropertiesManager.INTERNAL_KEYS.ICONS.BROWSE));/*?|r110|Malte|c4|?*/
+	    referenceButton.setImage(PropertiesManager.getInstance().getIcon(PropertiesManager.INTERNAL_KEYS.ICONS.BROWSE));
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.END;
 	    referenceButton.setLayoutData(gridData);

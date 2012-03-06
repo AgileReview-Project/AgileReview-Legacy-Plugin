@@ -32,9 +32,9 @@ public class AddNewCommentHandler extends AbstractHandler {
 	if (!ViewControl.isPerspectiveOpen()) {
 	    if (ViewControl.getInstance().shouldSwitchPerspective()) {
 		ViewControl.getInstance().switchPerspective();
-	    } else {/*?|r112|Malte|c0|*/
+	    } else {
 		return null;
-	    }/*|r112|Malte|c0|?*/
+	    }
 	}
 
 	PluginLogger.log(this.getClass().toString(), "execute", "Command \"Add new Comment\" triggered");
@@ -61,9 +61,9 @@ public class AddNewCommentHandler extends AbstractHandler {
 		    }
 		    // Save the new comment & Refresh the Review Explorer
 		    ra.save(newComment);
-		} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c11|*/
+		} catch (NoReviewSourceFolderException e) {
 		    ExceptionHandler.handleNoReviewSourceFolderException();
-		}/*|r108|Malte|c11|?*/
+		}
 		ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 	    } else {
 		// no open editor

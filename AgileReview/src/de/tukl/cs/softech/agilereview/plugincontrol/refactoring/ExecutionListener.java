@@ -76,9 +76,9 @@ public class ExecutionListener implements IExecutionListener {
 					CommentTableView.getInstance().resetComments();
 					CommentTableView.getInstance().resetEditorReferences();
 				}
-			} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c13|*/
+			} catch (NoReviewSourceFolderException e) {
 				ExceptionHandler.handleNoReviewSourceFolderExceptionOnStartUp();
-			}/*|r108|Malte|c13|?*/
+			}
 		}
 	}
 

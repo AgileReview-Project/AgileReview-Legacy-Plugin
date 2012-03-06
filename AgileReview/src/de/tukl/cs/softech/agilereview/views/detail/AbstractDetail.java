@@ -138,9 +138,9 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 				ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
 				SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
 				sp.setVariable(SourceProvider.REVERTABLE, false);
-			} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c18|*/
+			} catch (NoReviewSourceFolderException e) {
 				ExceptionHandler.handleNoReviewSourceFolderException();
-			}/*|r108|Malte|c18|?*/
+			}
 		}
 	}
 	

@@ -43,7 +43,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * Class for accessing the review and comment data (xml and internal model).
  */
-public class ReviewAccess {/* ?|r108|Malte|c1|? */
+public class ReviewAccess {
 
 	// //////////////
 	// attributes //
@@ -110,9 +110,9 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 	 * @return Folder for this review
 	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	private static IFolder createReviewFolder(String reviewId) throws NoReviewSourceFolderException {/* ?|r108|Malte|c4| */
+	private static IFolder createReviewFolder(String reviewId) throws NoReviewSourceFolderException {
 		if (REVIEW_REPO_FOLDER == null)
-			throw new NoReviewSourceFolderException();/* |r108|Malte|c4|? */
+			throw new NoReviewSourceFolderException();
 		IFolder folder = REVIEW_REPO_FOLDER.getFolder("review." + reviewId);
 		if (!folder.exists()) {
 			try {
@@ -330,12 +330,12 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 		PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
 		// Set the directory where the comments are located
 		String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
-		if (!loadReviewSourceProject(projectName)) {/*?|r108|Peter Reuter|c0|?*/
+		if (!loadReviewSourceProject(projectName)) {
 			// Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			// String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
 			// "Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
 			// MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);
-			ExceptionHandler.handleNoReviewSourceFolderExceptionOnStartUp();/* ?|r108|Malte|c23|? *//*?|r108|Thilo|c4|?*/
+			ExceptionHandler.handleNoReviewSourceFolderExceptionOnStartUp();
 		}
 	}
 
@@ -418,9 +418,9 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 	 * Fills the comment model
 	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	private void loadAllComment() throws NoReviewSourceFolderException {/* ?|r108|Malte|c2| */
+	private void loadAllComment() throws NoReviewSourceFolderException {
 		if (REVIEW_REPO_FOLDER == null)
-			throw new NoReviewSourceFolderException();/* |r108|Malte|c2|? */
+			throw new NoReviewSourceFolderException();
 		PluginLogger.log(this.getClass().toString(), "loadAllComments",
 				"All comment files will be loaded from file (including closed reviews). Exception thrown when parsing xml-file");
 		// Get all relevant folders in the review repository
@@ -488,9 +488,9 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 	 * Fills the review model
 	 * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
 	 */
-	private void loadAllReviews() throws NoReviewSourceFolderException {/* ?|r108|Malte|c3| */
+	private void loadAllReviews() throws NoReviewSourceFolderException {
 		if (REVIEW_REPO_FOLDER == null)
-			throw new NoReviewSourceFolderException();/* |r108|Malte|c3|? */
+			throw new NoReviewSourceFolderException();
 		PluginLogger.log(this.getClass().toString(), "loadAllReviews", "All reviews will be loaded from files");
 		// Get all relevant folders in the review repository
 		try {
@@ -866,8 +866,8 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 	public Review createNewReview(String reviewId) throws IOException, NoReviewSourceFolderException {
 		PluginLogger.log(this.getClass().toString(), "createNewReview", "Create new review: " + reviewId);
 
-		// Create the folder and file for this review/*?|r113|Malte|c1|*/
-		IFile revFile = ReviewAccess.createReviewFile(reviewId);/*|r113|Malte|c1|?*/
+		// Create the folder and file for this review
+		IFile revFile = ReviewAccess.createReviewFile(reviewId);
 
 		// Create the new review
 		ReviewDocument revDoc = ReviewDocument.Factory.newInstance();

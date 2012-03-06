@@ -35,11 +35,11 @@ public class DeleteHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if(ViewControl.isOpen(DetailView.class)) {
 			Object o = DetailView.getInstance().getContent();	
-			if(o instanceof Review) {/*?|r108|Malte|c17|*/
+			if(o instanceof Review) {
 				deleteReview(event, (Review)o);
 			} else if(o instanceof Comment) {
 				deleteComment(event, (Comment)o);
-			}/*|r108|Malte|c17|?*/
+			}
 		}
 		return null;
 	}
@@ -73,9 +73,9 @@ public class DeleteHandler extends AbstractHandler {
 			}
 			// Remove this review from the list of open reviews (regardless if it was open or not)
 			pm.removeFromOpenReviews(review.getId());
-		} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c16|*/
+		} catch (NoReviewSourceFolderException e) {
 			ExceptionHandler.handleNoReviewSourceFolderException();
-		}/*|r108|Malte|c16|?*/
+		}
 		return true;
 	}
 	
@@ -95,16 +95,16 @@ public class DeleteHandler extends AbstractHandler {
 		
 		ReviewAccess ra = ReviewAccess.getInstance();
 		try {
-			ra.deleteComment(comment);/*?|r108|Malte|c14|*/
+			ra.deleteComment(comment);
 			
 			if(ViewControl.isOpen(CommentTableView.class)) {
 				CommentTableView.getInstance().deleteComment(comment);
-			}/*|r108|Malte|c14|?*/
+			}
 		} catch (IOException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+comment, e);
-		} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c15|*/
+		} catch (NoReviewSourceFolderException e) {
 			ExceptionHandler.handleNoReviewSourceFolderException();
-		}/*|r108|Malte|c15|?*/
+		}
 		
 		// Refresh Review Explorer
 		ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);

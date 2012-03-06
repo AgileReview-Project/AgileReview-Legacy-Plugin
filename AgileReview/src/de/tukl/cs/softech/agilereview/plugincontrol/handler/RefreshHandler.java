@@ -32,9 +32,9 @@ public class RefreshHandler extends AbstractHandler {
 					PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 				}
 			}
-		} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c10|*/
+		} catch (NoReviewSourceFolderException e) {
 			ExceptionHandler.handleNoReviewSourceFolderException();
-		}/*|r108|Malte|c10|?*/
+		}
 		
 		ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
 

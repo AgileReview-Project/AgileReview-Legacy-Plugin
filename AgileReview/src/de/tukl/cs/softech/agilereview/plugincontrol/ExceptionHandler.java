@@ -15,7 +15,7 @@ import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizar
  * This class should be statically implemented and reserved for reusable exception handling.
  * @author Malte
  */
-public class ExceptionHandler {/* ?|r108|Malte|c22|? */
+public class ExceptionHandler {
 
 	/**
 	 *  Title for the message dialogs
@@ -30,16 +30,16 @@ public class ExceptionHandler {/* ?|r108|Malte|c22|? */
     /**
      * Handles {@link NoReviewSourceFolderException} in a standardized way
      */
-    public static void handleNoReviewSourceFolderException() {/*?|r108|Thilo|c1|*/
+    public static void handleNoReviewSourceFolderException() {
 	    if (MessageDialog.openQuestion(Display.getDefault().getActiveShell(), title, message)) {
 	    	openNewSourceFolderDialog();
 	    }
-    }/*|r108|Thilo|c1|?*/
+    }
     
     /**
      * Handles {@link NoReviewSourceFolderException} for Eclipse startup
      */
-    public static void handleNoReviewSourceFolderExceptionOnStartUp() {/*?|r108|Thilo|c0|*/
+    public static void handleNoReviewSourceFolderExceptionOnStartUp() {
 		if (!PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.DO_NOT_ASK_FOR_REVIEW_FOLDER)) {
 	    	MessageDialogWithToggle md = MessageDialogWithToggle
 				    .openYesNoQuestion(
@@ -55,15 +55,15 @@ public class ExceptionHandler {/* ?|r108|Malte|c22|? */
 		    	openNewSourceFolderDialog();
 		    }
 		}
-    }/*|r108|Thilo|c0|?*/
+    }
     
     /**
      * Opens the new source folder dialog and loads the new one if one is selected
      */
     private static void openNewSourceFolderDialog() {
-	NoReviewSourceWizard wizard = new NoReviewSourceWizard(true);/* ?|r113|Malte|c0|? */
+	NoReviewSourceWizard wizard = new NoReviewSourceWizard(true);
 	WizardDialog wDialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 	wDialog.setBlockOnOpen(true);
-	wDialog.open();/* ?|r108|Peter Reuter|c7|? */
+	wDialog.open();
     }
 }

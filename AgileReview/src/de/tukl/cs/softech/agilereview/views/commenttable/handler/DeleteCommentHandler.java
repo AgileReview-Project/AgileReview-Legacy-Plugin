@@ -46,9 +46,9 @@ public class DeleteCommentHandler extends AbstractHandler {
 							ReviewAccess.getInstance().deleteComment(c);
 						} catch (IOException e) {
 							PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+c, e);
-						} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c12|*/
+						} catch (NoReviewSourceFolderException e) {
 							ExceptionHandler.handleNoReviewSourceFolderException();
-						}/*|r108|Malte|c12|?*/
+						}
 						// Refresh the Review Explorer
 						ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
 					}

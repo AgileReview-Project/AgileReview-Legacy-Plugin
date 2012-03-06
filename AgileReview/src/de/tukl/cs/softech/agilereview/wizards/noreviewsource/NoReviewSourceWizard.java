@@ -69,10 +69,10 @@ public class NoReviewSourceWizard extends Wizard implements IWizard {
     }
 
     @Override
-    public boolean performCancel() {/*?|r108|Thilo|c2|*/
+    public boolean performCancel() {
     return MessageDialog.openQuestion(getShell(), "Cancel Review Source Project selection", "Are you sure you want to cancel? " +
     		"Agilereview will not work until you create and choose an AgileReview Source Project.");	
-    }/*|r108|Thilo|c2|?*/
+    }
 
     /**
      * Returns the name of the project chosen to be the current AgileReview Source Project

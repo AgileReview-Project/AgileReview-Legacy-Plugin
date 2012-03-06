@@ -40,7 +40,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 	/**
 	 * Displays the NoAgileReviewSourceProject wizard
 	 */
-	private void showNoSourceProjectWizard() {/*?|r108|Malte|c0|?*/
+	private void showNoSourceProjectWizard() {
 		// Has to be done in new thread, as the resourceChanged method blocks the building of the workspace
 		Display.getDefault().asyncExec(new Runnable() {								
 			@Override
@@ -85,7 +85,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 						IResourceDelta[] deltaArr = event.getDelta().getAffectedChildren();
 						if(deltaArr.length > 0) {
 							for(IResourceDelta delta : deltaArr) {
-								if (oldSourceProject.equals(delta.getResource())) {/*?|r108|Peter Reuter|c4|*/
+								if (oldSourceProject.equals(delta.getResource())) {
 									Shell currentShell = Display.getDefault().getActiveShell();
 									String msg = "You closed the currently used 'Agile Review Source Project'.\n" +
 									"Do you want to reopen it to avoid a crash of AgileReview?";
@@ -107,7 +107,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 										showNoSourceProjectWizard();
 									}
 									break;
-								}/*|r108|Peter Reuter|c4|?*/
+								}
 							}
 						}
 					}

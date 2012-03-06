@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Listener;
 /**
  * Generic FieldEditor which only displays a link which can be opened in the system browser
  */
-public class LinkField extends FieldEditor implements Listener {/*?|r110|Malte|c2|?*/
+public class LinkField extends FieldEditor implements Listener {
 	
 	/**
 	 * The text which contains a link tag

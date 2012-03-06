@@ -97,7 +97,7 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				"Use smart suggestion", getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 		
-		// Grouping FieldEditor for export defaults/*?|r110|Malte|c1|*/
+		// Grouping FieldEditor for export defaults
 		BorderedFieldEditor exportWrapper = new BorderedFieldEditor(getFieldEditorParent(), "Export Defaults");
 		Composite container = exportWrapper.getContainer();
 		
@@ -109,12 +109,12 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		// export template file
 		FileFieldEditor fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH,
 				"Default template for XLS export:", container);
-		fileExportTemplateField.setFileExtensions(new String[] { "*.xls;*.xlsx" });/*?|r106|Peter Reuter|c1|?*/
+		fileExportTemplateField.setFileExtensions(new String[] { "*.xls;*.xlsx" });
 		exportWrapper.addField(fileExportTemplateField);
 		
 		// export templates link
 		exportWrapper.addField(new LinkField(container, "Follow this <a>link</a> for downloading an example template.", pm
-				.getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));/*|r110|Malte|c1|?*/
+				.getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
 		
 		addField(exportWrapper);
 		

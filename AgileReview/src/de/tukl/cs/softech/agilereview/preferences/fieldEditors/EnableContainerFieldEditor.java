@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Composite;
  * and then add the field editor using <code>addField(FieldEditor fieldEditor)</code>.
  * Currently there is no support for validity checking and advanced layout inside the container.
  */
-public class EnableContainerFieldEditor extends BorderedFieldEditor {/*?|r110|Malte|c7|?*/
+public class EnableContainerFieldEditor extends BorderedFieldEditor {
 
 	/**
 	 * Check-Box for enabling the container (also represents a preference value)

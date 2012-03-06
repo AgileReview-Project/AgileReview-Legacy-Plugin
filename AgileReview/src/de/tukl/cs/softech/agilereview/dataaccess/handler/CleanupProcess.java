@@ -118,9 +118,9 @@ public class CleanupProcess implements IRunnableWithProgress {
 					ra.unloadReviewComments(r.getId());
 				}
 			}
-		} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c8|*/
+		} catch (NoReviewSourceFolderException e) {
 			ExceptionHandler.handleNoReviewSourceFolderException();
-		}/*|r108|Malte|c8|?*/
+		}
 		monitor.worked(100);
 		monitor.done();
 	}

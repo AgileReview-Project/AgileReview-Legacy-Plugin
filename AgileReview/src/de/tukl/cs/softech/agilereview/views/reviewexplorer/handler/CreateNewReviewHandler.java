@@ -20,7 +20,7 @@ public class CreateNewReviewHandler extends AbstractHandler {
 		PluginLogger.log(this.getClass().toString(), "execute", "New Review Handler triggered");
 		
 		// Forward to wizard
-		new WizardDialog(HandlerUtil.getActiveShell(event), new NewReviewWizard()).open();/*?|r108|Thilo|c3|?*/
+		new WizardDialog(HandlerUtil.getActiveShell(event), new NewReviewWizard()).open();
 		
 		return null;
 	}

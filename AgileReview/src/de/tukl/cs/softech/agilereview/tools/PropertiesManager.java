@@ -236,7 +236,7 @@ public class PropertiesManager implements IInputValidator{
 		/**
 		 * Indicates whether the user should be asked to create a review folder if none exists. 
 		 */
-		public static String DO_NOT_ASK_FOR_REVIEW_FOLDER = "do_not_ask_for_review_folder";/*?|r108|Peter Reuter|c2|?*/
+		public static String DO_NOT_ASK_FOR_REVIEW_FOLDER = "do_not_ask_for_review_folder";
 		
 	}
 	
@@ -596,7 +596,7 @@ public class PropertiesManager implements IInputValidator{
 	 * @param key a static field of {@link PropertiesManager.INTERNAL_KEYS.ICONS}
 	 * @return an image displaying the icon represented by the key or null if there no image could be loaded
 	 */
-	public Image getIcon(String key) {/*?|r110|Malte|c3|*/
+	public Image getIcon(String key) {
 		return Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, getInternalProperty(key)).createImage();
-	}/*|r110|Malte|c3|?*/
+	}
 }

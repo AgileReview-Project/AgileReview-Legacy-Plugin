@@ -58,8 +58,8 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 							// Review is closed --> open it
 							PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be opened");
 							try {
-								ra.loadReviewComments(reviewId);/*?|r108|Malte|c21|*/
-								selectedWrap.setOpen(true);/*|r108|Malte|c21|?*/
+								ra.loadReviewComments(reviewId);
+								selectedWrap.setOpen(true);
 								pm.addToOpenReviews(reviewId);
 							} catch (NoReviewSourceFolderException e) {
 								ExceptionHandler.handleNoReviewSourceFolderException();

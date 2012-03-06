@@ -182,9 +182,9 @@ public class RefactoringAccess {
 	 * @throws CoreException
 	 */
 	private void saveToString(XmlTokenSource document, IFile file, boolean pre) throws IOException, CoreException {
-		StringWriter sw = new StringWriter();/*?|r111|Malte|c0|*/
+		StringWriter sw = new StringWriter();
 		document.save(sw, new XmlOptions().setSavePrettyPrint());
-		String str = new String(sw.getBuffer());/*|r111|Malte|c0|?*/
+		String str = new String(sw.getBuffer());
 		
 		//add xml declaration manually as this is not provided by document.save()
 		str = "<?xml version=\"1.0\" encoding=\"" + file.getCharset() + "\"?>" + System.getProperty("line.separator") + str;
@@ -262,7 +262,7 @@ public class RefactoringAccess {
 	private void loadAllComments() {
 		// Get all relevant folders in the review repository
 		try {
-			if (ra.isCurrentSourceValid()) {/*?|r108|Peter Reuter|c1|?*/
+			if (ra.isCurrentSourceValid()) {
 				IResource[] allFolders = ra.getCurrentSourceFolder().members();
 				// Iterate all folders
 				for (IResource currFolder : allFolders) {

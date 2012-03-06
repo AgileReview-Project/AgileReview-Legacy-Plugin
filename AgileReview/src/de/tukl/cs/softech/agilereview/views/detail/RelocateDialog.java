@@ -132,15 +132,15 @@ public class RelocateDialog extends Composite implements Listener {
 									ctv.addComment(newComment);
 									
 									//delete old comment
-									ra.deleteComment(oldComment);/*?|r108|Malte|c19|*/
-									ctv.deleteComment(oldComment);/*|r108|Malte|c19|?*/
+									ra.deleteComment(oldComment);
+									ctv.deleteComment(oldComment);
 									
 									//refresh views
 									ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER | ViewControl.COMMMENT_TABLE_VIEW, true);
 									ctv.selectComment(newComment);
-								} catch (NoReviewSourceFolderException e) {/*?|r108|Malte|c20|*/
+								} catch (NoReviewSourceFolderException e) {
 									ExceptionHandler.handleNoReviewSourceFolderException();
-								}/*|r108|Malte|c20|?*/
+								}
 							} else {
 								MessageDialog.openError(this.getShell(), "Comment Detail - Repositioning", "You cannot relocate this comment as the currently opened editor is not yet supported!");
 							}
