@@ -465,7 +465,13 @@ public class ReviewAccess {/* ?|r108|Malte|c1|? */
 					message += file.getLocation().toOSString() + "\n";
 				}
 				message += "\nThese files may be corrupted (i.e. empty). Please check them.";
-				MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not load files", message);
+				final String finalMessage = message;
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not load files", finalMessage);
+					}
+				});
 			}
 		} catch (final CoreException e) {
 			PluginLogger.logError(ReviewAccess.class.toString(), "loadAllComment", "CoreException while filling comment model", e);
