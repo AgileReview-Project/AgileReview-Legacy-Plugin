@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
@@ -77,13 +78,13 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 	 * A map representing the printed document of each file to be changed after the refactoring
 	 */
 	private Map<IFile, String> postDocs;
-
+	
 	@Override
 	protected boolean initialize(Object element) {
 		ra = new RefactoringAccess();
 		addRefactoringIssue(element, getArguments());
-
-		if(!ra.getFailedFiles().isEmpty()) {
+		
+		if (!ra.getFailedFiles().isEmpty()) {
 			//participate and display the error as otherwise the agile review files will be corrupted
 			return true;
 		} else {
@@ -91,13 +92,13 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			prevDocs = ra.getPrevDocuments();
 		}
 		
-		if(affectedFiles.isEmpty()) {
+		if (affectedFiles.isEmpty()) {
 			return false;
 		} else {
 			return true;
 		}
 	}
-
+	
 	/**
 	 * Adds a refactoring issue as this is a sharable participant it will be called for each renaming done within one user triggered refactoring
 	 * @param element to be refactored
@@ -107,19 +108,20 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 		
 		//check whether the given arguments are the right ones, otherwise leave this function
 		RenameArguments rArguments;
-		if(arguments instanceof RenameArguments) {
-			rArguments = (RenameArguments)arguments;
+		if (arguments instanceof RenameArguments) {
+			rArguments = (RenameArguments) arguments;
 		} else {
 			errorWhileInitialization = 1;
-			PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR7: Unknown refactoring Arguments: "+arguments.getClass());
+			PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR7: Unknown refactoring Arguments: "
+					+ arguments.getClass());
 			return;
 		}
 		
 		//determine information about the element to be renamed, such as oldPath, newPath, type(of IResource) and whether the sub folders should also be renamed
-		if(element instanceof IPackageFragment && !renameSubpackages) {
+		if (element instanceof IPackageFragment && !renameSubpackages) {
 			try {
-				this.element = ((IPackageFragment)element).getCorrespondingResource();
-				String convOldPath = ((IPackageFragment)element).getElementName().replaceAll("\\.", "/");
+				this.element = ((IPackageFragment) element).getCorrespondingResource();
+				String convOldPath = ((IPackageFragment) element).getElementName().replaceAll("\\.", "/");
 				String convNewPath = rArguments.getNewName().replaceAll("\\.", "/");
 				String finalPath = this.element.getFullPath().toString();
 				int i = finalPath.lastIndexOf(convOldPath);
@@ -128,14 +130,15 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 				String newTmp = new Path(finalPath).toOSString();
 				
 				// if the next refactoring issue is a refinement of the previous one, rename subpackages also
-				if(oldPath != null && newPath != null) {
-					if(oldTmp.startsWith(oldPath) && newTmp.startsWith(newPath)) {
+				if (oldPath != null && newPath != null) {
+					if (oldTmp.startsWith(oldPath) && newTmp.startsWith(newPath)) {
 						renameSubpackages = true;
 					} else {
 						//else should not occur (assumption on observation)
 						errorWhileInitialization = 6;
-						PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR6: Not managed situation (excluded by observation):" +
-								"\noldPath="+oldPath+"\noldTmp="+oldTmp+"\nnewPath="+newPath+"\nnewTmp="+newTmp);
+						PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue",
+								"Error code IR6: Not managed situation (excluded by observation):" + "\noldPath=" + oldPath + "\noldTmp=" + oldTmp
+										+ "\nnewPath=" + newPath + "\nnewTmp=" + newTmp);
 						return;
 					}
 				} else {
@@ -145,10 +148,11 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 				type = IResource.FOLDER;
 			} catch (JavaModelException e) {
 				errorWhileInitialization = 3;
-				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR3: JavaModelException while accessing: "+((IPackageFragmentRoot)element).getElementName(), e);
+				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR3: JavaModelException while accessing: "
+						+ ((IPackageFragmentRoot) element).getElementName(), e);
 				return;
 			}
-		} else if(element instanceof IResource) {
+		} else if (element instanceof IResource) {
 			this.element = (IResource) element;
 			
 			//When an IResource occurs, sub packages will be also refactored
@@ -156,37 +160,40 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			int i = oldPath.lastIndexOf(SystemProperties.getProperty("file.separator"));
 			newPath = new String(oldPath);
 			//subSequence i+1 because index is selected on last file.separator
-			newPath = newPath.replace(newPath.subSequence(i+1, newPath.length()), rArguments.getNewName());
+			newPath = newPath.replace(newPath.subSequence(i + 1, newPath.length()), rArguments.getNewName());
 			renameSubpackages = true;
 			
-			if(this.element instanceof IProject) {
+			if (this.element instanceof IProject) {
 				type = IResource.PROJECT;
-			} else if(this.element instanceof IFolder) {
+			} else if (this.element instanceof IFolder) {
 				type = IResource.FOLDER;
-			} else if(this.element instanceof IFile) {
+			} else if (this.element instanceof IFile) {
 				type = IResource.FILE;
 			} else {
 				errorWhileInitialization = 5;
-				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR5: Unknown IResource subtype: "+element.getClass());
+				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR5: Unknown IResource subtype: "
+						+ element.getClass());
 				return;
 			}
-		} else if(element instanceof IPackageFragmentRoot && !renameSubpackages) {
+		} else if (element instanceof IPackageFragmentRoot && !renameSubpackages) {
 			try {
-				this.element = ((IPackageFragmentRoot)element).getCorrespondingResource();
+				this.element = ((IPackageFragmentRoot) element).getCorrespondingResource();
 				oldPath = this.element.getFullPath().toOSString();
 				int i = oldPath.lastIndexOf(SystemProperties.getProperty("file.separator"));
 				newPath = new String(oldPath);
-				newPath = newPath.replace(newPath.subSequence(i+1, newPath.length()), rArguments.getNewName());
+				newPath = newPath.replace(newPath.subSequence(i + 1, newPath.length()), rArguments.getNewName());
 				type = IResource.FOLDER;
 				renameSubpackages = true;
 			} catch (JavaModelException e) {
 				errorWhileInitialization = 4;
-				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR4: JavaModelException while accessing: "+((IPackageFragmentRoot)element).getElementName(), e);
+				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR4: JavaModelException while accessing: "
+						+ ((IPackageFragmentRoot) element).getElementName(), e);
 				return;
 			}
 		} else {
 			errorWhileInitialization = 9;
-			PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Error code IR9: Unknown type of the element which should be refactored: "+element.getClass());
+			PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue",
+					"Error code IR9: Unknown type of the element which should be refactored: " + element.getClass());
 			return;
 		}
 	}
@@ -195,21 +202,23 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 	public void addElement(Object element, RefactoringArguments arguments) {
 		addRefactoringIssue(element, arguments);
 	}
-
+	
 	@Override
 	public String getName() {
 		return "AgileReview Rename Processor";
 	}
-
+	
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm, CheckConditionsContext context) throws OperationCanceledException {
 		
 		RefactoringStatus resultStatus = new RefactoringStatus();
 		
 		//when an error occurred during the initialization, abort the refactoring process
-		if(errorWhileInitialization != 0) {
-			PluginLogger.logWarning(getClass().toString(), "checkConditions", "An error occured during initialization (Code: IR"+errorWhileInitialization+").");
-			resultStatus.addWarning("An error occurred while accessing AgileReview files. (Code: IR"+errorWhileInitialization+") Continuing could corrupt AgileReview Comments!");
+		if (errorWhileInitialization != 0) {
+			PluginLogger.logWarning(getClass().toString(), "checkConditions", "An error occured during initialization (Code: IR"
+					+ errorWhileInitialization + ").");
+			resultStatus.addWarning("An error occurred while accessing AgileReview files. (Code: IR" + errorWhileInitialization
+					+ ") Continuing could corrupt AgileReview Comments!");
 			return resultStatus;
 		}
 		
@@ -219,8 +228,9 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 			PluginLogger.logError(this.getClass().toString(), "checkConditions", "Loading of files for refactoring lead to failures:\n");
 			for (Entry<IFile, Exception> entry : errorFiles.entrySet()) {
 				String location = entry.getKey().getLocation().toOSString();
-				resultStatus.addWarning("Could not load file "+location+"for Refactoring. Continuing could corrupt AgileReview Comments!");
-				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Could not load file "+location+"for Refactoring", entry.getValue());
+				resultStatus.addWarning("Could not load file " + location + "for Refactoring. Continuing could corrupt AgileReview Comments!");
+				PluginLogger.logError(this.getClass().toString(), "addRefactoringIssue", "Could not load file " + location + "for Refactoring", entry
+						.getValue());
 			}
 		}
 		
@@ -231,27 +241,31 @@ public class AuthorFileRenameParticipant extends RenameParticipant implements IS
 		try {
 			postDocs = ra.getPostDocumentsOfRefactoring(oldPath, newPath, type, renameSubpackages);
 		} catch (IOException e) {
-			resultStatus.addWarning("An error occured while accessing AgileReview data in order to simulate refactoring changes. (Code IR10) Continuing will corrupt AgileReview Comments!");
+			resultStatus
+					.addWarning("An error occured while accessing AgileReview data in order to simulate refactoring changes. (Code IR10) Continuing will corrupt AgileReview Comments!");
 			return resultStatus;
 		} catch (XmlException e) {
-			resultStatus.addWarning("An error occured while accessing AgileReview data in order to simulate refactoring changes. (Code IR11) Continuing will corrupt AgileReview Comments!");
+			resultStatus
+					.addWarning("An error occured while accessing AgileReview data in order to simulate refactoring changes. (Code IR11) Continuing will corrupt AgileReview Comments!");
+			return resultStatus;
+		} catch (CoreException e) {
+			resultStatus
+					.addWarning("An error occured while accessing AgileReview data in order to simulate refactoring changes. (Code IR12) Continuing will corrupt AgileReview Comments!");
 			return resultStatus;
 		}
 		
 		//when no warnings are captured -> add info "everything ok"
-		if(resultStatus.getEntries().length == 0) {
+		if (resultStatus.getEntries().length == 0) {
 			resultStatus.addInfo("AgileReview refactoring conditions valid.");
 		}
 		return resultStatus;
 	}
-
+	
 	@Override
 	public Change createChange(IProgressMonitor pm) throws OperationCanceledException {
 		
 		//no changes to be done if there was an error during initialization
-		if(errorWhileInitialization != 0) {
-			return null;
-		}
+		if (errorWhileInitialization != 0) { return null; }
 		
 		return RefactoringKit.createChange(affectedFiles, prevDocs, postDocs, this);
 	}

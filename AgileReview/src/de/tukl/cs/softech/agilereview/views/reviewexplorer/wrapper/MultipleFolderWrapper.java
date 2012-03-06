@@ -1,14 +1,14 @@
 package de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper;
 
-import agileReview.softech.tukl.de.FilesDocument.Files;
-import agileReview.softech.tukl.de.FolderDocument.Folder;
-import agileReview.softech.tukl.de.ProjectDocument.Project;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+
+import agileReview.softech.tukl.de.FilesDocument.Files;
+import agileReview.softech.tukl.de.FolderDocument.Folder;
+import agileReview.softech.tukl.de.ProjectDocument.Project;
 
 /**
  * Special implementation of {@link AbstractMultipleWrapper} for <folder> nodes

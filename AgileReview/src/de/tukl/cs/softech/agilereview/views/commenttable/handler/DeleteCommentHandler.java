@@ -12,6 +12,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -44,6 +46,8 @@ public class DeleteCommentHandler extends AbstractHandler {
 							ReviewAccess.getInstance().deleteComment(c);
 						} catch (IOException e) {
 							PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+c, e);
+						} catch (NoReviewSourceFolderException e) {
+							ExceptionHandler.handleNoReviewSourceFolderException();
 						}
 						// Refresh the Review Explorer
 						ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);

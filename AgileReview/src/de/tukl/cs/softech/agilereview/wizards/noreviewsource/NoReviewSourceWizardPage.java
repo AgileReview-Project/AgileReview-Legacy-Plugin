@@ -90,7 +90,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 		container.setLayout(layout);
 		
 		Label labelChoose = new Label(container, SWT.NONE);
-		labelChoose.setText("Please choose a AgileReview Source Folder:");
+		labelChoose.setText("Please choose a AgileReview Source Project:");
 	
 		comboChooseProject = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 		comboChooseProject.addListener(SWT.Modify, this);
@@ -138,7 +138,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
 	}
 	
 	/**
-	 * Fills the comboBoxes with the currently available AgileReview Source Folders.
+	 * Fills the comboBoxes with the currently available AgileReview Source Projects.
 	 * @param prefProject project which should be selected in the 'Choose Project' comboBox. If no special one should be selected, <code>null</code> can be given
 	 */
 	private void updateComboBoxes(String prefProject) {
@@ -191,7 +191,7 @@ import de.tukl.cs.softech.agilereview.wizards.newreviewsource.NewReviewSourceWiz
     private boolean validatePage() {
         String projectFieldContents = comboChooseProject.getText();
         if (projectFieldContents.isEmpty()) { //$NON-NLS-1$
-            setErrorMessage("Please select a AgileReview Source Folder to use");
+            setErrorMessage("Please select a AgileReview Source Project to use");
             return false;
         }
 

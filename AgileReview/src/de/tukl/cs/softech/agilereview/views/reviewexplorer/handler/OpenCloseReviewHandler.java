@@ -8,6 +8,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
@@ -32,16 +34,12 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 		ReviewAccess ra = ReviewAccess.getInstance();
 		ISelection sel1 = HandlerUtil.getCurrentSelection(event);
 		if (sel1 != null){
-			if (sel1 instanceof IStructuredSelection)
-			{
-				for (Object o: ((IStructuredSelection)sel1).toArray())
-				{	
-					if (o instanceof MultipleReviewWrapper)
-					{
+			if (sel1 instanceof IStructuredSelection) {
+				for (Object o: ((IStructuredSelection)sel1).toArray()) {	
+					if (o instanceof MultipleReviewWrapper) {
 						MultipleReviewWrapper selectedWrap = (MultipleReviewWrapper)o;
 						String reviewId = selectedWrap.getReviewId();
-						if (selectedWrap.isOpen())
-						{	
+						if (selectedWrap.isOpen()) {	
 							// Review is open --> close it
 							PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be closed");
 							selectedWrap.setOpen(false);
@@ -50,22 +48,22 @@ public class OpenCloseReviewHandler extends AbstractHandler {
 							
 							// Test if active review may have vanished
 							String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-							if (activeReview.equals(reviewId))
-							{
-								if (!ra.isReviewLoaded(reviewId))
-								{
+							if (activeReview.equals(reviewId))	{
+								if (!ra.isReviewLoaded(reviewId)) {
 									// Active review has vanished --> deactivate it
 									PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
 								}
 							}
-						}
-						else
-						{
+						} else {
 							// Review is closed --> open it
 							PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be opened");
-							selectedWrap.setOpen(true);
+							try {
 								ra.loadReviewComments(reviewId);
-							pm.addToOpenReviews(reviewId);
+								selectedWrap.setOpen(true);
+								pm.addToOpenReviews(reviewId);
+							} catch (NoReviewSourceFolderException e) {
+								ExceptionHandler.handleNoReviewSourceFolderException();
+							}
 						}	
 					}
 				}

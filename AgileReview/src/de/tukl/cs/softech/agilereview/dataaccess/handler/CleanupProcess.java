@@ -24,6 +24,8 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.annotations.TagCleaner;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 
@@ -33,13 +35,9 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class CleanupProcess implements IRunnableWithProgress {
 	
 	/**
-	 * Instance of PropertiesManager
-	 */
-	private static PropertiesManager pm = PropertiesManager.getInstance();
-	/**
 	 * Supported files mapping to the corresponding comment tags
 	 */
-	private static final HashMap<String, String[]> supportedFiles = pm.getParserFileendingsMappingTags();
+	private static final HashMap<String, String[]> supportedFiles = PropertiesManager.getParserFileendingsMappingTags();
 	/**
 	 * Instance of ReviewAccess
 	 */
@@ -79,48 +77,50 @@ public class CleanupProcess implements IRunnableWithProgress {
 		monitor.worked(10);
 		monitor.subTask("Loading all reviews...");
 		// load all comments for all reviews
-		ra.fillDatabaseCompletely();
-
+		try {
+			ra.fillDatabaseCompletely();
 		
-		// save all comments for the given project
-		for (Review r : reviews) {
-			comments.addAll(ra.getComments(r.getId(), selProjectPath));
-		}
-		
-		monitor.worked(20);
-		monitor.subTask("Searching for project files...");
-		// save the paths of all files of the project
-		paths.addAll(getFilesOfProject(selProject));
-		
-		monitor.worked(30);
-		monitor.subTask("Removing tags...");
-		// remove tags from files
-		PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from "+paths.toString());
-		for (String path : paths) {
-			IPath actPath = new Path(path);
-			if (!TagCleaner.removeAllTags(actPath)) {
-				throw new InterruptedException("Tags of file "+actPath.toOSString()+" not successfully removed!");
+			// save all comments for the given project
+			for (Review r : reviews) {
+				comments.addAll(ra.getComments(r.getId(), selProjectPath));
 			}
-		}
-		
-		monitor.worked(60);
-		// delete comments based on users decision
-		if (deleteComments) {
-			monitor.subTask("Deleting comments...");
-			PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
-			ra.deleteComments(comments);
-		}
-		
-		monitor.worked(90);
-		// unload closed reviews again
-		monitor.subTask("Unloading closed reviews...");
-		List<String> openReviews = Arrays.asList(PropertiesManager.getInstance().getOpenReviews());
-		for (Review r : reviews) {				
-			if (!openReviews.contains(r.getId())) {
-				ra.unloadReviewComments(r.getId());
+			
+			monitor.worked(20);
+			monitor.subTask("Searching for project files...");
+			// save the paths of all files of the project
+			paths.addAll(getFilesOfProject(selProject));
+			
+			monitor.worked(30);
+			monitor.subTask("Removing tags...");
+			// remove tags from files
+			PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from "+paths.toString());
+			for (String path : paths) {
+				IPath actPath = new Path(path);
+				if (!TagCleaner.removeAllTags(actPath)) {
+					throw new InterruptedException("Tags of file "+actPath.toOSString()+" not successfully removed!");
+				}
 			}
+			
+			monitor.worked(60);
+			// delete comments based on users decision
+			if (deleteComments) {
+				monitor.subTask("Deleting comments...");
+				PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
+				ra.deleteComments(comments);
+			}
+			
+			monitor.worked(90);
+			// unload closed reviews again
+			monitor.subTask("Unloading closed reviews...");
+			List<String> openReviews = Arrays.asList(PropertiesManager.getInstance().getOpenReviews());
+			for (Review r : reviews) {				
+				if (!openReviews.contains(r.getId())) {
+					ra.unloadReviewComments(r.getId());
+				}
+			}
+		} catch (NoReviewSourceFolderException e) {
+			ExceptionHandler.handleNoReviewSourceFolderException();
 		}
-
 		monitor.worked(100);
 		monitor.done();
 	}

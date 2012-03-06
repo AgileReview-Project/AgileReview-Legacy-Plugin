@@ -13,26 +13,22 @@ import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.annotations.ColorManager;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.preferences.fieldEditors.BorderedFieldEditor;
+import de.tukl.cs.softech.agilereview.preferences.fieldEditors.LinkField;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
- * This class represents a preference page that
- * is contributed to the Preferences dialog. By 
- * subclassing <samp>FieldEditorPreferencePage</samp>, we
- * can use the field support built into JFace that allows
- * us to create a page that is small and knows how to 
- * save, restore and apply itself.
- * <p>
- * This page is used to modify preferences only. They
- * are stored in the preference store that belongs to
- * the main plug-in class. That way, preferences can
+ * This class represents a preference page that is contributed to the Preferences dialog. By subclassing <samp>FieldEditorPreferencePage</samp>, we
+ * can use the field support built into JFace that allows us to create a page that is small and knows how to save, restore and apply itself. <p> This
+ * page is used to modify preferences only. They are stored in the preference store that belongs to the main plug-in class. That way, preferences can
  * be accessed directly via the preference store.
  */
 
@@ -42,25 +38,9 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	 * Textfield for author
 	 */
 	private StringFieldEditor strAuthorField;
+	
 	/**
-	 * Combobox for selecting the AgileReview source folder which should be used
-	 */
-	private ComboFieldEditor comboReviewProjectField;
-	/**
-	 * Checkbox for using Smart Suggestions
-	 */
-	private BooleanFieldEditor booleanSmartSuggestionsField;
-	/**
-	 * Textfield for xls-Template file (including change button)
-	 */
-	private FileFieldEditor fileExportTemplateField;
-	/**
-	 * Textfield for xls-export folder (including change button)
-	 */
-	private DirectoryFieldEditor directoryExportField;
-
-	/**
-	 * Creates the PreferencePage. 
+	 * Creates the PreferencePage.
 	 */
 	public AgileReviewPreferencePage() {
 		super(GRID);
@@ -69,21 +49,21 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 	}
 	
 	/**
-	 * Creates the field editors. Field editors are abstractions of
-	 * the common GUI blocks needed to manipulate various types
-	 * of preferences. Each field editor knows how to save and
-	 * restore itself.
+	 * Creates the field editors. Field editors are abstractions of the common GUI blocks needed to manipulate various types of preferences. Each
+	 * field editor knows how to save and restore itself.
 	 */
 	public void createFieldEditors() {
-	
+		
+		final PropertiesManager pm = PropertiesManager.getInstance();
+		
 		// Field for author
-		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "Author:", getFieldEditorParent()) {		
+		strAuthorField = new StringFieldEditor(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME, "Author:", getFieldEditorParent()) {
 			@Override
 			protected boolean doCheckState() {
-				String isValidReply = PropertiesManager.getInstance().isValid(this.getStringValue());
+				String isValidReply = pm.isValid(this.getStringValue());
 				this.setErrorMessage(isValidReply);
 				return (isValidReply == null);
-			}		
+			}
 		};
 		strAuthorField.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 		addField(strAuthorField);
@@ -94,7 +74,7 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		IProject[] projArr = workspaceRoot.getProjects();
 		for (IProject currProj : projArr) {
 			try {
-				if (currProj.hasNature(PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE))) {
+				if (currProj.hasNature(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE))) {
 					list.add(currProj.getName());
 				}
 			} catch (CoreException e) {
@@ -103,35 +83,50 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		}
 		
 		String[][] vals = new String[list.size()][2];
-		for (int i=0;i<list.size();i++){
+		for (int i = 0; i < list.size(); i++) {
 			vals[i][0] = list.get(i);
 			vals[i][1] = list.get(i);
 		}
-		comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, "Review source project:", vals,getFieldEditorParent());
+		
+		ComboFieldEditor comboReviewProjectField = new ComboFieldEditor(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, "Review source project:",
+				vals, getFieldEditorParent());
 		addField(comboReviewProjectField);
 		
 		// Checkbox for using Smart Suggestion
-		booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, "Use smart suggestion", getFieldEditorParent());
+		BooleanFieldEditor booleanSmartSuggestionsField = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED,
+				"Use smart suggestion", getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 		
+		// Grouping FieldEditor for export defaults
+		BorderedFieldEditor exportWrapper = new BorderedFieldEditor(getFieldEditorParent(), "Export Defaults");
+		Composite container = exportWrapper.getContainer();
+		
 		// Directory Browser for export folder
-		directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, "Default XLS export location:", getFieldEditorParent());
-		addField(directoryExportField);
+		DirectoryFieldEditor directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH,
+				"Default XLS export location:", container);
+		exportWrapper.addField(directoryExportField);
 		
 		// export template file
-		fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, "Default template for XLS export:", getFieldEditorParent());
-		fileExportTemplateField.setFileExtensions(new String[]{"*.xls*"});
-		addField(fileExportTemplateField);
+		FileFieldEditor fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH,
+				"Default template for XLS export:", container);
+		fileExportTemplateField.setFileExtensions(new String[] { "*.xls;*.xlsx" });
+		exportWrapper.addField(fileExportTemplateField);
 		
-		// link text
-		addField(new LinkField(getFieldEditorParent()));
+		// export templates link
+		exportWrapper.addField(new LinkField(container, "Follow this <a>link</a> for downloading an example template.", pm
+				.getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
+		
+		addField(exportWrapper);
+		
+		// donate button
+		addField(new LinkField(getFieldEditorParent(), pm.getIcon(PropertiesManager.INTERNAL_KEYS.ICONS.DONATE),
+				pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_DONATIONS)));
 	}
-
 	
 	// performApply() simply calls performOk (by default). As we need no additional behavior, we don't have to override it
 	
 	@Override
-	public boolean performOk(){
+	public boolean performOk() {
 		boolean result = super.performOk();
 		
 		//change IDE user for color management
@@ -146,10 +141,10 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		
 		return result;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
-	}	
+	}
 }

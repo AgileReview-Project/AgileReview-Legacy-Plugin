@@ -248,7 +248,7 @@ public class ExportReviewDataWizardPage extends WizardPage implements SelectionL
 
 				// Change the title bar text
 				dlg.setText("AgileReview Export");
-				String[] filterExtensions = {"*.xls*"};
+				String[] filterExtensions = {"*.xls;*.xlsx"};
 				dlg.setFilterExtensions(filterExtensions);
 
 				// Calling open() will open and run the dialog.

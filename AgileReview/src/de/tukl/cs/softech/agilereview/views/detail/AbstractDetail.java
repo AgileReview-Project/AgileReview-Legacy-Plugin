@@ -17,7 +17,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 
@@ -126,15 +128,19 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
 			
 			// save the change persistently
 			PluginLogger.log(this.getClass().toString(), "partClosedOrDeactivated", "trigger save event");
-			ReviewAccess.getInstance().save(this.editedObject);
-			ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW);
-						
-			this.backupObject = (E)this.editedObject.copy();
-
-			//get SourceProvider for configuration
-			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
-			SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-			sp.setVariable(SourceProvider.REVERTABLE, false);
+			try {
+				ReviewAccess.getInstance().save(this.editedObject);
+				ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW);
+							
+				this.backupObject = (E)this.editedObject.copy();
+	
+				//get SourceProvider for configuration
+				ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+				SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
+				sp.setVariable(SourceProvider.REVERTABLE, false);
+			} catch (NoReviewSourceFolderException e) {
+				ExceptionHandler.handleNoReviewSourceFolderException();
+			}
 		}
 	}
 	

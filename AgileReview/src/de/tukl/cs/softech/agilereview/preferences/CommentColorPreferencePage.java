@@ -8,14 +8,15 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
+import de.tukl.cs.softech.agilereview.preferences.fieldEditors.AuthorColorFieldEditor;
+import de.tukl.cs.softech.agilereview.preferences.fieldEditors.EnableContainerFieldEditor;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Preference page for controlling the color management of comments
  */
-public class CommentColorPreferencePage extends FieldEditorPreferencePage
-		implements IWorkbenchPreferencePage {
+public class CommentColorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	/**
 	 * Creates the preferences page for the comment color settings.
@@ -49,6 +50,7 @@ public class CommentColorPreferencePage extends FieldEditorPreferencePage
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean performOk(){
 		boolean result = super.performOk();

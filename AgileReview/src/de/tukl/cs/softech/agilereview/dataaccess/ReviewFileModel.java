@@ -30,34 +30,33 @@ class ReviewFileModel {
 	/**
 	 * Maps the files to the corresponding review document (for saving)
 	 */
-	private HashMap<IFile, ReviewDocument> xmlReviewDocuments = new HashMap<IFile, ReviewDocument>();
+	private final HashMap<IFile, ReviewDocument> xmlReviewDocuments = new HashMap<IFile, ReviewDocument>();
 	
 	/**
 	 * Maps the file-paths to the corresponding comment document (for saving)
 	 */
-	private HashMap<IFile, CommentsDocument> xmlCommentDocuments = new HashMap<IFile, CommentsDocument>(); 
-
+	private final HashMap<IFile, CommentsDocument> xmlCommentDocuments = new HashMap<IFile, CommentsDocument>();
 	
 	/**
-	 * Saving method for a given XML document / File pair 
+	 * Saving method for a given XML document / File pair
 	 * @param document
 	 * @param filePath
 	 * @throws IOException
 	 */
-	private void save(XmlTokenSource document, IFile filePath) throws IOException
-	{
+	private void save(XmlTokenSource document, IFile filePath) throws IOException {
 		document.save(filePath.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
 		try {
 			filePath.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (final CoreException e) {
-			PluginLogger.logError(ReviewAccess.class.toString(), "save", "CoreException while saving "+filePath.getLocation().toOSString(), e);
+			PluginLogger.logError(ReviewAccess.class.toString(), "save", "CoreException while saving " + filePath.getLocation().toOSString(), e);
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
 				public void run() {
-					MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could save AgileReview files", e.getLocalizedMessage());
-		}
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could save AgileReview files", e
+							.getLocalizedMessage());
+				}
 			});
-	}
+		}
 	}
 	
 	/**
@@ -66,15 +65,26 @@ class ReviewFileModel {
 	 */
 	private void deleteResource(final IResource delFile) {
 		try {
-			if(delFile instanceof IFile) {
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-				IEditorPart editor = ResourceUtil.findEditor(page, (IFile)delFile);
-				if(editor != null) {
-					page.closeEditor(editor, false);
-				}
-			delFile.delete(true, null);
-			} else if(delFile instanceof IFolder){
-				for(IResource r : ((IFolder)delFile).members()) {
+			if (delFile instanceof IFile) {
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						while (PlatformUI.getWorkbench() == null) {
+						}
+						while (PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
+						}
+						while (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {
+						}
+						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+						IEditorPart editor = ResourceUtil.findEditor(page, (IFile) delFile);
+						if (editor != null) {
+							page.closeEditor(editor, false);
+						}
+					}
+				});
+				delFile.delete(true, null);
+			} else if (delFile instanceof IFolder) {
+				for (IResource r : ((IFolder) delFile).members()) {
 					deleteResource(r);
 				}
 				delFile.delete(true, null);
@@ -85,11 +95,13 @@ class ReviewFileModel {
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
 				public void run() {
-					MessageDialog.openError(Display.getDefault().getActiveShell(), "Could not delete file or folder", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted.\n" +
-							"Please delete the file manually.\n\nReason:\n"+e.getLocalizedMessage());
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Could not delete file or folder", "File \""
+							+ delFile.getLocation().toOSString() + "\" could not be deleted.\n" + "Please delete the file manually.\n\nReason:\n"
+							+ e.getLocalizedMessage());
 				}
 			});
-			PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \""+delFile.getLocation().toOSString()+"\" could not be deleted", e);
+			PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \"" + delFile.getLocation().toOSString()
+					+ "\" could not be deleted", e);
 		}
 	}
 	
@@ -99,18 +111,14 @@ class ReviewFileModel {
 	
 	/**
 	 * Adds the given Xml document / File pair to this model
-	 * @param doc 
-	 * @param path 
+	 * @param doc
+	 * @param path
 	 */
-	void addXmlDocument(XmlTokenSource doc, IFile path)
-	{
-		if (doc instanceof ReviewDocument)
-		{
-			this.xmlReviewDocuments.put(path, (ReviewDocument)doc);
-		}
-		else if (doc instanceof CommentsDocument)
-		{
-			this.xmlCommentDocuments.put(path, (CommentsDocument)doc);
+	void addXmlDocument(XmlTokenSource doc, IFile path) {
+		if (doc instanceof ReviewDocument) {
+			this.xmlReviewDocuments.put(path, (ReviewDocument) doc);
+		} else if (doc instanceof CommentsDocument) {
+			this.xmlCommentDocuments.put(path, (CommentsDocument) doc);
 		}
 		
 	}
@@ -119,34 +127,32 @@ class ReviewFileModel {
 	 * Removes this file from the model
 	 * @param file
 	 */
-	void removeXmlDocument(IFile file)
-	{
+	void removeXmlDocument(IFile file) {
 		// Delete the given file
 		this.deleteResource(file);
 		// If it was a review-file, delete the whole review
-		if (this.xmlCommentDocuments.remove(file)==null && this.xmlReviewDocuments.remove(file)!=null)
-		{
+		if (this.xmlCommentDocuments.remove(file) == null && this.xmlReviewDocuments.remove(file) != null) {
 			// Get the parent Folder
 			IResource delFolder = file.getParent();
 			
 			// Delete all files in the review folder
 			if (delFolder instanceof IFolder) {
 				try {
-					for (IResource f : ((IFolder)delFolder).members())
-					{
-						if (f instanceof IFile)
-						this.removeXmlDocument((IFile)f);
+					for (IResource f : ((IFolder) delFolder).members()) {
+						if (f instanceof IFile) this.removeXmlDocument((IFile) f);
 					}
 				} catch (final CoreException e) {
-					PluginLogger.logError(this.getClass().toString(), "removeXmlDocument", "CoreException while removing sibling files of "+file.getLocation().toOSString()+" from model", e);
+					PluginLogger.logError(this.getClass().toString(), "removeXmlDocument", "CoreException while removing sibling files of "
+							+ file.getLocation().toOSString() + " from model", e);
 					Display.getDefault().syncExec(new Runnable() {
 						@Override
 						public void run() {
-							MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not delete AgileReview files", e.getLocalizedMessage());
-				}
+							MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could not delete AgileReview files", e
+									.getLocalizedMessage());
+						}
 					});
 				}
-
+				
 				// Delete the folder afterwards
 				this.deleteResource(delFolder);
 			}
@@ -156,8 +162,7 @@ class ReviewFileModel {
 	/**
 	 * Clears this model
 	 */
-	void clearModel()
-	{
+	void clearModel() {
 		PluginLogger.log(this.getClass().toString(), "clearModel", "Review and Comment file model cleared");
 		this.xmlReviewDocuments.clear();
 		this.xmlCommentDocuments.clear();
@@ -168,19 +173,16 @@ class ReviewFileModel {
 	 * @param f
 	 * @throws IOException
 	 */
-	void save(IFile f) throws IOException
-	{
+	void save(IFile f) throws IOException {
 		XmlTokenSource document = null;
 		// Try comment-file
 		document = this.xmlCommentDocuments.get(f);
-		if (document == null)
-		{
+		if (document == null) {
 			document = this.xmlReviewDocuments.get(f);
 		}
 		
-		if (document != null)
-		{
-			this.save(document, f);	
+		if (document != null) {
+			this.save(document, f);
 		}
 	}
 	
@@ -188,17 +190,14 @@ class ReviewFileModel {
 	 * Saves all files of this model
 	 * @throws IOException
 	 */
-	void saveAll() throws IOException
-	{
+	void saveAll() throws IOException {
 		// First the reviews
-		for (Entry<IFile, ReviewDocument> currEntry :this.xmlReviewDocuments.entrySet())
-		{
+		for (Entry<IFile, ReviewDocument> currEntry : this.xmlReviewDocuments.entrySet()) {
 			this.save(currEntry.getValue(), currEntry.getKey());
 		}
 		
 		// Then the comments
-		for (Entry<IFile, CommentsDocument> currEntry :this.xmlCommentDocuments.entrySet())
-		{
+		for (Entry<IFile, CommentsDocument> currEntry : this.xmlCommentDocuments.entrySet()) {
 			this.save(currEntry.getValue(), currEntry.getKey());
 		}
 	}
@@ -217,11 +216,10 @@ class ReviewFileModel {
 	
 	/**
 	 * Returns the Comments document which is represented by the given file
-	 * @param file 
+	 * @param file
 	 * @return Comments document represented by this file
 	 */
-	CommentsDocument getCommentsDoc(IFile file)
-	{
+	CommentsDocument getCommentsDoc(IFile file) {
 		return this.xmlCommentDocuments.get(file);
 	}
 	
@@ -230,8 +228,7 @@ class ReviewFileModel {
 	 * @param file
 	 * @return <i>true</i> if this file is stored in this model, <i>false</i> otherwise
 	 */
-	boolean containsFile(IFile file)
-	{
+	boolean containsFile(IFile file) {
 		return this.xmlCommentDocuments.containsKey(file) || this.xmlReviewDocuments.containsKey(file);
 	}
 	
@@ -239,8 +236,7 @@ class ReviewFileModel {
 	 * Returns all stored CommentsDocuments
 	 * @return all stored CommentsDocuments
 	 */
-	Collection<CommentsDocument> getAllCommentsDocument()
-	{
+	Collection<CommentsDocument> getAllCommentsDocument() {
 		return this.xmlCommentDocuments.values();
 	}
 	
@@ -248,8 +244,7 @@ class ReviewFileModel {
 	 * Returns all stored ReviewDocuments
 	 * @return all stored ReviewDocuments
 	 */
-	Collection<ReviewDocument> getAllReviewDocument()
-	{
+	Collection<ReviewDocument> getAllReviewDocument() {
 		return this.xmlReviewDocuments.values();
 	}
 }

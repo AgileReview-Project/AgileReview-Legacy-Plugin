@@ -21,7 +21,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import agileReview.softech.tukl.de.ReviewDocument.Review;
-import de.tukl.cs.softech.agilereview.Activator;
 import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -102,7 +101,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
 	    reference.addFocusListener(this);
 	    
 	    referenceButton = new Button(this, SWT.PUSH );
-	    referenceButton.setImage(Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons"+System.getProperty("file.separator")+"discovery.gif").createImage());
+	    referenceButton.setImage(PropertiesManager.getInstance().getIcon(PropertiesManager.INTERNAL_KEYS.ICONS.BROWSE));
 	    gridData = new GridData();
 	    gridData.horizontalAlignment = GridData.END;
 	    referenceButton.setLayoutData(gridData);

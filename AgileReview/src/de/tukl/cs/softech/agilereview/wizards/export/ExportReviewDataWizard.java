@@ -21,10 +21,6 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 
 	/**
-	 * Instance of PropertiesManager
-	 */
-	private static PropertiesManager pm = PropertiesManager.getInstance();
-	/**
 	 * The first and sole page of the wizard 
 	 */
 	private ExportReviewDataWizardPage page1 = new ExportReviewDataWizardPage();
@@ -68,7 +64,7 @@ public class ExportReviewDataWizard extends Wizard implements IWorkbenchWizard {
 			pmd.run(true, false, new XSLExport(page1.getSelectedReviews(), page1.getTemplatePath(), page1.getExportPath()));
 			pmd.close();
 			if(page1.isSavePathAsDefault()) {
-				pm.setDefaultExportPaths(page1.getTemplatePath(), page1.getExportPath());
+				PropertiesManager.setDefaultExportPaths(page1.getTemplatePath(), page1.getExportPath());
 			}
 		} catch (InvocationTargetException e) {
 			PluginLogger.logError(this.getClass().toString(),"performFinish", "InvocationTargetException", e);

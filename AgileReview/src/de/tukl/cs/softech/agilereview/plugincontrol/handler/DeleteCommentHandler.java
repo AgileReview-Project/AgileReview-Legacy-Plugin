@@ -20,6 +20,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.CommentChooserDialog;
+import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
@@ -31,10 +33,6 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 public class DeleteCommentHandler extends AbstractHandler {
 	
 	/**
-	 * Instance of ReviewAccess
-	 */
-	private ReviewAccess ra = ReviewAccess.getInstance();
-	/**
 	 * Instance of PropertiesManager
 	 */
 	private PropertiesManager pm = PropertiesManager.getInstance();
@@ -42,7 +40,7 @@ public class DeleteCommentHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PluginLogger.log(this.getClass().toString(), "execute", "\"Delete Comment in Editor\" triggered");
-		
+		ReviewAccess ra = ReviewAccess.getInstance();
 		IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
 		if (editorPart instanceof ITextEditor) {
 			ISelection sel = ((ITextEditor)editorPart).getSelectionProvider().getSelection();
@@ -102,6 +100,8 @@ public class DeleteCommentHandler extends AbstractHandler {
 						ra.deleteComment(c);
 					} catch (IOException e) {
 						PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: "+c, e);
+					} catch (NoReviewSourceFolderException e) {
+						ExceptionHandler.handleNoReviewSourceFolderException();
 					}
 					// Refresh the Review Explorer
 					ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
