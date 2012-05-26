@@ -33,7 +33,7 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
  * Cleanup handler for Review specific Cleanups
  * @author Malte Brunnlieb (25.05.2012)
  */
-public class CleanupHandler extends AbstractHandler {
+public class CleanupHandler extends AbstractHandler {/*?|r120|Malte|c0|?*/
     
     /* (non-Javadoc)
      * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
