@@ -28,7 +28,7 @@ public class CleanupProcess implements IRunnableWithProgress {/*?|r120|Malte|c1|
     /**
      * Instance of ReviewAccess
      */
-    private static ReviewAccess ra = ReviewAccess.getInstance();
+    private static ReviewAccess ra = ReviewAccess.getInstance();/*?|r120|Thilo|c0|?*/
     /**
      * the review to clean
      */
