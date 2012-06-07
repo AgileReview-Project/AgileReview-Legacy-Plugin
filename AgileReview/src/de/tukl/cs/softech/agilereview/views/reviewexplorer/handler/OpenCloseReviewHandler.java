@@ -5,10 +5,13 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -16,61 +19,70 @@ import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
- * Handler for opening or closing the reviews selected in the ReviewExplorer
- * Active when: ReviewExplorer is activePart
- * Enabled when: arbitrary number of MultipleReviewWrappers are selected
+ * Handler for opening or closing the reviews selected in the ReviewExplorer Active when: ReviewExplorer is activePart Enabled when: arbitrary number
+ * of MultipleReviewWrappers are selected
  */
 public class OpenCloseReviewHandler extends AbstractHandler {
-	
-	/**
-	 * Instance of PropertiesManager
-	 */
-	private PropertiesManager pm = PropertiesManager.getInstance();
-	
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		PluginLogger.log(this.getClass().toString(), "execute", "\"Open/Close in ReviewExplorer selected review\" triggered");
-		ReviewAccess ra = ReviewAccess.getInstance();
-		ISelection sel1 = HandlerUtil.getCurrentSelection(event);
-		if (sel1 != null){
-			if (sel1 instanceof IStructuredSelection) {
-				for (Object o: ((IStructuredSelection)sel1).toArray()) {	
-					if (o instanceof MultipleReviewWrapper) {
-						MultipleReviewWrapper selectedWrap = (MultipleReviewWrapper)o;
-						String reviewId = selectedWrap.getReviewId();
-						if (selectedWrap.isOpen()) {	
-							// Review is open --> close it
-							PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be closed");
-							selectedWrap.setOpen(false);
-							ra.unloadReviewComments(reviewId);
-							pm.removeFromOpenReviews(reviewId);
-							
-							// Test if active review may have vanished
-							String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-							if (activeReview.equals(reviewId))	{
-								if (!ra.isReviewLoaded(reviewId)) {
-									// Active review has vanished --> deactivate it
-									PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-								}
-							}
-						} else {
-							// Review is closed --> open it
-							PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review "+selectedWrap.getReviewId()+" will be opened");
-							try {
-								ra.loadReviewComments(reviewId);
-								selectedWrap.setOpen(true);
-								pm.addToOpenReviews(reviewId);
-							} catch (NoReviewSourceFolderException e) {
-								ExceptionHandler.handleNoReviewSourceFolderException();
-							}
-						}	
-					}
-				}
-				ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
-				ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW, true);
-			}
-		}
-		return null;
-	}
+    
+    /**
+     * Instance of PropertiesManager
+     */
+    private final PropertiesManager pm = PropertiesManager.getInstance();
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        PluginLogger.log(this.getClass().toString(), "execute", "\"Open/Close in ReviewExplorer selected review\" triggered");
+        ReviewAccess ra = ReviewAccess.getInstance();
+        ISelection sel1 = HandlerUtil.getCurrentSelection(event);
+        if (sel1 != null) {
+            if (sel1 instanceof IStructuredSelection) {
+                boolean containsClosedReview = false;/*?|r122|Malte|c1|?*/
+                for (Object o : ((IStructuredSelection) sel1).toArray()) {
+                    if (o instanceof MultipleReviewWrapper) {
+                        MultipleReviewWrapper selectedWrap = (MultipleReviewWrapper) o;
+                        String reviewId = selectedWrap.getReviewId();
+                        if (selectedWrap.isOpen()) {
+                            // Review is open --> close it
+                            PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review " + selectedWrap.getReviewId()
+                                    + " will be closed");
+                            selectedWrap.setOpen(false);
+                            ra.unloadReviewComments(reviewId);
+                            pm.removeFromOpenReviews(reviewId);
+                            
+                            // Test if active review may have vanished
+                            String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+                            if (activeReview.equals(reviewId)) {
+                                if (!ra.isReviewLoaded(reviewId)) {
+                                    // Active review has vanished --> deactivate it
+                                    PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+                                }
+                            }
+                            containsClosedReview = containsClosedReview | true;/*?|r122|Malte|c2|?*/
+                        } else {
+                            // Review is closed --> open it
+                            PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review " + selectedWrap.getReviewId()
+                                    + " will be opened");
+                            try {
+                                ra.loadReviewComments(reviewId);
+                                selectedWrap.setOpen(true);
+                                pm.addToOpenReviews(reviewId);
+                                containsClosedReview = containsClosedReview | false;/*?|r122|Malte|c3|?*/
+                            } catch (NoReviewSourceFolderException e) {
+                                ExceptionHandler.handleNoReviewSourceFolderException();
+                            }
+                        }
+                    }
+                }
+                
+                ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(/*?|r122|Malte|c0|*/
+                ISourceProviderService.class);
+                SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTAINS_CLOSED_REVIEW);
+                sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);/*|r122|Malte|c0|?*/
+                
+                ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
+                ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW, true);
+            }
+        }
+        return null;
+    }
 }
