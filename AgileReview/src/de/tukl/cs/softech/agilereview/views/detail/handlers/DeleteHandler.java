@@ -92,11 +92,10 @@ public class DeleteHandler extends AbstractHandler {
         
         ReviewAccess ra = ReviewAccess.getInstance();
         try {
-            ra.deleteComment(comment);
-            
             if (ViewControl.isOpen(CommentTableView.class)) {
                 CommentTableView.getInstance().deleteComment(comment);
             }
+            ra.deleteComment(comment);
         } catch (IOException e) {
             PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: " + comment,
                     e);

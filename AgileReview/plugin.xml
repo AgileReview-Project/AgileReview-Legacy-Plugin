@@ -1017,16 +1017,32 @@
          commandId="de.tukl.cs.softech.agilereview.cleanup">
       <activeWhen>
          <with
-               variable="selection">
-            <iterate>
-               <or>
+               variable="activePart">
+            <instanceof
+                  value="de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer">
+            </instanceof>
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <and>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
                   <instanceof
                         value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
                   </instanceof>
-               </or>
-            </iterate>
-         </with>
-      </activeWhen>
+               </iterate>
+            </with>
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.export.variables.containsClosedReview">
+               <equals
+                     value="false">
+               </equals>
+            </with>
+         </and>
+      </enabledWhen>
    </handler>
 </extension>
 <extension

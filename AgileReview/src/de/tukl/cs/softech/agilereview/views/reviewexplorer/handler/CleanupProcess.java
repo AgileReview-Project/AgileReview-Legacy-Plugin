@@ -23,12 +23,8 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 /**
  * Class that performs the cleanup process
  */
-public class CleanupProcess implements IRunnableWithProgress {/*?|r120|Malte|c1|?*/
+public class CleanupProcess implements IRunnableWithProgress {
     
-    /**
-     * Instance of ReviewAccess
-     */
-    private static ReviewAccess ra = ReviewAccess.getInstance();
     /**
      * the review to clean
      */
@@ -50,6 +46,8 @@ public class CleanupProcess implements IRunnableWithProgress {/*?|r120|Malte|c1|
     
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+        ReviewAccess ra = ReviewAccess.getInstance();
+        
         monitor.beginTask("Performing cleanup: ", 100);
         monitor.worked(0);
         

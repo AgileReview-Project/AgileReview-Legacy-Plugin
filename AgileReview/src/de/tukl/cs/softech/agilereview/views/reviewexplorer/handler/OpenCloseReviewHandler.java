@@ -5,10 +5,13 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
+import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
@@ -33,6 +36,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
         ISelection sel1 = HandlerUtil.getCurrentSelection(event);
         if (sel1 != null) {
             if (sel1 instanceof IStructuredSelection) {
+                boolean containsClosedReview = false;
                 for (Object o : ((IStructuredSelection) sel1).toArray()) {
                     if (o instanceof MultipleReviewWrapper) {
                         MultipleReviewWrapper selectedWrap = (MultipleReviewWrapper) o;
@@ -53,6 +57,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
                                     PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
                                 }
                             }
+                            containsClosedReview = containsClosedReview | true;
                         } else {
                             // Review is closed --> open it
                             PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review " + selectedWrap.getReviewId()
@@ -61,12 +66,19 @@ public class OpenCloseReviewHandler extends AbstractHandler {
                                 ra.loadReviewComments(reviewId);
                                 selectedWrap.setOpen(true);
                                 pm.addToOpenReviews(reviewId);
+                                containsClosedReview = containsClosedReview | false;
                             } catch (NoReviewSourceFolderException e) {
                                 ExceptionHandler.handleNoReviewSourceFolderException();
                             }
                         }
                     }
                 }
+                
+                ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
+                ISourceProviderService.class);
+                SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTAINS_CLOSED_REVIEW);
+                sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
+                
                 ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
                 ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW, true);
             }
