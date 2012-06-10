@@ -36,7 +36,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
         ISelection sel1 = HandlerUtil.getCurrentSelection(event);
         if (sel1 != null) {
             if (sel1 instanceof IStructuredSelection) {
-                boolean containsClosedReview = false;/*?|r122|Malte|c1|?*/
+                boolean containsClosedReview = false;
                 for (Object o : ((IStructuredSelection) sel1).toArray()) {
                     if (o instanceof MultipleReviewWrapper) {
                         MultipleReviewWrapper selectedWrap = (MultipleReviewWrapper) o;
@@ -57,7 +57,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
                                     PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
                                 }
                             }
-                            containsClosedReview = containsClosedReview | true;/*?|r122|Malte|c2|?*/
+                            containsClosedReview = containsClosedReview | true;
                         } else {
                             // Review is closed --> open it
                             PluginLogger.log(this.getClass().toString(), "openCloseReview", "Review " + selectedWrap.getReviewId()
@@ -66,7 +66,7 @@ public class OpenCloseReviewHandler extends AbstractHandler {
                                 ra.loadReviewComments(reviewId);
                                 selectedWrap.setOpen(true);
                                 pm.addToOpenReviews(reviewId);
-                                containsClosedReview = containsClosedReview | false;/*?|r122|Malte|c3|?*/
+                                containsClosedReview = containsClosedReview | false;
                             } catch (NoReviewSourceFolderException e) {
                                 ExceptionHandler.handleNoReviewSourceFolderException();
                             }
@@ -74,10 +74,10 @@ public class OpenCloseReviewHandler extends AbstractHandler {
                     }
                 }
                 
-                ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(/*?|r122|Malte|c0|*/
+                ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
                 ISourceProviderService.class);
                 SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTAINS_CLOSED_REVIEW);
-                sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);/*|r122|Malte|c0|?*/
+                sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
                 
                 ViewControl.refreshViews(ViewControl.REVIEW_EXPLORER);
                 ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW, true);

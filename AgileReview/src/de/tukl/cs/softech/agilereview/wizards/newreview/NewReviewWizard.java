@@ -66,7 +66,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
                     ReviewExplorer.getInstance().addReview(newRev);
                 }
                 
-                ReviewAccess.getInstance().save(newRev);/*?|r127|mbrunnli|c0|?*/
+                ReviewAccess.getInstance().save(newRev);
                 
                 result = true;
             }
