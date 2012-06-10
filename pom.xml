@@ -29,6 +29,6 @@
     </repository>
   </repositories>
   <properties>
-    <trunk.version>0.8.1</trunk.version>
+    <trunk.version>0.8.2</trunk.version>
   </properties>
 </project>
