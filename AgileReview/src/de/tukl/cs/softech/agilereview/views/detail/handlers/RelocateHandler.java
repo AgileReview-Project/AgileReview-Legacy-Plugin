@@ -11,12 +11,12 @@ import de.tukl.cs.softech.agilereview.views.detail.DetailView;
  * This handler handles the repositioning action of the comment detail view
  */
 public class RelocateHandler extends AbstractHandler {
-	
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if(ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().relocateComment();
-		}
-		return null;
-	}
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        if (ViewControl.isOpen(DetailView.class)) {
+            DetailView.getInstance().relocateComment();
+        }
+        return null;
+    }
 }

@@ -18,29 +18,26 @@ import de.tukl.cs.softech.agilereview.wizards.export.ExportReviewDataWizard;
  * Handler for exporting selected reviews in the ReviewExplorer
  */
 public class ExportHandler extends AbstractHandler {
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		PluginLogger.log(this.getClass().toString(), "execute", "\"Export in ReviewExplorer\" triggered");
-		
-		ISelection sel = HandlerUtil.getCurrentSelection(event);
-		if (!sel.isEmpty() && sel instanceof IStructuredSelection) {
-			HashSet<String> selReviewIds = new HashSet<String>();
-			for (Object o: ((IStructuredSelection)sel).toArray())
-			{	
-				if (o instanceof MultipleReviewWrapper)
-				{
-					selReviewIds.add(((MultipleReviewWrapper)o).getReviewId());
-				}
-			}
-			
-			// Call export wizard with parameter
-			WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), new ExportReviewDataWizard(selReviewIds));
-			dialog.open();
-		}
-		
-		
-		return null;
-	}
-
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        PluginLogger.log(this.getClass().toString(), "execute", "\"Export in ReviewExplorer\" triggered");
+        
+        ISelection sel = HandlerUtil.getCurrentSelection(event);
+        if (!sel.isEmpty() && sel instanceof IStructuredSelection) {
+            HashSet<String> selReviewIds = new HashSet<String>();
+            for (Object o : ((IStructuredSelection) sel).toArray()) {
+                if (o instanceof MultipleReviewWrapper) {
+                    selReviewIds.add(((MultipleReviewWrapper) o).getReviewId());
+                }
+            }
+            
+            // Call export wizard with parameter
+            WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), new ExportReviewDataWizard(selReviewIds));
+            dialog.open();
+        }
+        
+        return null;
+    }
+    
 }

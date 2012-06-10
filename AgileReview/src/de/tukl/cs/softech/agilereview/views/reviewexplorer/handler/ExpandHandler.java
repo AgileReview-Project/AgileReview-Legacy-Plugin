@@ -12,25 +12,24 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 
 /**
- *	This handler takes care of the command for selective expand of all sub nodes 
- *  of a given node in the ReviewExplorer
+ * This handler takes care of the command for selective expand of all sub nodes of a given node in the ReviewExplorer
  */
 public class ExpandHandler extends AbstractHandler {
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		if(selection != null) {
-			if(selection instanceof IStructuredSelection) {
-				for(Object o : ((IStructuredSelection)selection).toArray()) {
-					if(o instanceof AbstractMultipleWrapper) {
-						if(ViewControl.isOpen(ReviewExplorer.class)) {
-							ReviewExplorer.getInstance().expandAllSubNodes((AbstractMultipleWrapper)o);
-						}
-					}
-				}
-			}
-		}
-		return null;
-	}
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        ISelection selection = HandlerUtil.getCurrentSelection(event);
+        if (selection != null) {
+            if (selection instanceof IStructuredSelection) {
+                for (Object o : ((IStructuredSelection) selection).toArray()) {
+                    if (o instanceof AbstractMultipleWrapper) {
+                        if (ViewControl.isOpen(ReviewExplorer.class)) {
+                            ReviewExplorer.getInstance().expandAllSubNodes((AbstractMultipleWrapper) o);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

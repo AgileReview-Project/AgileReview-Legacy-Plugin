@@ -9,20 +9,19 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizard;
 
 /**
- * Handler for switching the Review Source Project in the Review Explorer. 
- * This Handler simply opens the preferences dialog.
+ * Handler for switching the Review Source Project in the Review Explorer. This Handler simply opens the preferences dialog.
  */
 public class SwitchReviewSourceProjectHandler extends AbstractHandler {
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		//TODO get this from Properties (externalize Strings?)
-		NoReviewSourceWizard dialog = new NoReviewSourceWizard();
-		WizardDialog wDialog = new WizardDialog(HandlerUtil.getActiveShell(event), dialog);
-		wDialog.setBlockOnOpen(true);
-		wDialog.open();
-	
-		return null;
-	}
-
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        //TODO get this from Properties (externalize Strings?)
+        NoReviewSourceWizard dialog = new NoReviewSourceWizard();
+        WizardDialog wDialog = new WizardDialog(HandlerUtil.getActiveShell(event), dialog);
+        wDialog.setBlockOnOpen(true);
+        wDialog.open();
+        
+        return null;
+    }
+    
 }

@@ -23,51 +23,51 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  * Compute and reveal the next visible comment in the document
  */
 public class NextCommentInDocumentHandler extends AbstractHandler {
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		PluginLogger.log(this.getClass().toString(), "execute", "\"Next Comment In Document\" triggered");
-		IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
-		if (editorPart instanceof ITextEditor) {
-			ISelection sel = ((ITextEditor)editorPart).getSelectionProvider().getSelection();
-			if (sel instanceof ITextSelection) {
-				ITextSelection textSel = (ITextSelection)sel;
-				Position p = new Position(textSel.getOffset(), textSel.getLength());
-				
-				Position nextComment = null;
-				if (ViewControl.isOpen(CommentTableView.class)) {
-					nextComment = CommentTableView.getInstance().getNextCommentPosition(p);
-				}
-				
-				//TODO inform user that he has reached the bottom and ask for starting anew at the first comment
-				if (nextComment!=null) {
-					((ITextEditor) editorPart).selectAndReveal(nextComment.getOffset(), 0);
-				}
-				
-				String command = "de.tukl.cs.softech.agilereview.showComment";
-				IHandlerService handlerService = (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
-				try {
-					// the "showComment" can be executed, as we are required to be in the handler
-					if (handlerService != null) {
-						handlerService.executeCommand(command, null);	
-					} else {
-						PluginLogger.logError(this.getClass().toString(), "execute", "Unexpected error: handlerserivce is \"null\"");
-					}
-				} catch (ExecutionException e) {
-					PluginLogger.logError(this.getClass().toString(), "execute", "Problems occured executing command \""+command+"\"", e);
-					// if "showComment" throws an ExecutionException it will be forwarded
-					throw e;
-				} catch (NotDefinedException e) {
-					PluginLogger.logError(this.getClass().toString(), "execute", "Command \""+command+"\" is not defined", e);
-				} catch (NotEnabledException e) {
-					PluginLogger.logError(this.getClass().toString(), "execute", "Command \""+command+"\" is not enabled", e);
-				} catch (NotHandledException e) {
-					PluginLogger.logError(this.getClass().toString(), "execute", "Command \""+command+"\" is not handled", e);
-				}
-			}
-		}
-
-		return null;
-	}
-
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        PluginLogger.log(this.getClass().toString(), "execute", "\"Next Comment In Document\" triggered");
+        IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
+        if (editorPart instanceof ITextEditor) {
+            ISelection sel = ((ITextEditor) editorPart).getSelectionProvider().getSelection();
+            if (sel instanceof ITextSelection) {
+                ITextSelection textSel = (ITextSelection) sel;
+                Position p = new Position(textSel.getOffset(), textSel.getLength());
+                
+                Position nextComment = null;
+                if (ViewControl.isOpen(CommentTableView.class)) {
+                    nextComment = CommentTableView.getInstance().getNextCommentPosition(p);
+                }
+                
+                //TODO inform user that he has reached the bottom and ask for starting anew at the first comment
+                if (nextComment != null) {
+                    ((ITextEditor) editorPart).selectAndReveal(nextComment.getOffset(), 0);
+                }
+                
+                String command = "de.tukl.cs.softech.agilereview.showComment";
+                IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+                try {
+                    // the "showComment" can be executed, as we are required to be in the handler
+                    if (handlerService != null) {
+                        handlerService.executeCommand(command, null);
+                    } else {
+                        PluginLogger.logError(this.getClass().toString(), "execute", "Unexpected error: handlerserivce is \"null\"");
+                    }
+                } catch (ExecutionException e) {
+                    PluginLogger.logError(this.getClass().toString(), "execute", "Problems occured executing command \"" + command + "\"", e);
+                    // if "showComment" throws an ExecutionException it will be forwarded
+                    throw e;
+                } catch (NotDefinedException e) {
+                    PluginLogger.logError(this.getClass().toString(), "execute", "Command \"" + command + "\" is not defined", e);
+                } catch (NotEnabledException e) {
+                    PluginLogger.logError(this.getClass().toString(), "execute", "Command \"" + command + "\" is not enabled", e);
+                } catch (NotHandledException e) {
+                    PluginLogger.logError(this.getClass().toString(), "execute", "Command \"" + command + "\" is not handled", e);
+                }
+            }
+        }
+        
+        return null;
+    }
+    
 }

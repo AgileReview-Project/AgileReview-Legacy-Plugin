@@ -12,14 +12,14 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  * Handler for jumping to the filter comment field in the CommentTableView
  */
 public class FilterCommentsHandler extends AbstractHandler {
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		PluginLogger.log(this.getClass().toString(), "execute", "Command \"Filter comments\" triggered");
-		if(ViewControl.isOpen(CommentTableView.class)) {
-			CommentTableView.getInstance().focusFilterField();
-		}
-		return null;
-	}
-
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        PluginLogger.log(this.getClass().toString(), "execute", "Command \"Filter comments\" triggered");
+        if (ViewControl.isOpen(CommentTableView.class)) {
+            CommentTableView.getInstance().focusFilterField();
+        }
+        return null;
+    }
+    
 }

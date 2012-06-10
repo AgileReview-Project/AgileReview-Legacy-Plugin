@@ -13,16 +13,16 @@ import de.tukl.cs.softech.agilereview.wizards.newreview.NewReviewWizard;
  * Handler for Creating a new review
  */
 public class CreateNewReviewHandler extends AbstractHandler {
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-	
-		PluginLogger.log(this.getClass().toString(), "execute", "New Review Handler triggered");
-		
-		// Forward to wizard
-		new WizardDialog(HandlerUtil.getActiveShell(event), new NewReviewWizard()).open();
-		
-		return null;
-	}
-
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        
+        PluginLogger.log(this.getClass().toString(), "execute", "New Review Handler triggered");
+        
+        // Forward to wizard
+        new WizardDialog(HandlerUtil.getActiveShell(event), new NewReviewWizard()).open();
+        
+        return null;
+    }
+    
 }

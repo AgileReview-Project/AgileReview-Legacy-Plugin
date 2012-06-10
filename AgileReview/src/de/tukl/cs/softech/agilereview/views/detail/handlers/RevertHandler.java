@@ -11,13 +11,13 @@ import de.tukl.cs.softech.agilereview.views.detail.DetailView;
  * Handler for revert command of the DetailView
  */
 public class RevertHandler extends AbstractHandler {
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if(ViewControl.isOpen(DetailView.class)) {
-			DetailView.getInstance().revert();
-		}
-		return null;
-	}
-
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        if (ViewControl.isOpen(DetailView.class)) {
+            DetailView.getInstance().revert();
+        }
+        return null;
+    }
+    
 }

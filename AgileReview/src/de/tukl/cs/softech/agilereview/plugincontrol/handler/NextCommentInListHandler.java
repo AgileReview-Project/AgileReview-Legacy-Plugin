@@ -12,16 +12,16 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
  * Compute and reveal the next visible comment in the document
  */
 public class NextCommentInListHandler extends AbstractHandler {
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		PluginLogger.log(this.getClass().toString(), "execute", "\"Show Next Comment In List\" triggered");
-
-		if (ViewControl.isOpen(CommentTableView.class)) {
-			CommentTableView.getInstance().selectNextComment();
-		}
-
-		return null;
-	}
-
+    
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        PluginLogger.log(this.getClass().toString(), "execute", "\"Show Next Comment In List\" triggered");
+        
+        if (ViewControl.isOpen(CommentTableView.class)) {
+            CommentTableView.getInstance().selectNextComment();
+        }
+        
+        return null;
+    }
+    
 }
