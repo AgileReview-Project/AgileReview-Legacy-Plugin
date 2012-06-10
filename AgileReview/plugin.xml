@@ -1012,6 +1012,22 @@
          </with>
       </enabledWhen>
    </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CleanupHandler"
+         commandId="de.tukl.cs.softech.agilereview.cleanup">
+      <activeWhen>
+         <with
+               variable="selection">
+            <iterate>
+               <or>
+                  <instanceof
+                        value="de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper">
+                  </instanceof>
+               </or>
+            </iterate>
+         </with>
+      </activeWhen>
+   </handler>
 </extension>
 <extension
       point="org.eclipse.ui.commands">
@@ -1323,6 +1339,11 @@
       <command
             commandId="org.eclipse.ui.edit.delete"
             label="Delete"
+            style="push">
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.cleanup"
+            label="CleanUp"
             style="push">
       </command>
       <command
