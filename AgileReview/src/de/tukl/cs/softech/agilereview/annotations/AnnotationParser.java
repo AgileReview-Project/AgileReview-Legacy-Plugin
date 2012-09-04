@@ -53,9 +53,9 @@ public class AnnotationParser implements IAnnotationParser {
     /**
      * Core Regular Expression to find the core tag structure
      */
-    private static String rawTagRegex = "\\s*(\\??)" + Pattern.quote(keySeparator) + "\\s*([^" + Pattern.quote(keySeparator) + "]+"
+    private static String rawTagRegex = "-?\\s*(\\??)" + Pattern.quote(keySeparator) + "\\s*([^" + Pattern.quote(keySeparator) + "]+"/*?|r131|Thilo|c3|*/
             + Pattern.quote(keySeparator) + "[^" + Pattern.quote(keySeparator) + "]+" + Pattern.quote(keySeparator) + "[^\\?"
-            + Pattern.quote(keySeparator) + "]*)\\s*" + Pattern.quote(keySeparator) + "(\\??)\\s*(-?)";
+            + Pattern.quote(keySeparator) + "]*)\\s*" + Pattern.quote(keySeparator) + "(\\??)\\s*(-?)";/*|r131|Thilo|c3|?*/
     /**
      * Path of the file this parser represents
      */
@@ -109,7 +109,9 @@ public class AnnotationParser implements IAnnotationParser {
         
         if (editor.getDocumentProvider() != null) {
             this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            if (this.document == null) { throw new NoDocumentFoundException(); }
+            if (this.document == null) {
+                throw new NoDocumentFoundException();
+            }
         } else {
             throw new NoDocumentFoundException();
         }
@@ -131,6 +133,25 @@ public class AnnotationParser implements IAnnotationParser {
     private void parseInput() {
         this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
         PluginLogger.log(this.getClass().toString(), "parseInput", "triggered");
+        
+        // Save the current document before parsing, so automatic formatting can take place/*?|r131|Thilo|c4|*/
+        try {
+            editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
+        } catch (CoreException e) {
+            PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "
+                    + editor.getTitle(), e);
+            Display.getDefault().asyncExec(new Runnable() {
+                
+                @Override
+                public void run() {
+                    MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException",
+                            "An eclipse internal error occured when saving the current document!\n"
+                                    + "Please try to do this by hand in order to save the inserted comment tags.");
+                }
+                
+            });
+        }/*|r131|Thilo|c4|?*/
+        
         idPositionMap.clear();
         idTagPositions.clear();
         HashSet<String> corruptedCommentKeys = new HashSet<String>();
@@ -153,7 +174,7 @@ public class AnnotationParser implements IAnnotationParser {
                             // same begin tag already exists
                             corruptedCommentKeys.add(key);
                             document.replace(r.getOffset(), r.getLength(), "");
-                            PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <same begin tag already exists>: " + key
+                            PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <same begin tag already exists>: " + key
                                     + " --> deleting");
                             tagDeleted = true;
                         } else {
@@ -189,7 +210,7 @@ public class AnnotationParser implements IAnnotationParser {
                                 // same end tag already exists
                                 corruptedCommentKeys.add(key);
                                 document.replace(r.getOffset(), r.getLength(), "");
-                                PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <same end tag already exists>: " + key
+                                PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <same end tag already exists>: " + key
                                         + " --> deleting");
                                 tagDeleted = true;
                             } else {
@@ -206,7 +227,7 @@ public class AnnotationParser implements IAnnotationParser {
                             // end tag without begin tag
                             corruptedCommentKeys.add(key);
                             document.replace(r.getOffset(), r.getLength(), "");
-                            PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <end tag without begin tag>: " + key
+                            PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <end tag without begin tag>: " + key
                                     + " --> deleting");
                             tagDeleted = true;
                         }
@@ -228,7 +249,7 @@ public class AnnotationParser implements IAnnotationParser {
             for (String key : idTagPositions.keySet()) {
                 Position[] ps = idTagPositions.get(key);
                 if (ps[1] == null) {
-                    PluginLogger.log(this.getClass().toString(), "parseInput", "currupt: <begin tag without end tag>: " + key + " --> deleting");
+                    PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <begin tag without end tag>: " + key + " --> deleting");
                     corruptedCommentKeys.add(key);
                     positionsToDelete.add(ps[0]);
                     curruptedBeginTagExists = true;
@@ -427,7 +448,7 @@ public class AnnotationParser implements IAnnotationParser {
             
             // Write tag -> get start+end-tag for current file-ending, insert into file
             String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-            document.replace(insertOffset, 0, tags[0] + "?" + commentTag + "?" + tags[1]);
+            document.replace(insertOffset, 0, tags[0] + "-?" + commentTag + "?" + tags[1]);/*?|r131|Thilo|c0|?*/
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // document.getLineLength(selStartLine)-lineDelimiterLength);
@@ -450,13 +471,32 @@ public class AnnotationParser implements IAnnotationParser {
             
             // Write tags -> get tags for current file-ending, insert second tag, insert first tag
             String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-            document.replace(insertEndOffset, 0, tags[0] + commentTag + "?" + tags[1]);
-            document.replace(insertStartOffset, 0, tags[0] + "?" + commentTag + (newLineInserted ? "-" : "") + tags[1]);
+            document.replace(insertEndOffset, 0, tags[0] + "-" + commentTag + "?" + tags[1]);/*?|r131|Thilo|c1|*/
+            document.replace(insertStartOffset, 0, tags[0] + "-?" + commentTag + (newLineInserted ? "-" : "") + tags[1]);/*|r131|Thilo|c1|?*/
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // VARIANT(return Position): document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) +
             // document.getLineLength(selEndLine)-lineDelimiterLength);
         }
+        
+        // Save, so Eclipse save actions can take place before parsing
+        try {/*?|r131|Thilo|c2|*/
+            editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
+        } catch (CoreException e) {
+            PluginLogger.logError(this.getClass().toString(), "addTagsInDocument", "CoreException occurs while saving document of editor: "
+                    + editor.getTitle(), e);
+            Display.getDefault().asyncExec(new Runnable() {
+                
+                @Override
+                public void run() {
+                    MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException",
+                            "An eclipse internal error occured when saving the current document!\n"
+                                    + "Please try to do this by hand in order to save the inserted comment tags.");
+                }
+                
+            });
+        }/*|r131|Thilo|c2|?*/
+        
         parseInput();
         if (ViewControl.isPerspectiveOpen() && display) {
             ColorManager.addReservation(comment.getAuthor());
