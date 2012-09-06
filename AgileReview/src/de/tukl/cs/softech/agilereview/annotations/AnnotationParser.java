@@ -118,7 +118,21 @@ public class AnnotationParser implements IAnnotationParser {
         
         // Set the path this Parser stand for
         IEditorInput input = this.editor.getEditorInput();
-        path = ((IFile) input.getAdapter(IFile.class)).getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")),"");
+        IFile file = (IFile) input.getAdapter(IFile.class);
+        final String editorTitle = editor.getTitle();
+        if (file != null) {
+        	path = file.getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")),"");	
+        } else {
+			Display.getDefault().asyncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "FileNotFoundException",
+							"The file for editor "+editorTitle+" could not be found. Please consider saving the file before adding comments to it.");
+				}
+
+			});
+        }
         this.annotationModel = new AgileAnnotationController(editor);
         parseInput();
     }
