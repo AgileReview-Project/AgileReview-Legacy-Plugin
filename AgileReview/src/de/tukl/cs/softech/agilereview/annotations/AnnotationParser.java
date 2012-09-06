@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
@@ -23,7 +24,6 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -118,11 +118,7 @@ public class AnnotationParser implements IAnnotationParser {
         
         // Set the path this Parser stand for
         IEditorInput input = this.editor.getEditorInput();
-        if (input != null && input instanceof FileEditorInput) {
-            path = ((FileEditorInput) input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")),
-                    "");
-        }
-        
+        path = ((IFile) input.getAdapter(IFile.class)).getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")),"");
         this.annotationModel = new AgileAnnotationController(editor);
         parseInput();
     }
