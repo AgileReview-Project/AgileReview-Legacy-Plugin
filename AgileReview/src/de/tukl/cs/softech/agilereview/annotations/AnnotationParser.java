@@ -128,17 +128,15 @@ public class AnnotationParser implements IAnnotationParser {
     }
     
     /**
-     * Parses all comment tags and saves them with their {@link Position}
+     * Saves the current document
+     * @author Thilo Rauch (06.09.2012)
      */
-    private void parseInput() {
-        this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-        PluginLogger.log(this.getClass().toString(), "parseInput", "triggered");
-        
+    private void saveDocument() {
         // Save the current document before parsing, so automatic formatting can take place/*?|r131|Thilo|c4|*/
         try {
             editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
         } catch (CoreException e) {
-            PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "
+            PluginLogger.logError(this.getClass().toString(), "saveDocument", "CoreException occurs while saving document of editor: "
                     + editor.getTitle(), e);
             Display.getDefault().asyncExec(new Runnable() {
                 
@@ -151,6 +149,16 @@ public class AnnotationParser implements IAnnotationParser {
                 
             });
         }/*|r131|Thilo|c4|?*/
+    }
+    
+    /**
+     * Parses all comment tags and saves them with their {@link Position}
+     */
+    private void parseInput() {
+        this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+        PluginLogger.log(this.getClass().toString(), "parseInput", "triggered");
+        
+        saveDocument();
         
         idPositionMap.clear();
         idTagPositions.clear();
@@ -283,22 +291,7 @@ public class AnnotationParser implements IAnnotationParser {
         
         // Save the current document to save the tags
         // TODO only save document if there are changes made by the parser
-        try {
-            editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
-        } catch (CoreException e) {
-            PluginLogger.logError(this.getClass().toString(), "parseInput", "CoreException occurs while saving document of editor: "
-                    + editor.getTitle(), e);
-            Display.getDefault().asyncExec(new Runnable() {
-                
-                @Override
-                public void run() {
-                    MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException",
-                            "An eclipse internal error occured when saving the current document!\n"
-                                    + "Please try to do this by hand in order to save the inserted comment tags.");
-                }
-                
-            });
-        }
+        saveDocument();
         
         // update annotations in order to recognize moved tags
         TreeMap<String, Position> annotationsToUpdate = new TreeMap<String, Position>();
@@ -480,22 +473,8 @@ public class AnnotationParser implements IAnnotationParser {
         }
         
         // Save, so Eclipse save actions can take place before parsing
-        try {/*?|r131|Thilo|c2|*/
-            editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
-        } catch (CoreException e) {
-            PluginLogger.logError(this.getClass().toString(), "addTagsInDocument", "CoreException occurs while saving document of editor: "
-                    + editor.getTitle(), e);
-            Display.getDefault().asyncExec(new Runnable() {
-                
-                @Override
-                public void run() {
-                    MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException",
-                            "An eclipse internal error occured when saving the current document!\n"
-                                    + "Please try to do this by hand in order to save the inserted comment tags.");
-                }
-                
-            });
-        }/*|r131|Thilo|c2|?*/
+        /*?|r131|Thilo|c2|?*/
+        saveDocument();
         
         parseInput();
         if (ViewControl.isPerspectiveOpen() && display) {
