@@ -121,18 +121,23 @@ public class AnnotationParser implements IAnnotationParser {
         IFile file = (IFile) input.getAdapter(IFile.class);
         final String editorTitle = editor.getTitle();
         if (file != null) {
-        	path = file.getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")),"");	
+            path = file.getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
         } else {
-			Display.getDefault().asyncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					MessageDialog.openError(Display.getDefault().getActiveShell(), "FileNotFoundException",
-							"The file for editor "+editorTitle+" could not be found. Please consider saving the file before adding comments to it. Afterwards, for adding comments close the current editor and re-open it.");
-				}
-
-			});
-			throw new NoDocumentFoundException();
+            Display.getDefault().asyncExec(new Runnable() {
+                
+                @Override
+                public void run() {
+                    MessageDialog
+                            .openError(
+                                    Display.getDefault().getActiveShell(),
+                                    "FileNotFoundException",
+                                    "The file for editor "
+                                            + editorTitle
+                                            + " could not be found. Please consider saving the file before adding comments to it. Afterwards, for adding comments close the current editor and re-open it.");
+                }
+                
+            });
+            throw new NoDocumentFoundException();
         }
         this.annotationModel = new AgileAnnotationController(editor);
         parseInput();
@@ -204,10 +209,11 @@ public class AnnotationParser implements IAnnotationParser {
                                 int currLine = document.getLineOfOffset(r.getOffset());
                                 String lineToDelete = document.get(document.getLineOffset(currLine), document.getLineLength(currLine)
                                         - document.getLineDelimiter(currLine).length());
+                                lineToDelete = lineToDelete.trim();
                                 
                                 // if there is at least one tag which is not alone in this line, do not delete the whole line!
                                 Matcher lineMatcher = Pattern.compile("(.*)" + tagRegex + "(.*)").matcher(lineToDelete);
-                                if (lineMatcher.matches() && lineMatcher.group(1).trim().isEmpty() && lineMatcher.group(5).trim().isEmpty()) {
+                                if (lineMatcher.matches() && lineMatcher.group(1).trim().isEmpty() && lineMatcher.group(6).trim().isEmpty()) {
                                     int adaptedOffset = document.getLineOffset(currLine - 1) + document.getLineLength(currLine - 1)
                                             - document.getLineDelimiter(currLine - 1).length();
                                     idTagPositions.put(key, new Position[] {
