@@ -58,10 +58,11 @@ public class AddNewCommentHandler extends AbstractHandler {
             				@Override
             				public void run() {
             					MessageDialog.openError(Display.getDefault().getActiveShell(), "FileNotFoundException",
-            							"The file for editor "+editorTitle+" could not be found. Please consider saving the file before adding comments to it.");
+            							"The file for editor "+editorTitle+" could not be found. Please consider saving the file before adding comments to it. Afterwards, for adding comments close the current editor and re-open it.");
             				}
 
             			});
+            			return null;
                     }
                 }
                 String user = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);

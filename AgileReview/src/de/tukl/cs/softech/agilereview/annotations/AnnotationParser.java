@@ -128,10 +128,11 @@ public class AnnotationParser implements IAnnotationParser {
 				@Override
 				public void run() {
 					MessageDialog.openError(Display.getDefault().getActiveShell(), "FileNotFoundException",
-							"The file for editor "+editorTitle+" could not be found. Please consider saving the file before adding comments to it.");
+							"The file for editor "+editorTitle+" could not be found. Please consider saving the file before adding comments to it. Afterwards, for adding comments close the current editor and re-open it.");
 				}
 
 			});
+			throw new NoDocumentFoundException();
         }
         this.annotationModel = new AgileAnnotationController(editor);
         parseInput();
