@@ -74,7 +74,7 @@ public class TagCleaner {
                 if (!regex) {
                     identifier = Pattern.quote(identifier);
                 }
-                String identifierRegex = "\\s*(\\??)\\s*" + Pattern.quote(keySeparator) + "\\s*" + identifier + "\\s*" + Pattern.quote(keySeparator)
+                String identifierRegex = "-?\\s*(\\??)\\s*" + Pattern.quote(keySeparator) + "\\s*" + identifier + "\\s*" + Pattern.quote(keySeparator)
                         + "\\s*(\\??)\\s*";
                 
                 // get input from file
