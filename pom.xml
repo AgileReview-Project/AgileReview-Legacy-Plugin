@@ -23,9 +23,9 @@
   </build>
   <repositories>
     <repository>
-      <id>gallileo</id>
+      <id>galileo</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/gallileo/</url>
+      <url>http://download.eclipse.org/releases/galileo/</url>
     </repository>
   </repositories>
   <properties>
