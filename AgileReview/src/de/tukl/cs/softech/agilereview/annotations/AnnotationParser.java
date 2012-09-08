@@ -53,9 +53,9 @@ public class AnnotationParser implements IAnnotationParser {
     /**
      * Core Regular Expression to find the core tag structure
      */
-    private static String rawTagRegex = "-?\\s*(\\??)" + Pattern.quote(keySeparator) + "\\s*([^" + Pattern.quote(keySeparator) + "]+"/*?|r131|Thilo|c3|*/
+    private static String rawTagRegex = "-?\\s*(\\??)" + Pattern.quote(keySeparator) + "\\s*([^" + Pattern.quote(keySeparator) + "]+"
             + Pattern.quote(keySeparator) + "[^" + Pattern.quote(keySeparator) + "]+" + Pattern.quote(keySeparator) + "[^\\?"
-            + Pattern.quote(keySeparator) + "]*)\\s*" + Pattern.quote(keySeparator) + "(\\??)\\s*(-?)";/*|r131|Thilo|c3|?*/
+            + Pattern.quote(keySeparator) + "]*)\\s*" + Pattern.quote(keySeparator) + "(\\??)\\s*(-?)";
     /**
      * Path of the file this parser represents
      */
@@ -143,7 +143,7 @@ public class AnnotationParser implements IAnnotationParser {
      * @author Thilo Rauch (06.09.2012)
      */
     private void saveDocument() {
-        // Save the current document before parsing, so automatic formatting can take place/*?|r131|Thilo|c4|*/
+        // Save the current document before parsing, so automatic formatting can take place
         try {
             editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
         } catch (CoreException e) {
@@ -159,7 +159,7 @@ public class AnnotationParser implements IAnnotationParser {
                 }
                 
             });
-        }/*|r131|Thilo|c4|?*/
+        }
     }
     
     /**
@@ -452,7 +452,7 @@ public class AnnotationParser implements IAnnotationParser {
             
             // Write tag -> get start+end-tag for current file-ending, insert into file
             String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-            document.replace(insertOffset, 0, tags[0] + "-?" + commentTag + "?" + tags[1]);/*?|r131|Thilo|c0|?*/
+            document.replace(insertOffset, 0, tags[0] + "-?" + commentTag + "?" + tags[1]);
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // document.getLineLength(selStartLine)-lineDelimiterLength);
@@ -475,8 +475,8 @@ public class AnnotationParser implements IAnnotationParser {
             
             // Write tags -> get tags for current file-ending, insert second tag, insert first tag
             String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-            document.replace(insertEndOffset, 0, tags[0] + "-" + commentTag + "?" + tags[1]);/*?|r131|Thilo|c1|*/
-            document.replace(insertStartOffset, 0, tags[0] + "-?" + commentTag + (newLineInserted ? "-" : "") + tags[1]);/*|r131|Thilo|c1|?*/
+            document.replace(insertEndOffset, 0, tags[0] + "-" + commentTag + "?" + tags[1]);
+            document.replace(insertStartOffset, 0, tags[0] + "-?" + commentTag + (newLineInserted ? "-" : "") + tags[1]);
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // VARIANT(return Position): document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) +
@@ -484,7 +484,7 @@ public class AnnotationParser implements IAnnotationParser {
         }
         
         // Save, so Eclipse save actions can take place before parsing
-        /*?|r131|Thilo|c2|?*/
+        
         saveDocument();
         
         parseInput();
