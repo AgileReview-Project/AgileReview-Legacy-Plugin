@@ -23,12 +23,12 @@
   </build>
   <repositories>
     <repository>
-      <id>ganymede</id>
+      <id>gallileo</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/ganymede/</url>
+      <url>http://download.eclipse.org/releases/gallileo/</url>
     </repository>
   </repositories>
   <properties>
-    <trunk.version>0.8.2</trunk.version>
+    <trunk.version>0.8.3</trunk.version>
   </properties>
 </project>
