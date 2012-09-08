@@ -5,12 +5,13 @@ import java.util.regex.Pattern;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.part.FileEditorInput;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
@@ -46,10 +47,22 @@ public class AddNewCommentHandler extends AbstractHandler {
             IEditorPart part = HandlerUtil.getActiveEditor(event);
             if (part != null) {
                 if (part instanceof IEditorPart) {
-                    IEditorInput input = part.getEditorInput();
-                    if (input != null && input instanceof FileEditorInput) {
-                        pathToFile = ((FileEditorInput) input).getFile().getFullPath().toOSString().replaceFirst(
-                                Pattern.quote(System.getProperty("file.separator")), "");
+                	IEditorInput input = part.getEditorInput();
+                    IFile file = (IFile) input.getAdapter(IFile.class);
+                    final String editorTitle = part.getTitle();
+                    if (file != null) {
+                    	pathToFile = file.getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")),"");	
+                    } else {
+            			Display.getDefault().asyncExec(new Runnable() {
+
+            				@Override
+            				public void run() {
+            					MessageDialog.openError(Display.getDefault().getActiveShell(), "FileNotFoundException",
+            							"The file for editor "+editorTitle+" could not be found. Please consider saving the file before adding comments to it. Afterwards, for adding comments close the current editor and re-open it.");
+            				}
+
+            			});
+            			return null;
                     }
                 }
                 String user = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTHOR_NAME);

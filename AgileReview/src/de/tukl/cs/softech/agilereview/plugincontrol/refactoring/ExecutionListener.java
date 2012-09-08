@@ -43,13 +43,11 @@ public class ExecutionListener implements IExecutionListener {
             if (ViewControl.isOpen(CommentTableView.class)) {
                 CommentTableView.getInstance().reparseActiveEditor();
             }
-        }
-        if (commandId.equals("org.eclipse.ui.file.saveAll")) {
+        } else if (commandId.equals("org.eclipse.ui.file.saveAll")) {
             if (ViewControl.isOpen(CommentTableView.class)) {
                 CommentTableView.getInstance().reparseAllEditors();
             }
-        }
-        if (commandId.equals("org.eclipse.jdt.ui.edit.text.java.move.element")
+        } else if (commandId.equals("org.eclipse.jdt.ui.edit.text.java.move.element")
                 || commandId.equals("org.eclipse.ltk.ui.refactoring.commands.renameResource") || commandId.equals("org.eclipse.ui.edit.rename")
                 || commandId.equals("org.eclipse.jdt.ui.edit.text.java.rename.element")) {
             

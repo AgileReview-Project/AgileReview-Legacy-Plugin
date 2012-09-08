@@ -656,6 +656,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
      * @return comments of all currently displayed comments
      */
     private HashSet<Comment> getFilteredComments() {
+        if (!ViewControl.isPerspectiveOpen()) return new HashSet<Comment>();
         HashSet<Comment> comments = new HashSet<Comment>();
         for (TableItem i : viewer.getTable().getItems()) {
             if (i.getData() instanceof Comment) {
