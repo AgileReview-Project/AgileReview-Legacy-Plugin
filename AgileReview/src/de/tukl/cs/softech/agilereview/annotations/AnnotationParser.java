@@ -109,9 +109,7 @@ public class AnnotationParser implements IAnnotationParser {
         
         if (editor.getDocumentProvider() != null) {
             this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            if (this.document == null) {
-                throw new NoDocumentFoundException();
-            }
+            if (this.document == null) { throw new NoDocumentFoundException(); }
         } else {
             throw new NoDocumentFoundException();
         }
@@ -179,83 +177,19 @@ public class AnnotationParser implements IAnnotationParser {
         idPositionMap.clear();
         idTagPositions.clear();
         HashSet<String> corruptedCommentKeys = new HashSet<String>();
-        Matcher matcher;
-        FindReplaceDocumentAdapter fra = new FindReplaceDocumentAdapter(document);
         IRegion r;
         int startOffset = 0;
         try {
+            Matcher matcher;
+            FindReplaceDocumentAdapter fra = new FindReplaceDocumentAdapter(document);
             while ((r = fra.find(startOffset, tagRegex, true, false, false, true)) != null) {
                 boolean tagDeleted = false;
-                int line = document.getLineOfOffset(r.getOffset());
                 matcher = tagPattern.matcher(document.get(r.getOffset(), r.getLength()));
                 if (matcher.matches()) {
-                    String key = matcher.group(2).trim();
-                    Position[] tagPositions;
-                    if (matcher.group(1).equals("?")) {
-                        tagPositions = idTagPositions.get(key);
-                        // begin tag
-                        if (tagPositions != null) {
-                            // same begin tag already exists
-                            corruptedCommentKeys.add(key);
-                            document.replace(r.getOffset(), r.getLength(), "");
-                            PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <same begin tag already exists>: " + key
-                                    + " --> deleting");
-                            tagDeleted = true;
-                        } else {
-                            idPositionMap.put(key, new Position(document.getLineOffset(line)));
-                            if (matcher.group(4).equals("-")) {
-                                // set the position such that the line break beforehand will be removed too when replacing this position with the
-                                // empty string
-                                int currLine = document.getLineOfOffset(r.getOffset());
-                                String lineToDelete = document.get(document.getLineOffset(currLine), document.getLineLength(currLine)
-                                        - document.getLineDelimiter(currLine).length());
-                                lineToDelete = lineToDelete.trim();
-                                
-                                // if there is at least one tag which is not alone in this line, do not delete the whole line!
-                                Matcher lineMatcher = Pattern.compile("(.*)" + tagRegex + "(.*)").matcher(lineToDelete);
-                                if (lineMatcher.matches() && lineMatcher.group(1).trim().isEmpty() && lineMatcher.group(6).trim().isEmpty()) {
-                                    int adaptedOffset = document.getLineOffset(currLine - 1) + document.getLineLength(currLine - 1)
-                                            - document.getLineDelimiter(currLine - 1).length();
-                                    idTagPositions.put(key, new Position[] {
-                                            new Position(adaptedOffset, r.getOffset() + r.getLength() - adaptedOffset), null });
-                                } else {
-                                    idTagPositions.put(key, new Position[] { new Position(r.getOffset(), r.getLength()), null });
-                                }
-                            } else {
-                                idTagPositions.put(key, new Position[] { new Position(r.getOffset(), r.getLength()), null });
-                            }
-                        }
-                    }
-                    
-                    if (matcher.group(3).equals("?") && !tagDeleted) {
-                        tagPositions = idTagPositions.get(key);
-                        // end tag
-                        if (tagPositions != null) {
-                            if (tagPositions[1] != null) {
-                                // same end tag already exists
-                                corruptedCommentKeys.add(key);
-                                document.replace(r.getOffset(), r.getLength(), "");
-                                PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <same end tag already exists>: " + key
-                                        + " --> deleting");
-                                tagDeleted = true;
-                            } else {
-                                // end tag not set
-                                Position tmp = idPositionMap.get(key);
-                                tmp.setLength(document.getLineOffset(line) - tmp.getOffset() + document.getLineLength(line));
-                                idPositionMap.put(key, tmp);
-                                
-                                Position[] tmp2 = idTagPositions.get(key);
-                                tmp2[1] = new Position(r.getOffset(), r.getLength());
-                                idTagPositions.put(key, tmp2);
-                            }
-                        } else {
-                            // end tag without begin tag
-                            corruptedCommentKeys.add(key);
-                            document.replace(r.getOffset(), r.getLength(), "");
-                            PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <end tag without begin tag>: " + key
-                                    + " --> deleting");
-                            tagDeleted = true;
-                        }
+                    tagDeleted = parseStartTag(corruptedCommentKeys, matcher, r);
+                    // rewrite location if the line should be removed after comment deletion
+                    if (!tagDeleted) {
+                        tagDeleted = parseEndTag(corruptedCommentKeys, matcher, r);
                     }
                 }
                 
@@ -321,6 +255,125 @@ public class AnnotationParser implements IAnnotationParser {
         annotationModel.updateAnnotations(annotationsToUpdate);
     }
     
+    /**
+     * Parses the given region matched by the given Matcher against AgileReview end tag behavior. If the tag is corrupted, it will be added to the
+     * corruptedCommentKeys set passed. Otherwise it will be added as valid tag to the tagPositionMap.
+     * @param corruptedCommentKeys set of corrupted comment keys
+     * @param matcher for the tagRegex on the given region
+     * @param tagRegion region of the tag occurrence
+     * @return true, if the tag was deleted<br>false, otherwise
+     * @throws BadLocationException
+     * @author Malte Brunnlieb (08.09.2012)
+     */
+    private boolean parseStartTag(HashSet<String> corruptedCommentKeys, Matcher matcher, IRegion tagRegion) throws BadLocationException {
+        boolean tagDeleted = false;
+        Position[] tagPositions;
+        if (matcher.group(1).equals("?")) {
+            String key = matcher.group(2).trim();
+            tagPositions = idTagPositions.get(key);
+            // begin tag
+            if (tagPositions != null) {
+                // same begin tag already exists
+                corruptedCommentKeys.add(key);
+                document.replace(tagRegion.getOffset(), tagRegion.getLength(), "");
+                PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <same begin tag already exists>: " + key + " --> deleting");
+                tagDeleted = true;
+            } else {
+                idPositionMap.put(key, new Position(document.getLineOffset(document.getLineOfOffset(tagRegion.getOffset()))));
+            }
+            rewriteTagLocationForLineAdaption(matcher, tagRegion, true);
+        }
+        return tagDeleted;
+    }
+    
+    /**
+     * Parses the given region matched by the given Matcher against AgileReview end tag behavior. If the tag is corrupted, it will be added to the
+     * corruptedCommentKeys set passed. Otherwise it will be added as valid tag to the tagPositionMap.
+     * @param corruptedCommentKeys set of corrupted comment keys
+     * @param matcher for the tagRegex on the given region
+     * @param tagRegion region of the tag occurrence
+     * @return true, if the tag was deleted<br>false, otherwise
+     * @throws BadLocationException
+     * @author Malte Brunnlieb (08.09.2012)
+     */
+    private boolean parseEndTag(HashSet<String> corruptedCommentKeys, Matcher matcher, IRegion tagRegion) throws BadLocationException {
+        boolean tagDeleted = false;
+        Position[] tagPositions;
+        if (matcher.group(3).equals("?")) {
+            String key = matcher.group(2).trim();
+            tagPositions = idTagPositions.get(key);
+            // end tag
+            if (tagPositions != null) {
+                if (tagPositions[1] != null) {
+                    // same end tag already exists
+                    corruptedCommentKeys.add(key);
+                    document.replace(tagRegion.getOffset(), tagRegion.getLength(), "");
+                    PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <same end tag already exists>: " + key + " --> deleting");
+                    tagDeleted = true;
+                } else {
+                    // end tag not set
+                    Position tmp = idPositionMap.get(key);
+                    int line = document.getLineOfOffset(tagRegion.getOffset());
+                    tmp.setLength(document.getLineOffset(line) - tmp.getOffset() + document.getLineLength(line));
+                    idPositionMap.put(key, tmp);
+                    
+                    Position[] tmp2 = idTagPositions.get(key);
+                    tmp2[1] = new Position(tagRegion.getOffset(), tagRegion.getLength());
+                    idTagPositions.put(key, tmp2);
+                }
+            } else {
+                // end tag without begin tag
+                corruptedCommentKeys.add(key);
+                document.replace(tagRegion.getOffset(), tagRegion.getLength(), "");
+                PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <end tag without begin tag>: " + key + " --> deleting");
+                tagDeleted = true;
+            }
+            rewriteTagLocationForLineAdaption(matcher, tagRegion, false);
+        }
+        return tagDeleted;
+    }
+    
+    /**
+     * If the line was added by AgileReview, this function will rewrite the location of the current tag such that the line delimiter will also be
+     * removed.
+     * @param matcher Matcher matching the tagRegex against the tag in the current line
+     * @param tagRegion Region the tag occurs in
+     * @param startLine states whether the startLine or the endLine will be adapted
+     * @throws BadLocationException
+     * @author Malte Brunnlieb (08.09.2012)
+     */
+    private void rewriteTagLocationForLineAdaption(Matcher matcher, IRegion tagRegion, boolean startLine) throws BadLocationException {
+        String key = matcher.group(2).trim();
+        if (matcher.group(4).equals("-")) {
+            // set the position such that the line break beforehand will be removed too when replacing this position with the empty string
+            int currLine = document.getLineOfOffset(tagRegion.getOffset());
+            String lineToDelete = document.get(document.getLineOffset(currLine), document.getLineLength(currLine)
+                    - document.getLineDelimiter(currLine).length());
+            
+            // if there is at least one tag which is not alone in this line, do not delete the whole line!
+            Matcher lineMatcher = Pattern.compile("(.*)" + tagRegex + "(.*)").matcher(lineToDelete);
+            if (lineMatcher.matches() && lineMatcher.group(1).trim().isEmpty() && lineMatcher.group(6).trim().isEmpty()) {
+                //                int adaptedOffset = document.getLineOffset(currLine) + document.getLineLength(currLine);
+                //                //- document.getLineDelimiter(currLine).length();
+                
+                Position[] newPos = new Position[2];
+                if (idTagPositions.get(key) == null) {
+                    idTagPositions.put(key, newPos);
+                }
+                if (startLine) {
+                    newPos[0] = new Position(document.getLineOffset(currLine), document.getLineLength(currLine));
+                    newPos[1] = idTagPositions.get(key)[1];
+                } else {
+                    newPos[0] = idTagPositions.get(key)[0];
+                    newPos[1] = new Position(document.getLineOffset(currLine), document.getLineLength(currLine));
+                }
+                idTagPositions.put(key, newPos);
+                return;
+            }
+        }
+        idTagPositions.put(key, new Position[] { new Position(tagRegion.getOffset(), tagRegion.getLength()), null });
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -380,7 +433,7 @@ public class AnnotationParser implements IAnnotationParser {
      * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
      */
     private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException {
-        boolean newLineInserted = false;
+        boolean startLineInserted = false, endLineInserted = false;;
         int origSelStartLine = selStartLine;
         String commentKey = comment.getReviewID() + keySeparator + comment.getAuthor() + keySeparator + comment.getId();
         String commentTag = keySeparator + commentKey + keySeparator;
@@ -401,7 +454,7 @@ public class AnnotationParser implements IAnnotationParser {
                 if (!document.get(newStartLineOffset, newStartLineLength).trim().isEmpty()) {
                     document.replace(newStartLineOffset + newStartLineLength, 0, System.getProperty("line.separator"));
                     selStartLine = newLines[0] + 1;
-                    newLineInserted = true;
+                    startLineInserted = true;
                 } else {
                     selStartLine = newLines[0];
                 }
@@ -415,10 +468,20 @@ public class AnnotationParser implements IAnnotationParser {
             // adapt ending line if necessary
             // add a new line if a line was inserted before
             if (newLines[1] != -1) {
-                selEndLine = newLines[1] + (newLineInserted ? 1 : 0);
+                selEndLine = newLines[1] + (startLineInserted ? 1 : 0);
                 significantlyChanged[1] = true;
             } else {
-                selEndLine += (newLineInserted ? 1 : 0);
+                selEndLine += (startLineInserted ? 1 : 0);
+            }
+            
+            // add new line if end line is last line of javaDoc
+            int adaptionStartLine = checkForCodeComment(selEndLine - 1, new String[] { "/*", "*/" })[0];
+            int newEndLineOffset = document.getLineOffset(selEndLine + 1);
+            int newEndLineLength = document.getLineLength(selEndLine + 1);
+            if (lineContains(adaptionStartLine + 1, "/**") && !document.get(newEndLineOffset, newEndLineLength).trim().isEmpty()) {
+                document.replace(newEndLineOffset, 0, System.getProperty("line.separator"));
+                selEndLine++;
+                endLineInserted = true;
             }
             
             if (significantlyChanged[0] || significantlyChanged[1]) {
@@ -481,16 +544,15 @@ public class AnnotationParser implements IAnnotationParser {
             
             // Write tags -> get tags for current file-ending, insert second tag, insert first tag
             String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-            document.replace(insertEndOffset, 0, tags[0] + "-" + commentTag + "?" + tags[1]);
-            document.replace(insertStartOffset, 0, tags[0] + "-?" + commentTag + (newLineInserted ? "-" : "") + tags[1]);
+            document.replace(insertEndOffset, 0, tags[0] + "-" + commentTag + "?" + (endLineInserted ? "-" : "") + tags[1]);
+            document.replace(insertStartOffset, 0, tags[0] + "-?" + commentTag + (startLineInserted ? "-" : "") + tags[1]);
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // VARIANT(return Position): document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) +
             // document.getLineLength(selEndLine)-lineDelimiterLength);
         }
         
-        // Save, so Eclipse save actions can take place before parsing
-        
+        // Save, so Eclipse save actions can take place before parsing  
         saveDocument();
         
         parseInput();
@@ -517,11 +579,13 @@ public class AnnotationParser implements IAnnotationParser {
         int[] endLineAdaptions = checkForCodeComment(endLine, tags);
         
         // check if inserting a AgileReview comment at selected code region destroys a code comment
-        if (startLineAdaptions[0] != -1 && startLineAdaptions[1] != -1 && startLineAdaptions[0] != startLine) {
-            result[0] = startLineAdaptions[0];
-        }
-        if (endLineAdaptions[0] != -1 && endLineAdaptions[1] != -1 && endLineAdaptions[1] != endLine) {
-            result[1] = endLineAdaptions[1];
+        if (startLineAdaptions[0] != -1 && startLineAdaptions[1] != -1) {
+            if (startLineAdaptions[0] != startLine) {
+                result[0] = startLineAdaptions[0];
+            }
+            if (endLineAdaptions[1] != endLine) {
+                result[1] = endLineAdaptions[1];
+            }
         }
         
         return result;
@@ -542,31 +606,18 @@ public class AnnotationParser implements IAnnotationParser {
         
         // check for opening non-AgileReview comment tags before the line
         for (int i = 0; i <= line; i++) {
-            // get a content of current line
-            String lineContent = document.get(document.getLineOffset(i), document.getLineLength(i)).trim();
-            // get rid of possible AgileReview comment tags
-            lineContent = lineContent.replaceAll(Pattern.quote(tags[0]) + rawTagRegex + Pattern.quote(tags[1]), "");
-            // if still contains a starting tag for a code comment remember line number
-            if (lineContent.contains(tags[0])) {
+            if (lineContains(i, tags[0])) {
                 openTagLine = i;
             }
         }
         
         // check for according closing non-AgileReview comment tag
         if (openTagLine > -1) {
-            boolean found = false;
-            int actLine = openTagLine;
-            while (actLine < document.getNumberOfLines() && !found) {
-                // get a content of current line
-                String lineContent = document.get(document.getLineOffset(actLine), document.getLineLength(actLine)).trim();
-                // get rid of possible AgileReview comment tags
-                lineContent = lineContent.replaceAll(Pattern.quote(tags[0]) + rawTagRegex + Pattern.quote(tags[1]), "");
-                // if still contains a ending tag for a code comment remember line number
-                if (lineContent.contains(tags[1])) {
-                    closeTagLine = actLine;
-                    found = true;
+            for (int i = openTagLine; i < document.getNumberOfLines(); i++) {
+                if (lineContains(i, tags[1])) {
+                    closeTagLine = i;
+                    break;
                 }
-                actLine++;
             }
         }
         
@@ -580,6 +631,22 @@ public class AnnotationParser implements IAnnotationParser {
             }
         }
         return result;
+    }
+    
+    /**
+     * Checks whether the line identified by the lineNumber contains the given string. This function erases all AgileReview related comment tags
+     * before searching for the given string.
+     * @param lineNumber line number of the document
+     * @param string string to be searched for
+     * @return true, if the string is contained in the given line ignoring AgileReview tags,<br> false otherwise
+     * @throws BadLocationException if the given line could not be found in the current document
+     * 
+     * @author Malte Brunnlieb (08.09.2012)
+     */
+    private boolean lineContains(int lineNumber, String string) throws BadLocationException {
+        String lineContent = document.get(document.getLineOffset(lineNumber), document.getLineLength(lineNumber)).trim();
+        lineContent = lineContent.replaceAll(Pattern.quote(string) + rawTagRegex + Pattern.quote(string), "");
+        return lineContent.contains(string);
     }
     
     /*
