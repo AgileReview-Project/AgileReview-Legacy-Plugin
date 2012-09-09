@@ -109,7 +109,9 @@ public class AnnotationParser implements IAnnotationParser {
         
         if (editor.getDocumentProvider() != null) {
             this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            if (this.document == null) { throw new NoDocumentFoundException(); }
+            if (this.document == null) {
+                throw new NoDocumentFoundException();
+            }
         } else {
             throw new NoDocumentFoundException();
         }
@@ -279,7 +281,7 @@ public class AnnotationParser implements IAnnotationParser {
                 PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <same begin tag already exists>: " + key + " --> deleting");
                 tagDeleted = true;
             } else {
-                idPositionMap.put(key, new Position(document.getLineOffset(document.getLineOfOffset(tagRegion.getOffset()))));
+                idPositionMap.put(key, new Position(tagRegion.getOffset()));
             }
             rewriteTagLocationForLineAdaption(matcher, tagRegion, true);
         }
@@ -353,25 +355,27 @@ public class AnnotationParser implements IAnnotationParser {
             // if there is at least one tag which is not alone in this line, do not delete the whole line!
             Matcher lineMatcher = Pattern.compile("(.*)" + tagRegex + "(.*)").matcher(lineToDelete);
             if (lineMatcher.matches() && lineMatcher.group(1).trim().isEmpty() && lineMatcher.group(6).trim().isEmpty()) {
-                //                int adaptedOffset = document.getLineOffset(currLine) + document.getLineLength(currLine);
-                //                //- document.getLineDelimiter(currLine).length();
-                
-                Position[] newPos = new Position[2];
-                if (idTagPositions.get(key) == null) {
-                    idTagPositions.put(key, newPos);
-                }
-                if (startLine) {
-                    newPos[0] = new Position(document.getLineOffset(currLine), document.getLineLength(currLine));
-                    newPos[1] = idTagPositions.get(key)[1];
-                } else {
-                    newPos[0] = idTagPositions.get(key)[0];
-                    newPos[1] = new Position(document.getLineOffset(currLine), document.getLineLength(currLine));
-                }
-                idTagPositions.put(key, newPos);
+                setTagPosition(startLine, key, new Position(document.getLineOffset(currLine), document.getLineLength(currLine)));
                 return;
             }
         }
-        idTagPositions.put(key, new Position[] { new Position(tagRegion.getOffset(), tagRegion.getLength()), null });
+        setTagPosition(startLine, key, new Position(tagRegion.getOffset(), tagRegion.getLength()));
+    }
+    
+    /**
+     * Sets the tag position newPos either for the start tag or the end tag
+     * @param startTag determines whether the start tag should be set or the end tag
+     * @param key of the comment the tags are for
+     * @param newPos new {@link Position} to be set
+     * @author Malte Brunnlieb (09.09.2012)
+     */
+    private void setTagPosition(boolean startTag, String key, Position newPos) {
+        Position[] oldPos = idTagPositions.get(key);
+        if (oldPos == null) {
+            oldPos = new Position[2];
+        }
+        oldPos[startTag ? 0 : 1] = newPos;
+        idTagPositions.put(key, oldPos);
     }
     
     /*
