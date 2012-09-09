@@ -542,7 +542,7 @@ public class AnnotationParser implements IAnnotationParser {
             
             // Write tag -> get start+end-tag for current file-ending, insert into file
             String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-            document.replace(insertOffset, 0, tags[0] + "-?" + commentTag + "?" + tags[1]);
+            document.replace(insertOffset, 0, tags[0] + "-?" + commentTag + "?" + (startLineInserted || endLineInserted ? "-" : "") + tags[1]);
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // document.getLineLength(selStartLine)-lineDelimiterLength);
