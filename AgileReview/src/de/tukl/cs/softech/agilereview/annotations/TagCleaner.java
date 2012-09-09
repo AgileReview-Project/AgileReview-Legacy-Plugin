@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -24,22 +25,9 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 public class TagCleaner {
     
     /**
-     * Instance of PropertiesManager
-     */
-    private static PropertiesManager pm = PropertiesManager.getInstance();
-    /**
      * Supported files mapping to the corresponding comment tags
      */
     private static final HashMap<String, String[]> supportedFiles = PropertiesManager.getParserFileendingsMappingTags();
-    /**
-     * Key separator for tag creation
-     */
-    private static String keySeparator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-    /**
-     * Core Regular Expression to find the core tag structure
-     */
-    private static String rawTagRegex = "([^" + Pattern.quote(keySeparator) + "]+" + Pattern.quote(keySeparator) + "[^" + Pattern.quote(keySeparator)
-            + "]+" + Pattern.quote(keySeparator) + "[^\\?" + Pattern.quote(keySeparator) + "]*)";
     
     /**
      * Removes the comment tags from the file given by the path
@@ -47,16 +35,15 @@ public class TagCleaner {
      * @return true if tags were removed successfully, else false
      */
     public static boolean removeAllTags(IPath path) {
-        return removeTag(path, rawTagRegex, true);
+        return removeTag(path, null);
     }
     
     /**
      * @param path the path of the file which will be modified
-     * @param identifier the identifier of the comment to be removed
-     * @param regex true if the identifier already a regex
+     * @param identifier the identifier of the comment to be removed. Can be set to null in order to remove all tags
      * @return whether tags were removed successful
      */
-    public static boolean removeTag(IPath path, String identifier, boolean regex) {
+    public static boolean removeTag(IPath path, String identifier) {
         final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
         if (file.exists()) {
             try {
@@ -70,36 +57,49 @@ public class TagCleaner {
                     return false;
                 }
                 
-                // identifier already quoted?
-                if (!regex) {
-                    identifier = Pattern.quote(identifier);
-                }
-                String identifierRegex = "\\s*(\\??)\\s*" + Pattern.quote(keySeparator) + "\\s*" + identifier + "\\s*" + Pattern.quote(keySeparator)
-                        + "\\s*(\\??)\\s*";
-                
                 // get input from file
                 InputStream is = file.getContents();
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
                 
                 // read file line by line, replace tags
                 String input = "";
                 String line = br.readLine();
-                boolean changedFile = false;
+                boolean fileChanged = false;
                 while (line != null) {
-                    String searchRegex = Pattern.quote(beginTag) + identifierRegex + Pattern.quote(endTag);
-                    if (line.matches(".*" + searchRegex + ".*")) {
-                        changedFile = true;
+                    
+                    String searchRegex = Pattern.quote(beginTag) + AnnotationParser.RAW_TAG_REGEX + Pattern.quote(endTag);
+                    Pattern p = Pattern.compile(searchRegex);
+                    Matcher m = p.matcher(line);
+                    boolean deleteLine = false;
+                    StringBuffer sb = new StringBuffer();
+                    while (m.find()) {
+                        fileChanged = true;
+                        if (identifier == null || m.group(2).equals(identifier)) {
+                            if (m.group(4).equals("-")) {
+                                deleteLine = true;
+                            }
+                            m.appendReplacement(sb, "");
+                        }
                     }
-                    input += line.replaceAll(searchRegex, "");
+                    m.appendTail(sb);
+                    
                     line = br.readLine();
-                    // append new line chars if not last line
-                    input += line != null ? System.getProperty("line.separator") : "";
+                    if (!deleteLine || !sb.toString().matches("\\s*")) {
+                        input += sb.toString();
+                        input += line != null ? System.getProperty("line.separator") : "";
+                    }
                 }
-                if (changedFile) {
+                br.close();
+                isr.close();
+                is.close();
+                
+                if (fileChanged) {
                     // write modified content to file
                     byte[] bytes = input.getBytes();
                     InputStream source = new ByteArrayInputStream(bytes);
                     file.setContents(source, false, true, null);
+                    source.close();
                 }
                 
             } catch (final CoreException e) {

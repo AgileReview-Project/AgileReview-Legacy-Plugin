@@ -70,7 +70,7 @@ public class CleanupProcess implements IRunnableWithProgress {
                         }
                     });
                 } else {
-                    TagCleaner.removeTag(new Path(ReviewAccess.computePath(c)), key, false);
+                    TagCleaner.removeTag(new Path(ReviewAccess.computePath(c)), key);
                 }
                 try {
                     ReviewAccess.getInstance().deleteComment(c);
@@ -81,7 +81,7 @@ public class CleanupProcess implements IRunnableWithProgress {
                     ExceptionHandler.handleNoReviewSourceFolderException();
                 }
             } else {
-                TagCleaner.removeTag(new Path(ReviewAccess.computePath(c)), key, false);
+                TagCleaner.removeTag(new Path(ReviewAccess.computePath(c)), key);
             }
             i++;
             monitor.worked(Math.round(i * progressStep) + 10);

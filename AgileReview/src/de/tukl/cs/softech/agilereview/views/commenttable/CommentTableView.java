@@ -195,7 +195,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
             if (openEditorContains(comment)) {
                 parserMap.get(getActiveEditor()).removeCommentTags(comment);
             } else {
-                TagCleaner.removeTag(new Path(ReviewAccess.computePath(comment)), generateCommentKey(comment), false);
+                TagCleaner.removeTag(new Path(ReviewAccess.computePath(comment)), generateCommentKey(comment));
                 reparseAllEditors();
             }
         } catch (BadLocationException e) {
@@ -743,7 +743,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
     public String[] getCommentsByPositionOfActiveEditor(Position p) {
         if (getActiveEditor() != null) {
             IAnnotationParser parser;
-            if ((parser = this.parserMap.get(getActiveEditor())) != null) { return parser.getCommentsByPosition(p); }
+            if ((parser = this.parserMap.get(getActiveEditor())) != null) {
+                return parser.getCommentsByPosition(p);
+            }
         }
         return new String[] {};
     }
@@ -830,7 +832,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
     public void partClosed(IWorkbenchPartReference partRef) {
         if (partRef.getPart(false) instanceof IEditorPart) {
             IEditorPart editor = (IEditorPart) partRef.getPart(false);
-            if (editor == null) { return; }
+            if (editor == null) {
+                return;
+            }
             if (this.parserMap.containsKey(editor)) {
                 this.parserMap.remove(editor);
             }
@@ -845,7 +849,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
     public void partBroughtToTop(IWorkbenchPartReference partRef) {
         if (partRef.getPart(false) instanceof IEditorPart) {
             IEditorPart editor = (IEditorPart) partRef.getPart(false);
-            if (editor == null) { return; }
+            if (editor == null) {
+                return;
+            }
             if (!this.parserMap.containsKey(editor) && ViewControl.isPerspectiveOpen()) {
                 this.parserMap.put(editor, ParserFactory.createParser(editor));
             }
@@ -863,7 +869,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
     public void partInputChanged(IWorkbenchPartReference partRef) {
         if (partRef.getPart(false) instanceof IEditorPart) {
             IEditorPart editor = (IEditorPart) partRef.getPart(false);
-            if (editor == null) { return; }
+            if (editor == null) {
+                return;
+            }
             if (this.parserMap.containsKey(editor) && ViewControl.isPerspectiveOpen()) {
                 parserMap.get(editor).clearAnnotations();
                 parserMap.put(editor, ParserFactory.createParser(editor));
@@ -962,7 +970,9 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
             int index = 0;
             Object comment;
             if (viewer.getSelection().isEmpty()) {
-                if (comments.isEmpty()) { return; }
+                if (comments.isEmpty()) {
+                    return;
+                }
             } else {
                 IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
                 comment = sel.toList().get(sel.size() - 1);

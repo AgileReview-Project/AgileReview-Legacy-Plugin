@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.dataaccess;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -434,7 +435,9 @@ public class ReviewAccess {
                             // Open file and read basic information
                             if (!((IFile) currFile).getName().equals("review.xml")) {
                                 try {
-                                    CommentsDocument doc = CommentsDocument.Factory.parse(((IFile) currFile).getContents());
+                                    InputStream stream = ((IFile) currFile).getContents();
+                                    CommentsDocument doc = CommentsDocument.Factory.parse(stream);
+                                    stream.close();
                                     this.rFileModel.addXmlDocument(doc, (IFile) currFile);
                                     readCommentsDocument(doc);
                                 } catch (final CoreException e) {
@@ -503,7 +506,9 @@ public class ReviewAccess {
                         if (allFiles[i] instanceof IFile && ((IFile) allFiles[i]).getName().equals("review.xml")) {
                             try {
                                 // Open file and store review
-                                ReviewDocument doc = ReviewDocument.Factory.parse(((IFile) allFiles[i]).getContents());
+                                InputStream stream = ((IFile) allFiles[i]).getContents();
+                                ReviewDocument doc = ReviewDocument.Factory.parse(stream);
+                                stream.close();
                                 this.rFileModel.addXmlDocument(doc, (IFile) allFiles[i]);
                                 rModel.addReview(doc.getReview());
                             } catch (final CoreException e) {
@@ -878,7 +883,9 @@ public class ReviewAccess {
         
         // Add review to model,
         // return null in case of the reviewId being already in use
-        if (!rModel.addReview(result)) { return null; }
+        if (!rModel.addReview(result)) {
+            return null;
+        }
         this.rModel.createModelEntry(reviewId);
         
         // save new review file
@@ -925,7 +932,9 @@ public class ReviewAccess {
                     if (!((IFile) currFile).getName().equals("review.xml")) {
                         // Open file and read basic information
                         try {
-                            CommentsDocument doc = CommentsDocument.Factory.parse(((IFile) currFile).getContents());
+                            InputStream stream = ((IFile) currFile).getContents();
+                            CommentsDocument doc = CommentsDocument.Factory.parse(stream);
+                            stream.close();
                             this.rFileModel.addXmlDocument(doc, (IFile) currFile);
                             readCommentsDocument(doc);
                         } catch (final CoreException e) {
