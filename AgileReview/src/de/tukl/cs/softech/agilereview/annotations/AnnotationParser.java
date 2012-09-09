@@ -281,7 +281,7 @@ public class AnnotationParser implements IAnnotationParser {
                 PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <same begin tag already exists>: " + key + " --> deleting");
                 tagDeleted = true;
             } else {
-                idPositionMap.put(key, new Position(tagRegion.getOffset()));
+                idPositionMap.put(key, new Position(document.getLineOffset(document.getLineOfOffset(tagRegion.getOffset()))));
             }
             rewriteTagLocationForLineAdaption(matcher, tagRegion, true);
         }
@@ -441,6 +441,7 @@ public class AnnotationParser implements IAnnotationParser {
         int origSelStartLine = selStartLine;
         String commentKey = comment.getReviewID() + keySeparator + comment.getAuthor() + keySeparator + comment.getId();
         String commentTag = keySeparator + commentKey + keySeparator;
+        boolean[] significantlyChanged = new boolean[] { false, false };
         
         // check if selection needs to be adapted
         int[] newLines = computeSelectionAdapations(selStartLine, selEndLine);
@@ -449,7 +450,6 @@ public class AnnotationParser implements IAnnotationParser {
                     "Selection for inserting tags needs to be adapted, performing adaptation.");
             
             // adapt starting line if necessary
-            boolean[] significantlyChanged = new boolean[] { false, false };
             if (newLines[0] != -1) {
                 int newStartLineOffset = document.getLineOffset(newLines[0]);
                 int newStartLineLength = document.getLineLength(newLines[0]);
@@ -477,41 +477,58 @@ public class AnnotationParser implements IAnnotationParser {
             } else {
                 selEndLine += (startLineInserted ? 1 : 0);
             }
-            
-            // add new line if end line is last line of javaDoc
-            int adaptionStartLine = checkForCodeComment(selEndLine - 1, new String[] { "/*", "*/" })[0];
+        }
+        
+        // add new line if start line is last line of javaDoc
+        int[] adaptionLines = checkForCodeComment(selStartLine - 1, new String[] { "/*", "*/" });
+        if (adaptionLines[1] != -1 && lineContains(adaptionLines[0] + 1, "/**")) {
+            int newStartLineOffset = document.getLineOffset(selStartLine + 1);
+            int newStartLineLength = document.getLineLength(selStartLine + 1);
+            if (!document.get(newStartLineOffset, newStartLineLength).trim().isEmpty()) {
+                document.replace(newStartLineOffset, 0, System.getProperty("line.separator"));
+                selStartLine++;
+                selEndLine++;
+                startLineInserted = true;
+                significantlyChanged[0] = true;
+            }
+        }
+        
+        // add new line if end line is last line of javaDoc
+        adaptionLines = checkForCodeComment(selEndLine - 1, new String[] { "/*", "*/" });
+        if (adaptionLines[1] != -1 && lineContains(adaptionLines[0] + 1, "/**")) {
             int newEndLineOffset = document.getLineOffset(selEndLine + 1);
             int newEndLineLength = document.getLineLength(selEndLine + 1);
-            if (lineContains(adaptionStartLine + 1, "/**") && !document.get(newEndLineOffset, newEndLineLength).trim().isEmpty()) {
+            if (!document.get(newEndLineOffset, newEndLineLength).trim().isEmpty()) {
                 document.replace(newEndLineOffset, 0, System.getProperty("line.separator"));
                 selEndLine++;
                 endLineInserted = true;
+                significantlyChanged[1] = true;
             }
-            
-            if (significantlyChanged[0] || significantlyChanged[1]) {
-                // inform user
-                Display.getDefault().asyncExec(new Runnable() {
-                    
-                    @Override
-                    public void run() {
-                        MessageDialog
-                                .openWarning(
-                                        Display.getDefault().getActiveShell(),
-                                        "Warning!",
-                                        "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. "
-                                                + "AgileReview will adapt the current selection to avoid this.\nIf it is necessary a new line will be inserted above the selection which will be removed on comment deletion.");
-                    }
-                    
-                });
-                
-            }
-            
-            // compute new selection
-            int offset = document.getLineOffset(selStartLine);
-            int length = document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine);
-            // set new selection
-            editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
         }
+        
+        if (significantlyChanged[0] || significantlyChanged[1]) {
+            // inform user
+            Display.getDefault().asyncExec(new Runnable() {
+                
+                @Override
+                public void run() {
+                    MessageDialog
+                            .openWarning(
+                                    Display.getDefault().getActiveShell(),
+                                    "Warning!",
+                                    "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. "
+                                            + "AgileReview will adapt the current selection to avoid this.\nIf it is necessary a new line will be inserted above the selection which will be removed on comment deletion.");
+                }
+                
+            });
+            
+        }
+        
+        // compute new selection
+        int offset = document.getLineOffset(selStartLine);
+        int length = document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) + document.getLineLength(selEndLine);
+        // set new selection
+        editor.getSelectionProvider().setSelection(new TextSelection(offset, length));
         
         if (selStartLine == selEndLine) {
             // Only one line is selected
@@ -583,13 +600,11 @@ public class AnnotationParser implements IAnnotationParser {
         int[] endLineAdaptions = checkForCodeComment(endLine, tags);
         
         // check if inserting a AgileReview comment at selected code region destroys a code comment
-        if (startLineAdaptions[0] != -1 && startLineAdaptions[1] != -1) {
-            if (startLineAdaptions[0] != startLine) {
-                result[0] = startLineAdaptions[0];
-            }
-            if (endLineAdaptions[1] != endLine) {
-                result[1] = endLineAdaptions[1];
-            }
+        if (startLineAdaptions[0] != -1 && startLineAdaptions[1] != -1 && startLineAdaptions[0] != startLine) {
+            result[0] = startLineAdaptions[0];
+        }
+        if (endLineAdaptions[0] != -1 && endLineAdaptions[1] != -1 && endLineAdaptions[1] != endLine) {
+            result[1] = endLineAdaptions[1];
         }
         
         return result;
