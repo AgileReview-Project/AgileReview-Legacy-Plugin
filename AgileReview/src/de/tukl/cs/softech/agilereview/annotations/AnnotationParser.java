@@ -53,7 +53,7 @@ public class AnnotationParser implements IAnnotationParser {
     /**
      * Core Regular Expression to find the core tag structure
      */
-    private static String rawTagRegex = "-?\\s*(\\??)" + Pattern.quote(keySeparator) + "\\s*([^" + Pattern.quote(keySeparator) + "]+"
+    public static String RAW_TAG_REGEX = "-?\\s*(\\??)" + Pattern.quote(keySeparator) + "\\s*([^" + Pattern.quote(keySeparator) + "]+"
             + Pattern.quote(keySeparator) + "[^" + Pattern.quote(keySeparator) + "]+" + Pattern.quote(keySeparator) + "[^\\?"
             + Pattern.quote(keySeparator) + "]*)\\s*" + Pattern.quote(keySeparator) + "(\\??)\\s*(-?)";
     /**
@@ -102,7 +102,7 @@ public class AnnotationParser implements IAnnotationParser {
      */
     AnnotationParser(ITextEditor editor, String commentBeginTag, String commentEndTag) throws NoDocumentFoundException {
         
-        tagRegex = Pattern.quote(commentBeginTag) + rawTagRegex + Pattern.quote(commentEndTag);
+        tagRegex = Pattern.quote(commentBeginTag) + RAW_TAG_REGEX + Pattern.quote(commentEndTag);
         tagPattern = Pattern.compile(tagRegex);
         
         this.editor = editor;
@@ -664,7 +664,7 @@ public class AnnotationParser implements IAnnotationParser {
      */
     private boolean lineContains(int lineNumber, String string) throws BadLocationException {
         String lineContent = document.get(document.getLineOffset(lineNumber), document.getLineLength(lineNumber)).trim();
-        lineContent = lineContent.replaceAll(Pattern.quote(string) + rawTagRegex + Pattern.quote(string), "");
+        lineContent = lineContent.replaceAll(Pattern.quote(string) + RAW_TAG_REGEX + Pattern.quote(string), "");
         return lineContent.contains(string);
     }
     
