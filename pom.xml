@@ -37,6 +37,6 @@
     </repository>
   </repositories>
   <properties>
-    <branch.version>0.8.3-SNAPSHOT</branch.version>
+    <branch.version>0.8.4-SNAPSHOT</branch.version>
   </properties>
 </project>
