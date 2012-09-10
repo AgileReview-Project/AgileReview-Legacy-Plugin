@@ -2,7 +2,7 @@
 <feature
       id="de.tukl.cs.softech.agilereview.feature_nightly"
       label="AgileReview - nightly build"
-      version="0.8.3.qualifier"
+      version="0.8.4.qualifier"
       provider-name="AgileReview.org">
 
    <description>
@@ -243,7 +243,7 @@ limitations under the License.
          id="de.tukl.cs.softech.agilereview"
          download-size="0"
          install-size="0"
-         version="0.8.3.qualifier"
+         version="0.8.4.qualifier"
          unpack="false"/>
 
 </feature>
