@@ -212,7 +212,7 @@ public class AnnotationParser implements IAnnotationParser {
                 if (ps[1] == null) {
                     PluginLogger.log(this.getClass().toString(), "parseInput", "corrupt: <begin tag without end tag>: " + key + " --> deleting");
                     corruptedCommentKeys.add(key);
-                    positionsToDelete.add(ps[0]);
+                    positionsToDelete.add(new ComparablePosition(ps[0]));/*-?|r135|Malte|c0|?*/
                     curruptedBeginTagExists = true;
                 }
             }
