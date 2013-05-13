@@ -191,7 +191,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                         try {
                             if (p.hasNature(PropertiesManager.getInstance().getInternalProperty(
                                     PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE))
-                                    && !ra.getCurrentSourceFolder().equals(p)) {
+                                    && ra.getCurrentSourceFolder() != null && !ra.getCurrentSourceFolder().equals(p)) {
                                 ReviewAccess.setProjectNatures(p, new String[] { PropertiesManager.getInstance().getInternalProperty(
                                         PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE) });
                                 // update decorator
