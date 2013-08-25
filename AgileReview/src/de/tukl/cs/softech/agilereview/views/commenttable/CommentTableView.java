@@ -811,14 +811,16 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
                 this.selectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
                 
                 ICommandService cmdService = (ICommandService) getSite().getService(ICommandService.class);
-                Command linkExplorerCommand = cmdService.getCommand("de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer");
-                Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
-                // If "Link Editor" is enabled, then filter also
-                if ((Boolean) state) {
-                    PluginLogger.log(this.getClass().toString(), "selectionChanged", "Adding new filter regarding selection of ReviewExplorer");
-                    // refresh annotations, update list of filtered comments
-                    viewer.addFilter(this.selectionFilter);
-                    filterComments();
+                if (cmdService != null) {
+                    Command linkExplorerCommand = cmdService.getCommand("de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer");
+                    Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
+                    // If "Link Editor" is enabled, then filter also
+                    if ((Boolean) state) {
+                        PluginLogger.log(this.getClass().toString(), "selectionChanged", "Adding new filter regarding selection of ReviewExplorer");
+                        // refresh annotations, update list of filtered comments
+                        viewer.addFilter(this.selectionFilter);
+                        filterComments();
+                    }
                 }
             }
         }

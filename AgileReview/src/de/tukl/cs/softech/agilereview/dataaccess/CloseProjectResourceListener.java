@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -20,6 +21,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizard;
@@ -206,6 +208,23 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                                 });
                             }
                         } catch (CoreException e) {/* We are not interested in closed or non existent projects*/
+                        }
+                    }
+                }
+                
+                /////////////////////////////////////////////////////
+                // POST_BUILD -- Refresh Source Folder if necessary//
+                /////////////////////////////////////////////////////
+                if (event.getType() == IResourceChangeEvent.POST_BUILD) {
+                    if (oldSourceProject == null) {
+                        oldSourceProject = ra.getCurrentSourceFolder();
+                    }
+                    if (oldSourceProject != null) {
+                        for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
+                            if (oldSourceProject.equals(delta.getResource())) {
+                                RefreshHandler.doGlobalRefresh();
+                                break;
+                            }
                         }
                     }
                 }
