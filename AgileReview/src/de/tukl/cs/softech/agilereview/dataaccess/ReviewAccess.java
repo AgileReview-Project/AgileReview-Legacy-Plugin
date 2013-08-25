@@ -393,9 +393,8 @@ public class ReviewAccess {
             REVIEW_REPO_FOLDER = p;
             PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, p.getName());
             // add active nature to new project
-            setProjectNatures(p, new String[] {
-                    PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE),
-                    PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE) });
+	        setProjectNatures(p, new String[] {
+	                    PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE) });
             // update decorator
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
