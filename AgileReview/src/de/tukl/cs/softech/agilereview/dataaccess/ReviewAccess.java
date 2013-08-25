@@ -63,6 +63,9 @@ public class ReviewAccess {
      */
     private static volatile IProject REVIEW_REPO_FOLDER = null;
     
+    /**
+     * Simple object for synchronization
+     */
     private static final Object syncObj = new Object();
     
     /**
@@ -1042,7 +1045,7 @@ public class ReviewAccess {
     public boolean updateReviewSourceProject() {
         boolean result = false;
         String strPropManReviewSourceName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
-        if (REVIEW_REPO_FOLDER == null || !REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName)) {
+        if (strPropManReviewSourceName != "" && strPropManReviewSourceName != null && (REVIEW_REPO_FOLDER == null || !REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName))) {
             loadReviewSourceProject(strPropManReviewSourceName);
             result = true;
         }

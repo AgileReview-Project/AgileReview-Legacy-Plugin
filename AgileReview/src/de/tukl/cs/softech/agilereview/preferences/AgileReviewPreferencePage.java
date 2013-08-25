@@ -1,6 +1,6 @@
 package de.tukl.cs.softech.agilereview.preferences;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -70,7 +70,7 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
         addField(strAuthorField);
         
         // Field for AgileReview-folder
-        List<String> list = new ArrayList<String>();
+        List<String> list = new LinkedList<String>();
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         IProject[] projArr = workspaceRoot.getProjects();
         for (IProject currProj : projArr) {
@@ -81,6 +81,9 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
             } catch (CoreException e) {
                 // Is thrown, if currProj is closed or does not exist -> this project is not interesting for us
             }
+        }
+        if (!list.contains(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER))) {
+        	list.add(0, "");
         }
         
         String[][] vals = new String[list.size()][2];
