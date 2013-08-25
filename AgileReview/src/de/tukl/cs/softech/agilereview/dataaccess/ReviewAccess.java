@@ -61,7 +61,9 @@ public class ReviewAccess {
     /**
      * Reference to the folder where the review and comments xml files are located. This must never be null (after creation of ReviewAccess)
      */
-    private static IProject REVIEW_REPO_FOLDER = null;
+    private static volatile IProject REVIEW_REPO_FOLDER = null;
+    
+    private static final Object syncObj = new Object();
     
     /**
      * Instance of the comment model
@@ -300,11 +302,13 @@ public class ReviewAccess {
      * Singleton Pattern
      * @return Instance of this class
      */
-    public static synchronized ReviewAccess getInstance() {
-        if (RA == null) {
-            RA = new ReviewAccess();
+    public static ReviewAccess getInstance() {
+        synchronized (syncObj) {
+            if (RA == null) {
+                RA = new ReviewAccess();
+            }
+            return RA;
         }
-        return RA;
     }
     
     // //////////////////////////////
