@@ -3,7 +3,7 @@
    <description name="AgileReview Nightly Builds" url="http://www.agilereview.org/development_update">
       Nightly Builds of the AgileReview Development Branch.
    </description>
-   <feature url="features/de.tukl.cs.softech.agilereview.feature_nightly_0.8.4.qualifier.jar" id="de.tukl.cs.softech.agilereview.feature_nightly" version="0.8.4.qualifier">
+   <feature url="features/de.tukl.cs.softech.agilereview.feature_nightly_0.8.5.qualifier.jar" id="de.tukl.cs.softech.agilereview.feature_nightly" version="0.8.5.qualifier">
       <category name="de.tukl.cs.softech.agilereview.updatesite_nightly"/>
    </feature>
    <category-def name="de.tukl.cs.softech.agilereview.updatesite_nightly" label="AgileReview Nightly Builds"/>
