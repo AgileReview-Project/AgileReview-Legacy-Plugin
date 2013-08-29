@@ -61,7 +61,12 @@ public class ReviewAccess {
     /**
      * Reference to the folder where the review and comments xml files are located. This must never be null (after creation of ReviewAccess)
      */
-    private static IProject REVIEW_REPO_FOLDER = null;
+    private static volatile IProject REVIEW_REPO_FOLDER = null;
+    
+    /**
+     * Simple object for synchronization
+     */
+    private static final Object syncObj = new Object();
     
     /**
      * Instance of the comment model
@@ -300,11 +305,13 @@ public class ReviewAccess {
      * Singleton Pattern
      * @return Instance of this class
      */
-    public static synchronized ReviewAccess getInstance() {
-        if (RA == null) {
-            RA = new ReviewAccess();
+    public static ReviewAccess getInstance() {
+        synchronized (syncObj) {
+            if (RA == null) {
+                RA = new ReviewAccess();
+            }
+            return RA;
         }
-        return RA;
     }
     
     // //////////////////////////////
@@ -389,9 +396,8 @@ public class ReviewAccess {
             REVIEW_REPO_FOLDER = p;
             PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, p.getName());
             // add active nature to new project
-            setProjectNatures(p, new String[] {
-                    PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE),
-                    PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE) });
+	        setProjectNatures(p, new String[] {
+	                    PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE) });
             // update decorator
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
@@ -1039,7 +1045,7 @@ public class ReviewAccess {
     public boolean updateReviewSourceProject() {
         boolean result = false;
         String strPropManReviewSourceName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
-        if (REVIEW_REPO_FOLDER == null || !REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName)) {
+        if (strPropManReviewSourceName != "" && strPropManReviewSourceName != null && (REVIEW_REPO_FOLDER == null || !REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName))) {
             loadReviewSourceProject(strPropManReviewSourceName);
             result = true;
         }

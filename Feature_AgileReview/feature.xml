@@ -2,7 +2,7 @@
 <feature
       id="de.tukl.cs.softech.agilereview.feature"
       label="AgileReview"
-      version="0.8.3">
+      version="0.8.4">
 
    <description>
       AgileReview lets you easily conduct code reviews within the eclipse
@@ -226,7 +226,7 @@ IDE.
          id="de.tukl.cs.softech.agilereview"
          download-size="0"
          install-size="0"
-         version="0.8.3"
+         version="0.8.4"
          unpack="false"/>
 
 </feature>

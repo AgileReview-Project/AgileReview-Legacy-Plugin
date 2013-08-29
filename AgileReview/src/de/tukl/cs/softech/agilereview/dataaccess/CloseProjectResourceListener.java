@@ -1,7 +1,13 @@
 package de.tukl.cs.softech.agilereview.dataaccess;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -15,6 +21,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizard;
@@ -27,11 +34,11 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
     /**
      * This boolean indicates whether there was a PRE_CLOSE event before a POST_BUILD
      */
-    private boolean closedBefore = false;
+    private volatile Set<IResource> closedBefore = new HashSet<IResource>();
     /**
      * This IPath is unequal to null iff there was a PRE_DELETE event before a POST_BUILD
      */
-    private IPath deletedProjectPath = null;
+    private volatile HashMap<IResource, IPath> deletedProjectPath = new HashMap<IResource, IPath>();
     /**
      * Variable to save the old SourceProject between a PRE and a POST event
      */
@@ -64,12 +71,13 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                 // PRE_CLOSE //
                 ///////////////
                 if (event.getType() == IResourceChangeEvent.PRE_CLOSE) {
-                    closedBefore = true;
-                    oldSourceProject = ra.getCurrentSourceFolder();
+                    closedBefore.add(event.getResource());
+                    if (oldSourceProject == null) {
+                        oldSourceProject = ra.getCurrentSourceFolder();
+                    }
                     // Remove active nature, if needed
                     if (oldSourceProject != null) {
                         if (oldSourceProject.equals(event.getResource())) {
-                            // now remove active nature
                             oldSourceProject = ra.unloadCurrentReviewSourceProject();
                         }
                     }
@@ -78,51 +86,51 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                 ////////////////
                 // POST_CLOSE //
                 ////////////////
-                if (event.getType() == IResourceChangeEvent.POST_BUILD && closedBefore) {
-                    closedBefore = false;
+                if (event.getType() == IResourceChangeEvent.POST_BUILD && !closedBefore.isEmpty()) {
                     if (oldSourceProject != null) {
                         //check whether the project was one of the closed project
-                        IResourceDelta[] deltaArr = event.getDelta().getAffectedChildren();
-                        if (deltaArr.length > 0) {
-                            for (IResourceDelta delta : deltaArr) {
-                                if (oldSourceProject.equals(delta.getResource())) {
-                                    Shell currentShell = Display.getDefault().getActiveShell();
-                                    String msg = "You closed the currently used 'Agile Review Source Project'.\n"
-                                            + "Do you want to reopen it to avoid a crash of AgileReview?";
-                                    if (MessageDialog.openQuestion(currentShell, "Warning: AgileReview Source Project", msg)) {
-                                        try {
-                                            oldSourceProject.open(null); // TODO use progressmonitor?
-                                            ra.loadReviewSourceProject(oldSourceProject.getName());
-                                        } catch (final CoreException e) {
-                                            PluginLogger.logError(this.getClass().toString(), "resourceChanged",
-                                                    "An exception occured while reopening the closed source project", e);
-                                            Display.getDefault().syncExec(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could open project",
-                                                            e.getLocalizedMessage());
-                                                }
-                                            });
-                                        }
-                                    } else {
-                                        // Show NoAgileReviewSourceProject wizard
-                                        showNoSourceProjectWizard();
+                        for (IResource r : closedBefore) {
+                            if (oldSourceProject.equals(r)) {
+                                Shell currentShell = Display.getDefault().getActiveShell();
+                                String msg = "You closed the currently used 'Agile Review Source Project'.\n"
+                                        + "Do you want to reopen it to avoid a crash of AgileReview?";
+                                if (MessageDialog.openQuestion(currentShell, "Warning: AgileReview Source Project", msg)) {
+                                    try {
+                                        oldSourceProject.open(null); // TODO use progressmonitor?
+                                        ra.loadReviewSourceProject(oldSourceProject.getName());
+                                    } catch (final CoreException e) {
+                                        PluginLogger.logError(this.getClass().toString(), "resourceChanged",
+                                                "An exception occured while reopening the closed source project", e);
+                                        Display.getDefault().syncExec(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                MessageDialog.openError(Display.getDefault().getActiveShell(), "AgileReview: Could open project", e
+                                                        .getLocalizedMessage());
+                                            }
+                                        });
                                     }
-                                    break;
+                                } else {
+                                    // Show NoAgileReviewSourceProject wizard
+                                    showNoSourceProjectWizard();
                                 }
+                                break;
                             }
                         }
                     }
+                    closedBefore.clear();
                 }
                 
                 ////////////////
                 // PRE_DELETE //
                 ////////////////
                 if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
-                    oldSourceProject = ra.getCurrentSourceFolder();
+                    if (oldSourceProject == null) {
+                        oldSourceProject = ra.getCurrentSourceFolder();
+                    }
+                    
                     if (oldSourceProject != null) {
                         if (oldSourceProject.equals(event.getResource())) {
-                            deletedProjectPath = oldSourceProject.getLocation();
+                            deletedProjectPath.put(oldSourceProject, oldSourceProject.getLocation());
                             oldSourceProject = ra.unloadCurrentReviewSourceProject();
                         }
                     }
@@ -131,67 +139,62 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                 /////////////////
                 // POST_DELETE //
                 /////////////////
-                if (event.getType() == IResourceChangeEvent.POST_BUILD && deletedProjectPath != null) {
+                if (event.getType() == IResourceChangeEvent.POST_BUILD && !deletedProjectPath.isEmpty()) {
                     if (oldSourceProject != null) {
                         //check whether the project was one of the closed project
-                        IResourceDelta[] deltaArr = event.getDelta().getAffectedChildren();
-                        if (deltaArr.length > 0) {
-                            for (IResourceDelta delta : deltaArr) {
-                                if (oldSourceProject.equals(delta.getResource())) {
-                                    Shell currentShell = Display.getDefault().getActiveShell();
-                                    // Check in file system, if file still exists
-                                    if (!deletedProjectPath.toFile().exists()) {
-                                        String msg = "You deleted the current 'Agile Review Source Project' from disk.\n"
-                                                + "Please choose an other 'AgileReview Source Project' for AgileReview to stay functional";
-                                        MessageDialog.openWarning(currentShell, "'Agile Review Source Project' deleted", msg);
-                                        // Show NoAgileReviewSourceProject wizard
-                                        deletedProjectPath = null; // needed for correct wizard behavior
-                                        showNoSourceProjectWizard();
-                                    } else {
-                                        String msg = "You deleted the current 'Agile Review Source Project' from your internal explorer.\n"
-                                                + "Do you want to re-import it directly to avoid a crash of AgileReview?";
-                                        if (MessageDialog.openQuestion(currentShell, "Warning: AgileReview Source Project", msg)) {
-                                            try {
-                                                IProjectDescription description = ResourcesPlugin.getWorkspace().loadProjectDescription(
-                                                        new Path(deletedProjectPath + "/.project"));
-                                                IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(description.getName());
-                                                project.create(description, null); //TODO use progress monitor here and one line below?
-                                                project.open(null);
-                                                ra.loadReviewSourceProject(project.getName());
-                                            } catch (final CoreException e) {
-                                                PluginLogger.logError(this.getClass().toString(), "resourceChanged",
-                                                        "An exception occured while reimporting the closed source project", e);
-                                                Display.getDefault().syncExec(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        MessageDialog.openError(Display.getDefault().getActiveShell(),
-                                                                "AgileReview: Could not import project", e.getLocalizedMessage());
-                                                    }
-                                                });
-                                            }
-                                        } else {
-                                            // Show NoAgileReviewSourceProject wizard
-                                            deletedProjectPath = null; // needed for correct wizard behavior
-                                            showNoSourceProjectWizard();
+                        for (Entry<IResource, IPath> entry : deletedProjectPath.entrySet()) {
+                            if (oldSourceProject.equals(entry.getKey())) {
+                                Shell currentShell = Display.getDefault().getActiveShell();
+                                // Check in file system, if file still exists
+                                if (!entry.getValue().toFile().exists()) {
+                                    String msg = "You deleted the current 'Agile Review Source Project' from disk.\n"
+                                            + "Please choose an other 'AgileReview Source Project' for AgileReview to stay functional";
+                                    MessageDialog.openWarning(currentShell, "'Agile Review Source Project' deleted", msg);
+                                    // Show NoAgileReviewSourceProject wizard
+                                    showNoSourceProjectWizard();
+                                } else {
+                                    String msg = "You deleted the current 'Agile Review Source Project' from your internal explorer.\n"
+                                            + "Do you want to re-import it directly to avoid a crash of AgileReview?";
+                                    if (MessageDialog.openQuestion(currentShell, "Warning: AgileReview Source Project", msg)) {
+                                        try {
+                                            IProjectDescription description = ResourcesPlugin.getWorkspace().loadProjectDescription(
+                                                    new Path(entry.getValue() + "/.project"));
+                                            IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(description.getName());
+                                            project.create(description, null); //TODO use progress monitor here and one line below?
+                                            project.open(null);
+                                            ra.loadReviewSourceProject(project.getName());
+                                        } catch (final CoreException e) {
+                                            PluginLogger.logError(this.getClass().toString(), "resourceChanged",
+                                                    "An exception occured while reimporting the closed source project", e);
+                                            Display.getDefault().syncExec(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    MessageDialog.openError(Display.getDefault().getActiveShell(),
+                                                            "AgileReview: Could not import project", e.getLocalizedMessage());
+                                                }
+                                            });
                                         }
+                                    } else {
+                                        // Show NoAgileReviewSourceProject wizard
+                                        showNoSourceProjectWizard();
                                     }
-                                    break;
                                 }
+                                break;
                             }
                         }
                     }
-                    deletedProjectPath = null;
+                    deletedProjectPath.clear();
                 }
                 
                 ////////////////
                 // POST_BUILD //
                 ////////////////
-                if (event.getType() == IResourceChangeEvent.POST_BUILD && deletedProjectPath == null && !closedBefore) {
+                if (event.getType() == IResourceChangeEvent.POST_BUILD && deletedProjectPath.isEmpty() && closedBefore.isEmpty()) {
                     for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
                         try {
                             if (p.hasNature(PropertiesManager.getInstance().getInternalProperty(
                                     PropertiesManager.INTERNAL_KEYS.ACTIVE_AGILEREVIEW_NATURE))
-                                    && !ra.getCurrentSourceFolder().equals(p)) {
+                                    && ra.getCurrentSourceFolder() != null && !ra.getCurrentSourceFolder().equals(p)) {
                                 ReviewAccess.setProjectNatures(p, new String[] { PropertiesManager.getInstance().getInternalProperty(
                                         PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE) });
                                 // update decorator
@@ -205,6 +208,23 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                                 });
                             }
                         } catch (CoreException e) {/* We are not interested in closed or non existent projects*/
+                        }
+                    }
+                }
+                
+                /////////////////////////////////////////////////////
+                // POST_BUILD -- Refresh Source Folder if necessary//
+                /////////////////////////////////////////////////////
+                if (event.getType() == IResourceChangeEvent.POST_BUILD) {
+                    if (oldSourceProject == null) {
+                        oldSourceProject = ra.getCurrentSourceFolder();
+                    }
+                    if (oldSourceProject != null) {
+                        for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
+                            if (oldSourceProject.equals(delta.getResource())) {
+                                RefreshHandler.doGlobalRefresh();
+                                break;
+                            }
                         }
                     }
                 }

@@ -24,7 +24,9 @@ public class ComparablePosition extends Position implements Comparable<Position>
         if (arg0 instanceof ComparablePosition) {
             if (offset < ((ComparablePosition) arg0).offset) {
                 return -1;
-            } else if (offset > ((ComparablePosition) arg0).offset) { return 1; }
+            } else if (offset > ((ComparablePosition) arg0).offset) {
+                return 1;
+            }
         }
         return 0;
     }

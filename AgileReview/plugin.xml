@@ -606,7 +606,7 @@
    <initializer
          class="de.tukl.cs.softech.agilereview.preferences.PreferenceInitializer">
    </initializer>
-</extension>   
+</extension>
 <extension
       point="org.eclipse.ui.handlers">
    <handler
@@ -988,29 +988,6 @@
             </and>
          </with>
       </activeWhen>
-      <enabledWhen>
-         <with
-               variable="selection">
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                     <not>
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="%agileReview_active_nature.id">
-                        </test>
-                     </not>
-                  </adapt>
-               </iterate>
-            </and>
-         </with>
-      </enabledWhen>
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CleanupHandler"
@@ -1426,8 +1403,9 @@
             style="push">
       </command>
    </menuContribution>
+   
    <menuContribution
-         locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+         locationURI="popup:org.eclipse.ui.popup.any">
       <separator
             name="AgileReview.PackageExplorer.separator1"
             visible="true">
@@ -1450,7 +1428,7 @@
                         ifEmpty="false"
                         operator="and">
                      <adapt
-                           type="org.eclipse.core.resources.IResource">
+                           type="org.eclipse.core.resources.IProject">
                         <test
                               property="org.eclipse.core.resources.projectNature"
                               value="%agileReview_nature.id">
@@ -1468,7 +1446,28 @@
             style="push"
             tooltip="Remove AgileReview comments tags from all files of this project">
          <visibleWhen
-               checkEnabled="true">
+               checkEnabled="false">
+            <with
+                  variable="selection">
+               <and>
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <not>
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="%agileReview_nature.id">
+                           </test>
+                        </not>
+                     </adapt>
+                  </iterate>
+               </and>
+            </with>
          </visibleWhen>
       </command>
       <separator
@@ -1586,16 +1585,6 @@
    </runtime>
 </extension>
 <extension
-      id="de.tukl.cs.softech.agilereview.active_nature"
-      name="Active AgileReview Source Folder"
-      point="org.eclipse.core.resources.natures">
-   <runtime>
-      <run
-            class="de.tukl.cs.softech.agilereview.plugincontrol.AgileReviewNature">
-      </run>
-   </runtime>
-</extension>
-<extension
       point="org.eclipse.ui.ide.projectNatureImages">
    <image
          icon="icons/agile_icon.png"
@@ -1609,12 +1598,12 @@
       point="org.eclipse.ui.decorators">
    <decorator
          adaptable="true"
+         class="de.tukl.cs.softech.agilereview.views.AgileReviewActiveSourceDecorator"
          icon="icons/agile_active_icon.png"
          id="de.tukl.cs.softech.agilereview.active_decorator"
          label="Active AgileReview Source Folder Decorator"
          lightweight="true"
          location="BOTTOM_RIGHT"
-         objectClass="org.eclipse.core.resources.IProject"
          state="true">
       <description>
          Adds a small green hook to the current AgileReview Source Folder...
@@ -1622,7 +1611,7 @@
       <enablement>
          <objectState
                name="nature"
-               value="%agileReview_active_nature.id">
+               value="%agileReview_nature.id">
          </objectState>
       </enablement>
    </decorator>

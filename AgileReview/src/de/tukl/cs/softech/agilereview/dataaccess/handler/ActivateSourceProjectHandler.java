@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
@@ -44,5 +45,21 @@ public class ActivateSourceProjectHandler extends AbstractHandler {
         }
         return null;
     }
+ 
+    @Override
+	public boolean isEnabled() {
+    	// Only enabled when the only selected source project is not the current one
+    	ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getSelection(); 
+		if (selection instanceof IStructuredSelection) { 
+			IStructuredSelection strucSel = (IStructuredSelection) selection;
+			if (((IStructuredSelection) selection).size() == 1) {
+		        Object o = strucSel.getFirstElement();
+		        if (o instanceof IProject) {
+		        	return super.isEnabled() && !((IProject)o).getName().equals(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER));
+		        }
+			}
+		} 
+		return true;
+	}
     
 }

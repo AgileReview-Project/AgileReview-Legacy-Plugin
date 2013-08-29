@@ -18,7 +18,17 @@ public class RefreshHandler extends AbstractHandler {
     
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        PluginLogger.log(this.getClass().toString(), "execute", "Refresh triggered");
+        doGlobalRefresh();
+        // Return must be null (see API)
+        return null;
+    }
+    
+    /**
+     * 
+     * @author Malte Brunnlieb (25.08.2013)
+     */
+    public static void doGlobalRefresh() {
+        PluginLogger.log(RefreshHandler.class.toString(), "execute", "Refresh triggered");
         ReviewAccess ra = ReviewAccess.getInstance();
         // Refill the database
         try {
@@ -37,9 +47,6 @@ public class RefreshHandler extends AbstractHandler {
         }
         
         ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
-        
-        // Return must be null (see API)
-        return null;
     }
     
 }
