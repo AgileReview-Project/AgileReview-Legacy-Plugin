@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizard;
@@ -222,7 +221,8 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                     if (oldSourceProject != null) {
                         for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
                             if (oldSourceProject.equals(delta.getResource())) {
-                                RefreshHandler.doGlobalRefresh();
+// FIXME @may-bee: fix this, AR is unusable with this!
+//                                RefreshHandler.doGlobalRefresh();
                                 break;
                             }
                         }
