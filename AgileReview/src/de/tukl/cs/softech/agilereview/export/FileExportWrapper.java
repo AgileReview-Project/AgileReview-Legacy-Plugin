@@ -24,6 +24,10 @@ public class FileExportWrapper {
      * Path of the represented file
      */
     private String path = "";
+    /**
+     * Full Path
+     */
+    private String fullPath = "";
     
     /**
      * Creates a new FileExportWrapper instance with a given {@link java.io.File} and the correlated project
@@ -49,6 +53,7 @@ public class FileExportWrapper {
         this.project = project;
         String p = ReviewAccess.computePath(file);
         this.path = p.substring(p.indexOf(project) + project.length());
+        this.fullPath = p;
     }
     
     /**
@@ -81,5 +86,13 @@ public class FileExportWrapper {
      */
     public String getPath() {
         return path;
+    }
+    
+    /**
+     * @return the fullPath
+     * @author Malte Brunnlieb (06.11.2013)
+     */
+    public String getFullPath() {
+        return fullPath;
     }
 }
