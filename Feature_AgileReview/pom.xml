@@ -3,12 +3,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>next_Release</artifactId>
+    <artifactId>parent</artifactId>
     <groupId>de.tukl.cs.softech.agilereview</groupId>
-    <version>${branch.version}</version>
+    <version>0.8.5-SNAPSHOT</version>
   </parent>
   <groupId>de.tukl.cs.softech.agilereview</groupId>
-  <artifactId>de.tukl.cs.softech.agilereview.feature_nightly</artifactId>
-  <version>${branch.version}</version>
+  <artifactId>de.tukl.cs.softech.agilereview.feature</artifactId>
   <packaging>eclipse-feature</packaging>
 </project>

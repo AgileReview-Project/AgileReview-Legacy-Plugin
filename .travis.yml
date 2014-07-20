@@ -1,1 +1,5 @@
 language: java
+env:
+  global:
+  - secure: S2gSoCJw4UMKrfC49BqDIHozvphzcZzAxMwm6ODn8P3cL3LSLRVFsfp+V0xWI7YPVHuym7dPL6R/nDJkcHheWRHC5/ChfqJydjcJQno0zFMr/p81xpHymdcHZ2kHptZ5k627MYkK6qghH4WJJxvcHzyX7tPWhZQFCyaPFCvPX/8=
+  - secure: cV1Q385XlN/JYiEsZOto14hXvWCBM7TbhA+cy+mhrt+rgLtLJvny1XHLT8r/R+KhiWuAcdHZQQCO2MPQM5j8Z6s/RGtZEhweX+IO6yvXb82ufVw1sWxKdcyelVJkbIRwnztgV+IWFkWSMDJI0+GGUVsPJEvC/8A0MYAxhieoyCk=

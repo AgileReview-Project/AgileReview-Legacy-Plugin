@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/de.tukl.cs.softech.agilereview.feature_0.0.0.jar" id="de.tukl.cs.softech.agilereview.feature" version="0.0.0">
+      <category name="de.tukl.cs.softech.agilereview.updates"/>
+   </feature>
+   <category-def name="de.tukl.cs.softech.agilereview.updates" label="AgileReview"/>
+</site>

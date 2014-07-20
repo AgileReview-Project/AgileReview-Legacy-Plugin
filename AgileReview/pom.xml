@@ -3,13 +3,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>next_Release</artifactId>
-    <groupId>de.tukl.cs.softech.agilereview</groupId>
-    <version>${branch.version}</version>
+  <artifactId>parent</artifactId>
+  <groupId>de.tukl.cs.softech.agilereview</groupId>
+  <version>0.8.5-SNAPSHOT</version>
   </parent>
   <groupId>de.tukl.cs.softech.agilereview</groupId>
   <artifactId>de.tukl.cs.softech.agilereview</artifactId>
-  <version>${branch.version}</version>
+  <version>0.8.5-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
   
 	<reporting>
