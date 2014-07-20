@@ -2,33 +2,29 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>de.tukl.cs.softech.agilereview</groupId>
   <artifactId>next_Release</artifactId>
   <version>${branch.version}</version>
-  <packaging>pom</packaging>
+
   <modules>
     <module>AgileReview</module>
     <module>Feature_AgileReview_nightly</module>
     <module>UpdateSite_AgileReview_nightly</module>
   </modules>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>0.11.1</version>
-	<extensions>true</extensions>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.tycho</groupId>
-        <artifactId>target-platform-configuration</artifactId>
-        <version>0.11.1</version>
-        <configuration>
-          <resolver>p2</resolver>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
+  <packaging>pom</packaging>
+
+  <properties>
+    <branch.version>0.8.5-SNAPSHOT</branch.version>
+		<tycho.version>0.20.0</tycho.version>
+		<tycho-extras.version>0.20.0</tycho-extras.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
+  
   <repositories>
     <repository>
       <id>galileo</id>
@@ -36,7 +32,230 @@
       <url>http://download.eclipse.org/releases/galileo/</url>
     </repository>
   </repositories>
-  <properties>
-    <branch.version>0.8.5-SNAPSHOT</branch.version>
-  </properties>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>tycho</id>
+      <url>${tycho-repo.url}</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <build>
+    <plugins>
+			<!-- Maven Build -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+<!--				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>-->
+			</plugin>
+			<!-- Skip all eclipse:eclipse builds due to MANIFEST-first approach -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<!-- Copy jar dependencies to lib folder -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeScope>runtime</includeScope>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<outputDirectory>${project.basedir}/lib</outputDirectory>
+							<markersDirectory>${project.basedir}/lib</markersDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>clean-dependencies</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>lib</directory>
+									<includes>
+										<include>**/*</include>
+									</includes>
+								</fileset>
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Tycho Build -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<configuration>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+    </plugins>
+    
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>target-platform-configuration</artifactId>
+					<version>${tycho.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-compiler-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<compilerArguments>
+							<inlineJSR />
+							<enableJavadoc />
+							<encoding>${project.build.sourceEncoding}</encoding>
+						</compilerArguments>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-surefire-plugin</artifactId>
+					<version>${tycho.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-source-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<strictSrcIncludes>false</strictSrcIncludes>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-director-plugin</artifactId>
+					<version>${tycho.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-repository-plugin</artifactId>
+					<version>${tycho.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho.extras</groupId>
+					<artifactId>tycho-source-feature-plugin</artifactId>
+					<version>${tycho-extras.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho.extras</groupId>
+					<artifactId>tycho-custom-bundle-plugin</artifactId>
+					<version>${tycho-extras.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<baselineMode>warn</baselineMode>
+						<baselineReplace>none</baselineReplace>
+						<baselineRepositories>
+							<repository>
+								<url>http://download.eclipse.org/eclipse/updates/3.7</url>
+							</repository>
+						</baselineRepositories>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.5.2</version>	
+				<configuration>
+					<xmlOutput>true</xmlOutput>
+					<findbugsXmlOutput>true</findbugsXmlOutput>
+					<findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+					<threshold>Low</threshold>
+					<effort>Max</effort>
+					<debug>false</debug>
+					<relaxed>false</relaxed>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+  
 </project>
