@@ -31,6 +31,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.FileDocument.File;
 import agileReview.softech.tukl.de.FolderDocument.Folder;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
+import agileReview.softech.tukl.de.ReplyDocument.Reply;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
@@ -112,8 +113,6 @@ public class XSLExport implements IRunnableWithProgress {
         monitor.subTask("Collecting review data...");
         Map<String, Object> beans = new HashMap<String, Object>();
         
-        //collect all comments
-        
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         
         //collect all files which have been reviewed
@@ -138,6 +137,15 @@ public class XSLExport implements IRunnableWithProgress {
         }
         beans.put("reviewFiles", reviewFiles);
         beans.put("comments", comments);
+        
+        // Collect all replies
+        ArrayList<ReplyWrapper> replies = new ArrayList<ReplyWrapper>();
+        for (CommentWrapper c : comments) {
+            for (Reply r : c.getReplies()) {
+                replies.add(new ReplyWrapper(r, c));
+            }
+        }
+        beans.put("replies", replies);
         
         //collect all files which are in a project which has been reviewed partially
         ArrayList<FileExportWrapper> projectFiles = new ArrayList<FileExportWrapper>();
