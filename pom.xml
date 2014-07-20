@@ -32,7 +32,7 @@
 
 		<!-- basic deployment config -->
 		<ftp.url>ftp://agilereview.org</ftp.url>
-		<site.path>${project.build.directory}/site/</site.path>
+		<site.path>${project.build.directory}/repository/</site.path>
 	</properties>
 
 	<repositories>

@@ -10,7 +10,7 @@
   <groupId>de.tukl.cs.softech.agilereview</groupId>
   <artifactId>UpdateSite_AgileReview</artifactId>
   <version>0.8.5-SNAPSHOT</version>
-  <packaging>eclipse-update-site</packaging>
+  <packaging>eclipse-repository</packaging>
   <build>
     <plugins>
       <plugin>
