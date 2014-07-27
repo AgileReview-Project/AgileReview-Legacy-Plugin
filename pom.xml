@@ -1,34 +1,330 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>de.tukl.cs.softech.agilereview</groupId>
-  <artifactId>trunk</artifactId>
-  <version>${trunk.version}</version>
-  <packaging>pom</packaging>
-  <modules>
-    <module>AgileReview</module>
-    <module>Feature_AgileReview</module>
-    <module>UpdateSite_AgileReview</module>
-  </modules>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>0.11.1</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
-  <repositories>
-    <repository>
-      <id>galileo</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/galileo/</url>
-    </repository>
-  </repositories>
-  <properties>
-    <trunk.version>0.8.4</trunk.version>
-  </properties>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.tukl.cs.softech.agilereview</groupId>
+	<artifactId>parent</artifactId>
+	<version>0.9.0</version>
+
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>AgileReview</module>
+		<module>Feature_AgileReview</module>
+		<module>UpdateSite_AgileReview</module>
+	</modules>
+
+	<properties>
+		<!-- plugin versions -->
+		<ftpwagon.version>2.6</ftpwagon.version>
+		<wagonmaven.version>1.0-beta-5</wagonmaven.version>
+		<tycho.version>0.20.0</tycho.version>
+		<tycho-extras.version>0.20.0</tycho-extras.version>
+
+		<tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
+
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- basic deployment config -->
+		<ftp.url>ftp://agilereview.org</ftp.url>
+		<site.path>${project.build.directory}/repository/</site.path>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>indigo</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/indigo/</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>tycho</id>
+			<url>${tycho-repo.url}</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<!-- Maven Build -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<!-- <configuration> <source>1.7</source> <target>1.7</target> </configuration> -->
+			</plugin>
+			<!-- Skip all eclipse:eclipse builds due to MANIFEST-first approach -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+			<!-- Tycho Build -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<configuration>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--<plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
+				<version>2.8</version> <executions> <execution> <id>copy-dependencies</id> 
+				<phase>process-resources</phase> <goals> <goal>copy-dependencies</goal> </goals> 
+				<configuration> <includeScope>runtime</includeScope> <outputDirectory>./libs</outputDirectory> 
+				</configuration> </execution> </executions> </plugin> -->
+
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>target-platform-configuration</artifactId>
+					<version>${tycho.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-compiler-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<compilerArguments>
+							<inlineJSR />
+							<enableJavadoc />
+							<encoding>${project.build.sourceEncoding}</encoding>
+						</compilerArguments>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-surefire-plugin</artifactId>
+					<version>${tycho.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-source-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<strictSrcIncludes>false</strictSrcIncludes>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-director-plugin</artifactId>
+					<version>${tycho.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-repository-plugin</artifactId>
+					<version>${tycho.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho.extras</groupId>
+					<artifactId>tycho-source-feature-plugin</artifactId>
+					<version>${tycho-extras.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho.extras</groupId>
+					<artifactId>tycho-custom-bundle-plugin</artifactId>
+					<version>${tycho-extras.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-plugin</artifactId>
+					<version>${tycho.version}</version>
+					<configuration>
+						<baselineMode>warn</baselineMode>
+						<baselineReplace>none</baselineReplace>
+						<baselineRepositories>
+							<repository>
+								<url>http://download.eclipse.org/eclipse/updates/3.7</url>
+							</repository>
+						</baselineRepositories>
+					</configuration>
+				</plugin>
+				<plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-versions-plugin</artifactId>
+          <version>${tycho.version}</version>
+        </plugin>
+				
+			</plugins>
+		</pluginManagement>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>${ftpwagon.version}</version>
+			</extension>
+		</extensions>
+
+	</build>
+
+	<profiles>
+		<profile>
+			<id>uploadSnapshot</id>
+			<properties>
+				<ftp.toDir>/development_update</ftp.toDir>
+			</properties>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>${wagonmaven.version}</version>
+						<executions>
+							<execution>
+								<id>upload-snapshot</id>
+								<phase>install</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<configuration>
+									<fromDir>${site.path}</fromDir>
+									<includes>**</includes>
+									<toDir>${ftp.toDir}</toDir>
+									<url>${ftp.url}</url>
+                                                                        <serverId>org.agilereview.snapshots</serverId>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>uploadRelease</id>
+			<properties>
+				<ftp.toDir>/update</ftp.toDir>
+			</properties>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>${wagonmaven.version}</version>
+						<executions>
+							<execution>
+								<id>upload-release</id>
+								<phase>install</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<configuration>
+									<fromDir>${site.path}</fromDir>
+									<includes>**</includes>
+									<toDir>${ftp.toDir}</toDir>
+									<url>${ftp.url}</url>
+									<serverId>org.agilereview.snapshots</serverId>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+<!--	<distributionManagement>
+		<repository>
+			<id>org.agilereview.releases</id>
+			<url>ftp://agilereview.org/update</url>
+		</repository>
+		<snapshotRepository>
+			<id>org.agilereview.snapshots</id>
+			<url>ftp://agilereview.org/deveplopment_update</url>
+		</snapshotRepository>
+	</distributionManagement>
+-->
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.5.2</version>
+				<configuration>
+					<xmlOutput>true</xmlOutput>
+					<findbugsXmlOutput>true</findbugsXmlOutput>
+					<findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+					<threshold>Low</threshold>
+					<effort>Max</effort>
+					<debug>false</debug>
+					<relaxed>false</relaxed>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<scm>
+		<connection>scm:git:git@github.com:AgileReview-Project/AgileReview-Legacy-Plugin.git</connection>
+		<url>scm:git:git@github.com:AgileReview-Project/AgileReview-Legacy-Plugin.git</url>
+		<developerConnection>scm:git:git@github.com:AgileReview-Project/AgileReview-Legacy-Plugin.git</developerConnection>
+	</scm>
+
 </project>

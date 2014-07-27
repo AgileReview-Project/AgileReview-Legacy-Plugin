@@ -31,6 +31,7 @@ import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.FileDocument.File;
 import agileReview.softech.tukl.de.FolderDocument.Folder;
 import agileReview.softech.tukl.de.ProjectDocument.Project;
+import agileReview.softech.tukl.de.ReplyDocument.Reply;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
@@ -112,17 +113,11 @@ public class XSLExport implements IRunnableWithProgress {
         monitor.subTask("Collecting review data...");
         Map<String, Object> beans = new HashMap<String, Object>();
         
-        //collect all comments
-        ArrayList<Comment> comments = new ArrayList<Comment>();
-        for (Review r : reviews) {
-            comments.addAll(ra.getComments(r.getId()));
-        }
-        beans.put("comments", comments);
-        
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         
         //collect all files which have been reviewed
         ArrayList<FileExportWrapper> reviewFiles = new ArrayList<FileExportWrapper>();
+        ArrayList<CommentWrapper> comments = new ArrayList<CommentWrapper>();
         HashSet<java.io.File> projects = new HashSet<java.io.File>();
         for (Review r : reviews) {
             for (Project p : ra.getProjects(r.getId())) {
@@ -132,12 +127,25 @@ public class XSLExport implements IRunnableWithProgress {
                 }
                 
                 reviewFiles.addAll(convertFilesToWrappedFiles(Arrays.asList(p.getFileArray()), r.getId(), p.getName()));
+                for (File f : p.getFileArray()) {
+                    collectComments(comments, r.getId(), p.getName(), f);
+                }
                 for (Folder f : p.getFolderArray()) {
-                    reviewFiles.addAll(getAllWrappedFiles(f, r.getId(), p.getName()));
+                    reviewFiles.addAll(getAllWrappedFiles(f, r.getId(), p.getName(), comments));
                 }
             }
         }
         beans.put("reviewFiles", reviewFiles);
+        beans.put("comments", comments);
+        
+        // Collect all replies
+        ArrayList<ReplyWrapper> replies = new ArrayList<ReplyWrapper>();
+        for (CommentWrapper c : comments) {
+            for (Reply r : c.getReplies()) {
+                replies.add(new ReplyWrapper(r, c));
+            }
+        }
+        beans.put("replies", replies);
         
         //collect all files which are in a project which has been reviewed partially
         ArrayList<FileExportWrapper> projectFiles = new ArrayList<FileExportWrapper>();
@@ -162,27 +170,41 @@ public class XSLExport implements IRunnableWithProgress {
     }
     
     /**
+     * @param comments
+     * @param r
+     * @param p
+     * @param f
+     * @author Malte Brunnlieb (06.11.2013)
+     */
+    private static void collectComments(ArrayList<CommentWrapper> comments, String reviewId, String projectName, File f) {
+        for (Comment c : f.getCommentArray()) {
+            comments.add(new CommentWrapper(c, new FileExportWrapper(f, reviewId, projectName)));
+        }
+    }
+    
+    /**
      * Searches recursively for all files under the given folder and wraps them into a {@link FileExportWrapper} object
      * @param folder root node of the search process
      * @param review to which these files correlate
      * @param project to which these files correlate
      * @return a list of all found and wrapped {@link FileExportWrapper} objects
      */
-    private static ArrayList<FileExportWrapper> getAllWrappedFiles(Folder folder, String review, String project) {
+    private static ArrayList<FileExportWrapper> getAllWrappedFiles(Folder folder, String review, String project, ArrayList<CommentWrapper> comments) {
         ArrayList<FileExportWrapper> files = new ArrayList<FileExportWrapper>();
         
         TreeSet<String> omittings = new TreeSet<String>(Arrays.asList(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.EXPORT_OMITTINGS).split(
                 ",")));
-        LinkedList<File> uimlFiles = new LinkedList<File>();
+        LinkedList<File> tmpFiles = new LinkedList<File>();
         for (File f : Arrays.asList(folder.getFileArray())) {
             if (!omittings.contains(f.getName())) {
-                uimlFiles.add(f);
+                tmpFiles.add(f);
+                collectComments(comments, review, project, f);
             }
         }
         
-        files.addAll(convertFilesToWrappedFiles(uimlFiles, review, project));
+        files.addAll(convertFilesToWrappedFiles(tmpFiles, review, project));
         for (Folder f : folder.getFolderArray()) {
-            files.addAll(getAllWrappedFiles(f, review, project));
+            files.addAll(getAllWrappedFiles(f, review, project, comments));
         }
         
         return files;
