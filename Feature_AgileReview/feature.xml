@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="de.tukl.cs.softech.agilereview.feature"
-      label="AgileReview - nightly build"
-      version="0.8.5.qualifier"
+      label="AgileReview"
+      version="0.9.0"
       provider-name="AgileReview.org">
 
    <description>
