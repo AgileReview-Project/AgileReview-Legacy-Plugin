@@ -6,7 +6,7 @@
 
 	<groupId>de.tukl.cs.softech.agilereview</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.9.0</version>
+	<version>0.9.1-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
