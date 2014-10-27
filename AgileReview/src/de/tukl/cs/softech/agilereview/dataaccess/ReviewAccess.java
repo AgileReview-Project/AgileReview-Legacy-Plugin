@@ -38,8 +38,11 @@ import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
 import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
+import de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager.EXTERNAL_KEYS;
+import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
  * Class for accessing the review and comment data (xml and internal model).
@@ -77,6 +80,15 @@ public class ReviewAccess {
      * Instance of the review file model
      */
     private final ReviewFileModel rFileModel = new ReviewFileModel();
+    
+    /**
+     * Lock for preventing endless reloads while saving
+     */
+    private final static Object WRITE_LOCK = new Object();
+    /**
+     * Flag indicating that we just stored our data on disk.
+     */
+    private static boolean RECENTLY_SAVED = false;
     
     // //////////////////
     // static methods //
@@ -1058,24 +1070,61 @@ public class ReviewAccess {
      * @throws NoReviewSourceFolderException will be thrown if no review source folder had been defined beforehand
      */
     public void save(XmlObject obj) throws NoReviewSourceFolderException {
-        // Determine the file of this comment
-        IFile file2save = null;
-        if (obj instanceof Comment) {
-            file2save = createCommentFile(((Comment) obj).getReviewID(), ((Comment) obj).getAuthor());
-        } else if (obj instanceof Review) {
-            file2save = createReviewFile(((Review) obj).getId());
-        }
-        try {
-            if (file2save != null) {
-                PluginLogger.log(this.getClass().toString(), "save", "Save file '" + file2save.getName() + "' in order to save comment " + obj);
-                rFileModel.save(file2save);
-            } else {
-                PluginLogger.logError(this.getClass().toString(), "save", obj + " could not be saved, as it is neither a comment nor a review");
+        // lock for Mantis tracker issue no. 141, Github issue #1
+    	synchronized (WRITE_LOCK) {
+            // Determine the file of this comment
+            IFile file2save = null;
+            if (obj instanceof Comment) {
+                file2save = createCommentFile(((Comment) obj).getReviewID(), ((Comment) obj).getAuthor());
+            } else if (obj instanceof Review) {
+                file2save = createReviewFile(((Review) obj).getId());
             }
-        } catch (IOException e) {
-            PluginLogger.logError(this.getClass().toString(), "save", "IOException occured while trying to save to file " + file2save, e);
-        }
-        
+            try {
+                if (file2save != null) {
+                    PluginLogger.log(this.getClass().toString(), "save", "Save file '" + file2save.getName() + "' in order to save comment " + obj);
+                    rFileModel.save(file2save);
+                } else {
+                    PluginLogger.logError(this.getClass().toString(), "save", obj + " could not be saved, as it is neither a comment nor a review");
+                }
+            } catch (IOException e) {
+                PluginLogger.logError(this.getClass().toString(), "save", "IOException occured while trying to save to file " + file2save, e);
+            }
+            RECENTLY_SAVED = true;
+		}
     }
+
+	/**
+	 * Do a global refresh if but not if we are currently changing it.
+	 * @author Malte Brunnlieb (25.08.2013)
+	 * @author Peter Reuter (27.10.2014)
+	 */
+	public void doGlobalRefresh() {
+		// lock for Mantis tracker issue no. 141, Github issue #1
+		synchronized (WRITE_LOCK) {
+			if (RECENTLY_SAVED) {
+				// do nothing as we changed the data
+				RECENTLY_SAVED = false;
+			} else {
+				PluginLogger.log(RefreshHandler.class.toString(), "execute", "Refresh triggered");
+			    // Refill the database
+			    try {
+			        fillDatabaseForOpenReviews();
+			        
+			        // Test if active review may have vanished
+			        String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+			        if (!reviewExists(activeReview)) {
+			            if (!isReviewLoaded(activeReview)) {
+			                // Active review has vanished --> deactivate it
+			                PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+			            }
+			        }
+			    } catch (NoReviewSourceFolderException e) {
+			        ExceptionHandler.handleNoReviewSourceFolderException();
+			    }
+			    
+			    ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);	
+			}
+		}
+	}
     
 }

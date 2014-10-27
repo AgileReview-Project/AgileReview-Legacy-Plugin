@@ -210,6 +210,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         PluginLogger.log(this.getClass().toString(), "refreshTable", "Reloading current table input");
         viewer.refresh();
         filterComments();
+        reparseActiveEditor();
     }
     
     /**
