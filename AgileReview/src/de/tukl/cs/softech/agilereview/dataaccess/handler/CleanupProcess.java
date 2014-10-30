@@ -43,9 +43,9 @@ public class CleanupProcess implements IRunnableWithProgress {
      */
     private static ReviewAccess ra = ReviewAccess.getInstance();
     /**
-     * the project to clean
+     * the projects to clean
      */
-    private final IProject selProject;
+    private final List<IProject> selProjects;
     /**
      * delete (true) or keep (false) comments
      */
@@ -53,11 +53,11 @@ public class CleanupProcess implements IRunnableWithProgress {
     
     /**
      * Constructor of the Cleanup process
-     * @param selProject the project to clean (remove tags)
+     * @param selProjects the projects to clean (remove tags)
      * @param deleteComments indicates whether to delete (true) or keep (false) comments
      */
-    public CleanupProcess(IProject selProject, boolean deleteComments) {
-        this.selProject = selProject;
+    public CleanupProcess(List<IProject> selProjects, boolean deleteComments) {
+        this.selProjects = selProjects;
         this.deleteComments = deleteComments;
     }
     
@@ -72,25 +72,31 @@ public class CleanupProcess implements IRunnableWithProgress {
         // some helper variables
         ArrayList<Comment> comments = new ArrayList<Comment>();
         HashSet<String> paths = new HashSet<String>();
-        String selProjectPath = selProject.getFullPath().toOSString().replaceAll(Pattern.quote(System.getProperty("file.separator")), "");
         
         monitor.worked(10);
-        monitor.subTask("Loading all reviews...");
+        
         // load all comments for all reviews
         try {
+
+            monitor.subTask("Loading all reviews...");
             ra.fillDatabaseCompletely();
             
-            // save all comments for the given project
-            for (Review r : reviews) {
-                comments.addAll(ra.getComments(r.getId(), selProjectPath));
+            // save all comments for the given projects
+            for (IProject selProject: selProjects) {
+            	String selProjectPath = selProject.getFullPath().toOSString().replaceAll(Pattern.quote(System.getProperty("file.separator")), "");
+                for (Review r : reviews) {
+                    comments.addAll(ra.getComments(r.getId(), selProjectPath));
+                }	
             }
-            
             monitor.worked(20);
+
             monitor.subTask("Searching for project files...");
-            // save the paths of all files of the project
-            paths.addAll(getFilesOfProject(selProject));
-            
+            for (IProject selProject: selProjects) {
+	            // save the paths of all files of the project
+	            paths.addAll(getFilesOfProject(selProject));
+            }
             monitor.worked(30);
+            
             monitor.subTask("Removing tags...");
             // remove tags from files
             PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from " + paths.toString());
@@ -99,16 +105,16 @@ public class CleanupProcess implements IRunnableWithProgress {
                 if (!TagCleaner.removeAllTags(actPath)) { throw new InterruptedException("Tags of file " + actPath.toOSString()
                         + " not successfully removed!"); }
             }
-            
             monitor.worked(60);
+            
             // delete comments based on users decision
             if (deleteComments) {
                 monitor.subTask("Deleting comments...");
                 PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
                 ra.deleteComments(comments);
             }
-            
             monitor.worked(90);
+            
             // unload closed reviews again
             monitor.subTask("Unloading closed reviews...");
             List<String> openReviews = Arrays.asList(PropertiesManager.getInstance().getOpenReviews());
