@@ -65,6 +65,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
                 if (ViewControl.isOpen(ReviewExplorer.class)) {
                     ReviewExplorer.getInstance().addReview(newRev);
                 }
+                ReviewAccess.getInstance().save(newRev);
                 result = true;
             }
         } catch (IOException e) {
