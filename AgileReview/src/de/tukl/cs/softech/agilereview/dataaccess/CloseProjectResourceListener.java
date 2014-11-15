@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.wizards.noreviewsource.NoReviewSourceWizard;
@@ -148,10 +147,8 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                                 // Check in file system, if file still exists
                                 if (!entry.getValue().toFile().exists()) {
                                     String msg = "You deleted the current 'Agile Review Source Project' from disk.\n"
-                                            + "Please choose an other 'AgileReview Source Project' for AgileReview to stay functional";
+                                            + "Please choose an other 'AgileReview Source Project' for AgileReview to stay functional.";
                                     MessageDialog.openWarning(currentShell, "'Agile Review Source Project' deleted", msg);
-                                    // Show NoAgileReviewSourceProject wizard
-                                    showNoSourceProjectWizard();
                                 } else {
                                     String msg = "You deleted the current 'Agile Review Source Project' from your internal explorer.\n"
                                             + "Do you want to re-import it directly to avoid a crash of AgileReview?";
@@ -223,7 +220,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
                         for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
                             if (oldSourceProject.equals(delta.getResource())) {
                                 // Mantis tracker issue no. 141, Github issue #1
-                            	ReviewAccess.getInstance().doGlobalRefresh();
+                                ReviewAccess.getInstance().doGlobalRefresh();
                                 break;
                             }
                         }
