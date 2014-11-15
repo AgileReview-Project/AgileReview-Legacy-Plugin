@@ -41,7 +41,6 @@ import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFol
 import de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.tools.PropertiesManager.EXTERNAL_KEYS;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 
 /**
@@ -408,8 +407,8 @@ public class ReviewAccess {
             REVIEW_REPO_FOLDER = p;
             PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, p.getName());
             // add active nature to new project
-	        setProjectNatures(p, new String[] {
-	                    PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE) });
+            setProjectNatures(p, new String[] { PropertiesManager.getInstance().getInternalProperty(
+                    PropertiesManager.INTERNAL_KEYS.AGILEREVIEW_NATURE) });
             // update decorator
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
@@ -726,7 +725,8 @@ public class ReviewAccess {
         // Store comment in database
         this.rModel.addComment(result);
         
-        // Return the new empty comment
+        // Save and return the new empty comment
+        save(result);
         return result;
     }
     
@@ -901,9 +901,7 @@ public class ReviewAccess {
         
         // Add review to model,
         // return null in case of the reviewId being already in use
-        if (!rModel.addReview(result)) {
-            return null;
-        }
+        if (!rModel.addReview(result)) { return null; }
         this.rModel.createModelEntry(reviewId);
         
         // save new review file
@@ -1057,7 +1055,8 @@ public class ReviewAccess {
     public boolean updateReviewSourceProject() {
         boolean result = false;
         String strPropManReviewSourceName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
-        if (strPropManReviewSourceName != "" && strPropManReviewSourceName != null && (REVIEW_REPO_FOLDER == null || !REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName))) {
+        if (strPropManReviewSourceName != "" && strPropManReviewSourceName != null
+                && (REVIEW_REPO_FOLDER == null || !REVIEW_REPO_FOLDER.getName().equals(strPropManReviewSourceName))) {
             loadReviewSourceProject(strPropManReviewSourceName);
             result = true;
         }
@@ -1071,7 +1070,7 @@ public class ReviewAccess {
      */
     public void save(XmlObject obj) throws NoReviewSourceFolderException {
         // lock for Mantis tracker issue no. 141, Github issue #1
-    	synchronized (WRITE_LOCK) {
+        synchronized (WRITE_LOCK) {
             // Determine the file of this comment
             IFile file2save = null;
             if (obj instanceof Comment) {
@@ -1090,41 +1089,41 @@ public class ReviewAccess {
                 PluginLogger.logError(this.getClass().toString(), "save", "IOException occured while trying to save to file " + file2save, e);
             }
             RECENTLY_SAVED = true;
-		}
+        }
     }
-
-	/**
-	 * Do a global refresh if but not if we are currently changing it.
-	 * @author Malte Brunnlieb (25.08.2013)
-	 * @author Peter Reuter (27.10.2014)
-	 */
-	public void doGlobalRefresh() {
-		// lock for Mantis tracker issue no. 141, Github issue #1
-		synchronized (WRITE_LOCK) {
-			if (RECENTLY_SAVED) {
-				// do nothing as we changed the data
-				RECENTLY_SAVED = false;
-			} else {
-				PluginLogger.log(RefreshHandler.class.toString(), "execute", "Refresh triggered");
-			    // Refill the database
-			    try {
-			        fillDatabaseForOpenReviews();
-			        
-			        // Test if active review may have vanished
-			        String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-			        if (!reviewExists(activeReview)) {
-			            if (!isReviewLoaded(activeReview)) {
-			                // Active review has vanished --> deactivate it
-			                PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-			            }
-			        }
-			    } catch (NoReviewSourceFolderException e) {
-			        ExceptionHandler.handleNoReviewSourceFolderException();
-			    }
-			    
-			    ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);	
-			}
-		}
-	}
+    
+    /**
+     * Do a global refresh if but not if we are currently changing it.
+     * @author Malte Brunnlieb (25.08.2013)
+     * @author Peter Reuter (27.10.2014)
+     */
+    public void doGlobalRefresh() {
+        // lock for Mantis tracker issue no. 141, Github issue #1
+        synchronized (WRITE_LOCK) {
+            if (RECENTLY_SAVED) {
+                // do nothing as we changed the data
+                RECENTLY_SAVED = false;
+            } else {
+                PluginLogger.log(RefreshHandler.class.toString(), "execute", "Refresh triggered");
+                // Refill the database
+                try {
+                    fillDatabaseForOpenReviews();
+                    
+                    // Test if active review may have vanished
+                    String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+                    if (!reviewExists(activeReview)) {
+                        if (!isReviewLoaded(activeReview)) {
+                            // Active review has vanished --> deactivate it
+                            PropertiesManager.getPreferences().setToDefault(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
+                        }
+                    }
+                } catch (NoReviewSourceFolderException e) {
+                    ExceptionHandler.handleNoReviewSourceFolderException();
+                }
+                
+                ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
+            }
+        }
+    }
     
 }
