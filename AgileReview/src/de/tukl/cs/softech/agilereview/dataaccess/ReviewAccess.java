@@ -38,7 +38,6 @@ import agileReview.softech.tukl.de.ReviewDocument;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
 import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
-import de.tukl.cs.softech.agilereview.plugincontrol.handler.RefreshHandler;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
@@ -81,13 +80,9 @@ public class ReviewAccess {
     private final ReviewFileModel rFileModel = new ReviewFileModel();
     
     /**
-     * Lock for preventing endless reloads while saving
-     */
-    private final static Object WRITE_LOCK = new Object();
-    /**
      * Flag indicating that we just stored our data on disk.
      */
-    private static boolean RECENTLY_SAVED = false;
+    private static volatile Boolean RECENTLY_SAVED = false;
     
     // //////////////////
     // static methods //
@@ -1070,7 +1065,8 @@ public class ReviewAccess {
      */
     public void save(XmlObject obj) throws NoReviewSourceFolderException {
         // lock for Mantis tracker issue no. 141, Github issue #1
-        synchronized (WRITE_LOCK) {
+        synchronized (RECENTLY_SAVED) {
+            RECENTLY_SAVED = true;
             // Determine the file of this comment
             IFile file2save = null;
             if (obj instanceof Comment) {
@@ -1088,7 +1084,6 @@ public class ReviewAccess {
             } catch (IOException e) {
                 PluginLogger.logError(this.getClass().toString(), "save", "IOException occured while trying to save to file " + file2save, e);
             }
-            RECENTLY_SAVED = true;
         }
     }
     
@@ -1099,12 +1094,14 @@ public class ReviewAccess {
      */
     public void doGlobalRefresh() {
         // lock for Mantis tracker issue no. 141, Github issue #1
-        synchronized (WRITE_LOCK) {
+        synchronized (RECENTLY_SAVED) {
             if (RECENTLY_SAVED) {
+                PluginLogger.log(getClass().toString(), "doGlobalRefresh",
+                        "execution of global refresh canceled due to recently saved. (Loop detection)");
                 // do nothing as we changed the data
                 RECENTLY_SAVED = false;
             } else {
-                PluginLogger.log(RefreshHandler.class.toString(), "execute", "Refresh triggered");
+                PluginLogger.log(getClass().toString(), "doGlobalRefresh", "execute global refresh");
                 // Refill the database
                 try {
                     fillDatabaseForOpenReviews();
