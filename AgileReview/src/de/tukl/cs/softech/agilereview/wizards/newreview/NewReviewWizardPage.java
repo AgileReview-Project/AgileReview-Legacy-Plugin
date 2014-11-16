@@ -2,6 +2,7 @@ package de.tukl.cs.softech.agilereview.wizards.newreview;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -33,7 +34,7 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
     /**
      * the text field for retrieving the description
      */
-    private Text description;
+    private StyledText description;
     
     /**
      * Creates a new page
@@ -74,8 +75,9 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
         // description
         Label lDescription = new Label(container, SWT.NULL);
         lDescription.setText("Description:");
-        //Text descTextField = new Text(container, SWT.BORDER | SWT.SINGLE);
-        description = new Text(container, SWT.BORDER | SWT.H_SCROLL | SWT.MULTI);
+        description = new StyledText(container, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
+        description.setEditable(true);
+        description.setWordWrap(true);
         
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         id.setLayoutData(gd);
