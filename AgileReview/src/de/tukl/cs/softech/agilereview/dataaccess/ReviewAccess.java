@@ -900,8 +900,11 @@ public class ReviewAccess {
         this.rModel.createModelEntry(reviewId);
         
         // save new review file
-        this.rFileModel.addXmlDocument(revDoc, revFile);
-        this.rFileModel.save(revFile);
+        synchronized (RECENTLY_SAVED) {
+            RECENTLY_SAVED = true;
+            this.rFileModel.addXmlDocument(revDoc, revFile);
+            this.rFileModel.save(revFile);
+        }
         
         return result;
     }
