@@ -30,7 +30,7 @@ public class CleanupHandler extends AbstractHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands
 	 * .ExecutionEvent)
@@ -46,8 +46,7 @@ public class CleanupHandler extends AbstractHandler {
 		messageDialog.setText("AgileReview Cleanup");
 		String options = (deleteComments ? (ignoreOpenComments ? "All comments that are not in state 'open' will be deleted." : "All Comments will be deleted.")
 				: "References to code passages will be deleted. All comments will be kept.");
-		String message = "Really do cleanup? " + options
-				+ " Check the preferences to adjust whether no comments or only closed and fixed comments should be deleted.";
+		String message = "Really do cleanup? " + options + "\nCheck the preferences to adjust the behavior of the Project Cleanup Action.";
 		messageDialog.setMessage(message);
 		int result = messageDialog.open();
 

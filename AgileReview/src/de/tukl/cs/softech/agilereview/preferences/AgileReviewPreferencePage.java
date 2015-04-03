@@ -107,17 +107,19 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				getFieldEditorParent());
 		addField(booleanSmartSuggestionsField);
 
+		BorderedFieldEditor cleanupWrapper = new BorderedFieldEditor(getFieldEditorParent(), "Cleanup Action");
+		Composite container = cleanupWrapper.getContainer();
 		BooleanFieldEditor booleanCleanupDeleteComments = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.CLEANUP_DELETE_COMMENTS,
-				"Delete Comments on Cleanup. Uncheck to delete only tags from source code.", getFieldEditorParent());
-		addField(booleanCleanupDeleteComments);
+				"Delete Comments on Cleanup. Uncheck to delete only tags from source code.", container);
+		cleanupWrapper.addField(booleanCleanupDeleteComments);
 
 		BooleanFieldEditor booleanIgnoreOpenComments = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.CLEANUP_IGNORE_OPEN_COMMENTS,
-				"Ignore Comments with status 'open' on Cleanup", getFieldEditorParent());
-		addField(booleanIgnoreOpenComments);
+				"Ignore Comments with status 'open' on Cleanup", container);
+		cleanupWrapper.addField(booleanIgnoreOpenComments);
 
 		// Grouping FieldEditor for export defaults
 		BorderedFieldEditor exportWrapper = new BorderedFieldEditor(getFieldEditorParent(), "Export Defaults");
-		Composite container = exportWrapper.getContainer();
+		container = exportWrapper.getContainer();
 
 		// Directory Browser for export folder
 		DirectoryFieldEditor directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, "Default XLS export location:",
