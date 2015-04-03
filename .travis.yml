@@ -8,4 +8,4 @@ env:
 branches:
     only:
         - master
-        - stable
+        - next_Release
