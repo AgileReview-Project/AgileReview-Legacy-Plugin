@@ -33,6 +33,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
         super();
         setNeedsProgressMonitor(true);
         setWindowTitle("New Review");
+        setHelpAvailable(false);
     }
     
     /**
@@ -65,6 +66,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
                 if (ViewControl.isOpen(ReviewExplorer.class)) {
                     ReviewExplorer.getInstance().addReview(newRev);
                 }
+                ReviewAccess.getInstance().save(newRev);
                 result = true;
             }
         } catch (IOException e) {

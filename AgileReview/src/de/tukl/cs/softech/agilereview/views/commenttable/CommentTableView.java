@@ -147,6 +147,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
     protected void setTableContent(ArrayList<Comment> comments) {
         this.comments = comments;
         viewer.setInput(comments);
+        PluginLogger.log(getClass().toString(), "setTableContent", "Set viewer input: " + comments);
         viewer.refresh();
         PluginLogger.log(this.getClass().toString(), "setTableContent", "Setting table content");
     }
@@ -161,6 +162,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         this.comments.add(comment);
         
         viewer.setInput(this.comments);
+        PluginLogger.log(getClass().toString(), "addComment", "Set viewer input: " + comments);
         
         // TODO: Das hier vlt auslagern -> macht CTV dümmer, außerdem liegen z.B. Editor und Selection im Handler vor 
         try {
@@ -188,6 +190,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         // add comment to (un)filtered model
         this.comments.remove(comment);
         viewer.setInput(this.comments);
+        PluginLogger.log(getClass().toString(), "deleteComment", "Set viewer input: " + comments);
         
         // remove annotation and tags
         try {
@@ -220,6 +223,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
         this.comments = ra.getAllComments();
         this.viewer.setInput(this.comments);
+        PluginLogger.log(getClass().toString(), "resetComments", "Set viewer input: " + comments);
         this.refreshTable();
     }
     
@@ -302,6 +306,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         // set input for viewer
         viewer.setContentProvider(new ArrayContentProvider());
         viewer.setInput(this.comments);
+        PluginLogger.log(getClass().toString(), "createViewer", "Set viewer input: " + comments);
         
         // provide access to selections of table rows
         getSite().setSelectionProvider(viewer);
