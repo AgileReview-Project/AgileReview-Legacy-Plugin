@@ -5,3 +5,7 @@ env:
   global:
   - secure: nG4pNXh8uJObFZwcYIhTJ1XLTUT4tw45R/wjs4LRYr6E6j+pWlGYBzK4ONbxrLuLp7fXrf/88siSCx6uWJJSjZCKoOlJ8zDUf9+Ma9ir4rthzgWBFziLcUzjgiu943+JSvWIGFLKOhkGN/AOKjJEoAF65FlHndhv84Yj0LoA7MU=
   - secure: KrC8iGmMgbEl8Aa5Nqk9hvNz0AG/dWV3LBam0yrahdJAOsMXHdDKQiHVua6xSz5ftOdY3IrXFQs+m1l9BrKqmI+yuLvSjfzDC3hUM6RlcMoGIsfYscfJS92Cb90nVRKgoL3/acU3tBF0/kETg18xpbz/mOTjpDoWlegKmc2fxNI=
+branches:
+    only:
+        - master
+        - next_Release
