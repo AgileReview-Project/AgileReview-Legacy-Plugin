@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
+import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
@@ -29,31 +30,31 @@ public class CleanupHandler extends AbstractHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands
 	 * .ExecutionEvent)
 	 */
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		PluginLogger.log(this.getClass().toString(), "execute",
-				"Cleanup triggered in Package-Explorer");
+		PluginLogger.log(this.getClass().toString(), "execute", "Cleanup triggered in Package-Explorer");
 
-		// ask user whether to delete comments and tags or only tags
-		boolean deleteComments = true;
-		MessageBox messageDialog = new MessageBox(
-				HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+		boolean deleteComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_DELETE_COMMENTS);
+		boolean ignoreOpenComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_IGNORE_OPEN_COMMENTS);
+
+		MessageBox messageDialog = new MessageBox(HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 		messageDialog.setText("AgileReview Cleanup");
-		messageDialog.setMessage("Delete comments? Otherwise their referece to the respective code line(s) will be removed!");
+		String options = (deleteComments ? (ignoreOpenComments ? "All comments that are not in state 'open' will be deleted." : "All Comments will be deleted.")
+				: "References to code passages will be deleted. All comments will be kept.");
+		String message = "Really do cleanup? " + options + "\nCheck the preferences to adjust the behavior of the Project Cleanup Action.";
+		messageDialog.setMessage(message);
 		int result = messageDialog.open();
 
 		if (result == SWT.CANCEL) {
 			// cancel selected -> quit method
 			return null;
-		} else if (result == SWT.NO) {
-			deleteComments = false;
 		}
-		
+
 		// get the elements selected in the packageexplorer
 		List<IProject> selProjects = new ArrayList<IProject>();
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
@@ -65,31 +66,31 @@ public class CleanupHandler extends AbstractHandler {
 				selProjects.add(selProject);
 			}
 		}
-		
+
 		try {
 			ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
 			pmd.open();
-			pmd.run(true, false, new CleanupProcess(selProjects, deleteComments));
+			pmd.run(true, false, new CleanupProcess(selProjects, deleteComments, ignoreOpenComments));
 			pmd.close();
 		} catch (InvocationTargetException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "InvocationTargetException", e);
 			Display.getDefault().asyncExec(new Runnable() {
-                
-                @Override
-                public void run() {
-            		MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
+
+				@Override
+				public void run() {
+					MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
 							"An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:1");
-                }
+				}
 			});
 		} catch (InterruptedException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "InterruptedException", e);
 			Display.getDefault().asyncExec(new Runnable() {
-                
-                @Override
-                public void run() {
-                	MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
+
+				@Override
+				public void run() {
+					MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
 							"An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:2");
-                }
+				}
 			});
 		}
 

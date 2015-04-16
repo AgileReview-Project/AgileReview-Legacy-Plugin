@@ -1124,6 +1124,20 @@ public class ReviewAccess {
                 ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
             }
         }
-    }
-    
+	}
+
+	/**
+	 * Generates the comment key for the given comment in the following scheme:
+	 * reviewID|author|commendID
+	 * 
+	 * @param comment
+	 *            which comment key should be generated
+	 * @return comment key
+	 */
+	public String generateCommentKey(Comment comment) {
+		String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+		String commentTag = comment.getReviewID() + keySeparator + comment.getAuthor() + keySeparator + comment.getId();
+		return commentTag;
+	}
+
 }
