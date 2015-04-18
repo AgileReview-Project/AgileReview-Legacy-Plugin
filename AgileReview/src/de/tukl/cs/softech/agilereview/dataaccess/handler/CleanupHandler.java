@@ -107,11 +107,10 @@ public class CleanupHandler extends AbstractHandler {
 			});
 		}
 		
-		
+		ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW | ViewControl.REVIEW_EXPLORER, true);
 		if (ViewControl.isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().reparseAllEditors();
 		}
-		ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW | ViewControl.REVIEW_EXPLORER, true);
 
 		return null;
 	}

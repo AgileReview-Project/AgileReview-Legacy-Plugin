@@ -71,7 +71,7 @@ public class CleanupReviewProcess implements IRunnableWithProgress {
 				TagCleaner.removeTag(new Path(ReviewAccess.computePath(c)), key);
 				if (this.deleteComments) {
 					try {
-						ReviewAccess.getInstance().deleteComment(c);
+						ReviewAccess.getInstance().deleteComment(c);	
 					} catch (IOException e) {
 						PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: " + c, e);
 					} catch (NoReviewSourceFolderException e) {
