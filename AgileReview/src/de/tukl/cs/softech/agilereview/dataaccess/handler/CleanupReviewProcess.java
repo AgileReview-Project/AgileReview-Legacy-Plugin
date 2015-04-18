@@ -65,29 +65,19 @@ public class CleanupReviewProcess implements IRunnableWithProgress {
 		monitor.subTask("Deleting comments ...");
 		float progressStep = 90f / comments.size();
 		int i = 0;
-		String key;
-		for (final Comment c : comments) {
-			key = ra.generateCommentKey(c);
-			if (this.deleteComments && !(ignoreOpenComments && c.getStatus() == 0)) {
-				if (ViewControl.isOpen(CommentTableView.class)) {
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							CommentTableView.getInstance().deleteComment(c);
-						}
-					});
-				} else {
-					TagCleaner.removeTag(new Path(ReviewAccess.computePath(c)), key);
-				}
-				try {
-					ReviewAccess.getInstance().deleteComment(c);
-				} catch (IOException e) {
-					PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: " + c, e);
-				} catch (NoReviewSourceFolderException e) {
-					ExceptionHandler.handleNoReviewSourceFolderException();
-				}
-			} else {
+		for (Comment c : comments) {
+			String key = ra.generateCommentKey(c);
+			if (!(ignoreOpenComments && c.getStatus() == 0)) {
 				TagCleaner.removeTag(new Path(ReviewAccess.computePath(c)), key);
+				if (this.deleteComments) {
+					try {
+						ReviewAccess.getInstance().deleteComment(c);
+					} catch (IOException e) {
+						PluginLogger.logError(this.getClass().toString(), "execute", "IOException occured while deleting a comment in ReviewAccess: " + c, e);
+					} catch (NoReviewSourceFolderException e) {
+						ExceptionHandler.handleNoReviewSourceFolderException();
+					}
+				}
 			}
 			i++;
 			monitor.worked(Math.round(i * progressStep) + 10);
