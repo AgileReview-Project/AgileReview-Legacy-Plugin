@@ -6,8 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.NotEnabledException;
+import org.eclipse.core.commands.NotHandledException;
+import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -16,12 +20,14 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * Handler for the cleanup process
@@ -54,28 +60,33 @@ public class CleanupHandler extends AbstractHandler {
 			// cancel selected -> quit method
 			return null;
 		}
-
-		// get the elements selected in the packageexplorer
+		
 		List<IProject> selProjects = new ArrayList<IProject>();
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-		for (Iterator<?> it = selection.iterator(); it.hasNext();) {
-			Object currentElement = it.next();
-			if (currentElement instanceof IAdaptable) {
-				// get selected project
-				IProject selProject = (IProject) ((IAdaptable) currentElement).getAdapter(IProject.class);
-				selProjects.add(selProject);
-			}
-		}
-
+		
 		try {
-			ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
-			pmd.open();
-			pmd.run(true, false, new CleanupProcess(selProjects, deleteComments, ignoreOpenComments));
-			pmd.close();
+			// cleanup for projects
+			Object firstElement = selection.getFirstElement();
+			if (firstElement instanceof IProject) {
+				for (Iterator<?> it = selection.iterator(); it.hasNext();) {
+					Object currentElement = it.next();
+					if (currentElement instanceof IAdaptable) {
+						IProject selProject = (IProject) ((IAdaptable) currentElement).getAdapter(IProject.class);
+						selProjects.add(selProject);
+					}
+				}
+	
+				cleanupProjects(selProjects, event, deleteComments, ignoreOpenComments);	
+			}
+			// cleanup for reviews
+			else if (firstElement instanceof MultipleReviewWrapper) {
+	    		MultipleReviewWrapper reviewWrapper = ((MultipleReviewWrapper) firstElement);
+	            cleanupReview(event, reviewWrapper, deleteComments, ignoreOpenComments);
+	        }
 		} catch (InvocationTargetException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "InvocationTargetException", e);
 			Display.getDefault().asyncExec(new Runnable() {
-
+	
 				@Override
 				public void run() {
 					MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
@@ -85,7 +96,7 @@ public class CleanupHandler extends AbstractHandler {
 		} catch (InterruptedException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "InterruptedException", e);
 			Display.getDefault().asyncExec(new Runnable() {
-
+	
 				@Override
 				public void run() {
 					MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
@@ -93,7 +104,8 @@ public class CleanupHandler extends AbstractHandler {
 				}
 			});
 		}
-
+		
+		
 		if (ViewControl.isOpen(CommentTableView.class)) {
 			CommentTableView.getInstance().reparseAllEditors();
 		}
@@ -101,5 +113,87 @@ public class CleanupHandler extends AbstractHandler {
 
 		return null;
 	}
+
+	/**
+	 * Perform cleanup on selected Projects
+	 * @param selProjects
+	 * @param event 
+	 * @param deleteComments
+	 * @param ignoreOpenComments
+	 * @throws InterruptedException 
+	 * @throws InvocationTargetException 
+	 */
+	private void cleanupProjects(List<IProject> selProjects, final ExecutionEvent event,
+			boolean deleteComments, boolean ignoreOpenComments) throws InvocationTargetException, InterruptedException {
+		ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
+		pmd.open();
+		pmd.run(true, false, new CleanupProjectsProcess(selProjects, deleteComments, ignoreOpenComments));
+		pmd.close();
+	}
+	
+	/**
+	 * Perform cleanup on selected review
+	 * @param event
+	 * @param reviewWrapper
+	 * @param deleteComments 
+	 * @param ignoreOpenComments 
+	 * @throws ExecutionException
+	 * @throws InterruptedException 
+	 * @throws InvocationTargetException 
+	 */
+	private void cleanupReview(ExecutionEvent event, MultipleReviewWrapper reviewWrapper, boolean deleteComments, boolean ignoreOpenComments)
+			throws ExecutionException, InvocationTargetException, InterruptedException {
+		
+		if (!checkReviewOpen(event, reviewWrapper)) { return; }
+		
+	    ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
+	    pmd.open();
+	    pmd.run(true, false, new CleanupReviewProcess(reviewWrapper.getWrappedReview(), deleteComments, ignoreOpenComments));
+	    pmd.close();
+	}
+    
+    /**
+     * Checks whether the selected Review is open. If it is not, it will be opened automatically.
+     * @param event original handler event
+     * @param reviewWrapper wrapper class of the selected review
+     * @throws ExecutionException thrown when the execution of the open/close command for reviews fails
+     * @return true, if the review is open or was opened successfully<br>false, otherwise
+     * @author Malte Brunnlieb (25.05.2012)
+     */
+    private boolean checkReviewOpen(ExecutionEvent event, MultipleReviewWrapper reviewWrapper) throws ExecutionException {
+        if (!reviewWrapper.isOpen()) {
+            ICommandService cmdService = (ICommandService) HandlerUtil.getActiveSite(event).getService(ICommandService.class);
+            if (cmdService != null) {
+                Command cmd = cmdService.getCommand("de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose");
+                if (cmd != null) {
+                    try {
+                        cmd.executeWithChecks(event);
+                    } catch (NotDefinedException e) {
+                        MessageDialog.openError(HandlerUtil.getActiveShell(event), "Open Review",
+                                "An error occurred while opening the selected Review (1)\nPlease do it by yourself.");
+                        return false;
+                    } catch (NotEnabledException e) {
+                        MessageDialog.openError(HandlerUtil.getActiveShell(event), "Open Review",
+                                "An error occurred while opening the selected Review (2)\nPlease do it by yourself.");
+                        return false;
+                    } catch (NotHandledException e) {
+                        MessageDialog.openError(HandlerUtil.getActiveShell(event), "Open Review",
+                                "An error occurred while opening the selected Review (3)\nPlease do it by yourself.");
+                        return false;
+                    }
+                } else {
+                    MessageDialog.openError(HandlerUtil.getActiveShell(event), "An error occured",
+                            "The open/close command for Reviews could not be found. Please open the review by yourself before "
+                                    + "performing another cleanup.");
+                    return false;
+                }
+            } else {
+                MessageDialog.openError(HandlerUtil.getActiveShell(event), "An error occured",
+                        "The eclipse command service could not be found. Please open the review by yourself before performing another cleanup.");
+                return false;
+            }
+        }
+        return true;
+    }
 
 }

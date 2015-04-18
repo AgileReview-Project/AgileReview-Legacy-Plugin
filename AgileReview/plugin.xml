@@ -990,7 +990,7 @@
       </activeWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CleanupHandler"
+         class="de.tukl.cs.softech.agilereview.dataaccess.handler.CleanupHandler"
          commandId="de.tukl.cs.softech.agilereview.cleanup">
       <activeWhen>
          <with

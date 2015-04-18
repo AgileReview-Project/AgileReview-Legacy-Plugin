@@ -1,4 +1,4 @@
-package de.tukl.cs.softech.agilereview.views.reviewexplorer.handler;
+package de.tukl.cs.softech.agilereview.dataaccess.handler;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -22,7 +22,7 @@ import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 /**
  * Class that performs the cleanup process
  */
-public class CleanupProcess implements IRunnableWithProgress {
+public class CleanupReviewProcess implements IRunnableWithProgress {
 
 	/**
 	 * the review to clean
@@ -32,6 +32,10 @@ public class CleanupProcess implements IRunnableWithProgress {
 	 * delete (true) or keep (false) comments
 	 */
 	private final boolean deleteComments;
+	/**
+	 * ignore open comments during cleanup
+	 */
+	private boolean ignoreOpenComments;
 
 	/**
 	 * Constructor of the Cleanup process
@@ -41,9 +45,10 @@ public class CleanupProcess implements IRunnableWithProgress {
 	 * @param deleteComments
 	 *            indicates whether to delete (true) or keep (false) comments
 	 */
-	public CleanupProcess(Review review, boolean deleteComments) {
+	public CleanupReviewProcess(Review review, boolean deleteComments, boolean ignoreOpenComments) {
 		this.review = review;
 		this.deleteComments = deleteComments;
+		this.ignoreOpenComments = ignoreOpenComments;
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 		String key;
 		for (final Comment c : comments) {
 			key = ra.generateCommentKey(c);
-			if (this.deleteComments) {
+			if (this.deleteComments && !(ignoreOpenComments && c.getStatus() == 0)) {
 				if (ViewControl.isOpen(CommentTableView.class)) {
 					Display.getDefault().syncExec(new Runnable() {
 						@Override

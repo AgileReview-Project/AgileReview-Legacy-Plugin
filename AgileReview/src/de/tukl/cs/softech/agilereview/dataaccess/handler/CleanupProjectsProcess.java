@@ -33,7 +33,7 @@ import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 /**
  * Class that performs the cleanup process
  */
-public class CleanupProcess implements IRunnableWithProgress {
+public class CleanupProjectsProcess implements IRunnableWithProgress {
 
 	/**
 	 * Supported files mapping to the corresponding comment tags
@@ -67,7 +67,7 @@ public class CleanupProcess implements IRunnableWithProgress {
 	 *            indicates whether only closed or fixed comments should be
 	 *            processed
 	 */
-	public CleanupProcess(List<IProject> selProjects, boolean deleteComments, boolean ignoreOpenComments) {
+	public CleanupProjectsProcess(List<IProject> selProjects, boolean deleteComments, boolean ignoreOpenComments) {
 		this.selProjects = selProjects;
 		this.deleteComments = deleteComments;
 		this.ignoreOpenComments = ignoreOpenComments;
