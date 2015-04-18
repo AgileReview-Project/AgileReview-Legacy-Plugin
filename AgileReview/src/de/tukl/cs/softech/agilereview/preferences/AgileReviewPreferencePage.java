@@ -108,32 +108,33 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 		addField(booleanSmartSuggestionsField);
 
 		BorderedFieldEditor cleanupWrapper = new BorderedFieldEditor(getFieldEditorParent(), "Cleanup Action");
-		Composite container = cleanupWrapper.getContainer();
+		Composite cleanupContainer = cleanupWrapper.getContainer();
 		BooleanFieldEditor booleanCleanupDeleteComments = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.CLEANUP_DELETE_COMMENTS,
-				"Delete Comments on Cleanup. Uncheck to delete only tags from source code.", container);
+				"Delete Comments on Cleanup. Uncheck to delete only tags from source code.", cleanupContainer);
 		cleanupWrapper.addField(booleanCleanupDeleteComments);
 
 		BooleanFieldEditor booleanIgnoreOpenComments = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.CLEANUP_IGNORE_OPEN_COMMENTS,
-				"Ignore Comments with status 'open' on Cleanup", container);
+				"Ignore Comments with status 'open' on Cleanup", cleanupContainer);
 		cleanupWrapper.addField(booleanIgnoreOpenComments);
+		addField(cleanupWrapper);
 
 		// Grouping FieldEditor for export defaults
 		BorderedFieldEditor exportWrapper = new BorderedFieldEditor(getFieldEditorParent(), "Export Defaults");
-		container = exportWrapper.getContainer();
+		Composite exportContainer = exportWrapper.getContainer();
 
 		// Directory Browser for export folder
 		DirectoryFieldEditor directoryExportField = new DirectoryFieldEditor(PropertiesManager.EXTERNAL_KEYS.EXPORT_PATH, "Default XLS export location:",
-				container);
+				exportContainer);
 		exportWrapper.addField(directoryExportField);
 
 		// export template file
 		FileFieldEditor fileExportTemplateField = new FileFieldEditor(PropertiesManager.EXTERNAL_KEYS.TEMPLATE_PATH, "Default template for XLS export:",
-				container);
+				exportContainer);
 		fileExportTemplateField.setFileExtensions(new String[] { "*.xls;*.xlsx" });
 		exportWrapper.addField(fileExportTemplateField);
 
 		// export templates link
-		exportWrapper.addField(new LinkField(container, "Follow this <a>link</a> for downloading an example template.", pm
+		exportWrapper.addField(new LinkField(exportContainer, "Follow this <a>link</a> for downloading an example template.", pm
 				.getInternalProperty(PropertiesManager.INTERNAL_KEYS.URL_EXAMPLE_EXPORT_TEMPLATES)));
 
 		addField(exportWrapper);

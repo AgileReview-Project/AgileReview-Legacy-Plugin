@@ -190,12 +190,12 @@ public class PropertiesManager implements IInputValidator {
 		/**
 		 * Indicate whether comments should be deleted on cleanup
 		 */
-		public static final String CLEANUP_DELETE_COMMENTS = "cleanupDeleteComments";
+		public static String CLEANUP_DELETE_COMMENTS = "cleanupDeleteComments";
 		/**
 		 * Indicates whether cleanup should only process closed or fixed
 		 * comments
 		 */
-		public static final String CLEANUP_IGNORE_OPEN_COMMENTS = "cleanupClosedCommentsOnly";
+		public static String CLEANUP_IGNORE_OPEN_COMMENTS = "cleanupIgnoreOpenComments";
 		/**
 		 * The color of the annotations
 		 */
