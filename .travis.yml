@@ -1,6 +1,6 @@
 language: java
-install: travis_retry mvn clean install -P uploadSnapshot -s .m2/settings.xml
-#script: "mvn clean install -P uploadSnapshot -s .m2/settings.xml"
+install: true
+script: "mvn clean install -P uploadSnapshot -s .m2/settings.xml"
 env:
   global:
   - secure: nG4pNXh8uJObFZwcYIhTJ1XLTUT4tw45R/wjs4LRYr6E6j+pWlGYBzK4ONbxrLuLp7fXrf/88siSCx6uWJJSjZCKoOlJ8zDUf9+Ma9ir4rthzgWBFziLcUzjgiu943+JSvWIGFLKOhkGN/AOKjJEoAF65FlHndhv84Yj0LoA7MU=
