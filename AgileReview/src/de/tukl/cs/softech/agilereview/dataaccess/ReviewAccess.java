@@ -315,6 +315,15 @@ public class ReviewAccess {
         synchronized (syncObj) {
             if (RA == null) {
                 RA = new ReviewAccess();
+                // Set the directory where the comments are located
+                String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
+                if (!RA.loadReviewSourceProject(projectName)) {
+                    // Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+                    // String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
+                    // "Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
+                    // MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);
+                    ExceptionHandler.handleNoReviewSourceFolderExceptionOnStartUp();
+                }
             }
             return RA;
         }
@@ -340,15 +349,6 @@ public class ReviewAccess {
      */
     private ReviewAccess() {
         PluginLogger.log(this.getClass().toString(), "constructor", "ReviewAccess created");
-        // Set the directory where the comments are located
-        String projectName = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER);
-        if (!loadReviewSourceProject(projectName)) {
-            // Shell currShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-            // String msg = "AgileReview is either started for the first time or you deleted your 'AgileReview Source Folder'.\n" +
-            // "Please set an 'AgileReview Source Folder' for AgileReview to work properly.";
-            // MessageDialog.openInformation(currShell, "AgileReview Initialization", msg);
-            ExceptionHandler.handleNoReviewSourceFolderExceptionOnStartUp();
-        }
     }
     
     /**
