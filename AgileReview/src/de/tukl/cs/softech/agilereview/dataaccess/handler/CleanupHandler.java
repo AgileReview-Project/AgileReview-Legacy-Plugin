@@ -61,28 +61,30 @@ public class CleanupHandler extends AbstractHandler {
 			return null;
 		}
 		
-		List<IProject> selProjects = new ArrayList<IProject>();
 		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
 		
 		try {
-			// cleanup for projects
 			Object firstElement = selection.getFirstElement();
-			if (firstElement instanceof IProject) {
+			// cleanup for reviews
+			if (firstElement instanceof MultipleReviewWrapper) {
+	    		MultipleReviewWrapper reviewWrapper = ((MultipleReviewWrapper) firstElement);
+	            cleanupReview(event, reviewWrapper, deleteComments, ignoreOpenComments);
+	        } else 
+			// cleanup for projects
+			if (firstElement instanceof IAdaptable && ((IAdaptable) firstElement).getAdapter(IProject.class) != null) {
+				List<IProject> selProjects = new ArrayList<IProject>();
 				for (Iterator<?> it = selection.iterator(); it.hasNext();) {
 					Object currentElement = it.next();
 					if (currentElement instanceof IAdaptable) {
 						IProject selProject = (IProject) ((IAdaptable) currentElement).getAdapter(IProject.class);
-						selProjects.add(selProject);
+						if (selProject != null) {
+							selProjects.add(selProject);	
+						}
 					}
 				}
 	
 				cleanupProjects(selProjects, event, deleteComments, ignoreOpenComments);	
 			}
-			// cleanup for reviews
-			else if (firstElement instanceof MultipleReviewWrapper) {
-	    		MultipleReviewWrapper reviewWrapper = ((MultipleReviewWrapper) firstElement);
-	            cleanupReview(event, reviewWrapper, deleteComments, ignoreOpenComments);
-	        }
 		} catch (InvocationTargetException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "InvocationTargetException", e);
 			Display.getDefault().asyncExec(new Runnable() {
