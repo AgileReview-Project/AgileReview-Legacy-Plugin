@@ -195,7 +195,7 @@ public class PropertiesManager implements IInputValidator {
 		 * Indicates whether cleanup should only process closed or fixed
 		 * comments
 		 */
-		public static String CLEANUP_IGNORE_OPEN_COMMENTS = "cleanupIgnoreOpenComments";
+		public static String CLEANUP_ONLY_CLOSED_COMMENTS = "cleanupOnlyClosedComments";
 		/**
 		 * The color of the annotations
 		 */

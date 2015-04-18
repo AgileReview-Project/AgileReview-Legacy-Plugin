@@ -27,7 +27,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SOURCE_FOLDER, "AgileReviews");
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.SUGGESTIONS_ENABLED, true);
 		store.setDefault(PropertiesManager.EXTERNAL_KEYS.CLEANUP_DELETE_COMMENTS, true);
-		store.setDefault(PropertiesManager.EXTERNAL_KEYS.CLEANUP_IGNORE_OPEN_COMMENTS, false);
+		store.setDefault(PropertiesManager.EXTERNAL_KEYS.CLEANUP_ONLY_CLOSED_COMMENTS, false);
 
 		// initial color value and transferation of the color to the other
 		// preference

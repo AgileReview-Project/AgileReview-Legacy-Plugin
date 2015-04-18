@@ -113,9 +113,9 @@ public class AgileReviewPreferencePage extends FieldEditorPreferencePage impleme
 				"Delete Comments on Cleanup. Uncheck to delete only tags from source code.", cleanupContainer);
 		cleanupWrapper.addField(booleanCleanupDeleteComments);
 
-		BooleanFieldEditor booleanIgnoreOpenComments = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.CLEANUP_IGNORE_OPEN_COMMENTS,
-				"Ignore Comments with status 'open' on Cleanup", cleanupContainer);
-		cleanupWrapper.addField(booleanIgnoreOpenComments);
+		BooleanFieldEditor booleanOnlyClosedClosedComments = new BooleanFieldEditor(PropertiesManager.EXTERNAL_KEYS.CLEANUP_ONLY_CLOSED_COMMENTS,
+				"Restrict Cleanup to Comments with status 'closed'", cleanupContainer);
+		cleanupWrapper.addField(booleanOnlyClosedClosedComments);
 		addField(cleanupWrapper);
 
 		// Grouping FieldEditor for export defaults

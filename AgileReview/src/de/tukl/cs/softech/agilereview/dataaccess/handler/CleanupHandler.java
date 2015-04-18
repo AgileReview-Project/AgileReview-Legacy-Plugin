@@ -46,11 +46,11 @@ public class CleanupHandler extends AbstractHandler {
 		PluginLogger.log(this.getClass().toString(), "execute", "Cleanup triggered in Package-Explorer");
 
 		boolean deleteComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_DELETE_COMMENTS);
-		boolean ignoreOpenComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_IGNORE_OPEN_COMMENTS);
+		boolean onlyClosedComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_ONLY_CLOSED_COMMENTS);
 
 		MessageBox messageDialog = new MessageBox(HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
 		messageDialog.setText("AgileReview Cleanup");
-		String options = (deleteComments ? (ignoreOpenComments ? "All comments that are not in state 'open' will be deleted." : "All Comments will be deleted.")
+		String options = (deleteComments ? (onlyClosedComments ? "All comments that are in state 'clsoed' will be deleted." : "All Comments will be deleted.")
 				: "References to code passages will be deleted. All comments will be kept.");
 		String message = "Really do cleanup? " + options + "\nCheck the preferences to adjust the behavior of the Project Cleanup Action.";
 		messageDialog.setMessage(message);
@@ -68,7 +68,7 @@ public class CleanupHandler extends AbstractHandler {
 			// cleanup for reviews
 			if (firstElement instanceof MultipleReviewWrapper) {
 	    		MultipleReviewWrapper reviewWrapper = ((MultipleReviewWrapper) firstElement);
-	            cleanupReview(event, reviewWrapper, deleteComments, ignoreOpenComments);
+	            cleanupReview(event, reviewWrapper, deleteComments, onlyClosedComments);
 	        } else 
 			// cleanup for projects
 			if (firstElement instanceof IAdaptable && ((IAdaptable) firstElement).getAdapter(IProject.class) != null) {
@@ -83,7 +83,7 @@ public class CleanupHandler extends AbstractHandler {
 					}
 				}
 	
-				cleanupProjects(selProjects, event, deleteComments, ignoreOpenComments);	
+				cleanupProjects(selProjects, event, deleteComments, onlyClosedComments);	
 			}
 		} catch (InvocationTargetException e) {
 			PluginLogger.logError(this.getClass().toString(), "execute", "InvocationTargetException", e);
@@ -120,15 +120,15 @@ public class CleanupHandler extends AbstractHandler {
 	 * @param selProjects
 	 * @param event 
 	 * @param deleteComments
-	 * @param ignoreOpenComments
+	 * @param onlyClosedComments
 	 * @throws InterruptedException 
 	 * @throws InvocationTargetException 
 	 */
 	private void cleanupProjects(List<IProject> selProjects, final ExecutionEvent event,
-			boolean deleteComments, boolean ignoreOpenComments) throws InvocationTargetException, InterruptedException {
+			boolean deleteComments, boolean onlyClosedComments) throws InvocationTargetException, InterruptedException {
 		ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
 		pmd.open();
-		pmd.run(true, false, new CleanupProjectsProcess(selProjects, deleteComments, ignoreOpenComments));
+		pmd.run(true, false, new CleanupProjectsProcess(selProjects, deleteComments, onlyClosedComments));
 		pmd.close();
 	}
 	
@@ -137,19 +137,19 @@ public class CleanupHandler extends AbstractHandler {
 	 * @param event
 	 * @param reviewWrapper
 	 * @param deleteComments 
-	 * @param ignoreOpenComments 
+	 * @param onlyClosedComments 
 	 * @throws ExecutionException
 	 * @throws InterruptedException 
 	 * @throws InvocationTargetException 
 	 */
-	private void cleanupReview(ExecutionEvent event, MultipleReviewWrapper reviewWrapper, boolean deleteComments, boolean ignoreOpenComments)
+	private void cleanupReview(ExecutionEvent event, MultipleReviewWrapper reviewWrapper, boolean deleteComments, boolean onlyClosedComments)
 			throws ExecutionException, InvocationTargetException, InterruptedException {
 		
 		if (!checkReviewOpen(event, reviewWrapper)) { return; }
 		
 	    ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
 	    pmd.open();
-	    pmd.run(true, false, new CleanupReviewProcess(reviewWrapper.getWrappedReview(), deleteComments, ignoreOpenComments));
+	    pmd.run(true, false, new CleanupReviewProcess(reviewWrapper.getWrappedReview(), deleteComments, onlyClosedComments));
 	    pmd.close();
 	}
     

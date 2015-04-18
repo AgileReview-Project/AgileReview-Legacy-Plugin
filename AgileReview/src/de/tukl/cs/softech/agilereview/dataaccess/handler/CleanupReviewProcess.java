@@ -7,7 +7,6 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.widgets.Display;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import agileReview.softech.tukl.de.ReviewDocument.Review;
@@ -16,8 +15,6 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
 import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
-import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
 /**
  * Class that performs the cleanup process
@@ -33,9 +30,9 @@ public class CleanupReviewProcess implements IRunnableWithProgress {
 	 */
 	private final boolean deleteComments;
 	/**
-	 * ignore open comments during cleanup
+	 * process only closed comments during cleanup
 	 */
-	private boolean ignoreOpenComments;
+	private boolean onlyClosedComments;
 
 	/**
 	 * Constructor of the Cleanup process
@@ -44,11 +41,12 @@ public class CleanupReviewProcess implements IRunnableWithProgress {
 	 *            the review to clean (remove tags)
 	 * @param deleteComments
 	 *            indicates whether to delete (true) or keep (false) comments
+	 * @param onlyClosedComments 
 	 */
-	public CleanupReviewProcess(Review review, boolean deleteComments, boolean ignoreOpenComments) {
+	public CleanupReviewProcess(Review review, boolean deleteComments, boolean onlyClosedComments) {
 		this.review = review;
 		this.deleteComments = deleteComments;
-		this.ignoreOpenComments = ignoreOpenComments;
+		this.onlyClosedComments = onlyClosedComments;
 	}
 
 	@Override
@@ -67,7 +65,7 @@ public class CleanupReviewProcess implements IRunnableWithProgress {
 		int i = 0;
 		for (Comment c : comments) {
 			String key = ra.generateCommentKey(c);
-			if (!(ignoreOpenComments && c.getStatus() == 0)) {
+			if (!onlyClosedComments || c.getStatus() == 1) {
 				TagCleaner.removeTag(new Path(ReviewAccess.computePath(c)), key);
 				if (this.deleteComments) {
 					try {

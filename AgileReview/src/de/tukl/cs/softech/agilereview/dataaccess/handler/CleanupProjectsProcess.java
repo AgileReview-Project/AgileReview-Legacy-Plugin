@@ -52,9 +52,9 @@ public class CleanupProjectsProcess implements IRunnableWithProgress {
 	 */
 	private final boolean deleteComments;
 	/**
-	 * process not open comments only (true) or all (false) comments
+	 * process closed comments only (true) or all (false) comments
 	 */
-	private final boolean ignoreOpenComments;
+	private final boolean onlyClosedComments;
 
 	/**
 	 * Constructor of the Cleanup process
@@ -63,14 +63,14 @@ public class CleanupProjectsProcess implements IRunnableWithProgress {
 	 *            the projects to clean (remove tags)
 	 * @param deleteComments
 	 *            indicates whether to delete (true) or keep (false) comments
-	 * @param ignoreOpenComments
-	 *            indicates whether only closed or fixed comments should be
+	 * @param onlyClosedComments
+	 *            indicates whether only closed comments should be
 	 *            processed
 	 */
-	public CleanupProjectsProcess(List<IProject> selProjects, boolean deleteComments, boolean ignoreOpenComments) {
+	public CleanupProjectsProcess(List<IProject> selProjects, boolean deleteComments, boolean onlyClosedComments) {
 		this.selProjects = selProjects;
 		this.deleteComments = deleteComments;
-		this.ignoreOpenComments = ignoreOpenComments;
+		this.onlyClosedComments = onlyClosedComments;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class CleanupProjectsProcess implements IRunnableWithProgress {
 				for (Review r : reviews) {
 					ArrayList<Comment> projectComments = ra.getComments(r.getId(), selProjectPath);
 					for (Comment c : projectComments) {
-						if (!(this.ignoreOpenComments && c.getStatus() == 0)) {
+						if (!this.onlyClosedComments || c.getStatus() == 1) {
 							comments.add(c);
 						}
 					}
@@ -119,9 +119,9 @@ public class CleanupProjectsProcess implements IRunnableWithProgress {
 			PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from " + paths.toString());
 			for (String path : paths) {
 				IPath actPath = new Path(path);
-				if (this.ignoreOpenComments) { // issue #13: add ability to ignore open comments on cleanup
+				if (this.onlyClosedComments) { // issue #13: add ability to ignore open comments on cleanup
 					for (Comment c : comments) {
-						if (c.getStatus() != 0) {
+						if (c.getStatus() == 1) {
 							String key = ra.generateCommentKey(c);
 							if (!TagCleaner.removeTag(actPath, key)) {
 								throw new InterruptedException("Tag of comment " + c.getId() + " of review " + c.getReviewID() + "in file "
@@ -141,7 +141,7 @@ public class CleanupProjectsProcess implements IRunnableWithProgress {
 			if (this.deleteComments) {
 				monitor.subTask("Deleting comments...");
 				PluginLogger.log(this.getClass().toString(), "execute", "Removing comments from XML");
-				if (this.ignoreOpenComments) { // issue #13: add ability to ignore open comments on cleanup
+				if (this.onlyClosedComments) { // issue #13: add ability to ignore open comments on cleanup
 					for (Comment c : comments) {
 						if (c.getStatus() != 0) {
 							try {
