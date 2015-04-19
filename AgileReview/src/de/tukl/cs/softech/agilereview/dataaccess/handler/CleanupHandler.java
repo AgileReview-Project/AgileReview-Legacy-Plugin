@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -33,125 +34,133 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
  * Handler for the cleanup process
  */
 public class CleanupHandler extends AbstractHandler {
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands
-	 * .ExecutionEvent)
-	 */
-	@Override
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		PluginLogger.log(this.getClass().toString(), "execute", "Cleanup triggered in Package-Explorer");
-
-		boolean deleteComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_DELETE_COMMENTS);
-		boolean onlyClosedComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_ONLY_CLOSED_COMMENTS);
-
-		MessageBox messageDialog = new MessageBox(HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-		messageDialog.setText("AgileReview Cleanup");
-		String options = (deleteComments ? (onlyClosedComments ? "All comments that are in state 'clsoed' will be deleted." : "All Comments will be deleted.")
-				: "References to code passages will be deleted. All comments will be kept.");
-		String message = "Really do cleanup? " + options + "\nCheck the preferences to adjust the behavior of the Project Cleanup Action.";
-		messageDialog.setMessage(message);
-		int result = messageDialog.open();
-
-		if (result == SWT.CANCEL) {
-			// cancel selected -> quit method
-			return null;
-		}
-		
-		IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-		
-		try {
-			Object firstElement = selection.getFirstElement();
-			// cleanup for reviews
-			if (firstElement instanceof MultipleReviewWrapper) {
-	    		MultipleReviewWrapper reviewWrapper = ((MultipleReviewWrapper) firstElement);
-	            cleanupReview(event, reviewWrapper, deleteComments, onlyClosedComments);
-	        } else 
-			// cleanup for projects
-			if (firstElement instanceof IAdaptable && ((IAdaptable) firstElement).getAdapter(IProject.class) != null) {
-				List<IProject> selProjects = new ArrayList<IProject>();
-				for (Iterator<?> it = selection.iterator(); it.hasNext();) {
-					Object currentElement = it.next();
-					if (currentElement instanceof IAdaptable) {
-						IProject selProject = (IProject) ((IAdaptable) currentElement).getAdapter(IProject.class);
-						if (selProject != null) {
-							selProjects.add(selProject);	
-						}
-					}
-				}
-	
-				cleanupProjects(selProjects, event, deleteComments, onlyClosedComments);	
-			}
-		} catch (InvocationTargetException e) {
-			PluginLogger.logError(this.getClass().toString(), "execute", "InvocationTargetException", e);
-			Display.getDefault().asyncExec(new Runnable() {
-	
-				@Override
-				public void run() {
-					MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
-							"An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:1");
-				}
-			});
-		} catch (InterruptedException e) {
-			PluginLogger.logError(this.getClass().toString(), "execute", "InterruptedException", e);
-			Display.getDefault().asyncExec(new Runnable() {
-	
-				@Override
-				public void run() {
-					MessageDialog.openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
-							"An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:2");
-				}
-			});
-		}
-		
-		ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW | ViewControl.REVIEW_EXPLORER, true);
-		if (ViewControl.isOpen(CommentTableView.class)) {
-			CommentTableView.getInstance().reparseAllEditors();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Perform cleanup on selected Projects
-	 * @param selProjects
-	 * @param event 
-	 * @param deleteComments
-	 * @param onlyClosedComments
-	 * @throws InterruptedException 
-	 * @throws InvocationTargetException 
-	 */
-	private void cleanupProjects(List<IProject> selProjects, final ExecutionEvent event,
-			boolean deleteComments, boolean onlyClosedComments) throws InvocationTargetException, InterruptedException {
-		ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
-		pmd.open();
-		pmd.run(true, false, new CleanupProjectsProcess(selProjects, deleteComments, onlyClosedComments));
-		pmd.close();
-	}
-	
-	/**
-	 * Perform cleanup on selected review
-	 * @param event
-	 * @param reviewWrapper
-	 * @param deleteComments 
-	 * @param onlyClosedComments 
-	 * @throws ExecutionException
-	 * @throws InterruptedException 
-	 * @throws InvocationTargetException 
-	 */
-	private void cleanupReview(ExecutionEvent event, MultipleReviewWrapper reviewWrapper, boolean deleteComments, boolean onlyClosedComments)
-			throws ExecutionException, InvocationTargetException, InterruptedException {
-		
-		if (!checkReviewOpen(event, reviewWrapper)) { return; }
-		
-	    ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
-	    pmd.open();
-	    pmd.run(true, false, new CleanupReviewProcess(reviewWrapper.getWrappedReview(), deleteComments, onlyClosedComments));
-	    pmd.close();
-	}
+    
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands
+     * .ExecutionEvent)
+     */
+    @Override
+    public Object execute(final ExecutionEvent event) throws ExecutionException {
+        PluginLogger.log(this.getClass().toString(), "execute", "Cleanup triggered in Package-Explorer");
+        
+        boolean deleteComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_DELETE_COMMENTS);
+        boolean onlyClosedComments = PropertiesManager.getPreferences().getBoolean(PropertiesManager.EXTERNAL_KEYS.CLEANUP_ONLY_CLOSED_COMMENTS);
+        
+        ISelection sel = HandlerUtil.getCurrentSelection(event);
+        if (!(sel instanceof IStructuredSelection)) {
+            MessageDialog.openError(HandlerUtil.getActiveShell(event), "Not supported!",
+                    "The selection is not supported as input for the cleanup command.");
+            return null;
+        }
+        IStructuredSelection selection = (IStructuredSelection) sel;
+        
+        MessageBox messageDialog = new MessageBox(HandlerUtil.getActiveShell(event), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+        messageDialog.setText("AgileReview Cleanup");
+        String options = (deleteComments ? (onlyClosedComments ? "All comments that are in state 'closed' will be deleted."
+                : "All Comments will be deleted.") : "References to code passages will be deleted. All comments will be kept.");
+        String message = "Really do cleanup? " + options + "\nCheck the preferences to adjust the behavior of the Project Cleanup Action.";
+        messageDialog.setMessage(message);
+        int result = messageDialog.open();
+        
+        if (result == SWT.CANCEL) {
+            // cancel selected -> quit method
+            return null;
+        }
+        
+        try {
+            Object firstElement = selection.getFirstElement();
+            // cleanup for reviews
+            if (firstElement instanceof MultipleReviewWrapper) {
+                MultipleReviewWrapper reviewWrapper = ((MultipleReviewWrapper) firstElement);
+                cleanupReview(event, reviewWrapper, deleteComments, onlyClosedComments);
+            } else
+            // cleanup for projects
+            if (firstElement instanceof IAdaptable && ((IAdaptable) firstElement).getAdapter(IProject.class) != null) {
+                List<IProject> selProjects = new ArrayList<IProject>();
+                for (Iterator<?> it = selection.iterator(); it.hasNext();) {
+                    Object currentElement = it.next();
+                    if (currentElement instanceof IAdaptable) {
+                        IProject selProject = (IProject) ((IAdaptable) currentElement).getAdapter(IProject.class);
+                        if (selProject != null) {
+                            selProjects.add(selProject);
+                        }
+                    }
+                }
+                
+                cleanupProjects(selProjects, event, deleteComments, onlyClosedComments);
+            }
+        } catch (InvocationTargetException e) {
+            PluginLogger.logError(this.getClass().toString(), "execute", "InvocationTargetException", e);
+            Display.getDefault().asyncExec(new Runnable() {
+                
+                @Override
+                public void run() {
+                    MessageDialog
+                            .openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
+                                    "An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:1");
+                }
+            });
+        } catch (InterruptedException e) {
+            PluginLogger.logError(this.getClass().toString(), "execute", "InterruptedException", e);
+            Display.getDefault().asyncExec(new Runnable() {
+                
+                @Override
+                public void run() {
+                    MessageDialog
+                            .openError(HandlerUtil.getActiveShell(event), "Error while performing cleanup",
+                                    "An Eclipse internal error occured!\nRetry and please report the bug to the AgileReview team when it occurs again.\nCode:2");
+                }
+            });
+        }
+        
+        ViewControl.refreshViews(ViewControl.COMMMENT_TABLE_VIEW | ViewControl.REVIEW_EXPLORER, true);
+        if (ViewControl.isOpen(CommentTableView.class)) {
+            CommentTableView.getInstance().reparseAllEditors();
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Perform cleanup on selected Projects
+     * @param selProjects
+     * @param event
+     * @param deleteComments
+     * @param onlyClosedComments
+     * @throws InterruptedException
+     * @throws InvocationTargetException
+     */
+    private void cleanupProjects(List<IProject> selProjects, final ExecutionEvent event, boolean deleteComments, boolean onlyClosedComments)
+            throws InvocationTargetException, InterruptedException {
+        ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
+        pmd.open();
+        pmd.run(true, false, new CleanupProjectsProcess(selProjects, deleteComments, onlyClosedComments));
+        pmd.close();
+    }
+    
+    /**
+     * Perform cleanup on selected review
+     * @param event
+     * @param reviewWrapper
+     * @param deleteComments
+     * @param onlyClosedComments
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws InvocationTargetException
+     */
+    private void cleanupReview(ExecutionEvent event, MultipleReviewWrapper reviewWrapper, boolean deleteComments, boolean onlyClosedComments)
+            throws ExecutionException, InvocationTargetException, InterruptedException {
+        
+        if (!checkReviewOpen(event, reviewWrapper)) { return; }
+        
+        ProgressMonitorDialog pmd = new ProgressMonitorDialog(HandlerUtil.getActiveShell(event));
+        pmd.open();
+        pmd.run(true, false, new CleanupReviewProcess(reviewWrapper.getWrappedReview(), deleteComments, onlyClosedComments));
+        pmd.close();
+    }
     
     /**
      * Checks whether the selected Review is open. If it is not, it will be opened automatically.
@@ -196,5 +205,5 @@ public class CleanupHandler extends AbstractHandler {
         }
         return true;
     }
-
+    
 }
