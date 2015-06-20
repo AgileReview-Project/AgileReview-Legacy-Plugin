@@ -642,6 +642,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
             }
         } catch (PartInitException e) {
             PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
+            return false;
         }
         return true;
     }
