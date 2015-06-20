@@ -2,7 +2,7 @@
 <feature
       id="de.tukl.cs.softech.agilereview.feature"
       label="AgileReview"
-      version="0.9.1.qualifier"
+      version="0.9.1"
       provider-name="AgileReview.org">
 
    <description>
