@@ -147,6 +147,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
     protected void setTableContent(ArrayList<Comment> comments) {
         this.comments = comments;
         viewer.setInput(comments);
+        PluginLogger.log(getClass().toString(), "setTableContent", "Set viewer input: " + comments);
         viewer.refresh();
         PluginLogger.log(this.getClass().toString(), "setTableContent", "Setting table content");
     }
@@ -161,6 +162,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         this.comments.add(comment);
         
         viewer.setInput(this.comments);
+        PluginLogger.log(getClass().toString(), "addComment", "Set viewer input: " + comments);
         
         // TODO: Das hier vlt auslagern -> macht CTV dümmer, außerdem liegen z.B. Editor und Selection im Handler vor 
         try {
@@ -188,6 +190,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         // add comment to (un)filtered model
         this.comments.remove(comment);
         viewer.setInput(this.comments);
+        PluginLogger.log(getClass().toString(), "deleteComment", "Set viewer input: " + comments);
         
         // remove annotation and tags
         try {
@@ -210,6 +213,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         PluginLogger.log(this.getClass().toString(), "refreshTable", "Reloading current table input");
         viewer.refresh();
         filterComments();
+        reparseActiveEditor();
     }
     
     /**
@@ -219,6 +223,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         PluginLogger.log(this.getClass().toString(), "resetComments", "Reloading comments from model");
         this.comments = ra.getAllComments();
         this.viewer.setInput(this.comments);
+        PluginLogger.log(getClass().toString(), "resetComments", "Set viewer input: " + comments);
         this.refreshTable();
     }
     
@@ -301,6 +306,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         // set input for viewer
         viewer.setContentProvider(new ArrayContentProvider());
         viewer.setInput(this.comments);
+        PluginLogger.log(getClass().toString(), "createViewer", "Set viewer input: " + comments);
         
         // provide access to selections of table rows
         getSite().setSelectionProvider(viewer);
@@ -636,6 +642,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
             }
         } catch (PartInitException e) {
             PluginLogger.logError(this.getClass().toString(), "openEditor", "PartInitException occured when opening editor", e);
+            return false;
         }
         return true;
     }
@@ -1001,16 +1008,21 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
             //jump to comment in opened editor
             try {
                 PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
-                this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
+
+                IAnnotationParser annotationParser = this.parserMap.get(getActiveEditor());
+                if(annotationParser != null) {
+                	annotationParser.revealCommentLocation(generateCommentKey(comment));
+                	
+                	//open Detail View and set Focus
+                	ViewControl.openView(ViewControl.DETAIL_VIEW);
+                	if (ViewControl.isOpen(DetailView.class)) {
+                		selectComment(comment); //select comment another time to show the comment if the view was closed before
+                	}
+                }
             } catch (BadLocationException e) {
                 PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
             }
             
-            //open Detail View and set Focus
-            ViewControl.openView(ViewControl.DETAIL_VIEW);
-            if (ViewControl.isOpen(DetailView.class)) {
-                selectComment(comment); //select comment another time to show the comment if the view was closed before
-            }
         }
     }
     

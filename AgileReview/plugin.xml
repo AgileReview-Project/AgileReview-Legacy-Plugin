@@ -990,7 +990,7 @@
       </activeWhen>
    </handler>
    <handler
-         class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.CleanupHandler"
+         class="de.tukl.cs.softech.agilereview.dataaccess.handler.CleanupHandler"
          commandId="de.tukl.cs.softech.agilereview.cleanup">
       <activeWhen>
          <with
@@ -1449,24 +1449,19 @@
                checkEnabled="false">
             <with
                   variable="selection">
-               <and>
-                  <count
-                        value="1">
-                  </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <adapt
-                           type="org.eclipse.core.resources.IProject">
-                        <not>
-                           <test
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="%agileReview_nature.id">
-                           </test>
-                        </not>
-                     </adapt>
-                  </iterate>
-               </and>
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <adapt
+                       type="org.eclipse.core.resources.IProject">
+                    <not>
+                       <test
+                             property="org.eclipse.core.resources.projectNature"
+                             value="%agileReview_nature.id">
+                       </test>
+                    </not>
+                 </adapt>
+              </iterate>
             </with>
          </visibleWhen>
       </command>

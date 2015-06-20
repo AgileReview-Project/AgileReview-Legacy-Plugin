@@ -9,3 +9,6 @@ branches:
     only:
         - master
         - next_Release
+cache:
+    directories:
+        - $HOME/.m2
