@@ -1008,16 +1008,21 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
             //jump to comment in opened editor
             try {
                 PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
-                this.parserMap.get(getActiveEditor()).revealCommentLocation(generateCommentKey(comment));
+
+                IAnnotationParser annotationParser = this.parserMap.get(getActiveEditor());
+                if(annotationParser != null) {
+                	annotationParser.revealCommentLocation(generateCommentKey(comment));
+                	
+                	//open Detail View and set Focus
+                	ViewControl.openView(ViewControl.DETAIL_VIEW);
+                	if (ViewControl.isOpen(DetailView.class)) {
+                		selectComment(comment); //select comment another time to show the comment if the view was closed before
+                	}
+                }
             } catch (BadLocationException e) {
                 PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);
             }
             
-            //open Detail View and set Focus
-            ViewControl.openView(ViewControl.DETAIL_VIEW);
-            if (ViewControl.isOpen(DetailView.class)) {
-                selectComment(comment); //select comment another time to show the comment if the view was closed before
-            }
         }
     }
     
