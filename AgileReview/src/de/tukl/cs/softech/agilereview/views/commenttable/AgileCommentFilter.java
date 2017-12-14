@@ -62,6 +62,10 @@ public class AgileCommentFilter extends ViewerFilter {
             if (c.getAuthor().matches(searchString) && (restriction.equals("ALL") || restriction.equals("Author"))) {
                 matches = true;
             }
+            // match in Description and category ALL or Description
+            if (c.getText().matches(searchString) && (restriction.equals("ALL") || restriction.equals("Description"))) {
+                matches = true;
+            }
             // match in Recipient and category ALL or Recipient
             if (c.getRecipient().matches(searchString) && (restriction.equals("ALL") || restriction.equals("Recipient"))) {
                 matches = true;
@@ -97,6 +101,7 @@ public class AgileCommentFilter extends ViewerFilter {
             if (ReviewAccess.computePath(c).matches(searchString) && (restriction.equals("ALL") || restriction.equals("Location"))) {
                 matches = true;
             }
+            
         }
         
         return matches;
