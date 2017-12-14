@@ -542,7 +542,7 @@ public class AnnotationParser implements IAnnotationParser {
             
             // Write tag -> get start+end-tag for current file-ending, insert into file
             String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-            document.replace(insertOffset, 0, tags[0] + "-?" + commentTag + "?" + (startLineInserted || endLineInserted ? "-" : "") + tags[1]);
+            document.replace(insertOffset, 0, " " + tags[0] + "-?" + commentTag + "?" + (startLineInserted || endLineInserted ? "-" : "") + tags[1]);
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // document.getLineLength(selStartLine)-lineDelimiterLength);
@@ -565,8 +565,8 @@ public class AnnotationParser implements IAnnotationParser {
             
             // Write tags -> get tags for current file-ending, insert second tag, insert first tag
             String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-            document.replace(insertEndOffset, 0, tags[0] + "-" + commentTag + "?" + (endLineInserted ? "-" : "") + tags[1]);
-            document.replace(insertStartOffset, 0, tags[0] + "-?" + commentTag + (startLineInserted ? "-" : "") + tags[1]);
+            document.replace(insertEndOffset, 0, " " + tags[0] + "-" + commentTag + "?" + (endLineInserted ? "-" : "") + tags[1]);
+            document.replace(insertStartOffset, 0, " " + tags[0] + "-?" + commentTag + (startLineInserted ? "-" : "") + tags[1]);
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // VARIANT(return Position): document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) +
