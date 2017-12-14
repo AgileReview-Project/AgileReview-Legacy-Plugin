@@ -5,11 +5,10 @@
   <parent>
     <artifactId>parent</artifactId>
     <groupId>de.tukl.cs.softech.agilereview</groupId>
-    <version>0.9.2</version>
+    <version>0.9.3-SNAPSHOT</version>
   </parent>
   <groupId>de.tukl.cs.softech.agilereview</groupId>
   <artifactId>UpdateSite_AgileReview</artifactId>
-  <version>0.9.2</version>
   <packaging>eclipse-repository</packaging>
   <build>
     <plugins>
@@ -23,4 +22,5 @@
       </plugin>
     </plugins>
   </build>
+  <version>0.9.3-SNAPSHOT</version>
 </project>
