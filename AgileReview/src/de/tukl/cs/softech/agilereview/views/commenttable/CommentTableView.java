@@ -122,11 +122,11 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
      * The titles of the table's columns, also used to fill the filter menu
      */
     private final String[] titles = { "ReviewName", "CommentID", "Author", "Recipient", "Status", "Priority", "Date created", "Date modified",
-            "Replies", "Location" };
+            "Replies", "Location", "Description" };
     /**
      * The width of the table's columns
      */
-    private final int[] bounds = { 60, 70, 70, 70, 70, 70, 120, 120, 50, 100 };
+    private final int[] bounds = { 60, 70, 70, 70, 70, 70, 120, 120, 50, 100, 100 };
     /**
      * map of currently opened editors and their annotation parsers
      */
@@ -538,6 +538,16 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
             public String getText(Object element) {
                 Comment c = (Comment) element;
                 return ReviewAccess.computePath(c);
+            }
+        });
+        
+        // Description
+        col = createColumn(titles[10], bounds[10], 10);
+        col.setLabelProvider(new ColumnLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                Comment c = (Comment) element;
+                return c.getText();
             }
         });
     }
