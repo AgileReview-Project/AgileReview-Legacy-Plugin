@@ -68,7 +68,7 @@ public class TagCleaner {
                 boolean fileChanged = false;
                 while (line != null) {
                     
-                    String searchRegex = Pattern.quote(beginTag) + AnnotationParser.RAW_TAG_REGEX + Pattern.quote(endTag);
+                    String searchRegex = "\\s+" + Pattern.quote(beginTag) + AnnotationParser.RAW_TAG_REGEX + Pattern.quote(endTag);
                     Pattern p = Pattern.compile(searchRegex);
                     Matcher m = p.matcher(line);
                     boolean deleteLine = false;
