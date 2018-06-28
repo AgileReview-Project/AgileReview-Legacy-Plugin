@@ -61,18 +61,18 @@ public class CommentColorPreferencePage extends FieldEditorPreferencePage implem
         //set changed colors for annotations
         
         // TODO: Use of deprecated method here, as it seems that the new "correct" way is only available since 3.7 (indigo). Will be checked...
-        new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation",
-                PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
+        new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation", PropertiesManager.getPreferences().getString(
+                PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLOR));
         for (int i = 0; i < PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR.length; i++) {
-            new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation_Author" + i,
-                    PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i]));
+            new InstanceScope().getNode("org.eclipse.ui.editors").put("Comment_Annotation_Author" + i, PropertiesManager.getPreferences().getString(
+                    PropertiesManager.EXTERNAL_KEYS.ANNOTATION_COLORS_AUTHOR[i]));
         }
         
         //refresh views
         if (ReviewAccess.getInstance().updateReviewSourceProject()) {
             ViewControl.refreshViews(ViewControl.ALL_VIEWS, true);
         } else {
-            ViewControl.refreshViews(ViewControl.DETAIL_VIEW);
+            ViewControl.refreshViews(ViewControl.COMMENT_DETAIL_VIEW | ViewControl.REVIEW_DETAIL_VIEW);
         }
         
         return result;

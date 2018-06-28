@@ -16,13 +16,13 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
 import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
+import de.tukl.cs.softech.agilereview.tools.PlatformUIUtil;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
@@ -101,7 +101,7 @@ public class RelocateDialog extends Composite implements Listener {
             
             try {
                 IEditorPart editor;
-                if ((editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()) != null) {
+                if ((editor = PlatformUIUtil.getActivePage().getActiveEditor()) != null) {
                     
                     if (ctv.openEditorContains(oldComment)) {
                         //comment stays in same file
@@ -116,8 +116,8 @@ public class RelocateDialog extends Composite implements Listener {
                             
                             try {
                                 //create new comment in new file
-                                String pathToNewFile = ((FileEditorInput) input).getFile().getFullPath().toOSString().replaceFirst(
-                                        Pattern.quote(System.getProperty("file.separator")), "");
+                                String pathToNewFile = ((FileEditorInput) input).getFile().getFullPath().toOSString().replaceFirst(Pattern.quote(
+                                        System.getProperty("file.separator")), "");
                                 Comment newComment = ra.createNewComment(oldComment.getReviewID(), oldComment.getAuthor(), pathToNewFile);
                                 
                                 //fill contents

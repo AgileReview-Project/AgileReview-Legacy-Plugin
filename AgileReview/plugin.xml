@@ -50,6 +50,13 @@
             relative="org.eclipse.ui.editorss">
       </view>
       <view
+            id="de.tukl.cs.softech.agilereview.view.reviewdetailview.view"
+            minimized="false"
+            ratio="0.75f"
+            relationship="right"
+            relative="org.eclipse.ui.editorss">
+      </view>
+      <view
             id="de.tukl.cs.softech.agilereview.view.commentdetailview.view"
             minimized="false"
             ratio="0.75f"
@@ -111,10 +118,19 @@
       <view
             allowMultiple="false"
             category="de.tukl.cs.softech.agilereview.category"
-            class="de.tukl.cs.softech.agilereview.views.detail.DetailView"
+            class="de.tukl.cs.softech.agilereview.views.detail.CommentDetailView"
             icon="%agileReview.icon"
             id="de.tukl.cs.softech.agilereview.view.commentdetailview.view"
             name="%view.name.0"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="de.tukl.cs.softech.agilereview.category"
+            class="de.tukl.cs.softech.agilereview.views.detail.ReviewDetailView"
+            icon="%agileReview.icon"
+            id="de.tukl.cs.softech.agilereview.view.reviewdetailview.view"
+            name="%view.name.2"
             restorable="true">
       </view>
       <category
@@ -799,14 +815,42 @@
    </handler>
    <handler
          class="de.tukl.cs.softech.agilereview.views.detail.handlers.DeleteHandler"
-         commandId="de.tukl.cs.softech.agilereview.views.detail.delete">
+         commandId="de.tukl.cs.softech.agilereview.views.reviewdetail.delete">
       <activeWhen>
-         <with
-               variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
-            <equals
-                  value="true">
-            </equals>
-         </with>
+         <and>
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.reviewdetail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.reviewdetail.variables.reviewDetailOnTop">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </and>
+      </activeWhen>
+   </handler>
+   <handler
+         class="de.tukl.cs.softech.agilereview.views.detail.handlers.DeleteHandler"
+         commandId="de.tukl.cs.softech.agilereview.views.commentdetail.delete">
+      <activeWhen>
+         <and>
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.commentdetail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.commentdetail.variables.commentDetailOnTop">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </and>
       </activeWhen>
    </handler>
    <handler
@@ -1164,6 +1208,40 @@
       point="org.eclipse.ui.menus">
    <menuContribution
          allPopups="false"
+         locationURI="toolbar:de.tukl.cs.softech.agilereview.view.reviewdetailview.view">
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.detail.revert"
+            icon="icons/undo_edit.gif"
+            label="revert"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.reviewdetail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
+      </command>
+      <command
+            commandId="de.tukl.cs.softech.agilereview.views.detail.delete"
+            icon="icons/delete_obj.gif"
+            label="Delete shown resource"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <with
+                  variable="de.tukl.cs.softech.agilereview.views.commentdetail.variables.contentAvailable">
+               <equals
+                     value="true">
+               </equals>
+            </with>
+         </visibleWhen>
+      </command>
+   </menuContribution>
+   <menuContribution
+         allPopups="false"
          locationURI="toolbar:de.tukl.cs.softech.agilereview.view.commentdetailview.view">
       <command
             commandId="de.tukl.cs.softech.agilereview.views.detail.relocateComment"
@@ -1173,7 +1251,7 @@
          <visibleWhen
                checkEnabled="false">
             <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
+                  variable="de.tukl.cs.softech.agilereview.views.commentdetail.variables.commentShown">
                <equals
                      value="true">
                </equals>
@@ -1192,7 +1270,7 @@
          <visibleWhen
                checkEnabled="false">
             <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown">
+                  variable="de.tukl.cs.softech.agilereview.views.commentdetail.variables.commentShown">
                <equals
                      value="true">
                </equals>
@@ -1211,7 +1289,7 @@
          <visibleWhen
                checkEnabled="false">
             <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
+                  variable="de.tukl.cs.softech.agilereview.views.commentdetail.variables.contentAvailable">
                <equals
                      value="true">
                </equals>
@@ -1226,7 +1304,7 @@
          <visibleWhen
                checkEnabled="false">
             <with
-                  variable="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable">
+                  variable="de.tukl.cs.softech.agilereview.views.commentdetail.variables.contentAvailable">
                <equals
                      value="true">
                </equals>
@@ -1552,11 +1630,15 @@
             priorityLevel="workbench">
       </variable>
       <variable
-            name="de.tukl.cs.softech.agilereview.views.detail.variables.commentShown"
+            name="de.tukl.cs.softech.agilereview.views.commentdetail.variables.commentShown"
             priorityLevel="workbench">
       </variable>
       <variable
-            name="de.tukl.cs.softech.agilereview.views.detail.variables.contentAvailable"
+            name="de.tukl.cs.softech.agilereview.views.commentdetail.variables.contentAvailable"
+            priorityLevel="workbench">
+      </variable>
+      <variable
+            name="de.tukl.cs.softech.agilereview.views.reviewdetail.variables.contentAvailable"
             priorityLevel="workbench">
       </variable>
       <variable

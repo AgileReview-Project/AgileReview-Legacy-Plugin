@@ -6,6 +6,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import agileReview.softech.tukl.de.CommentDocument.Comment;
@@ -13,11 +14,13 @@ import agileReview.softech.tukl.de.ReviewDocument.Review;
 import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.plugincontrol.ExceptionHandler;
 import de.tukl.cs.softech.agilereview.plugincontrol.exceptions.NoReviewSourceFolderException;
+import de.tukl.cs.softech.agilereview.tools.PlatformUIUtil;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.detail.CommentDetailView;
+import de.tukl.cs.softech.agilereview.views.detail.ReviewDetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
@@ -33,14 +36,20 @@ public class DeleteHandler extends AbstractHandler {
     
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        if (ViewControl.isOpen(DetailView.class)) {
-            Object o = DetailView.getInstance().getContent();
-            if (o instanceof Review) {
-                deleteReview(event, (Review) o);
-            } else if (o instanceof Comment) {
+        IWorkbenchPage page = PlatformUIUtil.getActivePage();
+        
+        if (ViewControl.isOpen(CommentDetailView.class) && page.isPartVisible(CommentDetailView.getInstance())) {
+            Object o = CommentDetailView.getInstance().getContent();
+            if (o instanceof Comment) {
                 deleteComment(event, (Comment) o);
             }
+        } else if (ViewControl.isOpen(ReviewDetailView.class) && page.isPartVisible(ReviewDetailView.getInstance())) {
+            Object o = ReviewDetailView.getInstance().getContent();
+            if (o instanceof Review) {
+                deleteReview(event, (Review) o);
+            }
         }
+        
         return null;
     }
     
@@ -51,7 +60,10 @@ public class DeleteHandler extends AbstractHandler {
      * @return true, if the deletion was successful<br>false, otherwise
      */
     private boolean deleteReview(ExecutionEvent event, Review review) {
-        if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Review Details - Delete", "Are you sure you want to delete this review?")) { return false; }
+        if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Review Details - Delete",
+                "Are you sure you want to delete this review?")) {
+            return false;
+        }
         
         ReviewAccess ra = ReviewAccess.getInstance();
         try {
@@ -88,7 +100,9 @@ public class DeleteHandler extends AbstractHandler {
         String commentTag = comment.getReviewID() + keySeparator + comment.getAuthor() + keySeparator + comment.getId();
         
         if (!MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Comment Details - Delete", "Are you sure you want to delete comment \""
-                + commentTag + "\"?")) { return false; }
+                + commentTag + "\"?")) {
+            return false;
+        }
         
         ReviewAccess ra = ReviewAccess.getInstance();
         try {

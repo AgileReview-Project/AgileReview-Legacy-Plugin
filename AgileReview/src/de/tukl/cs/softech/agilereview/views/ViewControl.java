@@ -8,6 +8,7 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener2;
@@ -23,13 +24,19 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.services.ISourceProviderService;
 
+import agileReview.softech.tukl.de.CommentDocument.Comment;
 import de.tukl.cs.softech.agilereview.Activator;
+import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
+import de.tukl.cs.softech.agilereview.tools.PlatformUIUtil;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.detail.CommentDetailView;
+import de.tukl.cs.softech.agilereview.views.detail.ReviewDetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
+import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
 /**
  * The ViewControl provides information about the current displayed ViewPart of this plugin. Furthermore the ViewControl provides and forwards events
@@ -37,22 +44,16 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.ReviewExplorer;
  */
 public class ViewControl implements ISelectionChangedListener, IPartListener2, IPerspectiveListener3, IPropertyChangeListener {
     
-    /**
-     * Public static field representing the detail view
-     */
-    public static final int DETAIL_VIEW = 1;
-    /**
-     * Public static field representing the comment summary
-     */
-    public static final int COMMMENT_TABLE_VIEW = 2;
-    /**
-     * Public static field representing the review explorer
-     */
-    public static final int REVIEW_EXPLORER = 4;
-    /**
-     * Public static field representing all existing views of this plugin
-     */
-    public static final int ALL_VIEWS = 7;
+    /** Public static field representing the comment summary */
+    public static final int COMMMENT_TABLE_VIEW = 1;
+    /** Public static field representing the review explorer */
+    public static final int REVIEW_EXPLORER = 2;
+    /** Public static field representing the detail view for comments only. */
+    public static final int COMMENT_DETAIL_VIEW = 4;
+    /** Public static field representing the detail view for reviews only. */
+    public static final int REVIEW_DETAIL_VIEW = 8;
+    /** Public static field representing all existing views of this plugin */
+    public static final int ALL_VIEWS = 15;
     
     /**
      * Set of all active Views
@@ -86,21 +87,12 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                //wait until the active page is created, then register all listeners
-                while (PlatformUI.getWorkbench() == null) {
-                }
-                while (PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
-                }
-                while (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {
-                }
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(ViewControl.this);
-                // PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addSelectionListener(ViewControl.this);
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(ViewControl.this);
+                IWorkbenchPage page = PlatformUIUtil.getActivePage();
+                page.addPartListener(ViewControl.this);
+                PlatformUIUtil.getActiveWorkbenchWindow().addPerspectiveListener(ViewControl.this);
                 // If our perspective is loaded, activate its context
-                if (contextActivation == null
-                        && PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective().getId().equals(
-                                "de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
-                    IContextService contextService = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+                if (contextActivation == null && page.getPerspective().getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
+                    IContextService contextService = PlatformUIUtil.getWorkbench().getService(IContextService.class);
                     contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
                     PluginLogger.log(ViewControl.class.toString(), "Constructor",
                             "Context \"de.tukl.cs.softech.agilereview.perspective.open\" activated");
@@ -180,17 +172,20 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
      * @param refreshInputs if true, data of ReviewExplorer and CommentTableView will be freshly loaded
      */
     public static void refreshViews(int flags, boolean validateExplorerSelection, boolean refreshInputs) {
-        if ((flags % 2 == 1) && isOpen(DetailView.class)) {
-            DetailView.getInstance().refreshBackgroundColor();
+        if (((flags >> 2) % 2 == 1) && isOpen(CommentDetailView.class)) {
+            CommentDetailView.getInstance().refreshBackgroundColor();
         }
-        if (((flags >> 1) % 2 == 1) && isOpen(CommentTableView.class)) {
+        if (((flags >> 3) % 2 == 1) && isOpen(ReviewDetailView.class)) {
+            ReviewDetailView.getInstance().refreshBackgroundColor();
+        }
+        if ((flags % 2 == 1) && isOpen(CommentTableView.class)) {
             if (refreshInputs) {
                 CommentTableView.getInstance().resetComments();
             } else {
                 CommentTableView.getInstance().refreshTable();
             }
         }
-        if (((flags >> 2) % 2 == 1) && isOpen(ReviewExplorer.class)) {
+        if (((flags >> 1) % 2 == 1) && isOpen(ReviewExplorer.class)) {
             if (validateExplorerSelection) {
                 ReviewExplorer.getInstance().validateExplorerSelection();
             }
@@ -212,13 +207,12 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
             String switchPerspective = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.AUTO_OPEN_PERSPECTIVE);
             if (MessageDialogWithToggle.ALWAYS.equals(switchPerspective)) {
                 return true;
-            } else if (MessageDialogWithToggle.NEVER.equals(switchPerspective)) { return false; }
-            MessageDialogWithToggle dialog = MessageDialogWithToggle
-                    .openYesNoQuestion(
-                            Display.getDefault().getActiveShell(),
-                            "AgileReview",
-                            "This command belongs to the AgileReview Perspective. Do you want to switch to this perspective to fully enable the AgileReview Plugin?",
-                            null, false, PropertiesManager.getPreferences(), "autoOpenPerspective");
+            } else if (MessageDialogWithToggle.NEVER.equals(switchPerspective)) {
+                return false;
+            }
+            MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(Display.getDefault().getActiveShell(), "AgileReview",
+                    "This command belongs to the AgileReview Perspective. Do you want to switch to this perspective to fully enable the AgileReview Plugin?",
+                    null, false, PropertiesManager.getPreferences(), "autoOpenPerspective");
             answer = (dialog.getReturnCode() == IDialogConstants.YES_ID);
         }
         return answer;
@@ -237,8 +231,8 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
                 while (PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
                 }
                 try {
-                    PlatformUI.getWorkbench().showPerspective("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective",
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+                    PlatformUI.getWorkbench().showPerspective("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective", PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow());
                 } catch (WorkbenchException e) {
                     PluginLogger.logError(this.getClass().toString(), "partOpened", "WorkbenchException while opening perspective", e);
                 }
@@ -251,52 +245,61 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
      * @param views public static fields specifying the views (xor for more than one)
      */
     public static void openView(final int views) {
-        Display.getDefault().asyncExec(new Runnable() {
+        Display.getDefault().syncExec(new Runnable() {
             
             @Override
             public void run() {
-                while (PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
-                }
-                while (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {
-                }
-                IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                IWorkbenchPage page = PlatformUIUtil.getActivePage();
                 
-                if (views % 2 == 1) {
-                    if (isOpen(DetailView.class)) {
-                        page.bringToTop(DetailView.getInstance());
+                if ((views >> 2) % 2 == 1) {
+                    if (isOpen(CommentDetailView.class)) {
+                        page.bringToTop(CommentDetailView.getInstance());
                     } else {
                         try {
-                            page.showView("de.tukl.cs.softech.agilereview.view.commentdetailview.view");
+                            page.showView(CommentDetailView.VIEW_ID, null, IWorkbenchPage.VIEW_CREATE);
                         } catch (PartInitException e) {
                             MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View",
                                     "Could not open the Comment Detail View. Error during initialization!");
-                            PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
+                            PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the Comment Detail View", e);
+                        }
+                    }
+                }
+                if ((views >> 3) % 2 == 1) {
+                    if (isOpen(ReviewDetailView.class)) {
+                        page.bringToTop(ReviewDetailView.getInstance());
+                    } else {
+                        try {
+                            page.showView(ReviewDetailView.VIEW_ID, null, IWorkbenchPage.VIEW_CREATE);
+                        } catch (PartInitException e) {
+                            MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View",
+                                    "Could not open the Review Detail View. Error during initialization!");
+                            PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the Review Detail View", e);
+                        }
+                    }
+                }
+                if (views % 2 == 1) {
+                    if (isOpen(CommentTableView.class)) {
+                        page.bringToTop(CommentTableView.getInstance());
+                    } else {
+                        try {
+                            page.showView(CommentTableView.VIEW_ID, null, IWorkbenchPage.VIEW_CREATE);
+                        } catch (PartInitException e) {
+                            MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View",
+                                    "Could not open the Comment Summary View. Error during initialization!");
+                            PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the Comment Summary View", e);
                         }
                     }
                 }
                 if ((views >> 1) % 2 == 1) {
-                    if (isOpen(CommentTableView.class)) {
-                        page.bringToTop(DetailView.getInstance());
-                    } else {
-                        try {
-                            page.showView("de.tukl.cs.softech.agilereview.view.commenttableview.view");
-                        } catch (PartInitException e) {
-                            MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View",
-                                    "Could not open the Comment Summary View. Error during initialization!");
-                            PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
-                        }
-                    }
-                }
-                if ((views >> 2) % 2 == 1) {
                     if (isOpen(ReviewExplorer.class)) {
-                        page.bringToTop(DetailView.getInstance());
+                        page.bringToTop(ReviewExplorer.getInstance());
                     } else {
                         try {
-                            page.showView("de.tukl.cs.softech.agilereview.view.reviewnavigator.view");
+                            page.showView(ReviewExplorer.VIEW_ID, null, IWorkbenchPage.VIEW_CREATE);
                         } catch (PartInitException e) {
                             MessageDialog.openError(Display.getDefault().getActiveShell(), "Error while opening View",
                                     "Could not open the Review Explorer. Error during initialization!");
-                            PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the DetailView", e);
+                            PluginLogger.logError(ViewControl.class.toString(), "openView", "Could not open the Review Explorer", e);
                         }
                     }
                 }
@@ -313,8 +316,21 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
         if (isOpen(CommentTableView.class)) {
             CommentTableView.getInstance().selectionChanged(event);
         }
-        if (isOpen(DetailView.class)) {
-            DetailView.getInstance().selectionChanged(event);
+        if (isOpen(ReviewDetailView.class)) {
+            if (event.getSelection() instanceof IStructuredSelection) {
+                if (((IStructuredSelection) event.getSelection()).getFirstElement() instanceof MultipleReviewWrapper) {
+                    openView(REVIEW_DETAIL_VIEW); // bring to top
+                }
+            }
+            ReviewDetailView.getInstance().selectionChanged(event);
+        }
+        if (isOpen(CommentDetailView.class)) {
+            if (event.getSelection() instanceof IStructuredSelection) {
+                if (((IStructuredSelection) event.getSelection()).getFirstElement() instanceof Comment) {
+                    openView(COMMENT_DETAIL_VIEW); // bring to top
+                }
+            }
+            CommentDetailView.getInstance().selectionChanged(event);
         }
         if (isOpen(ReviewExplorer.class)) {
             ReviewExplorer.getInstance().selectionChanged(event);
@@ -345,11 +361,20 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
         if (isOpen(CommentTableView.class)) {
             CommentTableView.getInstance().partBroughtToTop(partRef);
         }
+        
+        ISourceProviderService isps = PlatformUIUtil.getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+        SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.REVIEW_DETAIL_ON_TOP);
+        SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.COMMENT_DETAIL_ON_TOP);
+        if (partRef.getPart(false).getClass().equals(ReviewDetailView.class)) {
+            sp1.setVariable(SourceProvider.REVIEW_DETAIL_ON_TOP, true);
+        } else if (partRef.getPart(false).getClass().equals(CommentDetailView.class)) {
+            sp2.setVariable(SourceProvider.COMMENT_DETAIL_ON_TOP, true);
+        }
     }
     
     /**
      * listens whether a part was closed and forwards this to the following methods:<br> {@link CommentTableView#partClosed(IWorkbenchPartReference)}
-     * <br> {@link DetailView#partClosedOrDeactivated(IWorkbenchPart)}
+     * <br> {@link CommentDetailView#partClosedOrDeactivated(IWorkbenchPart)}
      * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
      */
     @Override
@@ -358,8 +383,11 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
             PluginLogger.log(this.getClass().toString(), "partClosed", "unregister: " + partRef.getPart(false).getTitle());
         }
         
-        if (isOpen(DetailView.class)) {
-            DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
+        if (isOpen(CommentDetailView.class)) {
+            CommentDetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
+        }
+        if (isOpen(ReviewDetailView.class)) {
+            ReviewDetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
         }
         if (isOpen(CommentTableView.class)) {
             CommentTableView.getInstance().partClosed(partRef);
@@ -368,14 +396,17 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
     
     /**
      * listens whether a part was deactivated and forwards this to the following methods:<br>
-     * {@link DetailView#partClosedOrDeactivated(IWorkbenchPart)}
+     * {@link CommentDetailView#partClosedOrDeactivated(IWorkbenchPart)}
      * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
      */
     @Override
     public void partDeactivated(IWorkbenchPartReference partRef) {
         PluginLogger.log(this.getClass().toString(), "partDeactivated", partRef.getPart(false).getTitle());
-        if (isOpen(DetailView.class)) {
-            DetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
+        if (isOpen(CommentDetailView.class)) {
+            CommentDetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
+        }
+        if (isOpen(ReviewDetailView.class)) {
+            ReviewDetailView.getInstance().partClosedOrDeactivated(partRef.getPart(false));
         }
     }
     
@@ -393,6 +424,13 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
      */
     @Override
     public void partHidden(IWorkbenchPartReference partRef) {
+        ISourceProviderService isps = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+        SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.REVIEW_DETAIL_ON_TOP);
+        if (partRef.getPart(false).getClass().equals(ReviewDetailView.class)) {
+            sp2.setVariable(SourceProvider.REVIEW_DETAIL_ON_TOP, false);
+        } else if (partRef.getPart(false).getClass().equals(CommentDetailView.class)) {
+            sp2.setVariable(SourceProvider.COMMENT_DETAIL_ON_TOP, false);
+        }
     }
     
     /**
@@ -439,7 +477,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
         PluginLogger.log(this.getClass().toString(), "perspectiveActivated", perspective.getLabel());
         if (perspective.getId().equals("de.tukl.cs.softech.agilereview.view.AgileReviewPerspective")) {
             if (contextActivation == null) {
-                IContextService contextService = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+                IContextService contextService = PlatformUI.getWorkbench().getService(IContextService.class);
                 contextActivation = contextService.activateContext("de.tukl.cs.softech.agilereview.perspective.open");
                 PluginLogger.log(ViewControl.class.toString(), "perspectiveActivated",
                         "Context \"de.tukl.cs.softech.agilereview.perspective.open\" activated");
@@ -448,7 +486,7 @@ public class ViewControl implements ISelectionChangedListener, IPartListener2, I
             perspectiveIsOpen = true;
         } else {
             if (contextActivation != null) {
-                IContextService contextService = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+                IContextService contextService = PlatformUI.getWorkbench().getService(IContextService.class);
                 contextService.deactivateContext(contextActivation);
                 contextActivation = null;
                 PluginLogger.log(ViewControl.class.toString(), "perspectiveActivated",

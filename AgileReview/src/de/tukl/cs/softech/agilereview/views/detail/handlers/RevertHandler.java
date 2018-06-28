@@ -5,7 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.detail.CommentDetailView;
 
 /**
  * Handler for revert command of the DetailView
@@ -14,8 +14,8 @@ public class RevertHandler extends AbstractHandler {
     
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        if (ViewControl.isOpen(DetailView.class)) {
-            DetailView.getInstance().revert();
+        if (ViewControl.isOpen(CommentDetailView.class)) {
+            CommentDetailView.getInstance().revert();
         }
         return null;
     }

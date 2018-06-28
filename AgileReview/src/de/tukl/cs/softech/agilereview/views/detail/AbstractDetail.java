@@ -118,12 +118,12 @@ public abstract class AbstractDetail<E extends XmlObject> extends Composite impl
     
     /**
      * saves every changes made in the current Detail View
-     * @param part will be forwarded from the {@link DetailView}
+     * @param part will be forwarded from the {@link CommentDetailView}
      * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
      */
     @SuppressWarnings("unchecked")
     protected void partClosedOrDeactivated(IWorkbenchPart part) {
-        if (part instanceof DetailView) {
+        if (part instanceof CommentDetailView) {
             saveChanges();
             
             // save the change persistently

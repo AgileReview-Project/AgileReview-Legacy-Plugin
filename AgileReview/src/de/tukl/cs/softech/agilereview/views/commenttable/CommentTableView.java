@@ -69,7 +69,7 @@ import de.tukl.cs.softech.agilereview.dataaccess.ReviewAccess;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.detail.CommentDetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
@@ -77,6 +77,9 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
  * Used to provide an overview for review comments using a table
  */
 public class CommentTableView extends ViewPart implements IDoubleClickListener {
+    
+    /** View ID */
+    public static final String VIEW_ID = "de.tukl.cs.softech.agilereview.view.commenttableview.view";
     
     /**
      * Current Instance used by the ViewPart
@@ -617,7 +620,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         IPath path = new Path(ReviewAccess.computePath(comment));
         IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
         if (getActiveEditor() != null) {
-            IFile editorFile = (IFile) getActiveEditor().getEditorInput().getAdapter(IFile.class);
+            IFile editorFile = getActiveEditor().getEditorInput().getAdapter(IFile.class);
             PluginLogger.log(this.getClass().toString(), "openEditorContains", "File for comment: " + file.getFullPath() + " | Current Editor File: "
                     + editorFile.getFullPath());
             if (file.getFullPath().equals(editorFile.getFullPath())) {
@@ -827,7 +830,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
                 viewer.removeFilter(this.selectionFilter);
                 this.selectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
                 
-                ICommandService cmdService = (ICommandService) getSite().getService(ICommandService.class);
+                ICommandService cmdService = getSite().getService(ICommandService.class);
                 if (cmdService != null) {
                     Command linkExplorerCommand = cmdService.getCommand("de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer");
                     Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
@@ -975,8 +978,8 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
         if (getFilteredComments().contains(c)) {
             viewer.setSelection(new StructuredSelection(c), true);
         } else {
-            if (ViewControl.isOpen(DetailView.class)) {
-                DetailView.getInstance().selectionChanged(new SelectionChangedEvent(viewer, new StructuredSelection(c)));
+            if (ViewControl.isOpen(CommentDetailView.class)) {
+                CommentDetailView.getInstance().selectionChanged(new SelectionChangedEvent(viewer, new StructuredSelection(c)));
             }
         }
     }
@@ -1018,16 +1021,16 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
             //jump to comment in opened editor
             try {
                 PluginLogger.log(this.getClass().toString(), "doubleClick", "Revealing comment in it's editor");
-
+                
                 IAnnotationParser annotationParser = this.parserMap.get(getActiveEditor());
-                if(annotationParser != null) {
-                	annotationParser.revealCommentLocation(generateCommentKey(comment));
-                	
-                	//open Detail View and set Focus
-                	ViewControl.openView(ViewControl.DETAIL_VIEW);
-                	if (ViewControl.isOpen(DetailView.class)) {
-                		selectComment(comment); //select comment another time to show the comment if the view was closed before
-                	}
+                if (annotationParser != null) {
+                    annotationParser.revealCommentLocation(generateCommentKey(comment));
+                    
+                    // open Detail View and set focus
+                    ViewControl.openView(ViewControl.COMMENT_DETAIL_VIEW);
+                    if (ViewControl.isOpen(CommentDetailView.class)) {
+                        selectComment(comment); // select comment another time to show the comment if the view was closed before
+                    }
                 }
             } catch (BadLocationException e) {
                 PluginLogger.logError(this.getClass().toString(), "openEditor", "BadLocationException when revealing comment in it's editor", e);

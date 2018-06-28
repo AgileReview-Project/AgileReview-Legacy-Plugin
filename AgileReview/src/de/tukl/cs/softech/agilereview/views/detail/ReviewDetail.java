@@ -92,6 +92,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
         refId.setText("External reference: ");
         super.bgComponents.add(refId);
         
+        System.out.println("Old reference widget " + reference);
         reference = new Text(this, SWT.BORDER | SWT.SINGLE);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
@@ -99,6 +100,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
         gridData.horizontalSpan = numColumns - 2;
         reference.setLayoutData(gridData);
         reference.addFocusListener(this);
+        System.out.println("New created reference widget " + reference);
         
         referenceButton = new Button(this, SWT.PUSH);
         referenceButton.setImage(PropertiesManager.getInstance().getIcon(PropertiesManager.INTERNAL_KEYS.ICONS.BROWSE));
@@ -162,6 +164,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
         txt.setLayoutData(gridData);
         
         setPropertyConfigurations();
+        System.out.println("ReviewDetail initUI finished");
     }
     
     /*
@@ -218,6 +221,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
      * @param reviewWrapper MultipleReviewWrapper which data should be displayed in the view
      */
     protected void fillContents(MultipleReviewWrapper reviewWrapper) {
+        System.out.println("ReviewDetail#fillContents");
         if (reviewWrapper != null) {
             Review review = reviewWrapper.getWrappedReview();
             if (review != null) {
@@ -235,6 +239,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
         if (review != null) {
             this.backupObject = (Review) review.copy();
             this.editedObject = review;
+            System.out.println("Reference widget " + reference);
             this.reference.setText(review.getReferenceId());
             this.authorInstance.setText(review.getPersonInCharge().getName());
             this.authorInstance.setToolTipText(review.getPersonInCharge().getName());
@@ -249,8 +254,7 @@ public class ReviewDetail extends AbstractDetail<Review> implements SelectionLis
             statusDropDown.select(review.getStatus());
         }
         //set revertable to false because it was set from the ModificationListener while inserting inital content
-        ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
-                ISourceProviderService.class);
+        ISourceProviderService isps = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
         SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
         sp.setVariable(SourceProvider.REVERTABLE, false);
     }

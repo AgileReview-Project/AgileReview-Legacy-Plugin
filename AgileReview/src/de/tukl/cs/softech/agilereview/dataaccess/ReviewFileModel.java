@@ -15,11 +15,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.ResourceUtil;
 
 import agileReview.softech.tukl.de.CommentsDocument;
 import agileReview.softech.tukl.de.ReviewDocument;
+import de.tukl.cs.softech.agilereview.tools.PlatformUIUtil;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 
 /**
@@ -69,13 +69,7 @@ class ReviewFileModel {
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
                     public void run() {
-                        while (PlatformUI.getWorkbench() == null) {
-                        }
-                        while (PlatformUI.getWorkbench().getActiveWorkbenchWindow() == null) {
-                        }
-                        while (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage() == null) {
-                        }
-                        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                        IWorkbenchPage page = PlatformUIUtil.getActivePage();
                         IEditorPart editor = ResourceUtil.findEditor(page, (IFile) delFile);
                         if (editor != null) {
                             page.closeEditor(editor, false);
@@ -95,9 +89,9 @@ class ReviewFileModel {
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    MessageDialog.openError(Display.getDefault().getActiveShell(), "Could not delete file or folder", "File \""
-                            + delFile.getLocation().toOSString() + "\" could not be deleted.\n" + "Please delete the file manually.\n\nReason:\n"
-                            + e.getLocalizedMessage());
+                    MessageDialog.openError(Display.getDefault().getActiveShell(), "Could not delete file or folder", "File \"" + delFile
+                            .getLocation().toOSString() + "\" could not be deleted.\n" + "Please delete the file manually.\n\nReason:\n" + e
+                                    .getLocalizedMessage());
                 }
             });
             PluginLogger.logError(this.getClass().getName(), "deleteResource", "File \"" + delFile.getLocation().toOSString()
@@ -142,8 +136,8 @@ class ReviewFileModel {
                         if (f instanceof IFile) this.removeXmlDocument((IFile) f);
                     }
                 } catch (final CoreException e) {
-                    PluginLogger.logError(this.getClass().toString(), "removeXmlDocument", "CoreException while removing sibling files of "
-                            + file.getLocation().toOSString() + " from model", e);
+                    PluginLogger.logError(this.getClass().toString(), "removeXmlDocument", "CoreException while removing sibling files of " + file
+                            .getLocation().toOSString() + " from model", e);
                     Display.getDefault().syncExec(new Runnable() {
                         @Override
                         public void run() {

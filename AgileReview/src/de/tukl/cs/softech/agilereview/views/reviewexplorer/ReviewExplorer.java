@@ -29,6 +29,7 @@ import de.tukl.cs.softech.agilereview.plugincontrol.SourceProvider;
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
+import de.tukl.cs.softech.agilereview.views.detail.ReviewDetailView;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.AbstractMultipleWrapper;
 import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleReviewWrapper;
 
@@ -36,6 +37,9 @@ import de.tukl.cs.softech.agilereview.views.reviewexplorer.wrapper.MultipleRevie
  * The Review Explorer is the view which shows all reviews as well as the files and folder which are commented in the corresponding reviews.
  */
 public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
+    
+    /** View ID */
+    public static final String VIEW_ID = "de.tukl.cs.softech.agilereview.view.reviewnavigator.view";
     
     /**
      * {@link ReviewAccess} for accessing xml data
@@ -224,13 +228,13 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
                             // Review is open -> activate it
                             command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.activate";
                             // Execute activation command
-                            IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+                            IHandlerService handlerService = getSite().getService(IHandlerService.class);
                             handlerService.executeCommand(command, null);
                         }
                     } else {
                         command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose";
                         // Execute open/close command
-                        IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+                        IHandlerService handlerService = getSite().getService(IHandlerService.class);
                         handlerService.executeCommand(command, null);
                     }
                 } catch (ExecutionException e) {
@@ -273,6 +277,9 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
             while (it.hasNext() && !containsClosedReview) {
                 Object o = it.next();
                 if (o instanceof MultipleReviewWrapper) {
+                    if (!ViewControl.isOpen(ReviewDetailView.class)) {
+                        ViewControl.openView(ViewControl.REVIEW_DETAIL_VIEW);
+                    }
                     if (!((MultipleReviewWrapper) o).isOpen()) {
                         containsClosedReview = true;
                     }
@@ -285,8 +292,7 @@ public class ReviewExplorer extends ViewPart implements IDoubleClickListener {
                 }
                 firstIteration = false;
             }
-            ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
-                    ISourceProviderService.class);
+            ISourceProviderService isps = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
             SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTAINS_CLOSED_REVIEW);
             sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
             SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.IS_ACTIVE_REVIEW);

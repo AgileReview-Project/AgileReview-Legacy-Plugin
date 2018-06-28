@@ -81,7 +81,7 @@ public class ShowCommentHandler extends AbstractHandler {
                     Comment c = ReviewAccess.getInstance().getComment(reviewId, author, commentId);
                     
                     // open detail view
-                    ViewControl.openView(ViewControl.DETAIL_VIEW);
+                    ViewControl.openView(ViewControl.COMMENT_DETAIL_VIEW);
                     
                     // select it
                     if (ViewControl.isOpen(CommentTableView.class)) {

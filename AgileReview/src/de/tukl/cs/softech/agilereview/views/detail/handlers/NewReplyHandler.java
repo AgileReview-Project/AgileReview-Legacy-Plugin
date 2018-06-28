@@ -12,7 +12,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import de.tukl.cs.softech.agilereview.tools.PluginLogger;
 import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.detail.DetailView;
+import de.tukl.cs.softech.agilereview.views.detail.CommentDetailView;
 import de.tukl.cs.softech.agilereview.views.detail.ReplyDialog;
 
 /**
@@ -35,9 +35,9 @@ public class NewReplyHandler extends AbstractHandler {
         }
         
         if (dialog.getSaved()) {
-            if (ViewControl.isOpen(DetailView.class)) {
-                DetailView.getInstance().addReply(dialog.getReplyAuthor(), dialog.getReplyText(), Calendar.getInstance());
-                DetailView.getInstance().setFocus();
+            if (ViewControl.isOpen(CommentDetailView.class)) {
+                CommentDetailView.getInstance().addReply(dialog.getReplyAuthor(), dialog.getReplyText(), Calendar.getInstance());
+                CommentDetailView.getInstance().setFocus();
             }
         }
         return null;
